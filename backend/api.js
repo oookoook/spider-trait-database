@@ -97,21 +97,25 @@ router.route('/taxonomy')
   .get(function (req, res) {
     taxonomy.list(req.recordLimit).then(r => res.json(r)).catch(e => { console.log(e); res.sendStatus(400); });
   })
+  /* Taxons are synchronized with the World Spider Catalog
   .post(requiresAuth(), auth.isEditor, function (req, res) {
     taxonomy.create(req.body).then(r => res.json(r)).catch(e => { console.log(e); res.sendStatus(400); });
   })
+  */
 
 router.route('/taxonomy/:id')
   .get(function (req, res) {
     taxonomy.get(req.params).then(r => res.json(r)).catch(e => { console.log(e); res.sendStatus(400); });
   })
+  
+  /* Taxons are synchronized with the WOrld Spider Catalog
   .put(requiresAuth(), auth.isEditor, function (req, res) {
     taxonomy.update(req.params, req.body).then(r => res.json(r)).catch(e => { console.log(e); res.sendStatus(400); });
   })
   .delete(requiresAuth(), auth.isEditor, function (req, res) {
     taxonomy.remove(req.params).then(r => res.json(r)).catch(e => { console.log(e); res.sendStatus(400); });
   })
-
+  */
 router.route('/datasets')
   .get(function (req, res) {
     datasets.list(req.recordLimit).then(r => res.json(r)).catch(e => { console.log(e); res.sendStatus(400); });
@@ -131,14 +135,14 @@ router.route('/datasets/:id')
     datasets.remove(req.params).then(r => res.json(r)).catch(e => { console.log(e); res.sendStatus(400); });
   })
 
-router.route('/data')
+router.route('/data/family/:family/genus/:genus/species/:species/trait-category/:traitcat/trait/:trait/country/:country/habitat/:habitat/dataset/:dataset/authors/:authors/reference/:reference/row-link/:rowl')
   .get(function (req, res) {
-    data.list(req.recordLimit).then(r => res.json(r)).catch(e => { console.log(e); res.sendStatus(400); });
+    data.list(req.params, req.recordLimit).then(r => res.json(r)).catch(e => { console.log(e); res.sendStatus(400); });
   });
 
 router.route('/data/export')
   .get(function (req, res) {
-    data.export().then(r => res.json(r)).catch(e => { console.log(e); res.sendStatus(400); });
+    data.csv(req.params, req.recordLimit).then(r => res.json(r)).catch(e => { console.log(e); res.sendStatus(400); });
   });
 
 router.route('/import')

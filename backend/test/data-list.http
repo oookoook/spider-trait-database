@@ -1,0 +1,1 @@
+GET http://localhost:3000/backend/data/family/*/genus/*/species/*/trait-category/*/trait/1/country/*/habitat/*/dataset/*/authors/*/reference/*/row-link/* HTTP/1.1

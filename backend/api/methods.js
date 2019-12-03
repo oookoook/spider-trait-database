@@ -1,18 +1,17 @@
 var db = null;
 
 const list = async function(limits) {
-    var res = await db.prepareListResponse(limits, 'trait');
-    console.dir(res);
-    var results = await db.query(`SELECT trait.id, trait.abbrev, trait.name, trait_category.id, trait_category.name `
-     + `FROM trait LEFT JOIN trait_category ON trait.trait_category_id = trait_category.id LIMIT ${limits.offset},${limits.limit};`, [], true);    
+    var res = await db.prepareListResponse(limits, 'method');
+    var results = await db.query({ table: 'method', sql: `SELECT method.id, method.abbrev, method.name, reference.id, reference.abbrev `
+     + `FROM method LEFT JOIN reference ON method.reference_id = reference.id`, nestTables: true, limits });    
      res.items = results.map(r => {    
         return {
-                id: r.trait.id,
-                abbrev: r.trait.abbrev,
-                name: r.trait.name,
-                category: {
-                    id: r.trait_category.id,
-                    name: r.trait_category.name
+                id: r.method.id,
+                abbrev: r.method.abbrev,
+                name: r.method.name,
+                reference: {
+                    id: r.reference.id,
+                    abbrev: r.reference.abbrev
                 }
             }
         });
@@ -21,46 +20,40 @@ const list = async function(limits) {
 
 const get = async function(params) {
     var id = params.id;
-    var results = await db.query('SELECT trait.*, trait_category.id, trait_category.name, data_type.id, data_type.name '
-     + 'FROM trait LEFT JOIN trait_category ON trait.trait_category_id = trait_category.id LEFT JOIN data_type ON trait.data_type_id = data_type.id '
-     + 'WHERE trait.id = ?', [id], true);
-     console.dir(results);
+    var results = await db.query({table: 'method', sql: 'SELECT method.*, reference.* '
+     + 'FROM method LEFT JOIN reference ON method.reference_id = reference.id '
+     + 'WHERE method.id = ?', values: [id], nestTables: true});
      var r = results[0];
-     return {
-        id: r.trait.id,
-        abbrev: r.trait.abbrev,
-        name: r.trait.name,
-        description: r.trait.description,
-        standard: r.trait.standard,
-        category: {
-            id: r.trait_category.id,
-            name: r.trait_category.name
-        },
-        dataType: {
-            id: r.data_type.id,
-            name: r.data_type.name
+     return { item: {
+        id: r.method.id,
+        abbrev: r.method.abbrev,
+        name: r.method.name,
+        description: r.method.description,
+        reference: {
+            id: r.reference.id,
+            abbrev: r.reference.abbrev,
+            fullCitation: r.reference.full_citation,
+            doi: r.reference.doi
         }
-    }
+    }}
 }
 
-const prepareForSql = function(trait) {
-    trait.trait_category_id = (trait.category) ? trait.category.id : null;
-    trait.data_type_id = (trait.dataType) ? trait.dataType.id : null;
-    delete(trait.id);
-    delete(trait.category);
-    delete(trait.dataType);
+const prepareForSql = function(method) {
+    method.reference_id = (method.reference) ? method.reference.id : null;
+    delete(method.id);
+    delete(method.reference);
 }
 
-const create = function(body) {
-    return await db.createEntity(body, prepareForSql);
+const create = async function(body) {
+    return await db.createEntity(body, 'method', prepareForSql);
 }
 
-const update = function(params, body) {
-    return await db.updateEntity(body, prepareForSql);
+const update = async function(params, body) {
+    return await db.updateEntity(params, body, 'method', prepareForSql);
 }
 
-const remove = function(params) {
-    return await db.deleteEntity(params);
+const remove = async function(params) {
+    return await db.deleteEntity(params, 'method');
 }
 
 module.exports = function(dbClient) {

@@ -1,0 +1,1 @@
+GET http://localhost:3000/backend/traits/?sortField=abbrev&sortDirection=desc HTTP/1.1

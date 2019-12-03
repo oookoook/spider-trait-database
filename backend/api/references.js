@@ -1,66 +1,47 @@
 var db = null;
 
 const list = async function(limits) {
-    var res = await db.prepareListResponse(limits, 'trait');
+    var res = await db.prepareListResponse(limits, 'reference');
     console.dir(res);
-    var results = await db.query(`SELECT trait.id, trait.abbrev, trait.name, trait_category.id, trait_category.name `
-     + `FROM trait LEFT JOIN trait_category ON trait.trait_category_id = trait_category.id LIMIT ${limits.offset},${limits.limit};`, [], true);    
-     res.items = results.map(r => {    
-        return {
-                id: r.trait.id,
-                abbrev: r.trait.abbrev,
-                name: r.trait.name,
-                category: {
-                    id: r.trait_category.id,
-                    name: r.trait_category.name
-                }
-            }
-        });
+    var results = await db.query({table: 'reference', sql: `SELECT id, abbrev, doi `
+     + `FROM reference`, nestTables: true, limits});    
+     res.items = results;
     return res;
 }
 
 const get = async function(params) {
     var id = params.id;
-    var results = await db.query('SELECT trait.*, trait_category.id, trait_category.name, data_type.id, data_type.name '
-     + 'FROM trait LEFT JOIN trait_category ON trait.trait_category_id = trait_category.id LEFT JOIN data_type ON trait.data_type_id = data_type.id '
-     + 'WHERE trait.id = ?', [id], true);
+    var results = await db.query({table: 'reference', sql: 'SELECT * '
+     + 'FROM reference '
+     + 'WHERE id = ?', values: [id] });
      console.dir(results);
      var r = results[0];
-     return {
-        id: r.trait.id,
-        abbrev: r.trait.abbrev,
-        name: r.trait.name,
-        description: r.trait.description,
-        standard: r.trait.standard,
-        category: {
-            id: r.trait_category.id,
-            name: r.trait_category.name
-        },
-        dataType: {
-            id: r.data_type.id,
-            name: r.data_type.name
-        }
-    }
+     return { item: {
+        id: r.id,
+        abbrev: r.abbrev,
+        fullCitation: r.full_citation,
+        doi: r.doi
+    }}
 }
 
-const prepareForSql = function(trait) {
-    trait.trait_category_id = (trait.category) ? trait.category.id : null;
-    trait.data_type_id = (trait.dataType) ? trait.dataType.id : null;
-    delete(trait.id);
-    delete(trait.category);
-    delete(trait.dataType);
+const prepareForSql = function(reference) {
+    delete(reference.id);
 }
 
-const create = function(body) {
-    return await db.createEntity(body, prepareForSql);
+const validate = function(reference) {
+    return true;
 }
 
-const update = function(params, body) {
-    return await db.updateEntity(body, prepareForSql);
+const create = async function(body) {
+    return await db.createEntity(body, 'reference', prepareForSql, validate);
 }
 
-const remove = function(params) {
-    return await db.deleteEntity(params);
+const update = async function(params, body) {
+    return await db.updateEntity(params, body, 'reference', prepareForSql, validate);
+}
+
+const remove = async function(params) {
+    return await db.deleteEntity(params, 'reference');
 }
 
 module.exports = function(dbClient) {

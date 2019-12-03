@@ -26,7 +26,7 @@ const get = async function(params) {
      + 'WHERE trait.id = ?', [id], true);
      console.dir(results);
      var r = results[0];
-     return {
+     return { item: {
         id: r.trait.id,
         abbrev: r.trait.abbrev,
         name: r.trait.name,
@@ -40,7 +40,7 @@ const get = async function(params) {
             id: r.data_type.id,
             name: r.data_type.name
         }
-    }
+    }}
 }
 
 const prepareForSql = function(trait) {
@@ -51,15 +51,15 @@ const prepareForSql = function(trait) {
     delete(trait.dataType);
 }
 
-const create = function(body) {
-    return await db.createEntity(body, prepareForSql);
+const create = async function(body) {
+    return await db.createEntity(body, 'trait', prepareForSql);
 }
 
-const update = function(params, body) {
-    return await db.updateEntity(body, prepareForSql);
+const update = async function(params, body) {
+    return await db.updateEntity(params, body, 'trait', prepareForSql);
 }
 
-const remove = function(params) {
+const remove = async function(params) {
     return await db.deleteEntity(params);
 }
 
