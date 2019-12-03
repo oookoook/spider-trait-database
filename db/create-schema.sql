@@ -240,6 +240,7 @@ DROP TABLE IF EXISTS `spider_traits_db`.`dataset` ;
 
 CREATE TABLE IF NOT EXISTS `spider_traits_db`.`dataset` (
   `id` INT NOT NULL AUTO_INCREMENT,
+  `name` VARCHAR(255) NOT NULL,
   `authors` VARCHAR(4096) NULL,
   `uploader` VARCHAR(255) NOT NULL,
   `email` VARCHAR(255) NULL,
@@ -464,13 +465,17 @@ CREATE TABLE IF NOT EXISTS `spider_traits_db`.`import` (
     ON UPDATE NO ACTION)
 ENGINE = InnoDB;
 
+SET SQL_MODE = '';
+GRANT USAGE ON *.* TO app;
+ DROP USER app;
+SET SQL_MODE='TRADITIONAL,ALLOW_INVALID_DATES';
+CREATE USER 'app' IDENTIFIED BY 'app';
+
+GRANT SELECT, INSERT, TRIGGER ON TABLE `spider_traits_db`.* TO 'app';
+GRANT SELECT, INSERT, TRIGGER, UPDATE, DELETE ON TABLE `spider_traits_db`.* TO 'app';
+GRANT EXECUTE ON ROUTINE `spider_traits_db`.* TO 'app';
+GRANT SELECT ON TABLE `spider_traits_db`.* TO 'app';
 
 SET SQL_MODE=@OLD_SQL_MODE;
 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;
--- begin attached script 'data_enums'
-
--- end attached script 'data_enums'
--- begin attached script 'location_enums'
-
--- end attached script 'location_enums'

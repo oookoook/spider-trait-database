@@ -1,18 +1,35 @@
 <template>
-  <div class="home">
-    <img alt="Vue logo" src="../assets/logo.png">
-    <HelloWorld msg="Welcome to Your Vue.js App"/>
+  <div>
+    <h2>Home</h2>
+    <p>{{ user == null ? 'No data' : user.username }}</p>
+    <v-btn @click="checkUser">Re-check user</v-btn>
   </div>
 </template>
 
 <script>
-// @ is an alias to /src
-import HelloWorld from '@/components/HelloWorld.vue'
-
 export default {
-  name: 'home',
-  components: {
-    HelloWorld
+  name: "home",
+  components: {},
+  data() {
+    return {
+      user: null
+    }
+  },
+  methods: {
+    checkUser() {
+      this.$http.get("/user/info").then(
+        response => {
+          // get body data
+          this.user = response.body;
+        },
+        response => {
+          this.user = { username: "Please log in" };
+        }
+      );
+    }
+  },
+  created() {
+    this.checkUser();
   }
-}
+};
 </script>

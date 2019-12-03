@@ -1,60 +1,94 @@
 <template>
-  <v-app>
+  <v-app dark>
     <v-app-bar
       app
       color="primary"
       dark
     >
-      <div class="d-flex align-center">
-        <v-img
-          alt="Vuetify Logo"
-          class="shrink mr-2"
-          contain
-          src="https://cdn.vuetifyjs.com/images/logos/vuetify-logo-dark.png"
-          transition="scale-transition"
-          width="40"
-        />
+      <v-toolbar-title>Spider Trait Database</v-toolbar-title>
 
-        <v-img
-          alt="Vuetify Name"
-          class="shrink mt-1 hidden-sm-and-down"
-          contain
-          min-width="100"
-          src="https://cdn.vuetifyjs.com/images/logos/vuetify-name-dark.png"
-          width="100"
-        />
-      </div>
+
+      <v-divider vertical class="mx-5"></v-divider>
+
+      <v-btn
+        to="/data"
+        text
+      ><v-icon left>mdi-magnify</v-icon> View data 
+      </v-btn>
+
+      <v-menu right bottom offset-y>
+      <template v-slot:activator="{ on }">
+        <v-btn text v-on="on"><v-icon left>mdi-format-list-bulleted-square</v-icon> Browse<v-icon right>mdi-chevron-down</v-icon></v-btn>
+      </template>
+      <v-list>
+        <v-list-item to="/datasets">
+          <v-list-item-icon><v-icon>mdi-table</v-icon></v-list-item-icon>
+          <v-list-item-content><v-list-item-title>Datasets</v-list-item-title></v-list-item-content>
+        </v-list-item>
+        <v-list-item to="/references">
+          <v-list-item-icon><v-icon>mdi-bookmark-multiple-outline</v-icon></v-list-item-icon>
+          <v-list-item-content><v-list-item-title>References</v-list-item-title></v-list-item-content>
+        </v-list-item>
+        <v-list-item to="/locations">
+          <v-list-item-icon><v-icon>mdi-map-marker</v-icon></v-list-item-icon>
+          <v-list-item-content><v-list-item-title>Locations</v-list-item-title></v-list-item-content>
+        </v-list-item>
+        <v-list-item to="/traits">
+          <v-list-item-icon><v-icon>mdi-comment-question-outline</v-icon></v-list-item-icon>
+          <v-list-item-content><v-list-item-title>Traits</v-list-item-title></v-list-item-content>
+        </v-list-item>
+        <v-list-item to="/taxonomy">
+          <v-list-item-icon><v-icon>mdi-file-tree</v-icon></v-list-item-icon>
+          <v-list-item-content><v-list-item-title>Taxonomy</v-list-item-title></v-list-item-content>
+        </v-list-item>
+        <v-list-item to="/methods">
+          <v-list-item-icon><v-icon>mdi-chart-bell-curve</v-icon></v-list-item-icon>
+          <v-list-item-content><v-list-item-title>Methods</v-list-item-title></v-list-item-content>
+        </v-list-item>
+      </v-list>
+    </v-menu>      
+
+    <v-menu right bottom offset-y>
+      <template v-slot:activator="{ on }">
+        <v-btn text v-on="on"><v-icon left>mdi-share</v-icon> Contribute<v-icon right>mdi-chevron-down</v-icon></v-btn>
+      </template>
+      <v-list>
+        <v-list-item to="/upload">
+          <v-list-item-icon><v-icon>mdi-upload</v-icon></v-list-item-icon>
+          <v-list-item-content><v-list-item-title>Upload</v-list-item-title></v-list-item-content>
+        </v-list-item>
+        <v-list-item to="/prepare">
+          <v-list-item-icon><v-icon>mdi-table-edit</v-icon></v-list-item-icon>
+          <v-list-item-content><v-list-item-title>Prepare data</v-list-item-title></v-list-item-content>
+        </v-list-item>
+      </v-list>
+    </v-menu>
+
 
       <v-spacer></v-spacer>
 
       <v-btn
-        href="https://github.com/vuetifyjs/vuetify/releases/latest"
-        target="_blank"
+        href="/user/login"
         text
-      >
-        <span class="mr-2">Latest Release</span>
-        <v-icon>mdi-open-in-new</v-icon>
+      ><v-icon left>mdi-account-arrow-right-outline</v-icon>  Log in 
       </v-btn>
     </v-app-bar>
 
     <v-content>
-      <HelloWorld/>
+      <router-view></router-view>
     </v-content>
   </v-app>
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld'
 
 export default {
   name: 'App',
 
   components: {
-    HelloWorld
   },
 
   data: () => ({
-    //
   })
 }
 </script>
