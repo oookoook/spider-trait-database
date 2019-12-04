@@ -13,7 +13,7 @@ module.exports = {
         client: 'TODO',
         issuer: 'https://oidc.muni.cz/oidc',
         secret: 'TIDO',
-        url: 'http://spider-traits.sci.muni.cz',
+        url: 'https://spidertraits.sci.muni.cz',
         session: {
             name: 'TODO',
             secret: 'TODO'
