@@ -6,7 +6,8 @@ module.exports = {
     https: {
         enable: true,
         key: '/../server.key',
-        crt: '/../server.crt'
+        crt: '/../server.crt',
+        passphrase: 'TODO'
     },
     oidc: {
         client: 'TODO',

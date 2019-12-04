@@ -36,4 +36,9 @@ Edit the `/etc/fstab` file according to the instructions above.
 * The `create-schema.sql` is a script generated from the model. Can be used to create the database.
 * The `*-enums.sql` scripts are meant to be executed after the schema is created and populate the database with the basic enumerations.
 
-The creation script creates a default user with credentials `app/app`. Use [a guide](https://linuxize.com/post/how-to-change-mysql-user-password/) to change the password for production environment.
+The creation script creates a default user with credentials `app/app`. Use [a guide](https://linuxize.com/post/how-to-change-mysql-user-password/) to change the password for production environment:
+
+```sql
+SET PASSWORD FOR 'app' = PASSWORD('PASS');
+FLUSH PRIVILEGES;
+```
