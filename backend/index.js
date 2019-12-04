@@ -85,7 +85,7 @@ app.use('/backend', api);
 if(settings.https.enable) {
     https.createServer({
         key: fs.readFileSync(settings.https.key),
-        cert: fs.readFileSync(settings.http.crt)
+        cert: fs.readFileSync(settings.https.crt)
       }, app)
       .listen(settings.port, function () {
         console.log(`Server is listening on port ${settings.port}. Go to https://localhost:${settings.port}/`)
