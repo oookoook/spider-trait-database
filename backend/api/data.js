@@ -1,5 +1,9 @@
 var db = null;
 
+const fcsv = require('fast-csv');
+const settings = require('../settings');
+const path = require('path');
+
 var join = `data `
 + `LEFT JOIN taxonomy ON data.taxonomy_id = taxonomy.id `
 + `LEFT JOIN trait ON data.trait_id = trait.id `
@@ -80,9 +84,29 @@ const list = async function(params, limits) {
 }
 
 const csv =  async function(params, limits) {
-    return {
-        items: []
-    }
+    var cond = getCondition(params);
+    var res = await db.prepareListResponse(limits, 'data', cond.clause, cond.values, join);
+    limits.limit = res.count;
+
+    // TODO column names
+    // TODO full location
+    // TODO full reference
+
+    var results = await db.query({ table: 'data', sql: `SELECT data.*, taxonomy.wsc_lsid, taxonomy.family, taxonomy.genus, taxonomy.species, taxonomy.subspecies, `
+     + `trait.id, trait.abbrev, trait.name, trait_category.id, trait_category.name, `
+     + `measure.id, measure.name, sex.id, sex.name, life_stage.id, life_stage.name, method.id, method.abbrev, method.name, `
+     + `location.id, location.locality, habitat_global.id, habitat_global.name, country.id, country.alpha3_code, country.name, `
+     + `dataset.id, dataset.name, dataset.authors, reference.id, reference.abbrev `
+     + `FROM ${join} WHERE ${cond.clause}`
+     , values: cond.values, nestTables: false, limits, hasWhere: true});
+    
+    var p = path.resolve(settings.export.tmpDir, `spider-traits-${new Date().valueOf()}.csv`);
+    await new Promise((resolve, reject) => {
+        fcsv.writeToPath(p, results, {headers: true})
+        .on('error', err => reject(err))
+        .on('finish', () => resolve(path));
+    });
+    return p;
 }
 
 module.exports = function(dbClient) {

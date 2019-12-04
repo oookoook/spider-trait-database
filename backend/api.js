@@ -140,9 +140,9 @@ router.route('/data/family/:family/genus/:genus/species/:species/trait-category/
     data.list(req.params, req.recordLimit).then(r => res.json(r)).catch(e => { console.log(e); res.sendStatus(400); });
   });
 
-router.route('/data/export')
+router.route('/data/export/family/:family/genus/:genus/species/:species/trait-category/:traitcat/trait/:trait/country/:country/habitat/:habitat/dataset/:dataset/authors/:authors/reference/:reference/row-link/:rowl')
   .get(function (req, res) {
-    data.csv(req.params, req.recordLimit).then(r => res.json(r)).catch(e => { console.log(e); res.sendStatus(400); });
+    data.csv(req.params, req.recordLimit).then(r => res.download(r)).catch(e => { console.log(e); res.sendStatus(400); });
   });
 
 router.route('/import')

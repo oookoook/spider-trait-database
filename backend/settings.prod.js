@@ -24,5 +24,8 @@ module.exports = {
         user: 'app',
         password: 'TODO',
         database: 'spider_traits_db'
+    },
+    export: {
+        tmpDir: '/var/tmp'
     }
 }
