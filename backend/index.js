@@ -6,10 +6,16 @@ var history = require('connect-history-api-fallback');
 const { auth, requiresAuth } = require('express-openid-connect');
 const session = require('cookie-session');
 var bodyParser = require('body-parser');
+var cors = require('cors');
 
 var api = require('./api');
 
 var app = express();
+
+// userd for testing. Other CORS requests should be blocked
+app.use(cors({
+  origin: 'http://localhost:8080',
+}));
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: false}));

@@ -73,6 +73,19 @@
       ><v-icon left>mdi-account-arrow-right-outline</v-icon>  Log in 
       </v-btn>
     </v-app-bar>
+    <v-snackbar absolute
+      v-model="notification.active"
+      :timeout="5000"
+      :color="notification.color"
+      top>
+      {{ notification.text }}
+      <v-btn
+        text
+        @click="notification.active = false"
+      >
+        Close
+      </v-btn>
+    </v-snackbar>
 
     <v-content>
       <router-view></router-view>
@@ -81,7 +94,7 @@
 </template>
 
 <script>
-
+import { mapState, mapGetters } from 'vuex'
 export default {
   name: 'App',
 
@@ -89,6 +102,9 @@ export default {
   },
 
   data: () => ({
-  })
+  }),
+  computed: {
+    ...mapGetters(['notification'])
+  }
 }
 </script>

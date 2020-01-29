@@ -3,7 +3,7 @@ var db = null;
 const list = async function(limits) {
     var res = await db.prepareListResponse(limits, 'reference');
     console.dir(res);
-    var results = await db.query({table: 'reference', sql: `SELECT id, abbrev, doi `
+    var results = await db.query({table: 'reference', sql: `SELECT id, abbrev, name, doi `
      + `FROM reference`, nestTables: true, limits});    
      res.items = results;
     return res;

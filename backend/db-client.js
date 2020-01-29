@@ -8,6 +8,8 @@ var pool = mysql.createPool({
     database: settings.db.database
 });
 
+var synonyms = {};
+
 const addLimits = function (values, limits, table, hasWhere, aggregate, customWhereClause) {
     if(!limits) {
         return ';';
@@ -29,7 +31,7 @@ const addLimits = function (values, limits, table, hasWhere, aggregate, customWh
     } else if(limits.search) {
         //whereClause = ` ${searchStart} ${mysql.escapeId(table+'.'+limits.search.field)} ${op} '${mysql.escape(limits.search.value)}${wildcard}'`;
         whereClause = ` ${searchStart} ?? ${op} ?`;
-        values.push(table+'.'+limits.search.field);
+        values.push(getSynonym(table, limits.search.field));
         values.push(`${limits.search.value}${wildcard}`);
     }
 
@@ -44,7 +46,7 @@ const addLimits = function (values, limits, table, hasWhere, aggregate, customWh
             direction = "DESC";
         }
         orderClause = `ORDER BY ?? ${direction}`;
-        values.push(table+'.'+limits.sort.field);
+        values.push(getSynonym(table, limits.sort.field));
     }
     return `${whereClause} ${orderClause} LIMIT ${limits.offset},${limits.limit};`
 }
@@ -204,6 +206,21 @@ const updateEntity = async function (params, body, table, prepareForSql, validat
     }
 }
 
+const addSynonyms = function(table, tableSynonyms) {
+    synonyms[table] = tableSynonyms;
+}
+
+const getSynonym = function(table, field) {
+    console.dir(synonyms);
+    console.log(field);
+    
+    if(!synonyms[table] || !synonyms[table][field]) {
+        return `${table}.${field}`;
+    }
+    
+    return synonyms[table][field];
+}
+
 module.exports = {
     query,
     cquery,
@@ -213,5 +230,6 @@ module.exports = {
     prepareListResponse,
     createEntity,
     updateEntity,
-    deleteEntity
+    deleteEntity,
+    addSynonyms
 }
