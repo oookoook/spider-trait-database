@@ -20,10 +20,10 @@ export default {
   },
   computed: {
     items() {
-      return this.$store.getters[this.list];
+      return this.$store.getters[`${this.list}/list`];
     },
     total() {
-      return this.$store.getters[`${this.list}Total`];
+      return this.$store.getters[`${this.list}/total`];
     },
   },
   watch: {
@@ -44,7 +44,7 @@ export default {
         }
       }
       this.loading = true;
-      this.$store.dispatch(`${this.list}List`,params).then(() => {this.loading = false; }, (err) => { this.$store.dispatch('notify', { error: true, text: `Unable to retrieve ${this.list}.`})});
+      this.$store.dispatch(`${this.list}/list`,params).then(() => {this.loading = false; }, (err) => { this.$store.dispatch('notify', { error: true, text: `Unable to retrieve ${this.list}.`})});
     }
   },
   created () {

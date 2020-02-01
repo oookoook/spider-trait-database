@@ -45,7 +45,7 @@ const get = async function(params) {
     var id = parseInt(params.id);
     var results = await db.query({table: 'trait', sql:'SELECT trait.*, trait_category.id, trait_category.name, data_type.id, data_type.name, reference.id, reference.abbrev, reference.full_citation '
      + 'FROM trait LEFT JOIN trait_category ON trait.trait_category_id = trait_category.id LEFT JOIN data_type ON trait.data_type_id = data_type.id '
-     + 'LEFT JOIN reference ON trait.reference_id = reference.id'
+     + 'LEFT JOIN reference ON trait.reference_id = reference.id '
      + 'WHERE trait.id = ?', values: [id], nestTables: true });
      var r = results[0];
      return { item: {

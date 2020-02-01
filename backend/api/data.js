@@ -37,7 +37,7 @@ const getCondition = function(params) {
 const list = async function(params, limits) {
     var cond = getCondition(params);
     var res = await db.prepareListResponse(limits, 'data', cond.clause, cond.values, join);
-    var results = await db.query({ table: 'data', sql: `SELECT data.*, taxonomy.wsc_lsid, taxonomy.family, taxonomy.genus, taxonomy.species, taxonomy.subspecies, `
+    var results = await db.query({ table: 'data', sql: `SELECT data.*, taxonomy.wsc_id, taxonomy.wsc_lsid, taxonomy.family, taxonomy.genus, taxonomy.species, taxonomy.subspecies, `
      + `trait.id, trait.abbrev, trait.name, trait_category.id, trait_category.name, `
      + `measure.id, measure.name, sex.id, sex.name, life_stage.id, life_stage.name, method.id, method.abbrev, method.name, `
      + `location.id, location.locality, habitat_global.id, habitat_global.name, country.id, country.alpha3_code, country.name, `
@@ -77,7 +77,8 @@ const list = async function(params, limits) {
                     habitatGlobal: r.habitat_global,
                 },
                 dataset: r.dataset,
-                reference: r.reference
+                reference: r.reference,
+                rowLink: r.row_link
             }
         });
     return res;
@@ -99,8 +100,8 @@ const csv =  async function(params, limits) {
      + `measure.name as measure, sex.name as sex, life_stage.name as lifeStage, data.frequency, data.sample_size as sampleSize, method.abbrev as method, method.name as methodFullName, `
      + `location.lat as decimalLatitude, location.lon as decimalLongitude, location.precision as coordinatePrecision, location.altitude, location.locality as verbatimLocality, `
      + `country.alpha3_code as countryCode, country.name as countryName, habitat_global.name as habitatGlobal, habitat_global.number as habitatGlobalNumber,`
-     + `location.habitat as habitatVerbatim, location.microhabitat as microhabitatVerbatiom, location.stratum as stratumVerbatim, location.note as notePosition, `
-     + `dataset.id as dataset, dataset.name as datasetName, reference.abbrev as reference, reference.full_citation as referenceFull, reference.doi as referenceDOI `
+     + `location.habitat as habitatVerbatim, location.microhabitat as microhabitatVerbatim, location.stratum as stratumVerbatim, location.note as notePosition, `
+     + `dataset.id as dataset, dataset.name as datasetName, reference.abbrev as reference, reference.full_citation as referenceFull, reference.doi as referenceDOI, data.row_link as rowLinks `
      + `FROM ${join} WHERE ${cond.clause}`
      , values: cond.values, nestTables: false, limits, hasWhere: true});
     

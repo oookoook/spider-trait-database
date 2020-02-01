@@ -1,7 +1,9 @@
 <template>
+<v-container fluid>
   <list-provider list="traits" v-slot="i">
     <traits-table :items="i.items" :loading="i.loading" :total="i.total" @update="i.update"/>
   </list-provider>
+</v-container>
 </template>
 
 <script>

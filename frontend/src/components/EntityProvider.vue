@@ -1,6 +1,6 @@
 <template>
   <div>
-    <slot :loading="loading" :item="item">
+    <slot :loading="loading" :item="item" v-if="id">
     {{ JSON.stringify(item) }}
     </slot>
   </div>
@@ -13,19 +13,18 @@ export default {
   name: 'EntityProvider',
   components: {
   },
-  props: { entity: String, id: Number },
+  props: { list: String, id: Number },
   data () {
     return {
-
     }
   },
   computed: {
     item() {
-      return this.$store.getters[this.entity];
+      return this.$store.getters[`${this.list}/entity`];
     }
   },
   watch: {
-    table() {
+    list() {
       this.get();
     },
     id() {
@@ -34,13 +33,18 @@ export default {
   },
   methods: {
     get() {
-      this.$store.dispatch(`${this.entity}Get`,params).then(() => {this.loading = false; }, (err) => { this.$store.dispatch('notify', { error: true, text: `Unable to retrieve ${this.entity}.`})});
+      if(!this.id) {
+        return;
+      }
+      this.loading = true;
+      this.$store.dispatch(`${this.list}/get`,{ id: this.id }).then(() => {this.loading = false; }, (err) => { this.$store.dispatch('notify', { error: true, text: `Unable to retrieve ${this.list}.`})});
     }
   },
   created () {
 
   },
   mounted () {
+    this.get();
   }
 }
 </script>

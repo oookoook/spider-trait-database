@@ -21,46 +21,35 @@
       :loading="loading"
       class="elevation-1"
     >
+    
     <template v-slot:item.abbrev="{ item }">
-      <v-tooltip top>
-      <template v-slot:activator="{ on }">
-        <router-link :to="`/traits/${item.id}`"><span v-on="on">{{item.abbrev}}</span></router-link>
-      </template>
-      <span>Search the data for this trait</span>
-    </v-tooltip>
+      <entity-link-cell :text="item.abbrev" tooltip="View the trait detail" :link="`/traits/${item.id}`" />
     </template>
+    
     <template v-slot:item.reference="{ item }">
-      <v-tooltip top v-if="item.reference">
-      <template v-slot:activator="{ on }">
-        <router-link :to="`/references/${item.reference.id}`"><span v-on="on">{{item.reference.abbrev}}</span></router-link>
-      </template>
-      <span>Open the reference detail</span>
-    </v-tooltip>
+      <entity-link-cell v-if="item.reference" :text="item.reference.abbrev" tooltip="View the reference detail" :link="`/references/${item.reference.id}`" />
     </template>
 
     <template v-slot:item.actions="{ item }">
-      <v-tooltip top>
-      <template v-slot:activator="{ on }">
-        <v-btn icon :to="`/data/trait/${item.id}`" v-on="on"><v-icon>mdi-magnify</v-icon></v-btn>
-      </template>
-      <span>Search the data for this trait</span>
-    </v-tooltip>
+    <entity-link-cell tooltip="Set as filter in the data explorer" :link="`/traits/${item.id}`" icon="mdi-filter" />
     </template>
-
+    <!--
     <template v-slot:expanded-item="{ headers, item }">
       <td :colspan="headers.length">{{item.description}}</td>
     </template>
-
+    -->
     </v-data-table>
   </v-card>
 </template>
 
 <script>
-import { mapState, mapGetters } from 'vuex'
+
+import EntityLinkCell from '../components/EntityLinkCell'
 
 export default {
   name: 'TraitsTable',
   components: {
+    EntityLinkCell
   },
   props: { items: Array, total: { type: Number, default: 0 }, loading: Boolean },
   data () {

@@ -7,12 +7,14 @@ import user from './user'
 import ui from './ui'
 import api from './api'
 import traits from './traits'
+import data from './data'
 
 export default new Vuex.Store({
   modules: {
     user,
     ui,
     api,
-    traits
+    traits,
+    data
   }
 })
