@@ -3,6 +3,30 @@
     <v-card-title>
       Traits
       <v-spacer></v-spacer>
+      <v-select
+          v-model="searchField"
+          :items="searchFields"
+          label="Search parameter"
+          single-line
+          hide-details
+
+        ></v-select>
+      <v-autocomplete
+        :loading="autocompleteLoading"
+        :items="autocompleteItems"
+        v-model="search"
+        clearable
+        append-outer-icon="mdi-magnify"
+        label="Search for..."
+        single-line
+        hide-details
+        :search-input.sync="autocompleteInput"
+        return-object
+        @click:append-outer="needsCount = true; update()"
+      >
+
+      </v-autocomplete>
+      <!--
       <v-text-field
         v-model="search"
         clearable
@@ -12,6 +36,7 @@
         hide-details
         @click:append-outer="needsCount = true; update()"
       ></v-text-field>
+      -->
     </v-card-title>
   <v-data-table
       :headers="headers"
@@ -51,21 +76,19 @@ export default {
   components: {
     EntityLinkCell
   },
-  props: { items: Array, total: { type: Number, default: 0 }, loading: Boolean },
+  props: { items: Array, total: { type: Number, default: 0 }, loading: Boolean, 'autocomplete-loading': Boolean, 'autocomplete-items': Array },
   data () {
     return {
       search: null,
+      searchFields: [{ text: 'Life category', valueField: 'category.id', textField: 'category.name' }, { text: 'Trait name', valueField: 'id', textField: ['abbrev','name'] }],
+      searchField: { text: 'Life category', valueField: 'category.id', textField: 'category.name' },
+      autocompleteInput: null,
       needsCount: true,
       options: {},
       headers: [
         { text: 'Trait ID', value: 'abbrev' },
         { text: 'Life Category', value: 'category.name' },
         { text: 'Trait Name', value: 'name' },
-        /*
-        { text: 'Definition', value: 'data-table-expand'},
-        { text: 'Data type', value: 'dataType.name'},
-        { text: 'Standard', value: 'standard'},
-        */
         { text: 'Reference', value: 'reference'},
         { text: 'Actions', value: 'actions'}
       ]
@@ -87,19 +110,28 @@ export default {
         this.needsCount = true;
         this.update();
       }
+    },
+    autocompleteInput(val) {
+      console.log('acval changed');
+      this.autocomplete();
     }
+
   },
   methods: {
     update() {
       //console.log('update called')
-      this.$emit('update', {options: this.options, search: this.search, count: this.needsCount, searchField: 'name' });
+      this.$emit('update', {options: this.options, search: this.search, count: this.needsCount, searchField: this.searchField, searchLike: true });
       this.needsCount = false;
+    },
+    autocomplete() {
+      this.$emit('autocomplete', { term: this.autocompleteInput, field: this.searchField })
     }
   },
   created () {
 
   },
   mounted () {
+    this.autocomplete();
   }
 }
 </script>

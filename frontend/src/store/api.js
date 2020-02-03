@@ -25,6 +25,7 @@ const getListParams = function(payload) {
     var limit = (payload.options.itemsPerPage == -1) ? payload.currCount : payload.options.itemsPerPage;
     var searchField = payload.searchField;
     var searchValue = payload.search;
+    var searchLike = payload.searchLike ? true : false;
     var count = payload.count;
     var sortField = (payload.options.sortBy && payload.options.sortBy[0]) ? payload.options.sortBy[0] : null;
     var sortDirection = (payload.options.sortDesc && payload.options.sortDesc[0]) ? 'desc' : 'asc';
@@ -38,7 +39,7 @@ const getListParams = function(payload) {
     if(searchValue) {
         params.searchField = searchField;
         params.searchValue = searchValue;
-        params.searchLike = true;
+        params.searchLike = searchLike;
     }
     if(count) {
         params.count = true;
@@ -63,6 +64,12 @@ const authenticate = function(payload) {
 export default {
     state: {
         lastCall: 0,
+        baseUrl
+    },
+    getters: {
+        baseUrl(state) {
+            return state.baseUrl;
+        }
     },
     actions: {
 
@@ -90,7 +97,7 @@ export default {
                 return false;
             }
             try {
-            var result = await Vue.http.get(url);
+                var result = await Vue.http.get(url, { params: payload.params });
             return result.body;
             } catch (err) {
                 console.error(err);

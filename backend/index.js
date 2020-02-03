@@ -52,12 +52,14 @@ app.use(history({
 app.use(express.static(settings.frontend.path));
 
 // setting up the OIDC
-app.use(session({
+
+if(!settings.oidc.disable) {
+  app.use(session({
     name: settings.oidc.session.name,
     secret: settings.oidc.session.secret
   }));
 
-app.use(auth({
+  app.use(auth({
     required: false,
     issuerBaseURL: settings.oidc.issuer,
     baseURL: settings.oidc.url,
@@ -70,7 +72,7 @@ app.use(auth({
         scope: "openid"
       }
   }));
-
+}
 // route used to show the SSO login screen
 app.get('/user/login', (req, res) => res.openid.login({ returnTo: '/' }));
 

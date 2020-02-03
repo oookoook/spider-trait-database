@@ -1,0 +1,1 @@
+GET http://localhost:3000/backend/autocomplete/traits?valueField=category.id&textField=category.name HTTP/1.1

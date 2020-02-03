@@ -1,22 +1,12 @@
-const endpoint = 'traits';
-
-const getAutocompleteValue = function(item, field) {
-    var f = field.split('.');
-    var r = item;
-    // go through all the nested objects
-    for(var i = 0; i < f.length; i++) {
-        r = r[f[i]]; 
-    }
-    return r;
-}
-
-export default {
+export default (endpoint) => {
+    return {
     namespaced: true,
     state: {
       list: [],
       total: 0,
       entity: null,
-      autocomplete: []
+      autocomplete: [],
+      search: null
     },
     mutations: {
       list(state, payload) {
@@ -30,6 +20,9 @@ export default {
       },
       autocomplete(state, payload) {
         state.autocomplete = payload.value;
+      },
+      search(state, payload) {
+          state.search = payload.value;
       }
     },
     getters: {
@@ -65,10 +58,10 @@ export default {
         },
         autocomplete: async function(context, payload) {
             console.log(`${endpoint}/autocomplete`);
-            payload.endpoint = endpoint;
+            payload.endpoint = `autocomplete/${endpoint}`;
             try {
-                var data = await context.dispatch('list', payload, { root: true });
-                context.commit('autocomplete', { value: data.items.map(i => getAutocompleteValue(i, payload.searchField)) });
+                var data = await context.dispatch('get', payload, { root: true });
+                context.commit('autocomplete', { value: data.items });
             } catch(err) {
                 console.error(err);
                 throw(err);
@@ -76,3 +69,4 @@ export default {
         }
     },
   }
+};

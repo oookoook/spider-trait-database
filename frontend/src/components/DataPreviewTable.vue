@@ -68,10 +68,9 @@ export default {
   components: {
       ListItem
   },
-  props: { items: Array, entity: String, id: Number, total: { type: Number, default: 0 }, loading: Boolean },
+  props: { items: Array, entity: String, id: Number, filter: Object, total: { type: Number, default: 0 }, loading: Boolean },
   data () {
     return {
-      search: null,
       needsCount: true,
       options: {},
       headers: [
@@ -102,14 +101,22 @@ export default {
     },
     id() {
         this.update();
+    },
+    filter() {
+        this.update();
     }
   },
   methods: {
     update() {
       //console.log('update called')
       //if(!this.entity || !this.id)
-      var filter = {};
-      filter[this.entity] = this.id;
+      var filter;
+      if(this.filter) {
+          filter = this.filter;
+      } else {
+        filter = {};
+        filter[this.entity] = this.id;
+      }
       this.$emit('update', {options: this.options, filter, count: this.needsCount });
       this.needsCount = false;
     }

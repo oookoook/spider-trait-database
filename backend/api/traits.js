@@ -91,14 +91,16 @@ const remove = async function(params) {
 }
 
 const synonyms = {
+    'traits': 'trait',
     'category.name': 'trait_category.name',
+    'category.id': 'trait_category.id',
     'dataType.name': 'data_type.name',
     'reference.abbrev': 'reference.abbrev'
 }
 
 module.exports = function(dbClient) {
     db = dbClient;
-    db.addSynonyms('trait', synonyms);
+    db.addSynonyms('traits','trait', synonyms);
     return {
         list,
         get,

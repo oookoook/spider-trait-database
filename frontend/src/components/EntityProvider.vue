@@ -20,7 +20,7 @@ export default {
   },
   computed: {
     item() {
-      return this.$store.getters[`${this.list}/entity`];
+      return this.$store.state[this.list].entity;
     }
   },
   watch: {

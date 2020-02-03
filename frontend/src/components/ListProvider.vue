@@ -1,6 +1,13 @@
 <template>
   <div>
-  <slot :loading="loading" :items="items" :total="total" :update="update">
+  <slot :loading="loading" 
+  :items="items" 
+  :total="total" 
+  :update="update" 
+  :autocomplete="autocomplete" 
+  :autocomplete-items="autocompleteItems" 
+  :autocomplete-loading="acloading"
+  :search-update="searchUpdate">
     {{ JSON.stringify(items) }}
   </slot>
   </div>
@@ -15,16 +22,20 @@ export default {
   props: { 'list': String },
   data () {
     return {
-      loading: false
+      loading: false,
+      acloading: false
     }
   },
   computed: {
     items() {
-      return this.$store.getters[`${this.list}/list`];
+      return this.$store.state[this.list].list;
     },
     total() {
-      return this.$store.getters[`${this.list}/total`];
+      return this.$store.state[this.list].total;
     },
+    autocompleteItems() {
+      return this.$store.state[this.list].autocomplete;
+    }
   },
   watch: {
 
@@ -45,6 +56,23 @@ export default {
       }
       this.loading = true;
       this.$store.dispatch(`${this.list}/list`,params).then(() => {this.loading = false; }, (err) => { this.$store.dispatch('notify', { error: true, text: `Unable to retrieve ${this.list}.`})});
+    },
+    autocomplete(p) {
+      this.acloading = true;
+      var params = {
+        search: p.term,
+        valueField: p.valueField,
+      }
+      if(p.textField) {
+        params.textField = p.textField;
+      }
+      if(!p.showAll) {
+        params.count = 10;
+      } 
+      this.$store.dispatch(`${this.list}/list`, { params }).then(() => {this.acloading = false; }, (err) => { this.$store.dispatch('notify', { error: true, text: `Unable to retrieve autocomplete.`})});
+    },
+    searchUpdate(term) {
+      this.$store.commit(`${this.list}/search`, { value: term });
     }
   },
   created () {

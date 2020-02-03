@@ -1,7 +1,13 @@
 <template>
 <v-container fluid>
   <list-provider list="traits" v-slot="i">
-    <traits-table :items="i.items" :loading="i.loading" :total="i.total" @update="i.update"/>
+    <traits-table :items="i.items" 
+    :loading="i.loading" 
+    :total="i.total" 
+    :autocomplete-items="i.autocompleteItems" 
+    :autocomplete-loading="i.autocompleteLoading" 
+    @update="i.update" 
+    @autocomplete="i.autocomplete" />
   </list-provider>
 </v-container>
 </template>

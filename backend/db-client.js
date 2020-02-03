@@ -8,7 +8,9 @@ var pool = mysql.createPool({
     database: settings.db.database
 });
 
-var synonyms = {};
+var synonyms = {
+    endpoints: {}
+};
 
 const addLimits = function (values, limits, table, hasWhere, aggregate, customWhereClause) {
     if(!limits) {
@@ -162,6 +164,69 @@ const prepareListResponse = async function (limits, table, customWhereClause, cu
     return res;
 }
 
+const getAutocomplete = async function(endpoint, valueField, textField, search, count) {
+    
+    var qt = getSynonym(endpoint); 
+    var vfparts = getSynonym(endpoint, valueField).split('.');
+    if(vfparts.length > 1) {
+        qt = vfparts[0];
+    }
+    
+    console.log(`endpoint ${endpoint} table ${qt} valueField ${valueField} textField ${textField} search ${search} count ${count}`)
+    //console.dir(vfparts);
+    var values = [];
+    var sql = '';
+    var textSql = null;
+    var countSql = '';
+    var st = search ? `%${search}%` : '%';
+
+    values.push(getSynonym(endpoint, valueField));
+
+    if(textField && Array.isArray(textField)) {        
+        textSql = 'CONCAT(' + textField.map(f => '??').join(`,' ',`) + ')';
+        var syn = textField.map(f => getSynonym(endpoint,f));
+        values = values.concat(syn); // ?? AS TEXT
+        values.push(qt); // FROM ??
+        values = values.concat(syn); // WHERE ??    
+        values.push(st); // LIKE ?
+        values = values.concat(syn); // ORDER BY ?? 
+    } else if(textField && typeof textField == 'string') {
+        textSql = '??';
+        var syn = getSynonym(endpoint, textField);
+        values.push(syn); // ?? as text
+        values.push(qt); // FROM ??
+        values.push(syn); // WHERE ??  
+        values.push(st); // LIKE ?
+        values.push(syn); // ORDER BY ??
+    } else {
+        var syn = getSynonym(endpoint, valueField);
+        values.push(qt); // FROM ??
+        values.push(syn); // WHERE ??
+        values.push(st); // LIKE ?
+        values.push(syn); // ORDER BY
+    }
+    
+
+
+
+    if(count) {
+        var countSql = 'LIMIT 0,?';
+        values.push(count);
+    }
+    if(textSql) {
+        sql = `SELECT DISTINCT ?? as value, ${textSql} as text FROM ?? WHERE ${textSql} LIKE ? ORDER BY ${textSql} ${countSql}`;
+    } else {
+        sql = `SELECT DISTINCT ?? as value FROM ?? WHERE ?? LIKE ? ORDER BY ?? ${countSql}`;
+    }
+    console.log(typeof textField);
+    console.dir(textField);
+    console.log(textSql);
+    console.log(sql);
+    console.dir(values);
+    var r = await query({sql, values});
+    return r;
+}
+
 const createEntity = async function (body, table, prepareForSql, validate) {
     var obj = body;
     if (typeof validate == 'function') {
@@ -206,19 +271,44 @@ const updateEntity = async function (params, body, table, prepareForSql, validat
     }
 }
 
-const addSynonyms = function(table, tableSynonyms) {
-    synonyms[table] = tableSynonyms;
+const addSynonyms = function(endpoint, mainTable, tableSynonyms) {
+    synonyms[mainTable] = tableSynonyms;
+    synonyms.endpoints[endpoint] = mainTable;
 }
 
 const getSynonym = function(table, field) {
-    console.dir(synonyms);
-    console.log(field);
+    //console.dir(synonyms);
+    //console.log(table);
+    //console.log(field);
     
-    if(!synonyms[table] || !synonyms[table][field]) {
-        return `${table}.${field}`;
+    if(!field) {
+        return synonyms.endpoints[table] || table;
     }
     
-    return synonyms[table][field];
+    if(!synonyms[table] && !synonyms.endpoints[table]) {
+        //console.log('Not found');
+        return field;
+    }
+
+    if(synonyms[table] && synonyms[table][field]) {
+        //console.log(`match: ${table} ${field}`);
+        return synonyms[table][field];
+    }
+
+    if(synonyms[table] && !synonyms[table][field]) {
+        return `${table}.${field}`;
+    }
+
+    var t = getSynonym(table);
+
+    if(t) {
+        //console.log(`table match: ${table} ${t} ${field}`);
+        //return `${t}.${field}`;
+        return getSynonym(t, field);
+    }
+    //console.log(`no match: ${table} ${field}`);
+    return field;
+    
 }
 
 module.exports = {
@@ -231,5 +321,6 @@ module.exports = {
     createEntity,
     updateEntity,
     deleteEntity,
+    getAutocomplete,
     addSynonyms
 }

@@ -7,6 +7,7 @@ module.exports = {
         enable: false
     },
     oidc: {
+        disable: true,
         client: 'TODO',
         issuer: 'https://oidc.muni.cz/oidc',
         secret: 'TODO',

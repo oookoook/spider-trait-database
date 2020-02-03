@@ -1,3 +1,5 @@
+const endpoint = 'data';
+
 const getParams = function(payload) {
     var f = payload.filter;
     var filters = ['family', 'genus', 'species', 'trait-category', 'trait', 'country', 'habitat', 'dataset', 'authors','reference','row-link'];
@@ -10,7 +12,8 @@ export default {
     namespaced: true,
     state: {
       list: [],
-      total: 0
+      total: 0,
+      exportLink: null
     },
     mutations: {
       list(state, payload) {
@@ -19,23 +22,23 @@ export default {
       total(state, payload) {
         state.total = payload.value;
       },
+      exportLink(state,payload) {
+        state.exportLink = payload.value;
+      }
     },
     getters: {
-        list(state) {
-            return state.list;
-        },
-        total(state) {
-            return state.total;
+        exportLink(state, getters, rootState, rootGetters) {
+            return `${rootGetters.baseUrl}/data/export/${state.exportLink}`;
         }
     },
     actions: {
         
         list: async function(context, payload) {
-            console.log('data/list');
-            
-            payload.endpoint = 'data';
+            console.log(`${endpoint}/list`);
+            payload.endpoint = endpoint;
             payload.currCount = context.state.total;
             payload.params = getParams(payload);
+            context.commit('exportLink', { value: payload.params });
             console.log(payload.params);
             try {
                 var data = await context.dispatch('list', payload, { root: true });

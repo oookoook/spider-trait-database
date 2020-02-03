@@ -17,6 +17,12 @@ router.use(auth.resourcesAuth);
 
 router.use(db.limits);
 
+router.route('/autocomplete/:endpoint')
+  .get(function(req, res) {
+    db.getAutocomplete(req.params.endpoint, req.query.valueField, req.query.textField, 
+      req.query.search, req.query.count ? parseInt(req.query.count) : null).then(r => res.json({ items: r })).catch(e => { console.log(e); res.sendStatus(400); });
+  })
+
 router.route('/traits')
   .get(function (req, res) {
       traits.list(req.recordLimit).then(r => res.json(r)).catch(e => { console.log(e); res.sendStatus(400); });
