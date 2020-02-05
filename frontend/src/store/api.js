@@ -8,9 +8,11 @@ const getUrl = function(payload) {
 
 const getListParams = function(payload) {
     console.dir(payload);
+    /*
     if(!payload.list) {
         return {};
     }
+    */
     /*
     limit=10 +
     offset=10 +
@@ -48,7 +50,7 @@ const getListParams = function(payload) {
         params.sortField = sortField;
         params.sortDirection = sortDirection;
     }
-
+    //console.dir(params);
     return params;
 }
 
@@ -97,7 +99,7 @@ export default {
                 return false;
             }
             try {
-                var result = await Vue.http.get(url, { params: payload.params });
+                var result = await Vue.http.get(url, { params: payload.query });
             return result.body;
             } catch (err) {
                 console.error(err);

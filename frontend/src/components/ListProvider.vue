@@ -15,6 +15,8 @@
 
 <script>
 
+//import { debounce } from 'throttle-debounce';
+
 export default {
   name: 'ListProvider',
   components: {
@@ -57,19 +59,27 @@ export default {
       this.loading = true;
       this.$store.dispatch(`${this.list}/list`,params).then(() => {this.loading = false; }, (err) => { this.$store.dispatch('notify', { error: true, text: `Unable to retrieve ${this.list}.`})});
     },
-    autocomplete(p) {
+    autocomplete(p) { // autocomplete: debounce(500, function(p) {
+
+      //console.dir(p);
+      if(this.acloading) {
+        // we are still waiting for the last data fetch
+        return;
+      }
       this.acloading = true;
-      var params = {
-        search: p.term,
-        valueField: p.valueField,
+      var query = {
+        valueField: p.field.valueField,
       }
-      if(p.textField) {
-        params.textField = p.textField;
+      if(p.term) {
+        query.search = p.term;
       }
-      if(!p.showAll) {
-        params.count = 10;
+      if(p.field.textField) {
+        query.textField = p.field.textField;
+      }
+      if(!p.field.showAll) {
+        query.count = 10;
       } 
-      this.$store.dispatch(`${this.list}/list`, { params }).then(() => {this.acloading = false; }, (err) => { this.$store.dispatch('notify', { error: true, text: `Unable to retrieve autocomplete.`})});
+      this.$store.dispatch(`${this.list}/autocomplete`, { query }).then(() => {this.acloading = false; }, (err) => { this.$store.dispatch('notify', { error: true, text: `Unable to retrieve autocomplete.`})});
     },
     searchUpdate(term) {
       this.$store.commit(`${this.list}/search`, { value: term });

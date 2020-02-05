@@ -1,26 +1,15 @@
 var db = null;
 
+
+
 const list = async function(limits) {
-    var res = await db.prepareListResponse(limits, 'trait');
-    //we can provide more data
-    /*
-    var results = await db.query({table: 'trait', sql: `SELECT trait.id, trait.abbrev, trait.name, trait_category.id, trait_category.name `
-     + `FROM trait LEFT JOIN trait_category ON trait.trait_category_id = trait_category.id`, nestTables: true, limits });    
-     res.items = results.map(r => {    
-        return {
-                id: r.trait.id,
-                abbrev: r.trait.abbrev,
-                name: r.trait.name,
-                category: {
-                    id: r.trait_category.id,
-                    name: r.trait_category.name
-                }
-            }
-        });
-    */
-   var results = await db.query({table: 'trait', sql:'SELECT trait.id, trait.abbrev, trait.name, trait_category.id, trait_category.name, reference.id, reference.abbrev '
-   + 'FROM trait LEFT JOIN trait_category ON trait.trait_category_id = trait_category.id '
-   + 'LEFT JOIN reference ON trait.reference_id = reference.id', nestTables: true, limits });
+    const join = 'trait LEFT JOIN trait_category ON trait.trait_category_id = trait_category.id '
+               + 'LEFT JOIN reference ON trait.reference_id = reference.id';
+    
+    var res = await db.prepareListResponse(limits, 'trait', null, null, join);
+    
+   var results = await db.query({table: 'trait', sql:`SELECT trait.id, trait.abbrev, trait.name, trait_category.id, trait_category.name, reference.id, reference.abbrev `
+   + `FROM ${join}`, nestTables: true, limits });
    res.items = results.map(r => {    
     return {
         id: r.trait.id,

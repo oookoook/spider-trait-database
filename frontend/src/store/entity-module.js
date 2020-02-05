@@ -58,6 +58,7 @@ export default (endpoint) => {
         },
         autocomplete: async function(context, payload) {
             console.log(`${endpoint}/autocomplete`);
+            //console.dir(payload);
             payload.endpoint = `autocomplete/${endpoint}`;
             try {
                 var data = await context.dispatch('get', payload, { root: true });

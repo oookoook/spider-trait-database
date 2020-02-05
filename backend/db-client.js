@@ -34,7 +34,7 @@ const addLimits = function (values, limits, table, hasWhere, aggregate, customWh
         //whereClause = ` ${searchStart} ${mysql.escapeId(table+'.'+limits.search.field)} ${op} '${mysql.escape(limits.search.value)}${wildcard}'`;
         whereClause = ` ${searchStart} ?? ${op} ?`;
         values.push(getSynonym(table, limits.search.field));
-        values.push(`${limits.search.value}${wildcard}`);
+        values.push(`${wildcard}${limits.search.value}${wildcard}`);
     }
 
     //console.log(`${whereClause} ${orderClause} LIMIT ${limits.offset},${limits.limit};`);
@@ -172,7 +172,7 @@ const getAutocomplete = async function(endpoint, valueField, textField, search, 
         qt = vfparts[0];
     }
     
-    console.log(`endpoint ${endpoint} table ${qt} valueField ${valueField} textField ${textField} search ${search} count ${count}`)
+    //console.log(`endpoint ${endpoint} table ${qt} valueField ${valueField} textField ${textField} search ${search} count ${count}`)
     //console.dir(vfparts);
     var values = [];
     var sql = '';
@@ -218,11 +218,11 @@ const getAutocomplete = async function(endpoint, valueField, textField, search, 
     } else {
         sql = `SELECT DISTINCT ?? as value FROM ?? WHERE ?? LIKE ? ORDER BY ?? ${countSql}`;
     }
-    console.log(typeof textField);
-    console.dir(textField);
-    console.log(textSql);
-    console.log(sql);
-    console.dir(values);
+    //console.log(typeof textField);
+    //console.dir(textField);
+    //console.log(textSql);
+    //console.log(sql);
+    //console.dir(values);
     var r = await query({sql, values});
     return r;
 }
