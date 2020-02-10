@@ -1,5 +1,3 @@
-TRUNCATE TABLE `sex`;
-
 INSERT INTO `sex` (`name`) VALUES ('Male');
 INSERT INTO `sex` (`name`) VALUES ('Female');
 INSERT INTO `sex` (`name`) VALUES ('Both');

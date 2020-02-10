@@ -1,5 +1,3 @@
-TRUNCATE TABLE `country`;
-
 INSERT INTO `country` (`name`,`alpha2_code`,`alpha3_code`) VALUES ('Afghanistan','AF','AFG');
 INSERT INTO `country` (`name`,`alpha2_code`,`alpha3_code`) VALUES ('Åland Islands','AX','ALA');
 INSERT INTO `country` (`name`,`alpha2_code`,`alpha3_code`) VALUES ('Albania','AL','ALB');
