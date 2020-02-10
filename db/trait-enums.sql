@@ -1,5 +1,5 @@
-TRUNCATE TABLE `trait_category`;
 TRUNCATE TABLE `trait`;
+TRUNCATE TABLE `trait_category`;
 TRUNCATE TABLE `data_type`;
 
 INSERT INTO `trait_category` (`name`) VALUES ('Life History');
