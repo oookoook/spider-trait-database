@@ -4,7 +4,7 @@ var https = require('https')
 var settings = require('./settings')
 var history = require('connect-history-api-fallback');
 const { auth, requiresAuth } = require('express-openid-connect');
-const session = require('cookie-session');
+//const session = require('cookie-session');
 var bodyParser = require('body-parser');
 var cors = require('cors');
 
@@ -54,16 +54,18 @@ app.use(express.static(settings.frontend.path));
 // setting up the OIDC
 
 if(!settings.oidc.disable) {
+  /*
   app.use(session({
     name: settings.oidc.session.name,
     secret: settings.oidc.session.secret
   }));
-
+  */
   app.use(auth({
     required: false,
     issuerBaseURL: settings.oidc.issuer,
     baseURL: settings.oidc.url,
     clientID: settings.oidc.client,
+    appSessionSecret: settings.oidc.session.secret,
     clientSecret: settings.oidc.secret,
     routes: false,
     authorizationParams: {

@@ -12,8 +12,7 @@
 </template>
 
 <script>
-import { mapState, mapGetters } from 'vuex'
-import IdFromRoute from '../mixins/IdFormRoute' 
+import IdFromRoute from '../mixins/id-from-route' 
 import EntityProvider from '../components/EntityProvider'
 import ListProvider from '../components/ListProvider'
 import TraitDetail from '../components/TraitDetail'

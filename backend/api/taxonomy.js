@@ -2,18 +2,22 @@ var db = null;
 
 const list = async function(limits) {
     var res = await db.prepareListResponse(limits, 'taxonomy');
-    var results = await db.query({table: 'taxonomy', sql: `SELECT taxonomy.id, taxonomy.wsc_lsid, taxonomy.family, taxonomy.genus, taxonomy.species, taxonomy.subspecies, `
-     + `reference.id, reference.abbrev `
-     + `FROM taxonomy LEFT JOIN reference ON method.reference_id = reference.id`, nestTables: true, limits});    
+    var results = await db.query({table: 'taxonomy', sql: `SELECT taxonomy.id, taxonomy.wsc_lsid, taxonomy.wsc_id, taxonomy.family, taxonomy.genus, taxonomy.species, taxonomy.subspecies, `
+     + `taxonomy.author, taxonomy.year `
+     + `FROM taxonomy`, nestTables: true, limits});    
      res.items = results.map(r => {    
         return {
-                id: r.method.id,
-                abbrev: r.method.abbrev,
-                name: r.method.name,
-                reference: {
-                    id: r.reference.id,
-                    abbrev: r.reference.abbrev
-                }
+                id: r.taxonomy.id,
+                wsc: {
+                    id: r.taxonomy.wsc_id,
+                    lsid: r.taxonomy.wsc_lsid
+                },
+                family: r.taxonomy.family,
+                genus: r.taxonomy.genus,
+                species: r.taxonomy.species,
+                subspecies: r.taxonomy.subspecies,
+                author: r.taxonomy.author,
+                year: r.taxonomy.year
             }
         });
     return res;
@@ -21,21 +25,22 @@ const list = async function(limits) {
 
 const get = async function(params) {
     var id = params.id;
-    var results = await db.query({table: 'taxonomy', sql: 'SELECT taxonomy.*, reference.* '
-     + 'FROM method LEFT JOIN reference ON method.reference_id = reference.id '
-     + 'WHERE method.id = ?', values: [id], nestTables: true});
+    var results = await db.query({table: 'taxonomy', sql: 'SELECT taxonomy.* '
+     + 'FROM taxonomy '
+     + 'WHERE taxonomy.id = ?', values: [id], nestTables: true});
      var r = results[0];
      return { item: {
-        id: r.method.id,
-        abbrev: r.method.abbrev,
-        name: r.method.name,
-        description: r.method.description,
-        reference: {
-            id: r.reference.id,
-            abbrev: r.reference.abbrev,
-            fullCitation: r.reference.full_citation,
-            doi: r.reference.doi
-        }
+        id: r.taxonomy.id,
+        wsc: {
+            id: r.taxonomy.wsc_id,
+            lsid: r.taxonomy.wsc_lsid
+        },
+        family: r.taxonomy.family,
+        genus: r.taxonomy.genus,
+        species: r.taxonomy.species,
+        subspecies: r.taxonomy.subspecies,
+        author: r.taxonomy.author,
+        year: r.taxonomy.year
     }}
 }
 
@@ -63,8 +68,14 @@ const remove = async function(params) {
     return await db.deleteEntity(params, 'taxonomy');
 }
 
+const synonyms = {
+    'wsc.id': 'taxonomy.wsc_id',
+    'wsc.lsid': 'taxonomy.wsc_lsid'
+}
+
 module.exports = function(dbClient) {
     db = dbClient;
+    db.addSynonyms('taxonomy','taxonomy', synonyms);
     return {
         list,
         get,

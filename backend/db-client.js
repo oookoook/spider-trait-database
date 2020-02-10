@@ -199,7 +199,9 @@ const getAutocomplete = async function(endpoint, valueField, textField, search, 
         values.push(st); // LIKE ?
         values.push(syn); // ORDER BY ??
     } else {
+        textSql = '??';
         var syn = getSynonym(endpoint, valueField);
+        values.push(syn); // ?? as text
         values.push(qt); // FROM ??
         values.push(syn); // WHERE ??
         values.push(st); // LIKE ?
@@ -322,5 +324,6 @@ module.exports = {
     updateEntity,
     deleteEntity,
     getAutocomplete,
-    addSynonyms
+    addSynonyms,
+    escape: mysql.escape
 }

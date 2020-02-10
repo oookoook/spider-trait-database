@@ -23,8 +23,9 @@ CREATE TABLE IF NOT EXISTS `spider_traits_db`.`reference` (
   `id` INT NOT NULL AUTO_INCREMENT,
   `doi` VARCHAR(255) NULL,
   `full_citation` VARCHAR(4096) NULL,
-  `abbrev` VARCHAR(255) NULL,
-  PRIMARY KEY (`id`))
+  `abbrev` VARCHAR(255) NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE INDEX `abbrev_UNIQUE` (`abbrev` ASC))
 ENGINE = InnoDB;
 
 
@@ -36,6 +37,7 @@ DROP TABLE IF EXISTS `spider_traits_db`.`taxonomy` ;
 CREATE TABLE IF NOT EXISTS `spider_traits_db`.`taxonomy` (
   `id` INT NOT NULL AUTO_INCREMENT,
   `wsc_lsid` VARCHAR(45) NOT NULL,
+  `wsc_id` INT NOT NULL,
   `family` VARCHAR(255) NULL,
   `genus` VARCHAR(255) NULL,
   `species` VARCHAR(255) NULL,
@@ -84,7 +86,7 @@ DROP TABLE IF EXISTS `spider_traits_db`.`trait` ;
 
 CREATE TABLE IF NOT EXISTS `spider_traits_db`.`trait` (
   `id` INT NOT NULL AUTO_INCREMENT,
-  `abbrev` VARCHAR(45) NULL,
+  `abbrev` VARCHAR(45) NOT NULL,
   `trait_category_id` INT NOT NULL,
   `name` VARCHAR(255) NOT NULL,
   `description` TEXT NULL,
@@ -95,6 +97,7 @@ CREATE TABLE IF NOT EXISTS `spider_traits_db`.`trait` (
   INDEX `trait_trait_category_fk_idx` (`trait_category_id` ASC),
   INDEX `trait_data_type_fk_idx` (`data_type_id` ASC),
   INDEX `trait_reference_fk_idx` (`reference_id` ASC),
+  UNIQUE INDEX `abbrev_UNIQUE` (`abbrev` ASC),
   CONSTRAINT `trait_trait_category_fk`
     FOREIGN KEY (`trait_category_id`)
     REFERENCES `spider_traits_db`.`trait_category` (`id`)
@@ -206,6 +209,7 @@ DROP TABLE IF EXISTS `spider_traits_db`.`location` ;
 
 CREATE TABLE IF NOT EXISTS `spider_traits_db`.`location` (
   `id` INT NOT NULL AUTO_INCREMENT,
+  `abbrev` VARCHAR(45) NOT NULL,
   `lat` DECIMAL(11,8) NULL COMMENT 'The geographic latitude (in decimal degrees, using the spatial reference system WGS84) of the geographic center of a Location. Positive values are north of the Equator, negative values are south of it. Legal values lie between -90 and 90, inclusive (e.g. 45.74, -37.22285; etc.)',
   `lon` DECIMAL(11,8) NULL COMMENT 'The geographic longitude (in decimal degrees, using the spatial reference system WGS84) of the geographic center of a Location. Positive values are east of the Greenwich Meridian, negative values are west of it. Legal values lie between -180 and 180, inclusive. (e.g. 102.478922; -0.4767; etc.)\n',
   `precision` DECIMAL(11,8) NULL COMMENT 'A decimal representation of the precision of the coordinates given in the decimalLatitude and decimalLongitude.',
@@ -220,6 +224,7 @@ CREATE TABLE IF NOT EXISTS `spider_traits_db`.`location` (
   PRIMARY KEY (`id`),
   INDEX `habitat_global_fk_idx` (`habitat_global_id` ASC),
   INDEX `location_country_fk_idx` (`country_id` ASC),
+  UNIQUE INDEX `abbrev_UNIQUE` (`abbrev` ASC),
   CONSTRAINT `location_habitat_global_fk`
     FOREIGN KEY (`habitat_global_id`)
     REFERENCES `spider_traits_db`.`habitat_global` (`id`)
@@ -247,7 +252,9 @@ CREATE TABLE IF NOT EXISTS `spider_traits_db`.`dataset` (
   `date` DATETIME NOT NULL,
   `notes` TEXT NULL,
   `imported` TINYINT(1) NOT NULL,
-  PRIMARY KEY (`id`))
+  `sub` VARCHAR(45) NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE INDEX `name_UNIQUE` (`name` ASC))
 ENGINE = InnoDB;
 
 
@@ -473,7 +480,6 @@ CREATE USER 'app' IDENTIFIED BY 'app';
 
 GRANT SELECT, INSERT, TRIGGER ON TABLE `spider_traits_db`.* TO 'app';
 GRANT SELECT, INSERT, TRIGGER, UPDATE, DELETE ON TABLE `spider_traits_db`.* TO 'app';
-GRANT EXECUTE ON ROUTINE `spider_traits_db`.* TO 'app';
 GRANT SELECT ON TABLE `spider_traits_db`.* TO 'app';
 
 SET SQL_MODE=@OLD_SQL_MODE;

@@ -15,7 +15,6 @@
 <script>
 import TraitsTable from '../components/TraitsTable'
 import ListProvider from '../components/ListProvider'
-import { mapState, mapGetters } from 'vuex'
 
 export default {
   name: 'traits',

@@ -1,20 +1,34 @@
 <template>
-  <div>
-    Reference
-  </div>
+  <v-container>
+  <entity-provider list="references" :id="id" v-slot="i">
+    <reference-detail :item="i.item" />
+  </entity-provider>
+  
+  <list-provider v-if="id" list="data" v-slot="i">
+    <data-preview-table entity="reference" :id="id" :items="i.items" :loading="i.loading" :total="i.total" @update="i.update"/>
+  </list-provider>
+  
+  </v-container>
 </template>
 
 <script>
-import { mapState, mapGetters } from 'vuex'
-
+import IdFromRoute from '../mixins/id-from-route' 
+import EntityProvider from '../components/EntityProvider'
+import ListProvider from '../components/ListProvider'
+import ReferenceDetail from '../components/ReferenceDetail'
+import DataPreviewTable from '../components/DataPreviewTable'
 export default {
   name: 'reference',
+  mixins: [IdFromRoute],
   components: {
+    EntityProvider,
+    ReferenceDetail,
+    ListProvider,
+    DataPreviewTable
   },
   props: [],
   data () {
     return {
-
     }
   },
   computed: {

@@ -5,7 +5,7 @@
       color="primary"
       dark
     >
-      <v-toolbar-title>Spider Trait Database</v-toolbar-title>
+      <v-toolbar-title><v-icon left>mdi-spider</v-icon> Trait Database</v-toolbar-title>
 
 
       <v-divider vertical class="mx-5"></v-divider>

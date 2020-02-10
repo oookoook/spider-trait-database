@@ -15,7 +15,7 @@
 
 <script>
 
-//import { debounce } from 'throttle-debounce';
+import { debounce } from 'throttle-debounce';
 
 export default {
   name: 'ListProvider',
@@ -59,7 +59,7 @@ export default {
       this.loading = true;
       this.$store.dispatch(`${this.list}/list`,params).then(() => {this.loading = false; }, (err) => { this.$store.dispatch('notify', { error: true, text: `Unable to retrieve ${this.list}.`})});
     },
-    autocomplete(p) { // autocomplete: debounce(500, function(p) {
+    autocomplete: debounce(500, function(p) {
 
       //console.dir(p);
       if(this.acloading) {
@@ -80,7 +80,7 @@ export default {
         query.count = 10;
       } 
       this.$store.dispatch(`${this.list}/autocomplete`, { query }).then(() => {this.acloading = false; }, (err) => { this.$store.dispatch('notify', { error: true, text: `Unable to retrieve autocomplete.`})});
-    },
+    }),
     searchUpdate(term) {
       this.$store.commit(`${this.list}/search`, { value: term });
     }

@@ -2,10 +2,16 @@ var db = null;
 
 const list = async function(limits) {
     var res = await db.prepareListResponse(limits, 'reference');
-    console.dir(res);
-    var results = await db.query({table: 'reference', sql: `SELECT id, abbrev, name, doi `
-     + `FROM reference`, nestTables: true, limits});    
-     res.items = results;
+    //console.dir(res);
+    var results = await db.query({table: 'reference', sql: `SELECT id, abbrev, full_citation, doi `
+     + `FROM reference`, nestTables: false, limits});    
+     res.items = results.map(r => { return {
+                id: r.id,
+                abbrev: r.abbrev,
+                fullCitation: r.full_citation,
+                doi: r.doi
+            }
+        });
     return res;
 }
 
@@ -44,8 +50,13 @@ const remove = async function(params) {
     return await db.deleteEntity(params, 'reference');
 }
 
+const synonyms = {
+    'fullCitation': 'full_citation'
+}
+
 module.exports = function(dbClient) {
     db = dbClient;
+    db.addSynonyms('references', 'reference', synonyms);
     return {
         list,
         get,

@@ -1,5 +1,6 @@
 const resourcesAuth = function (req, res, next) {
     req.resourcesAuth = {
+        user: req.oidc && req.oidc.user && req.oidc.user.sub ? req.oidc.user.sub : null, 
         isAdmin: true,
         isEditor: true,
         isContributor: true

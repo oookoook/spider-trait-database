@@ -25,7 +25,7 @@
     </template>
 
     <template v-slot:item.location="{item}">
-        <entity-link-cell :text="item.location.habitatGlobal" tooltip="View the location detail" :link="`/methods/${item.location.id}`" />
+        <entity-link-cell :text="item.location.abbrev" tooltip="View the location detail" :link="`/locations/${item.location.id}`" />
     </template>
 
     <template v-slot:item.dataset="{item}">
@@ -49,8 +49,8 @@
             <list-item title="Life stage" :text="item.lifeStage" icon="mdi-egg" />
             <list-item title="Frequency" :text="item.frequency" icon="mdi-ab-testing" />
             <list-item title="Sample size" :text="item.sampleSize" icon="mdi-numeric" />
-            <list-item title="Event start" :text="new Date(item.eventDate.start).toISOString()" icon="mdi-calendar-arrow-right" />
-            <list-item title="Event end" :text="new Date(item.eventDate.end).toISOString()" icon="mdi-calendar-arrow-left" />
+            <list-item v-if="item.eventDate && item.eventDate.start" title="Event start" :text="new Date(item.eventDate.start).toISOString()" icon="mdi-calendar-arrow-right" />
+            <list-item v-if="item.eventDate && item.eventDate.end" title="Event end" :text="new Date(item.eventDate.end).toISOString()" icon="mdi-calendar-arrow-left" />
         </v-list>
       </td>
     </template>

@@ -68,6 +68,7 @@ const list = async function(params, limits) {
                 method: r.method,
                 location: {
                     id: r.location.id,
+                    abbrev: r.location.abbrev,
                     locality: r.location.locality,
                     country: {
                         id: r.country.id,
@@ -98,7 +99,7 @@ const csv =  async function(params, limits) {
      + `taxonomy.family, taxonomy.genus, taxonomy.species, taxonomy.subspecies, `
      + `trait.abbrev as trait, trait.name as traitFullName, trait_category.name as traitCategory, data.value, `
      + `measure.name as measure, sex.name as sex, life_stage.name as lifeStage, data.frequency, data.sample_size as sampleSize, method.abbrev as method, method.name as methodFullName, `
-     + `location.lat as decimalLatitude, location.lon as decimalLongitude, location.precision as coordinatePrecision, location.altitude, location.locality as verbatimLocality, `
+     + `location.abbrev as location, location.lat as decimalLatitude, location.lon as decimalLongitude, location.precision as coordinatePrecision, location.altitude, location.locality as verbatimLocality, `
      + `country.alpha3_code as countryCode, country.name as countryName, habitat_global.name as habitatGlobal, habitat_global.number as habitatGlobalNumber,`
      + `location.habitat as habitatVerbatim, location.microhabitat as microhabitatVerbatim, location.stratum as stratumVerbatim, location.note as notePosition, `
      + `dataset.id as dataset, dataset.name as datasetName, reference.abbrev as reference, reference.full_citation as referenceFull, reference.doi as referenceDOI, data.row_link as rowLinks `

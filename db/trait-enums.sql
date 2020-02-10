@@ -1,3 +1,7 @@
+TRUNCATE TABLE `trait_category`;
+TRUNCATE TABLE `trait`;
+TRUNCATE TABLE `data_type`;
+
 INSERT INTO `trait_category` (`name`) VALUES ('Life History');
 INSERT INTO `trait_category` (`name`) VALUES ('Reproduction');
 INSERT INTO `trait_category` (`name`) VALUES ('Predation');
@@ -61,7 +65,7 @@ INSERT INTO `trait` (`abbrev`, `trait_category_id`, `name`, `description`, `data
 INSERT INTO `trait` (`abbrev`, `trait_category_id`, `name`, `description`, `data_type_id`, `standard`) VALUES ('rspd', (SELECT id FROM `trait_category` WHERE `name` = 'Biomechanical'), 'Running speed', 'Maximal running speed (travelling horizontally)', (SELECT id FROM `data_type`  WHERE UPPER(`name`) = UPPER('real number')), 'in cm/s');
 INSERT INTO `trait` (`abbrev`, `trait_category_id`, `name`, `description`, `data_type_id`, `standard`) VALUES ('cspd', (SELECT id FROM `trait_category` WHERE `name` = 'Biomechanical'), 'Climbing speed', 'Maximal climbing speed (travelling on a slope)', (SELECT id FROM `data_type`  WHERE UPPER(`name`) = UPPER('real number')), 'in cm/s');
 INSERT INTO `trait` (`abbrev`, `trait_category_id`, `name`, `description`, `data_type_id`, `standard`) VALUES ('stre', (SELECT id FROM `trait_category` WHERE `name` = 'Biomechanical'), 'Silk strength', 'Maximal engineering strength of silk', (SELECT id FROM `data_type`  WHERE UPPER(`name`) = UPPER('real number')), 'in MPa');
-INSERT INTO `trait` (`abbrev`, `trait_category_id`, `name`, `description`, `data_type_id`, `standard`) VALUES ('stra', (SELECT id FROM `trait_category` WHERE `name` = 'Biomechanical'), 'Silk strain', 'Maximal engineering strain of silk', (SELECT id FROM `data_type`  WHERE UPPER(`name`) = UPPER('real number')), 'in mm/mm');
+INSERT INTO `trait` (`abbrev`, `trait_category_id`, `name`, `description`, `data_type_id`, `standard`) VALUES ('sstr', (SELECT id FROM `trait_category` WHERE `name` = 'Biomechanical'), 'Silk strain', 'Maximal engineering strain of silk', (SELECT id FROM `data_type`  WHERE UPPER(`name`) = UPPER('real number')), 'in mm/mm');
 INSERT INTO `trait` (`abbrev`, `trait_category_id`, `name`, `description`, `data_type_id`, `standard`) VALUES ('toug', (SELECT id FROM `trait_category` WHERE `name` = 'Biomechanical'), 'Silk toughness', 'Toughness of silk', (SELECT id FROM `data_type`  WHERE UPPER(`name`) = UPPER('real number')), 'in MPa');
 INSERT INTO `trait` (`abbrev`, `trait_category_id`, `name`, `description`, `data_type_id`, `standard`) VALUES ('adhe', (SELECT id FROM `trait_category` WHERE `name` = 'Biomechanical'), 'Web adhesion', 'Adhesion of capture thread', (SELECT id FROM `data_type`  WHERE UPPER(`name`) = UPPER('real number')), 'in MPa');
 INSERT INTO `trait` (`abbrev`, `trait_category_id`, `name`, `description`, `data_type_id`, `standard`) VALUES ('pytu', (SELECT id FROM `trait_category` WHERE `name` = 'Physiological'), 'Upper thermal limit', 'maximal temperature limit the spider can tolerate', (SELECT id FROM `data_type`  WHERE UPPER(`name`) = UPPER('real number')), 'in °C');

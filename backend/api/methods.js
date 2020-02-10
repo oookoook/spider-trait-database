@@ -56,8 +56,12 @@ const remove = async function(params) {
     return await db.deleteEntity(params, 'method');
 }
 
+const synonyms = {
+}
+
 module.exports = function(dbClient) {
     db = dbClient;
+    db.addSynonyms('methods','method', synonyms);
     return {
         list,
         get,

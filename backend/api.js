@@ -135,10 +135,10 @@ router.route('/datasets/:id')
     datasets.get(req.params).then(r => res.json(r)).catch(e => { console.log(e); res.sendStatus(400); });
   })
   .put(requiresAuth(), auth.isContributor, function (req, res) {
-    datasets.update(req.params, req.body).then(r => res.json(r)).catch(e => { console.log(e); res.sendStatus(400); });
+    datasets.update(req.params, req.body, req.resourcesAuth).then(r => res.json(r)).catch(e => { console.log(e); res.sendStatus(400); });
   })
   .delete(requiresAuth(), auth.isContributor, function (req, res) {
-    datasets.remove(req.params).then(r => res.json(r)).catch(e => { console.log(e); res.sendStatus(400); });
+    datasets.remove(req.params, req.resourcesAuth).then(r => res.json(r)).catch(e => { console.log(e); res.sendStatus(400); });
   })
 
 router.route('/data/family/:family/genus/:genus/species/:species/trait-category/:traitcat/trait/:trait/country/:country/habitat/:habitat/dataset/:dataset/authors/:authors/reference/:reference/row-link/:rowl')
@@ -151,32 +151,60 @@ router.route('/data/export/family/:family/genus/:genus/species/:species/trait-ca
     data.csv(req.params, req.recordLimit).then(r => res.download(r)).catch(e => { console.log(e); res.sendStatus(400); });
   });
 
-router.route('/import')
-  .get(function (req, res) {      
-    importx.list(req.recordLimit).then(r => res.json(r)).catch(e => { console.log(e); res.sendStatus(400); });
+router.route('/import/')
+// gets the not imported datasets  
+.get(requiresAuth(), auth.isContributor, function (req, res) {      
+    datasets.list(req.recordLimit, req.resourcesAuth, true).then(r => res.json(r)).catch(e => { console.log(e); res.sendStatus(400); });
   })
+  /* Datasets are created in the datasets endpoint
   .post(requiresAuth(), auth.isContributor, function (req, res) {
-      // uploads new file
-});
+      // creates a new dataset
+  });
+  */
+
 
 router.route('/import/:id')
-  .get(function (req, res) {
-    importx.get(req.params, req.recordLimit).then(r => res.json(r)).catch(e => { console.log(e); res.sendStatus(400); });
+  // gets the not imported dataset info
+  .get(requiresAuth(), auth.isContributor, function (req, res) {      
+    datasets.get(req.params, req.resourcesAuth, true).then(r => res.json(r)).catch(e => { console.log(e); res.sendStatus(400); });
   })
   .put(requiresAuth(), auth.isContributor, function (req, res) {
-  })
-  .delete(requiresAuth(), auth.isContributor, function (req, res) {
+    // used for sending the dataset to approval and for approving the dataset. If the dataset is approved,
+    // all the records are transferred from the import table to the data table - that's why this is not handled by the datasets endpoint 
   });
 
-  router.route('/import/:id/row/:row')
-  .get(function (req, res) {
-    importx.getRow(req.params).then(r => res.json(r)).catch(e => { console.log(e); res.sendStatus(400); });
+
+router.route('/import/:id/data')
+  // gets data for a given dataset
+  .get(requiresAuth(), auth.isContributor, function (req, res) {
+    importx.list(req.params, req.recordLimit).then(r => res.json(r)).catch(e => { console.log(e); res.sendStatus(400); });
+  })
+  .put(requiresAuth(), auth.isContributor, function (req, res) {
+    // uploads a file to already existing dataset
+    // returns only a jobId that can be used to track the progress
+    // in the background transfers rows from the file to the import table
+    importx.uploadFile(req.params, req.resourcesAuth).then(r => res.json(r)).catch(e => { console.log(e); res.sendStatus(400); });
+  })
+  .delete(requiresAuth(), auth.isContributor, function (req, res) {
+    // delete all the records for a given dataset in the import table
+    importx.deleteRecords(req.params, req.resourcesAuth);
+  });
+
+router.route('/import/:id/row/:row')
+  .get(requiresAuth(), auth.isContributor, function (req, res) {
+    importx.getRow(req.params, req.resourcesAuth).then(r => res.json(r)).catch(e => { console.log(e); res.sendStatus(400); });
    })
   .put(requiresAuth(), auth.isContributor, function (req, res) {
-    importx.updateRow(req.params, req.body).then(r => res.json(r)).catch(e => { console.log(e); res.sendStatus(400); });
+    importx.updateRow(req.params, req.body, req.resourcesAuth).then(r => res.json(r)).catch(e => { console.log(e); res.sendStatus(400); });
    })
   .delete(requiresAuth(), auth.isContributor, function (req, res) {
-    importx.deleteRow(req.params).then(r => res.json(r)).catch(e => { console.log(e); res.sendStatus(400); });
+    importx.deleteRow(req.params, req.resourcesAuth).then(r => res.json(r)).catch(e => { console.log(e); res.sendStatus(400); });
   });
+
+router.route('/import/:id/column/:column')
+  .put(requiresAuth(), auth.isContributor, function (req, res) {
+    // used for batch value replacements
+    importx.updateColumn(req.params, req.body, req.resourcesAuth).then(r => res.json(r)).catch(e => { console.log(e); res.sendStatus(400); });
+   });
 
 module.exports = router;

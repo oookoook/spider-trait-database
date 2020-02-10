@@ -10,13 +10,17 @@
     </v-list-item-content>
 
     <v-list-item-action v-if="link">
-      <v-btn icon v-if="routerLink" :to="link">
+      <v-tooltip top>
+      <template v-slot:activator="{ on }">
+      <v-btn icon v-if="!external" :to="link" v-on="on">
         <v-icon>{{ linkIcon }}</v-icon>
       </v-btn>
-      <v-btn icon v-if="!routerLink" :href="link" target="_blank">
+      <v-btn icon v-else :href="link" target="_blank" v-on="on">
         <v-icon>{{ linkIcon }}</v-icon>
       </v-btn>
-
+      </template>
+      <span>{{linkTooltip}}</span>
+      </v-tooltip>
     </v-list-item-action>
   </v-list-item>
 </template>
@@ -26,7 +30,14 @@
 export default {
   name: "ListItem",
   components: {},
-  props: { icon: {type: String, default: 'mdi-information'}, title: String, text: String, link: String, 'routerLink': {type: Boolean, default: true }, 'linkIcon': {type: String, default: 'mdi-eye-outline'} },
+  props: { icon: {type: String, default: 'mdi-information'}, 
+  title: String, 
+  text: String, 
+  link: String, 
+  external: Boolean, 
+  linkIcon: {type: String, default: 'mdi-eye-outline'}, 
+  linkTooltip: {type: String, default: 'Open detail' } 
+  },
   data() {
     return {};
   },

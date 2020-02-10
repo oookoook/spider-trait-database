@@ -2,11 +2,12 @@ var db = null;
 
 const list = async function(limits) {
     var res = await db.prepareListResponse(limits, 'location');
-    var results = await db.query({table: 'location', sql: `SELECT location.id, location.locality, country.id, country.alpha3_code, country.name, habitat_global.id, habitat_global.name `
-     + `FROM location LEFT JOIN contry ON location.country_id = country.id LEFT JOIN habitat_global ON location.habitat_global_id = habitat_global.id`, nestTables: true, limits });    
+    var results = await db.query({table: 'location', sql: `SELECT location.id, location.abbrev, location.locality, country.id, country.alpha3_code, country.name, habitat_global.id, habitat_global.name `
+     + `FROM location LEFT JOIN country ON location.country_id = country.id LEFT JOIN habitat_global ON location.habitat_global_id = habitat_global.id`, nestTables: true, limits });    
      res.items = results.map(r => {    
         return {
                 id: r.location.id,
+                abbrev: r.location.abbrev,
                 locality: r.location.locality,
                 country: {
                     id: r.country.id,
@@ -25,11 +26,12 @@ const list = async function(limits) {
 const get = async function(params) {
     var id = params.id;
     var results = await db.query({table: 'location', sql:'SELECT location.*, habitat_global.*, country.* '
-     + 'FROM location LEFT JOIN contry ON location.country_id = country.id LEFT JOIN habitat_global ON location.habitat_global_id = habitat_global.id '
+     + 'FROM location LEFT JOIN country ON location.country_id = country.id LEFT JOIN habitat_global ON location.habitat_global_id = habitat_global.id '
      + 'WHERE location.id = ?', values: [id], nestTables: true });
      var r = results[0];
      return { item: {
         id: r.location.id,
+        abbrev: r.location.abbrev,
         locality: r.location.locality,
         coords: {
             lat: r.location.lat,
@@ -80,8 +82,19 @@ const remove = async function(params) {
     return await db.deleteEntity(params, 'location');
 }
 
+const synonyms = {
+    'habitatGlobal.id': 'habitat_global.id',
+    'habitatGlobal.name': 'habitat_global.name',
+    'habitatGlobal.category': 'habitat_global.category',
+    'habitatGlobal.number': 'habitat_global.number',
+    'country.id': 'country.id',
+    'country.code': 'country.alpha3_code',
+    'country.name': 'country.name'
+}
+
 module.exports = function(dbClient) {
     db = dbClient;
+    db.addSynonyms('locations','location', synonyms);
     return {
         list,
         get,

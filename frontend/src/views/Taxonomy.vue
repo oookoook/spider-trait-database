@@ -1,15 +1,26 @@
 <template>
-  <div>
-    Taxonomy
-  </div>
+  <v-container fluid>
+  <list-provider list="taxonomy" v-slot="i">
+    <taxonomy-table :items="i.items" 
+    :loading="i.loading" 
+    :total="i.total" 
+    :autocomplete-items="i.autocompleteItems" 
+    :autocomplete-loading="i.autocompleteLoading" 
+    @update="i.update" 
+    @autocomplete="i.autocomplete" />
+  </list-provider>
+</v-container>
 </template>
 
 <script>
-import { mapState, mapGetters } from 'vuex'
+import TaxonomyTable from '../components/TaxonomyTable'
+import ListProvider from '../components/ListProvider'
 
 export default {
   name: 'taxonomy',
   components: {
+    TaxonomyTable,
+    ListProvider
   },
   props: [],
   data () {
