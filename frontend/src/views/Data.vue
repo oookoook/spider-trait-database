@@ -1,26 +1,15 @@
 <template>
-  <div>
-    Data
-    <!-- Filter autocompletes, each in its own list provider -->
-    <!-- Export Button- gets href from getters - data/exportLink-->
-
-    <!-- 
-    <list-provider>
-      <tabs>
-        <data-preview-table />
-        <data-table />
-      </tabs>
-    </list-provider>  
-    -->
-  </div>
+<v-container fluid>
+  <data-explorer />
+</v-container>
 </template>
 
 <script>
-import { mapState, mapGetters } from 'vuex'
-
+import DataExplorer from '../components/DataExplorer'
 export default {
-  name: 'data',
+  name: 'datap',
   components: {
+    DataExplorer
   },
   props: [],
   data () {

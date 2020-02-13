@@ -4,8 +4,8 @@
     <dataset-detail :item="i.item" />
   </entity-provider>
   
-  <list-provider v-if="id" list="data" v-slot="i">
-    <data-preview-table entity="dataset" :id="id" :items="i.items" :loading="i.loading" :total="i.total" @update="i.update"/>
+  <list-provider v-if="id" list="data" v-slot="i" entity="dataset" :id="id" >
+    <data-preview-table :items="i.items" :loading="i.loading" :total="i.total" @update="i.update"/>
   </list-provider>
   
   </v-container>

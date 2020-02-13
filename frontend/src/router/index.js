@@ -29,6 +29,11 @@ const routes = [
     component: () => import(/* webpackChunkName: "data" */ '../views/Data.vue')
   },
   {
+    path: '/data/family/:family/genus/:genus/species/:species/trait-category/:traitcategory/trait/:trait/country/:country/habitat/:habitat/dataset/:dataset/authors/:authors/reference/:reference/row-link/:rowlink',
+    name: 'dataFullFilter',
+    component: () => import(/* webpackChunkName: "data" */ '../views/Data.vue')
+  },
+  {
     path: '/upload',
     name: 'upload',
     component: () => import(/* webpackChunkName: "upload" */ '../views/Upload.vue')

@@ -4,8 +4,8 @@
     <taxon-detail :item="i.item" />
   </entity-provider>
   
-  <list-provider v-if="id" list="data" v-slot="i">
-    <data-preview-table entity="species" :id="id" :items="i.items" :loading="i.loading" :total="i.total" @update="i.update"/>
+  <list-provider v-if="id" list="data" entity="species" :id="id"  v-slot="i">
+    <data-preview-table :items="i.items" :loading="i.loading" :total="i.total" @update="i.update"/>
   </list-provider>
   
   </v-container>

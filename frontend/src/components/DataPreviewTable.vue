@@ -6,7 +6,7 @@
   <v-data-table
       :headers="headers"
       :items="items"
-      :options.sync="options"
+      :options.sync="opts"
       :server-items-length="total"
       :loading="loading"
       class="elevation-1"
@@ -60,19 +60,18 @@
 </template>
 
 <script>
-import ListItem from '../components/ListItem'
 
+import EntityLinkCell from '../components/EntityLinkCell'
+import DataTable from '../mixins/data-table'
 
 export default {
   name: 'DataPreviewTable',
   components: {
-      ListItem
+        EntityLinkCell,
   },
-  props: { items: Array, entity: String, id: Number, filter: Object, total: { type: Number, default: 0 }, loading: Boolean },
+  mixins: [DataTable],
   data () {
     return {
-      needsCount: true,
-      options: {},
       headers: [
         { text: 'Taxon', value: 'taxon' },
         { text: 'Trait Name', value: 'trait' },
@@ -90,36 +89,8 @@ export default {
 
   },
   watch: {
-    options: {
-        handler () {
-          this.update();
-        },
-        deep: true,
-    },
-    entity() {
-        this.update();
-    },
-    id() {
-        this.update();
-    },
-    filter() {
-        this.update();
-    }
   },
   methods: {
-    update() {
-      //console.log('update called')
-      //if(!this.entity || !this.id)
-      var filter;
-      if(this.filter) {
-          filter = this.filter;
-      } else {
-        filter = {};
-        filter[this.entity] = this.id;
-      }
-      this.$emit('update', {options: this.options, filter, count: this.needsCount });
-      this.needsCount = false;
-    }
   },
   created () {
 

@@ -7,7 +7,8 @@ const getUrl = function(payload) {
 }
 
 const getListParams = function(payload) {
-    console.dir(payload);
+    //console.debug('listParams:');
+    //console.dir(payload);
     /*
     if(!payload.list) {
         return {};

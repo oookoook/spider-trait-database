@@ -164,10 +164,11 @@ const prepareListResponse = async function (limits, table, customWhereClause, cu
     return res;
 }
 
-const getAutocomplete = async function(endpoint, valueField, textField, search, count) {
+const getAutocomplete = async function(endpoint, valueField, textField, search, count, searchByValue) {
     
     var qt = getSynonym(endpoint); 
-    var vfparts = getSynonym(endpoint, valueField).split('.');
+    var vf = getSynonym(endpoint, valueField);
+    var vfparts = vf.split('.');
     if(vfparts.length > 1) {
         qt = vfparts[0];
     }
@@ -178,24 +179,37 @@ const getAutocomplete = async function(endpoint, valueField, textField, search, 
     var sql = '';
     var textSql = null;
     var countSql = '';
-    var st = search ? `%${search}%` : '%';
+    var st = '%';
+    if(searchByValue && search) {
+        st = search;
+    } else if(search) {
+        st = `%${search}%`;
+    }
 
-    values.push(getSynonym(endpoint, valueField));
+    values.push(vf);
 
     if(textField && Array.isArray(textField)) {        
-        textSql = 'CONCAT(' + textField.map(f => '??').join(`,' ',`) + ')';
+        textSql = 'TRIM(CONCAT(' + textField.map(f =>`COALESCE(??,'')`).join(`,' ',`) + '))';
         var syn = textField.map(f => getSynonym(endpoint,f));
         values = values.concat(syn); // ?? AS TEXT
         values.push(qt); // FROM ??
-        values = values.concat(syn); // WHERE ??    
-        values.push(st); // LIKE ?
+        if(!searchByValue) {
+            values = values.concat(syn); // WHERE ??    
+        } else {
+            values.push(vf); // WHERE ??
+        }
+        values.push(st); // LIKE ? or = ?
         values = values.concat(syn); // ORDER BY ?? 
     } else if(textField && typeof textField == 'string') {
         textSql = '??';
         var syn = getSynonym(endpoint, textField);
         values.push(syn); // ?? as text
         values.push(qt); // FROM ??
-        values.push(syn); // WHERE ??  
+        if(!searchByValue) {
+            values.push(syn); // WHERE ??
+        } else {
+            values.push(vf);
+        }
         values.push(st); // LIKE ?
         values.push(syn); // ORDER BY ??
     } else {
@@ -208,15 +222,16 @@ const getAutocomplete = async function(endpoint, valueField, textField, search, 
         values.push(syn); // ORDER BY
     }
     
-
-
-
     if(count) {
         var countSql = 'LIMIT 0,?';
         values.push(count);
     }
-    if(textSql) {
+    if(textSql && searchByValue) {
+        sql = `SELECT DISTINCT ?? as value, ${textSql} as text FROM ?? WHERE ?? = ? ORDER BY ${textSql} ${countSql}`;
+    } else if(textSql) {
         sql = `SELECT DISTINCT ?? as value, ${textSql} as text FROM ?? WHERE ${textSql} LIKE ? ORDER BY ${textSql} ${countSql}`;
+    } else if(searchByValue) {
+        sql = `SELECT DISTINCT ?? as value FROM ?? WHERE = LIKE ? ORDER BY ?? ${countSql}`;
     } else {
         sql = `SELECT DISTINCT ?? as value FROM ?? WHERE ?? LIKE ? ORDER BY ?? ${countSql}`;
     }
@@ -297,8 +312,15 @@ const getSynonym = function(table, field) {
         return synonyms[table][field];
     }
 
-    if(synonyms[table] && !synonyms[table][field]) {
+
+    if(synonyms[table] && !synonyms[table][field] && field.indexOf('.') == -1) {
+        // this is just a field name
         return `${table}.${field}`;
+    }
+
+    if(synonyms[table] && !synonyms[table][field] && field.indexOf('.') > 0) {
+        // this is a fully qualified name
+        return field;
     }
 
     var t = getSynonym(table);

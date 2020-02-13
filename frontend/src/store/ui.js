@@ -3,7 +3,7 @@ export default {
       notification: {
         active: false,
         text: null,
-        color: 'success'
+        color: 'info'
       },
     },
     getters: {
@@ -20,7 +20,7 @@ export default {
       notify(context, payload) {
         var n = {
           text: payload.text,
-          color: !payload.error ? 'success' : 'error',
+          color: !payload.error ? 'info' : 'error',
           active: true
         };
         context.commit('notification', {

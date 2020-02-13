@@ -6,7 +6,7 @@
   <v-data-table
       :headers="headers"
       :items="items"
-      :options.sync="options"
+      :options.sync="opts"
       :server-items-length="total"
       :loading="loading"
       class="elevation-1"
@@ -17,9 +17,12 @@
         <span v-if="item.eventDate.end">;{{ new Date(item.eventDate.end).toISOString() }}</span>
     </template>
 
+    <template v-slot:item.location="{item}">
+        <span v-if="item.location">{{ location.abbrev }}</span>
+    </template>
+
     <template v-slot:item.reference="{item}">
         <span v-if="item.reference">{{ reference.abbrev }}</span>
-        <span v-if="item.eventDate.end">;{{ new Date(item.eventDate.end).toISOString() }}</span>
     </template>
 
     </v-data-table>
@@ -27,19 +30,14 @@
 </template>
 
 <script>
-import ListItem from '../components/ListItem'
 
+import DataTable from '../mixins/data-table'
 
 export default {
   name: 'DataExportTable',
-  components: {
-      ListItem
-  },
-  props: { items: Array, entity: String, id: Number, filter: Object, total: { type: Number, default: 0 }, loading: Boolean },
+  mixins: [DataTable],
   data () {
     return {
-      needsCount: true,
-      options: {},
       headers: [
         { text: 'Id', value: 'id' },
         { text: 'WSC LSID', value: 'wsc.lsid' },
@@ -52,7 +50,7 @@ export default {
         { text: 'Frequency', value: 'frequency' },
         { text: 'Sample size', value: 'sampleSize' },
         { text: 'Method', value: 'method.abbrev'},
-        { text: 'Location', value: 'location.abbrev'},
+        { text: 'Location', value: 'location'},
         { text: 'Event date', value: 'eventDate'},
         { text: 'Dataset', value: 'dataset.name'},
         { text: 'Reference', value: 'reference'},
@@ -64,36 +62,8 @@ export default {
 
   },
   watch: {
-    options: {
-        handler () {
-          this.update();
-        },
-        deep: true,
-    },
-    entity() {
-        this.update();
-    },
-    id() {
-        this.update();
-    },
-    filter() {
-        this.update();
-    }
   },
   methods: {
-    update() {
-      //console.log('update called')
-      //if(!this.entity || !this.id)
-      var filter;
-      if(this.filter) {
-          filter = this.filter;
-      } else {
-        filter = {};
-        filter[this.entity] = this.id;
-      }
-      this.$emit('update', {options: this.options, filter, count: this.needsCount });
-      this.needsCount = false;
-    }
   },
   created () {
 

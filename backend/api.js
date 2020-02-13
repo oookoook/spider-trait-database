@@ -20,7 +20,7 @@ router.use(db.limits);
 router.route('/autocomplete/:endpoint')
   .get(function(req, res) {
     db.getAutocomplete(req.params.endpoint, req.query.valueField, req.query.textField, 
-      req.query.search, req.query.count ? parseInt(req.query.count) : null).then(r => res.json({ items: r })).catch(e => { console.log(e); res.sendStatus(400); });
+      req.query.search, req.query.count ? parseInt(req.query.count) : null, req.query.searchByValue == 'true').then(r => res.json({ items: r })).catch(e => { console.log(e); res.sendStatus(400); });
   })
 
 router.route('/traits')

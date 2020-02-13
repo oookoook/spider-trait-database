@@ -115,8 +115,27 @@ const csv =  async function(params, limits) {
     return p;
 }
 
+const synonyms = {
+    /*
+    'trait.id': 'trait.id',
+    'trait.abbrev': 'trait.abrev',
+    'trait.name': 'trait.name',
+    'taxonomy.family': 'taxonomy.family', 
+    */
+    'location.habitatGlobal.id': 'habitat_global.id',
+    'location.habitatGlobal.name': 'habitat_global.name',
+    'location.habitatGlobal.category': 'habitat_global.category',
+    'location.habitatGlobal.number': 'habitat_global.number',
+    'location.country.id': 'country.id',
+    'location.country.code': 'country.alpha3_code',
+    'location.country.name': 'country.name',
+    'trait.category.id':'trait_category.id',
+    'trait.category.name':'trait_category.name',
+}
+
 module.exports = function(dbClient) {
     db = dbClient;
+    db.addSynonyms('data','data', synonyms);
     return {
         list,
         csv

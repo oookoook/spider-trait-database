@@ -9,7 +9,7 @@
 
 
       <v-divider vertical class="mx-5"></v-divider>
-
+      <v-toolbar-items>
       <v-btn
         to="/data"
         text
@@ -63,15 +63,16 @@
         </v-list-item>
       </v-list>
     </v-menu>
-
+      </v-toolbar-items>
 
       <v-spacer></v-spacer>
-
+      <v-toolbar-items>
       <v-btn
         href="/user/login"
         text
       ><v-icon left>mdi-account-arrow-right-outline</v-icon>  Log in 
       </v-btn>
+      </v-toolbar-items>
     </v-app-bar>
     <v-snackbar absolute
       v-model="notification.active"

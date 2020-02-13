@@ -1,0 +1,1 @@
+GET http://localhost:3000/backend/autocomplete/traits?valueField=id&textField=abbrev&textField=name&search=4&count=10&searchByValue=true HTTP/1.1
