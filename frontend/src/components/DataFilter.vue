@@ -38,7 +38,7 @@ export default {
     }
     */
     iconColor() {
-      this.value ? 'primary' : null;
+      return this.value ? 'primary' : null;
     }
   },
   watch: {
