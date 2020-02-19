@@ -171,19 +171,20 @@ router.route('/import/:id')
   .put(requiresAuth(), auth.isContributor, function (req, res) {
     // used for sending the dataset to approval and for approving the dataset. If the dataset is approved,
     // all the records are transferred from the import table to the data table - that's why this is not handled by the datasets endpoint 
+    importx.changeState(req.params, req.body, req.resourcesAuth);
   });
 
 
 router.route('/import/:id/data')
   // gets data for a given dataset
   .get(requiresAuth(), auth.isContributor, function (req, res) {
-    importx.list(req.params, req.recordLimit).then(r => res.json(r)).catch(e => { console.log(e); res.sendStatus(400); });
+    importx.list(req.params, req.recordLimit, req.resourcesAuth).then(r => res.json(r)).catch(e => { console.log(e); res.sendStatus(400); });
   })
   .put(requiresAuth(), auth.isContributor, function (req, res) {
     // uploads a file to already existing dataset
     // returns only a jobId that can be used to track the progress
     // in the background transfers rows from the file to the import table
-    importx.uploadFile(req.params, req.resourcesAuth).then(r => res.json(r)).catch(e => { console.log(e); res.sendStatus(400); });
+    importx.uploadFile(req.params, req.body, req.resourcesAuth).then(r => res.json(r)).catch(e => { console.log(e); res.sendStatus(400); });
   })
   .delete(requiresAuth(), auth.isContributor, function (req, res) {
     // delete all the records for a given dataset in the import table

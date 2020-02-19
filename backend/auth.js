@@ -1,10 +1,16 @@
+var claims;
+
 const resourcesAuth = function (req, res, next) {
     req.resourcesAuth = {
-        user: req.oidc && req.oidc.user && req.oidc.user.sub ? req.oidc.user.sub : null, 
+        sub: req.oidc && req.oidc.user && req.oidc.user.sub ? req.oidc.user.sub : null, 
+        name: req.oidc && req.oidc.user && req.oidc.user.sub ? req.oidc.user.sub : null, 
         isAdmin: true,
         isEditor: true,
         isContributor: true
     }
+    console.dir(claims);
+    console.dir(oidc.user);
+    console.dir(req.resourcesAuth);
     next();
 }
 
@@ -32,9 +38,14 @@ const isContributor = function (req, res, next) {
     }
 }
 
+const setClaims = function(c) {
+    claims = c;
+}
+
 module.exports = {
     resourcesAuth,
     isAdmin,
     isEditor,
-    isContributor
+    isContributor,
+    setClaims
 }

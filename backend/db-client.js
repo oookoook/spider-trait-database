@@ -253,6 +253,7 @@ const createEntity = async function (body, table, prepareForSql, validate) {
         }
     }
     prepareForSql(obj);
+    delete(obj.id);
     var r = await d.query({table, sql: `INSERT INTO ${table} SET ?`, values: [obj] });
     return {
         id: r.insertId
@@ -282,6 +283,8 @@ const updateEntity = async function (params, body, table, prepareForSql, validat
         }
     }
     prepareForSql(obj);
+    // we don't want to update the id
+    delete(obj.id);
     var r = await d.query({table, sql: `UPDATE \`${table}\` SET ? WHERE id = ?`, values: [obj, id] });
     return {
         id
@@ -347,5 +350,6 @@ module.exports = {
     deleteEntity,
     getAutocomplete,
     addSynonyms,
-    escape: mysql.escape
+    escape: mysql.escape,
+    escapeId: mysql.escapeId
 }

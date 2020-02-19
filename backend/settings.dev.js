@@ -13,7 +13,6 @@ module.exports = {
         secret: 'TODO',
         url: 'http://localhost:3000',
         session: {
-            name: 'rQcTwUiBTp',
             secret: '?~gVQ}hp]Y0IKPzx)nZ9_[t+S9&J0c'
         }
     },

@@ -2,11 +2,11 @@ var db = null;
 
 const getWhere = function(auth, showImport) {
     if(!auth || !showImport) {
-        return 'imported = 1';
+        return 'imported = 2';
     }
 
     if(auth.isEditor && showImport) {
-        return 'imported = 0';
+        return 'imported < 2';
     }
     if(auth.isContributor && showImport) {
         return `imported = 0 AND sub = ${db.escape(auth.user)}`;
@@ -19,6 +19,7 @@ const list = async function(limits, auth, showImport) {
     //console.dir(res);
     var results = await db.query({table: 'dataset', sql: `SELECT dataset.id, dataset.name, dataset.authors, dataset.uploader, dataset.date, dataset.imported `
      + `FROM dataset WHERE ${where}`, limits, hasWhere: true });    
+     
      res.items = results;
      res.items.foreach(r => {
          r.imported = r.imported > 0;
@@ -34,7 +35,20 @@ const get = async function(params, auth, showImport) {
     var where = getWhere(auth,showImport);
     var results = await db.query({table: 'dataset', sql: `SELECT * FROM dataset WHERE id = ? AND ${where}`, values: [id]});
      var r = results[0];
-     r.imported = r.imported > 0;
+     
+     if(showImport) {
+        var validR = db.query({table: 'import', sql: `SELECT COUNT(import.valid) as invalid FROM `
+        + `import LEFT JOIN dataset ON import.dataset_id = dataset.id WHERE dataset.id = ? AND ${where} AND valid=0`, values: [id]});
+       res.valid = validR.results[0].invalid == 0;
+    }
+     
+     r.state = 'approved';
+     if(r.imported == 0) {
+         r.state = 'uploaded';
+     } else if(r.imported == 1) {
+         r.state = 'reviewed';
+     }
+     delete(r.imported);
      // JavaScript dates are serialized badly in JSON
      r.date = r.date.valueOf();
      return {
@@ -43,7 +57,11 @@ const get = async function(params, auth, showImport) {
 }
 
 const prepareForSql = function(dataset) {
-    dataset.imported = (dataset.imported) ? 1 : 0;
+    
+    //dataset.imported = (dataset.state) ? 1 : 0;
+    // state of the dataset can't be changed here
+    delete(dataset.state);
+    delete(dataset.imported);
     dataset.date = new Date(dataset.date);
 }
 
@@ -56,6 +74,8 @@ const update = async function(params, body) {
 }
 
 const remove = async function(params) {
+    // TODO delete all the record in the import and data tables
+
     return await db.deleteEntity(params, 'dataset');
 }
 

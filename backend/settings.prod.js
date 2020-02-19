@@ -12,11 +12,15 @@ module.exports = {
     oidc: {
         client: 'TODO',
         issuer: 'https://oidc.muni.cz/oidc',
-        secret: 'TIDO',
+        secret: 'TODO',
         url: 'https://spidertraits.sci.muni.cz',
         session: {
-            name: 'TODO',
             secret: 'TODO'
+        },
+        claims: {
+            administration: 'urn:geant:muni.cz:res:spider-trait-db-administration#idm.ics.muni.cz',
+            dataValidation: 'urn:geant:muni.cz:res:spider-trait-db-data-validation#idm.ics.muni.cz',
+            dataEntry: 'urn:geant:muni.cz:res:spider-trait-db-data-entry#idm.ics.muni.cz'
         }
     },
     db: {

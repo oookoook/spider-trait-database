@@ -67,10 +67,14 @@
 
       <v-spacer></v-spacer>
       <v-toolbar-items>
-      <v-btn
-        href="/user/login"
+      <v-btn v-if="!user"
+        :href="loginUrl"
         text
       ><v-icon left>mdi-account-arrow-right-outline</v-icon>  Log in 
+      </v-btn>
+      <v-btn v-else
+        text
+      ><v-icon left>mdi-account</v-icon>  {{user.name}} 
       </v-btn>
       </v-toolbar-items>
     </v-app-bar>
@@ -96,9 +100,10 @@
 
 <script>
 import { mapState, mapGetters } from 'vuex'
+import Auth from './mixins/auth'
 export default {
   name: 'App',
-
+  mixins: [Auth],
   components: {
   },
 

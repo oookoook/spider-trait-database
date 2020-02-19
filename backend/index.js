@@ -9,6 +9,7 @@ var bodyParser = require('body-parser');
 var cors = require('cors');
 
 var api = require('./api');
+var cauth = require('./auth');
 
 var app = express();
 
@@ -74,18 +75,22 @@ if(!settings.oidc.disable) {
         scope: "openid"
       }
   }));
+  cauth.setClaims(settings.oidc.claims);
 }
 // route used to show the SSO login screen
-app.get('/user/login', (req, res) => res.openid.login({ returnTo: '/' }));
+app.get('/user/login', (req, res) => res.openid.login({ returnTo: `/login?returnRoute=${encodeURIComponent(req.query.returnRoute)}` }));
 
 
 
-app.get('/user/info', requiresAuth(), function (req, res) {
+app.get('/user/info', requiresAuth(), cauth.resourcesAuth, function (req, res) {
     //console.dir(req.openid.user);
+    /*
     var user = {
-        username: req.openid.user.sub
+        username: req.openid.user.sub,
+
     }
-    res.json(user);
+    */
+    res.json(req.resourcesAuth);
   });
 
 // sets up the data hnadling routes
