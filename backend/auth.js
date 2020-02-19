@@ -2,14 +2,14 @@ var claims;
 
 const resourcesAuth = function (req, res, next) {
     req.resourcesAuth = {
-        sub: req.oidc && req.oidc.user && req.oidc.user.sub ? req.oidc.user.sub : null, 
-        name: req.oidc && req.oidc.user && req.oidc.user.sub ? req.oidc.user.sub : null, 
+        sub: req.openid && req.openid.user && req.openid.user.sub ? req.openid.user.sub : null, 
+        name: req.openid && req.openid.user && req.openid.user.sub ? req.openid.user.sub : null, 
         isAdmin: true,
         isEditor: true,
         isContributor: true
     }
     console.dir(claims);
-    console.dir(req.oidc? req.oidc.user : 'no oidc present');
+    console.dir(req.openid ? req.openid : 'no oidc present');
     console.dir(req.resourcesAuth);
     next();
 }
