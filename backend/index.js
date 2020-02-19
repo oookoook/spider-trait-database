@@ -78,12 +78,13 @@ if(!settings.oidc.disable) {
   cauth.setClaims(settings.oidc.claims);
 }
 // route used to show the SSO login screen
-app.get('/user/login', (req, res) => res.openid.login({ returnTo: `/login?returnRoute=${encodeURIComponent(req.query.returnRoute)}` }));
+// ?returnRoute=${encodeURIComponent(req.query.returnRoute)}
+app.get('/user/login', (req, res) => res.openid.login({ returnTo: `/login` }));
 
 
 
 app.get('/user/info', requiresAuth(), cauth.resourcesAuth, function (req, res) {
-    //console.dir(req.openid.user);
+    console.dir(req.openid.user);
     /*
     var user = {
         username: req.openid.user.sub,
