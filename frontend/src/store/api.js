@@ -1,6 +1,6 @@
 import Vue from 'vue';
 
-const baseUrl = `${process.env.VUE_APP_BACKEND_HOST}backend/` //Vue.config.devtools ? 'http://localhost:3000/backend/' : '/backend/';
+const baseUrl = `${process.env.VUE_APP_BACKEND}backend/` //Vue.config.devtools ? 'http://localhost:3000/backend/' : '/backend/';
 
 const getUrl = function(payload) {
     return `${baseUrl}${payload.endpoint}${payload.params ? '/' + payload.params : ''}`;

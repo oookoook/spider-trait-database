@@ -20,13 +20,13 @@ export default {
             return state.user;
         },
         loginUrl(state) {
-          return `${process.env.VUE_APP_BACKEND_HOST}user/login?returnPath=${encodeURIComponent(state.lastRoute)}`;
+          return `${process.env.VUE_APP_BACKEND}user/login?returnPath=${encodeURIComponent(state.lastRoute)}`;
         }
     },
     actions: {
       async getUserInfo(context, payload) {
         try {
-          var result = await Vue.http.get(`${process.env.VUE_APP_BACKEND_HOST}user/info`);
+          var result = await Vue.http.get(`${process.env.VUE_APP_BACKEND}user/info`);
           context.commit('user', { value: result.body });
           context.commit('loginTime', { value: new Date().valueOf() });
         } catch (err) {

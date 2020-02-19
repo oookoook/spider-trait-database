@@ -9,7 +9,7 @@ const resourcesAuth = function (req, res, next) {
         isContributor: true
     }
     console.dir(claims);
-    console.dir(oidc.user);
+    console.dir(req.oidc? req.oidc.user : 'no oidc present');
     console.dir(req.resourcesAuth);
     next();
 }
