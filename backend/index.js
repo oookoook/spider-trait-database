@@ -78,8 +78,8 @@ if(!settings.oidc.disable) {
   cauth.setClaims(settings.oidc.claims);
 }
 // route used to show the SSO login screen
-// ?returnRoute=${encodeURIComponent(req.query.returnRoute)}
-app.get('/user/login', (req, res) => res.openid.login({ returnTo: `/login` }));
+// 
+app.get('/user/login', (req, res) => res.openid.login({ returnTo: `/login?returnRoute=${encodeURIComponent(req.query.returnRoute)}` }));
 
 
 
