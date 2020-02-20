@@ -72,7 +72,7 @@ if(!settings.oidc.disable) {
     authorizationParams: {
         response_type: "code",
         response_mode: "query",
-        scope: "openid"
+        scope: "openid eduperson_entitlement"
       }
   }));
   cauth.setClaims(settings.oidc.claims);

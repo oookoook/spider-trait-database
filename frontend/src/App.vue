@@ -63,6 +63,26 @@
         </v-list-item>
       </v-list>
     </v-menu>
+
+    <v-menu right bottom offset-y>
+      <template v-slot:activator="{ on }">
+        <v-btn text v-on="on"><v-icon left>mdi-help</v-icon> Help<v-icon right>mdi-chevron-down</v-icon></v-btn>
+      </template>
+      <v-list>
+        <v-list-item to="/about">
+          <v-list-item-icon><v-icon>mdi-frequently-asked-questions</v-icon></v-list-item-icon>
+          <v-list-item-content><v-list-item-title>About project</v-list-item-title></v-list-item-content>
+        </v-list-item>
+        <v-list-item to="/terms">
+          <v-list-item-icon><v-icon>mdi-format-list-numbered</v-icon></v-list-item-icon>
+          <v-list-item-content><v-list-item-title>Terms of service</v-list-item-title></v-list-item-content>
+        </v-list-item>
+        <v-list-item to="/policy">
+          <v-list-item-icon><v-icon>mdi-shield-check-outline</v-icon></v-list-item-icon>
+          <v-list-item-content><v-list-item-title>Policy statement</v-list-item-title></v-list-item-content>
+        </v-list-item>
+      </v-list>
+    </v-menu>
       </v-toolbar-items>
 
       <v-spacer></v-spacer>
