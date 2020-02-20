@@ -6,7 +6,7 @@ export default {
         }
     },
     computed: {
-        ...mapGetters(['loginUrl', 'user'])
+        ...mapGetters(['loginUrl', 'user', 'lastRoute'])
     },
     watch: {
         $route(to, from) {
@@ -24,10 +24,11 @@ export default {
                 this.$store.dispatch('getUserInfo').then(
                     () => this.$store.dispatch('notify', { error: false, text: `You were successully loged in as ${this.user.name}`}), 
                     () => this.$store.dispatch('notify', { error: true, text: `Unable to log you in.`}));
-                var returnRoute = this.$route.query.returnRoute ? this.$route.query.returnRoute : '/';
+                // should be stored in the local storage (vuex persistence)
+                var returnRoute = this.lastRoute ? this.lastRoute : '/';
                 this.$router.replace(returnRoute);
             } else {
-                // stores the current route so the login link is updated
+                // stores the current route to the store and to the local storage
                 this.$store.commit('lastRoute', {value: this.$route.path });
             }
         }

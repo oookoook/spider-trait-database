@@ -1,6 +1,6 @@
 <template>
 <v-container fluid>
-  <list-provider list="references" v-slot="i">
+  <list-provider list="datasets" v-slot="i">
     <datasets-table :items="i.items" 
     :loading="i.loading" 
     :total="i.total" 

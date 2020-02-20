@@ -79,7 +79,7 @@ if(!settings.oidc.disable) {
 }
 // route used to show the SSO login screen
 // 
-app.get('/user/login', (req, res) => res.openid.login({ returnTo: `/login?returnRoute=${encodeURIComponent(req.query.returnRoute)}` }));
+app.get('/user/login', (req, res) => res.openid.login({ returnTo: `/login` }));
 
 
 

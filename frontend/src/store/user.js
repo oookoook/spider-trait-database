@@ -1,5 +1,6 @@
 import Vue from 'vue';
 
+
 export default {
     state: {
       user: null,
@@ -22,7 +23,10 @@ export default {
             return state.user;
         },
         loginUrl(state) {
-          return `${process.env.VUE_APP_BACKEND}user/login?returnPath=${encodeURIComponent(state.lastRoute)}`;
+          return `${process.env.VUE_APP_BACKEND}user/login`;
+        },
+        lastRoute(state) {
+          return state.lastRoute;
         }
     },
     actions: {
@@ -35,7 +39,7 @@ export default {
           console.error(err);
           throw err;
         }
-      }
+      },
     },
     modules: {
     }
