@@ -1,0 +1,3 @@
+git pull
+cd backend
+sudo pm2 restart spidertraits
