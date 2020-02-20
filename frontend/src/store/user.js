@@ -1,3 +1,5 @@
+import Vue from 'vue';
+
 export default {
     state: {
       user: null,
@@ -31,7 +33,8 @@ export default {
           context.commit('loginTime', { value: new Date().valueOf() });
         } catch (err) {
           console.error(err);
-      }
+          throw err;
+        }
       }
     },
     modules: {

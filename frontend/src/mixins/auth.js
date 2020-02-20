@@ -24,7 +24,7 @@ export default {
                 this.$store.dispatch('getUserInfo').then(
                     () => this.$store.dispatch('notify', { error: false, text: `You were successully loged in as ${this.user.name}`}), 
                     () => this.$store.dispatch('notify', { error: true, text: `Unable to log you in.`}));
-                var returnRoute = this.$route.query.returnRoute;
+                var returnRoute = this.$route.query.returnRoute ? this.$route.query.returnRoute : '/';
                 this.$router.replace(returnRoute);
             } else {
                 // stores the current route so the login link is updated
