@@ -10,7 +10,9 @@ const resourcesAuth = function (req, res, next) {
     }
     console.dir(claims);
     //console.dir(req.openid ? req.openid : 'no oidc present');
-    console.dir((req.openid && req.openid.identity) ? req.openid.identity : 'no identity');
+    console.dir((req.openid && req.openid.identity) ? req.openid.identity : 'no openid identity');
+    console.dir((req.identity) ? req.identity : 'no req identity');
+    console.dir((req.identity && req.identity.claims) ? req.identity.claims : 'no req identity');
     console.dir(req.resourcesAuth);
     next();
 }
