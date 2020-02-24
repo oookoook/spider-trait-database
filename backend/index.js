@@ -73,7 +73,11 @@ if(!settings.oidc.disable) {
         response_type: "code",
         response_mode: "query",
         scope: "openid eduperson_entitlement"
-      }
+    },
+    handleCallback: async function (req, res, next) {
+      console.dir(req.openidTokens);
+      next();
+    }
   }));
   cauth.setClaims(settings.oidc.claims);
 }
