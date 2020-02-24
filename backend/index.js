@@ -71,7 +71,7 @@ if(!settings.oidc.disable) {
     routes: false,
     authorizationParams: {
         response_type: "token",
-        response_mode: "form_post",
+        response_mode: "fragment",
         scope: "openid eduperson_entitlement"
     },
     handleCallback: async function (req, res, next) {
