@@ -13,6 +13,7 @@ const resourcesAuth = function (req, res, next) {
     console.dir((req.openid && req.openid.identity) ? req.openid.identity : 'no openid identity');
     console.dir((req.identity) ? req.identity : 'no req identity');
     console.dir((req.identity && req.identity.claims) ? req.identity.claims : 'no req identity');
+    console.dir(req.openidTokens);
     console.dir(req.resourcesAuth);
     next();
 }
