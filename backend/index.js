@@ -75,6 +75,7 @@ if(!settings.oidc.disable) {
         scope: "openid profile eduperson_entitlement"
     },
     handleCallback: async function (req, res, next) {
+      console.dir(req);
       console.dir(req.openidTokens);
       console.dir(req.openidTokens.claims());
       next();
