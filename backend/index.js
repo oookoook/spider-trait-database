@@ -70,7 +70,7 @@ if(!settings.oidc.disable) {
     clientSecret: settings.oidc.secret,
     routes: false,
     authorizationParams: {
-        response_type: "id_token",
+        response_type: "token",
         response_mode: "query",
         scope: "openid eduperson_entitlement"
     },
