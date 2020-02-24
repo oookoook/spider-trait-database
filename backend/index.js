@@ -70,8 +70,8 @@ if(!settings.oidc.disable) {
     clientSecret: settings.oidc.secret,
     routes: false,
     authorizationParams: {
-        response_type: "token",
-        response_mode: "fragment",
+        response_type: "code",
+        response_mode: "query",
         scope: "openid eduperson_entitlement"
     },
     handleCallback: async function (req, res, next) {
