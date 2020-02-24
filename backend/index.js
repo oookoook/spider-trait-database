@@ -70,12 +70,13 @@ if(!settings.oidc.disable) {
     clientSecret: settings.oidc.secret,
     routes: false,
     authorizationParams: {
-        response_type: "code",
+        response_type: "id_token",
         response_mode: "query",
         scope: "openid eduperson_entitlement"
     },
     handleCallback: async function (req, res, next) {
       console.dir(req.openidTokens);
+      console.dir(req.openidTokens.claims());
       next();
     }
   }));
