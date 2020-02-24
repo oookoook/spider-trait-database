@@ -72,7 +72,7 @@ if(!settings.oidc.disable) {
     authorizationParams: {
         response_type: "code",
         response_mode: "query",
-        scope: "openid eduperson_entitlement"
+        scope: "openid profile eduperson_entitlement"
     },
     handleCallback: async function (req, res, next) {
       console.dir(req.openidTokens);
