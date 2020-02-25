@@ -1,6 +1,7 @@
 var express = require('express')
 var fs = require('fs')
 var https = require('https')
+var http = require('http')
 var settings = require('./settings')
 var history = require('connect-history-api-fallback');
 const { auth, requiresAuth } = require('express-openid-connect');
@@ -75,10 +76,14 @@ if(!settings.oidc.disable) {
         scope: "openid profile eduperson_entitlement"
     },
     handleCallback: async function (req, res, next) {
-      console.dir(req);
-      console.dir(req.openidTokens);
-      console.dir(req.openidTokens.claims());
-      next();
+      const client = req.openid.client;
+      req.appSession = req.appSession || {};
+      try {
+        req.appSession.claims = await client.userinfo(req.openidTokens);
+        next();
+      } catch(e) {
+        next(e);
+      }
     }
   }));
   cauth.setClaims(settings.oidc.claims);
@@ -112,7 +117,13 @@ if(settings.https.enable) {
       }, app)
       .listen(settings.port, function () {
         console.log(`Server is listening on port ${settings.port}. Go to https://localhost:${settings.port}/`)
-      })
+      });
+    
+    // http server that redirects the requests
+    http.createServer(function (req, res) {
+      res.writeHead(301, { "Location": "https://" + req.headers['host'] + req.url });
+      res.end();
+    }).listen(80);
 } else {
     app.listen(settings.port, () => console.log(`Server is listening on port ${settings.port}. Go to http://localhost:${settings.port}/`))
 }
