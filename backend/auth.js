@@ -1,21 +1,18 @@
 var claims;
 
 const resourcesAuth = function (req, res, next) {
-    req.resourcesAuth = {
-        sub: req.openid && req.openid.user && req.openid.user.sub ? req.openid.user.sub : null, 
-        name: req.openid && req.openid.user && req.openid.user.sub ? req.openid.user.sub : null, 
-        isAdmin: true,
-        isEditor: true,
-        isContributor: true
-    }
+    
     console.dir(claims);
     //console.dir(req.openid ? req.openid : 'no oidc present');
     console.dir((req.openid && req.openid.user) ? req.openid.user : 'no openid user');
-    console.dir((req.openid && req.openid.identity) ? req.openid.identity : 'no openid identity');
-    console.dir((req.identity) ? req.identity : 'no req identity');
-    console.dir((req.identity && req.identity.claims) ? req.identity.claims : 'no req identity');
-    console.dir((req.appSession && req.appSession.claims) ? req.appSession.claims : 'no appSession cookie');
-    console.dir(req.openidTokens);
+    var groups = req.openid.user[claims.name];
+    req.resourcesAuth = {
+        sub: req.openid && req.openid.user && req.openid.user.sub ? req.openid.user.sub : null, 
+        name: req.openid && req.openid.user && req.openid.user.sub ? req.openid.user.sub : null, 
+        isAdmin: groups.includes(claims.administration),
+        isEditor: groups.includes(claims.dataValidation),
+        isContributor: groups.includes(claims.dataEntry)
+    }
     console.dir(req.resourcesAuth);
     next();
 }
