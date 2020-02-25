@@ -67,9 +67,12 @@ if(!settings.oidc.disable) {
     issuerBaseURL: settings.oidc.issuer,
     baseURL: settings.oidc.url,
     clientID: settings.oidc.client,
+    appSessionSecret: settings.oidc.session.secret,
+    /* will be required in a new version
     appSession: {
       secret: settings.oidc.session.secret
     },
+    */
     clientSecret: settings.oidc.secret,
     routes: false,
     authorizationParams: {
@@ -78,12 +81,13 @@ if(!settings.oidc.disable) {
         scope: "openid profile eduperson_entitlement"
     },
     handleCallback: async function (req, res, next) {
+      // replace this with a new version (appSession instead of identity) once a new relase is made
       const client = req.openid.client;
-      req.appSession = req.appSession || {};
+      req.identity = req.identity || {};
       try {
         var t = await client.userinfo(req.openidTokens);
         console.dir(t);
-        req.appSession.claims = t;
+        req.identity.claims = t;
         next();
       } catch(e) {
         next(e);
