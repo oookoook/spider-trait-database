@@ -79,7 +79,9 @@ if(!settings.oidc.disable) {
       const client = req.openid.client;
       req.appSession = req.appSession || {};
       try {
-        req.appSession.claims = await client.userinfo(req.openidTokens);
+        var t = await client.userinfo(req.openidTokens);
+        console.dir(t);
+        req.appSession.claims = t;
         next();
       } catch(e) {
         next(e);
