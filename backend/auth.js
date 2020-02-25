@@ -2,9 +2,9 @@ var claims;
 
 const resourcesAuth = function (req, res, next) {
     
-    console.dir(claims);
+    //console.dir(claims);
     //console.dir(req.openid ? req.openid : 'no oidc present');
-    console.dir((req.openid && req.openid.user) ? req.openid.user : 'no openid user');
+    //console.dir((req.openid && req.openid.user) ? req.openid.user : 'no openid user');
     var groups = req.openid.user[claims.name];
     req.resourcesAuth = {
         sub: req.openid && req.openid.user && req.openid.user.sub ? req.openid.user.sub : null, 
@@ -13,7 +13,7 @@ const resourcesAuth = function (req, res, next) {
         isEditor: groups.includes(claims.dataValidation),
         isContributor: groups.includes(claims.dataEntry)
     }
-    console.dir(req.resourcesAuth);
+    //console.dir(req.resourcesAuth);
     next();
 }
 

@@ -18,6 +18,7 @@ module.exports = {
             secret: 'TODO'
         },
         claims: {
+            name: 'eduperson_entitlement',
             administration: 'urn:geant:muni.cz:res:spider-trait-db-administration#idm.ics.muni.cz',
             dataValidation: 'urn:geant:muni.cz:res:spider-trait-db-data-validation#idm.ics.muni.cz',
             dataEntry: 'urn:geant:muni.cz:res:spider-trait-db-data-entry#idm.ics.muni.cz'

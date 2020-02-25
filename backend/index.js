@@ -86,7 +86,7 @@ if(!settings.oidc.disable) {
       req.identity = req.identity || {};
       try {
         var t = await client.userinfo(req.openidTokens);
-        console.dir(t);
+        //console.dir(t);
         req.identity.claims = t;
         next();
       } catch(e) {
@@ -103,13 +103,7 @@ app.get('/user/login', (req, res) => res.openid.login({ returnTo: `/login` }));
 
 
 app.get('/user/info', requiresAuth(), cauth.resourcesAuth, function (req, res) {
-    console.dir(req.openid.user);
-    /*
-    var user = {
-        username: req.openid.user.sub,
-
-    }
-    */
+    //console.dir(req.openid.user);
     res.json(req.resourcesAuth);
   });
 
