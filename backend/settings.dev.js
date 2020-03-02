@@ -23,7 +23,10 @@ module.exports = {
         password: 'app',
         database: 'spider_traits_db'
     },
-    export: {
-        tmpDir: './test'
+    files: {
+        tmpDir: './test',
+        import: {
+            sizeLimitMB: 100
+        }
     }
 }

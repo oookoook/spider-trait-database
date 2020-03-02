@@ -1,21 +1,27 @@
 const express = require('express');
+const fileUpload = require('express-fileupload');
 const router = express.Router();
 const { requiresAuth } = require('express-openid-connect');
-const auth = require('./auth');
-const db = require('./db-client');
 
-const traits = require('./api/traits')(db);
-const methods = require('./api/methods')(db);
-const references = require('./api/references')(db);
-const locations = require('./api/locations')(db);
-const taxonomy = require('./api/taxonomy')(db);
-const datasets = require('./api/datasets')(db);
-const data = require('./api/data')(db);
-const importx = require('./api/import')(db);
+
+const auth = require('../util/auth');
+const db = require('../util/db-client');
+const settings = require('../settings');
+
+const traits = require('./traits')(db);
+const methods = require('./methods')(db);
+const references = require('./references')(db);
+const locations = require('./locations')(db);
+const taxonomy = require('./taxonomy')(db);
+const datasets = require('./datasets')(db);
+const data = require('./data')(db);
+const importx = require('./import')(db);
 
 router.use(auth.resourcesAuth);
 
 router.use(db.limits);
+
+var uploadOpts = { useTempFiles: true, tempFileDir : settings.files.tmpDir, limits: { fileSize: settings.files.import.sizeLimitMB * 1024 * 1024 }};
 
 router.route('/autocomplete/:endpoint')
   .get(function(req, res) {
@@ -148,7 +154,7 @@ router.route('/data/family/:family/genus/:genus/species/:species/trait-category/
 
 router.route('/data/export/family/:family/genus/:genus/species/:species/trait-category/:traitcat/trait/:trait/country/:country/habitat/:habitat/dataset/:dataset/authors/:authors/reference/:reference/row-link/:rowl')
   .get(function (req, res) {
-    data.csv(req.params, req.recordLimit).then(r => res.download(r)).catch(e => { console.log(e); res.sendStatus(400); });
+    data.csv(req.params, req.recordLimit, settings.files.tmpDir).then(r => res.download(r)).catch(e => { console.log(e); res.sendStatus(400); });
   });
 
 router.route('/import/')
@@ -180,11 +186,11 @@ router.route('/import/:id/data')
   .get(requiresAuth(), auth.isContributor, function (req, res) {
     importx.list(req.params, req.recordLimit, req.resourcesAuth).then(r => res.json(r)).catch(e => { console.log(e); res.sendStatus(400); });
   })
-  .put(requiresAuth(), auth.isContributor, function (req, res) {
+  .put(requiresAuth(), auth.isContributor, fileUpload(uploadOpts), function (req, res) {
     // uploads a file to already existing dataset
     // returns only a jobId that can be used to track the progress
     // in the background transfers rows from the file to the import table
-    importx.uploadFile(req.params, req.body, req.resourcesAuth).then(r => res.json(r)).catch(e => { console.log(e); res.sendStatus(400); });
+    importx.uploadFile(req.params, req.body, req.files, req.resourcesAuth).then(r => res.json(r)).catch(e => { console.log(e); res.sendStatus(400); });
   })
   .delete(requiresAuth(), auth.isContributor, function (req, res) {
     // delete all the records for a given dataset in the import table
@@ -203,9 +209,29 @@ router.route('/import/:id/row/:row')
   });
 
 router.route('/import/:id/column/:column')
+  .get(requiresAuth(), auth.isContributor, function (req, res) {
+  // used for getting the distinct entities that must be created
+  importx.getColumn(req.params, req.resourcesAuth).then(r => res.json(r)).catch(e => { console.log(e); res.sendStatus(400); });
+  })
   .put(requiresAuth(), auth.isContributor, function (req, res) {
     // used for batch value replacements
     importx.updateColumn(req.params, req.body, req.resourcesAuth).then(r => res.json(r)).catch(e => { console.log(e); res.sendStatus(400); });
    });
+   
+router.route('/jobs/')
+    .get(requiresAuth(), auth.isAdmin, function (req, res) {
+      // used for getting the distinct entities that must be created
+      jobs.list().then(r => res.json(r)).catch(e => { console.log(e); res.sendStatus(400); });
+     });
+
+router.route('/jobs/:id')
+    .get(requiresAuth(), auth.isContributor, function (req, res) {
+      // used for getting the distinct entities that must be created
+      jobs.get(req.params, req.resourcesAuth).then(r => res.json(r)).catch(e => { console.log(e); res.sendStatus(400); });
+     })
+     .delete(requiresAuth(), auth.isContributor, function (req, res) {
+      jobs.remove(req.params, req.resourcesAuth).then(r => res.json(r)).catch(e => { console.log(e); res.sendStatus(400); });
+    });
+ 
 
 module.exports = router;

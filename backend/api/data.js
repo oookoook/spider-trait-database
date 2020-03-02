@@ -1,7 +1,7 @@
 var db = null;
 
 const fcsv = require('fast-csv');
-const settings = require('../settings');
+const fs = require('fs');
 const path = require('path');
 
 var join = `data `
@@ -85,19 +85,14 @@ const list = async function(params, limits) {
     return res;
 }
 
-const csv =  async function(params, limits) {
+const csv =  async function(params, limits, tmpDir) {
     var cond = getCondition(params);
     var res = await db.prepareListResponse(limits, 'data', cond.clause, cond.values, join);
     limits.limit = res.count;
 
-    // TODO column names
-    // TODO remove ids
-    // TODO full location
-    // TODO full reference
-
-    var results = await db.query({ table: 'data', sql: `SELECT data.id, taxonomy.wsc_lsid, data.original_name as originalName, `
+    var dstream = db.squery({ table: 'data', sql: `SELECT data.id, taxonomy.wsc_lsid, data.original_name as originalName, `
      + `taxonomy.family, taxonomy.genus, taxonomy.species, taxonomy.subspecies, `
-     + `trait.abbrev as trait, trait.name as traitFullName, trait_category.name as traitCategory, data.value, `
+     + `trait.abbrev as trait, trait.name as traitFullName, trait_category.name as traitCategory, data.value, data.value_numeric, `
      + `measure.name as measure, sex.name as sex, life_stage.name as lifeStage, data.frequency, data.sample_size as sampleSize, method.abbrev as method, method.name as methodFullName, `
      + `location.abbrev as location, location.lat as decimalLatitude, location.lon as decimalLongitude, location.precision as coordinatePrecision, location.altitude, location.locality as verbatimLocality, `
      + `country.alpha3_code as countryCode, country.name as countryName, habitat_global.name as habitatGlobal, habitat_global.number as habitatGlobalNumber,`
@@ -106,11 +101,36 @@ const csv =  async function(params, limits) {
      + `FROM ${join} WHERE ${cond.clause}`
      , values: cond.values, nestTables: false, limits, hasWhere: true});
     
-    var p = path.resolve(settings.export.tmpDir, `spider-traits-${new Date().valueOf()}.csv`);
+    var p = path.resolve(tmpDir, `spider-traits-${new Date().valueOf()}.csv`);
+    
     await new Promise((resolve, reject) => {
-        fcsv.writeToPath(p, results, {headers: true})
+
+    var cstream = fcsv.format({headers: true})
         .on('error', err => reject(err))
         .on('finish', () => resolve(path));
+    
+    const fstream = fs.createWriteStream(p, { encoding: 'utf8' });
+    cstream.pipe(fstream);
+
+    dstream
+        .on('error', function(err) {
+        // Handle error, an 'end' event will be emitted after this as well
+        console.log(err);
+        })
+        .on('fields', function(fields) {
+        // the field packets for the rows to follow
+        })
+        .on('result', function(row) {
+        // Pausing the connnection is useful if your processing involves I/O
+        connection.pause();
+        cstream.write(row);    
+        connection.resume();
+      })
+      .on('end', function() {
+        // all rows have been received
+        cstream.end();
+      });
+        
     });
     return p;
 }

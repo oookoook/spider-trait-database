@@ -1,18 +1,18 @@
-var express = require('express')
-var fs = require('fs')
-var https = require('https')
-var http = require('http')
-var settings = require('./settings')
-var history = require('connect-history-api-fallback');
+const express = require('express')
+const fs = require('fs')
+const https = require('https')
+const http = require('http')
+const settings = require('./settings')
+const history = require('connect-history-api-fallback');
 const { auth, requiresAuth } = require('express-openid-connect');
 //const session = require('cookie-session');
-var bodyParser = require('body-parser');
-var cors = require('cors');
+const bodyParser = require('body-parser');
+const cors = require('cors');
 
-var api = require('./api');
-var cauth = require('./auth');
+const api = require('./api/api');
+const cauth = require('./util/auth');
 
-var app = express();
+const app = express();
 
 // userd for testing. Other CORS requests should be blocked
 app.use(cors({

@@ -73,8 +73,12 @@ const update = async function(params, body) {
     return await db.updateEntity(params, body, 'dataset', prepareForSql);
 }
 
-const remove = async function(params) {
-    // TODO delete all the record in the import and data tables
+const remove = async function(params, auth) {
+    // delete all the records in the import and data tables
+    var id = parseInt(params.id);
+    var aw = getWhere(auth, true);
+    await db.query({table: 'import', sql: `DELETE import FROM import JOIN dataset ON import.dataset_id = dataset.id WHERE dataset_id = ? AND ${aw}`, values: [id] });
+    await db.query({table: 'data', sql: `DELETE data FROM data JOIN dataset ON data.dataset_id = dataset.id WHERE dataset_id = ? AND ${aw}`, values: [id] });
 
     return await db.deleteEntity(params, 'dataset');
 }

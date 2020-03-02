@@ -1,5 +1,5 @@
 var mysql = require('mysql');
-var settings = require('./settings');
+var settings = require('../settings');
 var pool = mysql.createPool({
     connectionLimit: settings.db.connections,
     host: settings.db.host,
@@ -63,24 +63,42 @@ hasWhere
 }
 */
 
+const getQueryParams = function(opt) {
+    if(!opt.values) {
+        opt.values = [];
+    }
+    return {
+        nestTables: opt.nestTables,
+        sql: opt.sql + addLimits(opt.values, opt.limits, opt.table, opt.hasWhere, opt.aggregate, opt.customWhereClause),
+        values: opt.values
+    };
+}
 
 const query = function (opt) {
     return new Promise(function (resolve, reject) {
         //console.log(opt);
-        if(!opt.values) {
-            opt.values = [];
-        }
-        pool.query({
-            nestTables: opt.nestTables,
-            sql: opt.sql + addLimits(opt.values, opt.limits, opt.table, opt.hasWhere, opt.aggregate, opt.customWhereClause),
-            values: opt.values
-        }, function (error, results, fields) {
+        pool.query(getQueryParams(opt), function (error, results, fields) {
             if (error) {
                 reject(error);
             }
             resolve(results, fields);
         });
     });
+}
+
+const cquery = function (c, opt) {
+    return new Promise(function (resolve, reject) {
+        c.query(getQueryParams(opt), function (error, results, fields) {
+            if (error) {
+                reject(error);
+            }
+            resolve(results, fields);
+        });
+    });
+}
+
+const squery = function (opt) {
+    return pool.query(getQueryParams(opt));
 }
 
 const getConnection = function () {
@@ -92,21 +110,6 @@ const getConnection = function () {
             resolve(connection);
 
         })
-    });
-}
-
-const cquery = function (c, opt) {
-    return new Promise(function (resolve, reject) {
-        c.query({
-            nestTables: opt.nestTables,
-            sql: opt.sql + addLimits(opt.values, opt.limits, opt.table, opt.hasWhere, opt.aggregate, opt.customWhereClause),
-            values: opt.values
-        }, function (error, results, fields) {
-            if (error) {
-                reject(error);
-            }
-            resolve(results, fields);
-        });
     });
 }
 
@@ -231,7 +234,7 @@ const getAutocomplete = async function(endpoint, valueField, textField, search, 
     } else if(textSql) {
         sql = `SELECT DISTINCT ?? as value, ${textSql} as text FROM ?? WHERE ${textSql} LIKE ? ORDER BY ${textSql} ${countSql}`;
     } else if(searchByValue) {
-        sql = `SELECT DISTINCT ?? as value FROM ?? WHERE = LIKE ? ORDER BY ?? ${countSql}`;
+        sql = `SELECT DISTINCT ?? as value FROM ?? WHERE ?? = ? ORDER BY ?? ${countSql}`;
     } else {
         sql = `SELECT DISTINCT ?? as value FROM ?? WHERE ?? LIKE ? ORDER BY ?? ${countSql}`;
     }
@@ -341,6 +344,7 @@ const getSynonym = function(table, field) {
 module.exports = {
     query,
     cquery,
+    squery,
     getConnection,
     releaseConnection,
     limits,

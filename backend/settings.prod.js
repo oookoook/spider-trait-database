@@ -31,7 +31,10 @@ module.exports = {
         password: 'TODO',
         database: 'spider_traits_db'
     },
-    export: {
-        tmpDir: '/var/tmp'
+    files: {
+        tmpDir: '/var/tmp',
+        import: {
+            sizeLimitMB: 100
+        }
     }
 }
