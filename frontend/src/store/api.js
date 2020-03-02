@@ -57,7 +57,7 @@ const getListParams = function(payload) {
 
 const authenticate = function(payload) {
     if(payload.auth) {
-        /* TODO */
+        /* TODO authorization */
         return Promise.resolve(true);
     } else {
         return Promise.resolve(true);
