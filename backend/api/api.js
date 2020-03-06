@@ -133,7 +133,7 @@ router.route('/datasets')
     datasets.list(req.recordLimit).then(r => res.json(r)).catch(e => { console.log(e); res.sendStatus(400); });
   })
   .post(requiresAuth(), auth.isContributor, function (req, res) {
-    datasets.create(req.body).then(r => res.json(r)).catch(e => { console.log(e); res.sendStatus(400); });
+    datasets.create(req.body, req.resourcesAuth).then(r => res.json(r)).catch(e => { console.log(e); res.sendStatus(400); });
   })
 
 router.route('/datasets/:id')

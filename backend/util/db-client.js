@@ -1,5 +1,7 @@
-var mysql = require('mysql');
-var settings = require('../settings');
+const mysql = require('mysql');
+const settings = require('../settings');
+const shortid = require('shortid');
+
 var pool = mysql.createPool({
     connectionLimit: settings.db.connections,
     host: settings.db.host,
@@ -247,7 +249,8 @@ const getAutocomplete = async function(endpoint, valueField, textField, search, 
     return r;
 }
 
-const createEntity = async function (body, table, prepareForSql, validate) {
+const createEntity = async function (opts) {
+    var {body, table, auth, prepareForSql, validate} = opts;
     var obj = body;
     if (typeof validate == 'function') {
         var vr = validate(obj);
@@ -255,23 +258,44 @@ const createEntity = async function (body, table, prepareForSql, validate) {
             throw 'Object validation failed';
         }
     }
-    prepareForSql(obj);
+    prepareForSql(obj, auth);
     delete(obj.id);
-    var r = await d.query({table, sql: `INSERT INTO ${table} SET ?`, values: [obj] });
+    console.dir(obj);
+    var r = await query({table, sql: `INSERT INTO ${table} SET ?`, values: [obj] });
     return {
         id: r.insertId
     }
 }
 
-const deleteEntity = async function (params, table) {
-    var id = parseInt(params.id);
-    var r = await d.query({table, sql: `DELETE FROM \`${table}\` WHERE id=?`, values: [id] });
-    return {
-        id
+const getAuthWhere = function(auth) {
+    var aw = "";
+    if(auth) {
+        // if auth is set, we have to check the sub attribute and add the clause
+        aw = `AND sub = ${mysql.escape(auth.sub)}`;
     }
+    return aw;
 }
 
-const updateEntity = async function (params, body, table, prepareForSql, validate) {
+const deleteEntity = async function (opts) {
+    var {params, table, auth} = opts;
+    var id = parseInt(params.id);
+
+    var values = [id];
+    
+
+    var r = await query({table, sql: `DELETE FROM ${table} WHERE id=? ${getAuthWhere(auth)}`, values: [id] });
+    if(r.affectedRows > 0) {
+        return {
+            id
+        }
+    } else {
+        throw 'No record was deleted';
+    }
+    
+}
+
+const updateEntity = async function (opts) {
+    var { params, body, table, auth, prepareForSql, validate } = opts;
     var id = parseInt(params.id);
     var obj = body;
     if (obj.id && id != obj.id) {
@@ -285,13 +309,17 @@ const updateEntity = async function (params, body, table, prepareForSql, validat
             throw 'Object validation failed';
         }
     }
-    prepareForSql(obj);
+    prepareForSql(obj, auth);
     // we don't want to update the id
     delete(obj.id);
-    var r = await d.query({table, sql: `UPDATE \`${table}\` SET ? WHERE id = ?`, values: [obj, id] });
+    var r = await query({table, sql: `UPDATE \`${table}\` SET ? WHERE id = ? ${getAuthWhere(auth)}`, values: [obj, id] });
     return {
         id
     }
+}
+
+const unique = function(val) {
+    return `${val}-${shortid.generate()}`;
 }
 
 const addSynonyms = function(endpoint, mainTable, tableSynonyms) {
@@ -355,5 +383,6 @@ module.exports = {
     getAutocomplete,
     addSynonyms,
     escape: mysql.escape,
-    escapeId: mysql.escapeId
+    escapeId: mysql.escapeId,
+    unique
 }

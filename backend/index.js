@@ -53,6 +53,8 @@ app.use(history({
 // serving the frontend
 app.use(express.static(settings.frontend.path));
 
+
+cauth.setClaims(settings.oidc.claims);
 // setting up the OIDC
 
 if(!settings.oidc.disable) {
@@ -94,7 +96,10 @@ if(!settings.oidc.disable) {
       }
     }
   }));
-  cauth.setClaims(settings.oidc.claims);
+  
+} else {
+  // everything is authorized
+  app.use(cauth.mockupAuth('http://localhost:8080/login'));
 }
 // route used to show the SSO login screen
 // 

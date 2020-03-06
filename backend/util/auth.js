@@ -45,10 +45,27 @@ const setClaims = function(c) {
     claims = c;
 }
 
+const mockupAuth = function(returnPath) {
+    return function (req, res, next) {    
+    req.openid = { user: {
+        sub: 'DEBUG',
+        name: 'DEBUG',
+    }};
+    res.openid = {
+        login: (opts) => {
+        res.redirect(returnPath);
+        }
+    };
+    req.openid.user[claims.name] = [claims.administration, claims.dataEntry, claims.dataValidation].join(',');
+    next();
+}
+}
+
 module.exports = {
     resourcesAuth,
     isAdmin,
     isEditor,
     isContributor,
-    setClaims
+    setClaims,
+    mockupAuth
 }

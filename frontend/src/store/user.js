@@ -5,7 +5,7 @@ export default {
     state: {
       user: null,
       lastRoute: null,
-      loginTime: null,
+      lastAction: null,
     },
     mutations: {
       user(state, payload) {
@@ -14,8 +14,8 @@ export default {
       lastRoute(state, payload) {
         state.lastRoute = payload.value;
       },
-      loginTime(state, payload) {
-        state.loginTime = payload.value;
+      lastAction(state, payload) {
+        state.lastAction = payload.value;
       }
     },
     getters: {
@@ -27,6 +27,9 @@ export default {
         },
         lastRoute(state) {
           return state.lastRoute;
+        },
+        lastAction(state) {
+          return state.lastAction;
         }
     },
     actions: {
@@ -34,7 +37,7 @@ export default {
         try {
           var result = await Vue.http.get(`${process.env.VUE_APP_BACKEND}user/info`);
           context.commit('user', { value: result.body });
-          context.commit('loginTime', { value: new Date().valueOf() });
+          context.commit('lastAction', { value: Date.now().valueOf() });
         } catch (err) {
           console.error(err);
           throw err;

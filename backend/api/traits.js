@@ -68,15 +68,15 @@ const prepareForSql = function(trait) {
 }
 
 const create = async function(body) {
-    return await db.createEntity(body, 'trait', prepareForSql);
+    return await db.createEntity({body, table: 'trait', prepareForSql});
 }
 
 const update = async function(params, body) {
-    return await db.updateEntity(params, body, 'trait', prepareForSql);
+    return await db.updateEntity({params, body, table: 'trait', prepareForSql});
 }
 
 const remove = async function(params) {
-    return await db.deleteEntity(params, 'trait');
+    return await db.deleteEntity({params, table: 'trait'});
 }
 
 const synonyms = {

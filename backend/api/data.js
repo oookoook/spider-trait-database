@@ -52,8 +52,8 @@ const list = async function(params, limits) {
                 frequency: r.data.frequency,
                 sampleSize: r.data.sample_size,
                 eventDate: { 
-                    start: r.data.event_date_start.valueOf(), 
-                    end: r.data.event_date_end.valueOf()
+                    start: r.data.event_date_start.toJSON(), 
+                    end: r.data.event_date_end.toJSON()
                 },
                 taxonomy: r.taxonomy,
                 trait: {

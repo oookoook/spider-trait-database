@@ -67,7 +67,44 @@ export default (endpoint) => {
                 console.error(err);
                 throw(err);
             }
-        }
+        },
+        create: async function(context, payload) {
+            console.log(`${endpoint}/create`);
+            //console.dir(payload);
+            var p = {};
+            p.endpoint = `${endpoint}`;
+            p.auth = true;
+            p.body = payload;
+            try {
+                var data = await context.dispatch('create', p, { root: true });
+                // the api module returns false uf user is not authenticated
+                if(data) {
+                    return data.id;
+                } else {
+                    throw 'Unauthenticated user';
+                }  
+            } catch(err) {
+                console.error(err);
+                throw(err);
+            }
+        },
+        update: async function(context, payload) {
+            console.log(`${endpoint}/update`);
+            //console.dir(payload);
+            var p = {};
+            p.endpoint = `${endpoint}`;
+            p.auth = true;
+            p.body = payload;
+
+            try {
+                var r = await context.dispatch('update', p, { root: true });
+                // the api module returns false uf user is not authenticated
+                return r;
+            } catch(err) {
+                console.error(err);
+                throw(err);
+            }
+        },
     },
   }
 };

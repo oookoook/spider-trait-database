@@ -22,7 +22,12 @@ export default {
   name: 'ListProvider',
   components: {
   },
-  props: { list: String, entity: String, id: Number, filter: Object },
+  props: { list: String, entity: String, id: Number, filter: Object, 
+    listAction: { type: String, default: 'list' },
+    listState: { type: String, default: 'list' },
+    totalState: {type: String, default: 'total' },
+    autocompleteAction:{ type: String, default: 'autocomplete'},
+    autocompleteState:{ type: String, default: 'autocomplete'} },
   data () {
     return {
       loading: false,
@@ -32,18 +37,18 @@ export default {
   },
   computed: {
     items() {
-      return this.$store.state[this.list].list;
+      return this.$store.state[this.list][this.listState];
     },
     total() {
-      return this.$store.state[this.list].total;
+      return this.$store.state[this.list][this.totalState];
     },
     autocompleteItems() {
       if(this.entity) {
-        return this.$store.state[this.list].autocomplete[this.entity];
+        return this.$store.state[this.list][this.autocompleteState][this.entity];
         //console.dir(ac);
         //return  ac == null ? [] : ac;
       }
-      return this.$store.state[this.list].autocomplete;
+      return this.$store.state[this.list][this.autocompleteState];
     }
   },
   watch: {
@@ -88,7 +93,7 @@ export default {
       }
 
       this.loading = true;
-      this.$store.dispatch(`${this.list}/list`,params).then(() => {this.loading = false; }, (err) => { this.$store.dispatch('notify', { error: true, text: `Unable to retrieve ${this.list}.`})});
+      this.$store.dispatch(`${this.list}/${this.listAction}`,params).then(() => {this.loading = false; }, (err) => { this.$store.dispatch('notify', { error: true, text: `Unable to retrieve ${this.list}.`})});
     }),
     autocomplete: debounce(500, function(p) {
 
@@ -112,7 +117,7 @@ export default {
       if(!p.field.showAll) {
         query.count = 10;
       } 
-      this.$store.dispatch(`${this.list}/autocomplete`, { query }).then(() => {this.acloading = false; }, (err) => { this.$store.dispatch('notify', { error: true, text: `Unable to retrieve autocomplete.`})});
+      this.$store.dispatch(`${this.list}/${this.autocompleteAction}`, { query }).then(() => {this.acloading = false; }, (err) => { this.$store.dispatch('notify', { error: true, text: `Unable to retrieve autocomplete.`})});
     }),
     searchUpdate(term) {
       this.$store.commit(`${this.list}/search`, { value: term });

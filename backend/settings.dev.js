@@ -8,12 +8,11 @@ module.exports = {
     },
     oidc: {
         disable: true,
-        client: 'TODO',
-        issuer: 'https://oidc.muni.cz/oidc',
-        secret: 'TODO',
-        url: 'http://localhost:3000',
-        session: {
-            secret: '?~gVQ}hp]Y0IKPzx)nZ9_[t+S9&J0c'
+        claims: {
+            name: 'eduperson_entitlement',
+            administration: 'urn:geant:muni.cz:res:spider-trait-db-administration#idm.ics.muni.cz',
+            dataValidation: 'urn:geant:muni.cz:res:spider-trait-db-data-validation#idm.ics.muni.cz',
+            dataEntry: 'urn:geant:muni.cz:res:spider-trait-db-data-entry#idm.ics.muni.cz'
         }
     },
     db: {

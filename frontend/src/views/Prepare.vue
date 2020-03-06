@@ -6,9 +6,11 @@
 
 <script>
 import { mapState, mapGetters } from 'vuex'
+import IdFromRoute from '../mixins/id-from-route' 
 
 export default {
   name: 'prepare',
+  mixins: [IdFromRoute],
   components: {
   },
   props: [],

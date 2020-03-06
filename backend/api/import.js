@@ -117,8 +117,8 @@ const getObject = function(r) {
         },
         eventDate: {
             raw: r[`event_date`],
-            start: r[`event_date_start`].valueOf(),
-            end: r[`event_date_end`].valueOf()
+            start: r[`event_date_start`].toJSON(),
+            end: r[`event_date_end`].toJSON()
         },
         rowLink: r[`row_link`],
         method: {
@@ -206,9 +206,10 @@ const changeState = async function(params, body, auth) {
 
     var imp;
     switch(state) {
-        case 'uploaded': imp = 0; break;
-        case 'reviewed': imp = 1; break;
-        case 'approved': imp = 2; break; 
+        case 'created': imp = 0; break;
+        case 'rejected': imp = 1; break;
+        case 'reviewed': imp = 2; break;
+        case 'approved': imp = 3; break; 
     }
 
     if(imp < 2) {

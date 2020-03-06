@@ -4,8 +4,8 @@ import Vuex from 'vuex'
 import VuexPersist from 'vuex-persist'
 const vuexPersist = new VuexPersist({
   storage: window.localStorage,
-  // save only the lastRoute
-  filter: (mutation) => mutation.type == 'lastRoute'
+  // save only the lastRoute and user info
+  filter: (mutation) => ['lastRoute', 'user', 'lastAction'].includes(mutation.type)
 })
 
 Vue.use(Vuex)
@@ -30,6 +30,7 @@ export default new Vuex.Store({
     methods: new EntityModule('methods'),
     datasets: new EntityModule('datasets'),
     references: new EntityModule('references'),
+    imports: new EntityModule('import'),
     data
   }
 })

@@ -54,20 +54,8 @@ const prepareForSql = function(trait) {
 
 /*
 Data manipulating methods should not be called from the API - Taxonomy will be synchronized with the World Spider Catalog database
+
 */
-
-const create = async function(body) {
-    return await db.createEntity(body, 'taxonomy', prepareForSql);
-}
-
-const update = async function(params, body) {
-    return await db.updateEntity(params, body, 'taxonomy', prepareForSql);
-}
-
-const remove = async function(params) {
-    return await db.deleteEntity(params, 'taxonomy');
-}
-
 const synonyms = {
     'wsc.id': 'taxonomy.wsc_id',
     'wsc.lsid': 'taxonomy.wsc_lsid'
@@ -79,8 +67,8 @@ module.exports = function(dbClient) {
     return {
         list,
         get,
-        create,
-        update,
-        remove
+        //create,
+        //update,
+        //remove
     }
 }

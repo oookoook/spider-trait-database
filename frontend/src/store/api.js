@@ -1,6 +1,7 @@
 import Vue from 'vue';
 
 const baseUrl = `${process.env.VUE_APP_BACKEND}backend/` //Vue.config.devtools ? 'http://localhost:3000/backend/' : '/backend/';
+const sessionTimeout = parseInt(process.env.VUE_APP_SESSION_TIMEOUT);
 
 const getUrl = function(payload) {
     return `${baseUrl}${payload.endpoint}${payload.params ? '/' + payload.params : ''}`;
@@ -55,10 +56,27 @@ const getListParams = function(payload) {
     return params;
 }
 
-const authenticate = function(payload) {
-    if(payload.auth) {
-        /* TODO authorization */
-        return Promise.resolve(true);
+const authenticate = function(context, payload) {
+    var authRequired = payload.auth;
+    var user = context.getters.user;
+    var lastAction = context.getters.lastAction;
+    context.commit('lastAction', {value: Date.now()});
+    if(authRequired) {
+        //return Promise.resolve(true);
+        /*
+        console.log(lastAction);
+        console.log(sessionTimeout);
+        console.log(lastAction + sessionTimeout);
+        console.log(Date.now());
+        */
+        if(user && (lastAction + sessionTimeout) > Date.now()) {
+            return Promise.resolve(true);
+        } else {
+            // log off the user in the frontend
+            context.commit('user', {value: null});
+            context.dispatch('notify', { error: true, text: 'Please log in to perform this action.'});
+            return Promise.resolve(false);
+        }
     } else {
         return Promise.resolve(true);
     }
@@ -78,8 +96,7 @@ export default {
 
         list: async function(context, payload) {
             var url = getUrl(payload);
-            if(!await authenticate(payload)) {
-                context.dispatch('notify', { error: true, text: 'You are not authorized for this action.'});
+            if(!await authenticate(context, payload)) {
                 return false;
             }
             try {
@@ -89,14 +106,13 @@ export default {
             } catch (err) {
                 console.error(err);
                 //context.dispatch('notify', { error: true, text: 'Unable to connect to the backend.'});
-                //throw err;
+                throw err;
             }
         },
 
         get: async function(context, payload) {
             var url = getUrl(payload);
-            if(!await authenticate(payload)) {
-                context.dispatch('notify', { error: true, text: 'You are not authorized for this action.'});
+            if(!await authenticate(context, payload)) {
                 return false;
             }
             try {
@@ -105,7 +121,37 @@ export default {
             } catch (err) {
                 console.error(err);
                 //context.dispatch('notify', { error: true, text: 'Unable to connect to the backend.'});
-                //throw err;
+                throw err;
+            }
+        },
+
+        create: async function(context, payload) {
+            var url = getUrl(payload);
+            if(!await authenticate(context, payload)) {
+                return false;
+            }
+            try {
+                var result = await Vue.http.post(url, payload.body, { params: payload.query });
+                return result.body;
+            } catch (err) {
+                console.error(err);
+                //context.dispatch('notify', { error: true, text: 'Unable to connect to the backend.'});
+                throw err;
+            }
+        },
+
+        update: async function(context, payload) {
+            var url = getUrl(payload);
+            if(!await authenticate(context, payload)) {
+                return false;
+            }
+            try {
+                var result = await Vue.http.put(url, payload.body, { params: payload.query });
+            return result.body;
+            } catch (err) {
+                console.error(err);
+                //context.dispatch('notify', { error: true, text: 'Unable to connect to the backend.'});
+                throw err;
             }
         }
     }

@@ -45,15 +45,15 @@ const prepareForSql = function(method) {
 }
 
 const create = async function(body) {
-    return await db.createEntity(body, 'method', prepareForSql);
+    return await db.createEntity({ body, table: 'method', prepareForSql});
 }
 
 const update = async function(params, body) {
-    return await db.updateEntity(params, body, 'method', prepareForSql);
+    return await db.updateEntity({params, body, table: 'method', prepareForSql});
 }
 
 const remove = async function(params) {
-    return await db.deleteEntity(params, 'method');
+    return await db.deleteEntity({params, table: 'method'});
 }
 
 const synonyms = {

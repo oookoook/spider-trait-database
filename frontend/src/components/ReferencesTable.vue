@@ -8,7 +8,8 @@
       :autocomplete-loading="autocompleteLoading" 
       :autocomplete-items="autocompleteItems" 
       @autocomplete="autocomplete"
-      v-model="search"/>
+      v-model="search"
+      show-expand/>
     </v-card-title>
   <v-data-table
       :headers="headers"

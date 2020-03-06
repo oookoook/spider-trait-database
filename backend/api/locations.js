@@ -71,15 +71,15 @@ const prepareForSql = function(location) {
 }
 
 const create = async function(body) {
-    return await db.createEntity(body, 'location', prepareForSql);
+    return await db.createEntity({ body, table: 'location', prepareForSql});
 }
 
 const update = async function(params, body) {
-    return await db.updateEntity(params, body, 'location', prepareForSql);
+    return await db.updateEntity({params, body, table: 'location', prepareForSql});
 }
 
 const remove = async function(params) {
-    return await db.deleteEntity(params, 'location');
+    return await db.deleteEntity({ params, table:'location'});
 }
 
 const synonyms = {

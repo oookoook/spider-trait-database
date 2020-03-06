@@ -47,12 +47,17 @@ const routes = [
     component: () => import(/* webpackChunkName: "data" */ '../views/Data.vue')
   },
   {
-    path: '/upload',
-    name: 'upload',
-    component: () => import(/* webpackChunkName: "upload" */ '../views/Upload.vue')
+    path: '/import',
+    name: 'import',
+    component: () => import(/* webpackChunkName: "import" */ '../views/Import.vue')
   },
   {
-    path: '/prepare',
+    path: '/approve',
+    name: 'approve',
+    component: () => import(/* webpackChunkName: "approve" */ '../views/Approve.vue')
+  },
+  {
+    path: '/prepare/:id',
     name: 'prepare',
     component: () => import(/* webpackChunkName: "prepare" */ '../views/Prepare.vue')
   },

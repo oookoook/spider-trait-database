@@ -39,15 +39,15 @@ const validate = function(reference) {
 }
 
 const create = async function(body) {
-    return await db.createEntity(body, 'reference', prepareForSql, validate);
+    return await db.createEntity({body, table: 'reference', prepareForSql, validate});
 }
 
 const update = async function(params, body) {
-    return await db.updateEntity(params, body, 'reference', prepareForSql, validate);
+    return await db.updateEntity({params, body, table: 'reference', prepareForSql, validate});
 }
 
 const remove = async function(params) {
-    return await db.deleteEntity(params, 'reference');
+    return await db.deleteEntity({params, table: 'reference'});
 }
 
 const synonyms = {

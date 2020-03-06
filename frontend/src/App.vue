@@ -53,13 +53,13 @@
         <v-btn text v-on="on"><v-icon left>mdi-share</v-icon> Contribute<v-icon right>mdi-chevron-down</v-icon></v-btn>
       </template>
       <v-list>
-        <v-list-item to="/upload">
+        <v-list-item to="/import">
           <v-list-item-icon><v-icon>mdi-upload</v-icon></v-list-item-icon>
-          <v-list-item-content><v-list-item-title>Upload</v-list-item-title></v-list-item-content>
+          <v-list-item-content><v-list-item-title>Import datasets</v-list-item-title></v-list-item-content>
         </v-list-item>
-        <v-list-item to="/prepare">
+        <v-list-item to="/approve">
           <v-list-item-icon><v-icon>mdi-table-edit</v-icon></v-list-item-icon>
-          <v-list-item-content><v-list-item-title>Prepare data</v-list-item-title></v-list-item-content>
+          <v-list-item-content><v-list-item-title>Approve datasets</v-list-item-title></v-list-item-content>
         </v-list-item>
       </v-list>
     </v-menu>

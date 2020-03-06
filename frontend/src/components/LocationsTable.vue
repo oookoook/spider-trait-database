@@ -59,14 +59,6 @@ export default {
   watch: {
   },
   methods: {
-    getTaxon(item) {
-      var t = [ item.genus, item.species];
-      if(item.subspecies) {
-        t.push(item.subspecies);
-      }
-      //console.dir(t);
-      return t.join(' ');
-    }
   },
   created () {
 
