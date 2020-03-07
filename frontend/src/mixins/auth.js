@@ -6,7 +6,7 @@ export default {
         }
     },
     computed: {
-        ...mapGetters(['loginUrl', 'user', 'lastRoute'])
+        ...mapGetters(['loginUrl', 'user', 'lastRoute', 'isEditor', 'isAdmin'])
     },
     watch: {
         $route(to, from) {

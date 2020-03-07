@@ -30,6 +30,12 @@ export default {
         },
         lastAction(state) {
           return state.lastAction;
+        },
+        isEditor(state) {
+          return state.user && state.user.isEditor;
+        },
+        isAdmin(state) {
+          return state.user && state.user.isAdmin;
         }
     },
     actions: {

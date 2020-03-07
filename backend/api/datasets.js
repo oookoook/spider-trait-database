@@ -29,8 +29,9 @@ const list = async function(limits, auth, showImport) {
     var res = await db.prepareListResponse(limits, 'dataset');
     var where = getWhere(auth,showImport);
     //console.dir(res);
-    var results = await db.query({table: 'dataset', sql: `SELECT dataset.id, dataset.name, dataset.authors, dataset.uploader, dataset.date, dataset.imported `
-     + `FROM dataset WHERE ${where}`, limits, hasWhere: true });    
+    var results = await db.query({table: 'dataset', sql: `SELECT dataset.id, dataset.name, dataset.authors, dataset.uploader, `
+                        +`dataset.date, dataset.message, dataset.notes, dataset.imported `
+                        + `FROM dataset WHERE ${where}`, limits, hasWhere: true });    
      
      res.items = results;
      res.items.forEach(r => {
@@ -49,10 +50,14 @@ const get = async function(params, auth, showImport) {
     var results = await db.query({table: 'dataset', sql: `SELECT * FROM dataset WHERE id = ? AND ${where}`, values: [id]});
      var r = results[0];
      
+     r.valid = {};
      if(showImport) {
-        var validR = db.query({table: 'import', sql: `SELECT COUNT(import.valid) as invalid FROM `
+        var validR = await db.query({table: 'import', sql: `SELECT COUNT(import.valid) as invalid FROM `
         + `import LEFT JOIN dataset ON import.dataset_id = dataset.id WHERE dataset.id = ? AND ${where} AND valid=0`, values: [id]});
-       r.valid = validR.results[0].invalid == 0;
+        r.valid.approve = validR.results[0].invalid == 0;
+        var validRR = await db.query({table: 'import', sql: `SELECT COUNT(import.valid) as invalid FROM `
+        + `import LEFT JOIN dataset ON import.dataset_id = dataset.id WHERE dataset.id = ? AND ${where} AND valid_review=0`, values: [id]});
+        r.valid.review = validRR.results[0].invalid == 0;
     }
      
      setState(r);
@@ -98,8 +103,9 @@ const remove = async function(params, auth) {
 }
 
 module.exports = function(dbClient) {
+    // TODO check sorting ny state form UI
     db = dbClient;
-    db.addSynonyms('datasets', 'dataset', {});
+    db.addSynonyms('datasets', 'dataset', {state: `imported`});
     return {
         list,
         get,

@@ -5,7 +5,10 @@
       color="primary"
       dark
     >
-      <v-toolbar-title><v-icon left>mdi-spider</v-icon> Trait Database</v-toolbar-title>
+      <v-toolbar-title>
+        <router-link style="color:white;text-decoration:none" to="/"><v-icon left>mdi-spider</v-icon>Spider Trait Database</router-link>
+        <!--<v-icon left>mdi-spider</v-icon>Spider Trait Database-->
+        </v-toolbar-title>
 
 
       <v-divider vertical class="mx-5"></v-divider>
@@ -48,7 +51,7 @@
       </v-list>
     </v-menu>      
 
-    <v-menu right bottom offset-y>
+    <v-menu right bottom offset-y v-if="user">
       <template v-slot:activator="{ on }">
         <v-btn text v-on="on"><v-icon left>mdi-share</v-icon> Contribute<v-icon right>mdi-chevron-down</v-icon></v-btn>
       </template>
@@ -57,7 +60,7 @@
           <v-list-item-icon><v-icon>mdi-upload</v-icon></v-list-item-icon>
           <v-list-item-content><v-list-item-title>Import datasets</v-list-item-title></v-list-item-content>
         </v-list-item>
-        <v-list-item to="/approve">
+        <v-list-item to="/approve" v-if="isEditor">
           <v-list-item-icon><v-icon>mdi-table-edit</v-icon></v-list-item-icon>
           <v-list-item-content><v-list-item-title>Approve datasets</v-list-item-title></v-list-item-content>
         </v-list-item>

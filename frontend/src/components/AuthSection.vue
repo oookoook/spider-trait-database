@@ -10,7 +10,19 @@
       <v-btn text :href="mailLink" target="_blank"><v-icon left>mdi-email-edit-outline</v-icon>  Request access </v-btn>
     </v-card-actions>
     </v-card>
-    <slot v-else>
+    <v-card v-else-if="editor && !isEditor">
+      <v-card-title><v-icon color="warning" left>mdi-cancel</v-icon>Unsufficient rights</v-card-title>
+      <v-card-text>You must be an editor to access this section of the portal. If you want to became one of the editors, please write an email to the administrators of the
+        Spider Trait Database (<a :href="`mailto:${adminMail}`">{{adminMail}}</a>).
+      </v-card-text>
+    </v-card>
+    <v-card v-else-if="admin && !isAdmin">
+      <v-card-title><v-icon color="warning" left>mdi-cancel</v-icon>Unsufficient rights</v-card-title>
+      <v-card-text>You must be an administrator to access this section of the portal. If you want to became one of the administrators, please write an email to the administrators of the
+        Spider Trait Database (<a :href="`mailto:${adminMail}`">{{adminMail}}</a>).
+      </v-card-text>
+    </v-card>
+    <slot v-else :editor="isEditor" :admin="isAdmin" :user="user">
     </slot>
   </div>
 </template>
@@ -22,7 +34,7 @@ export default {
   name: 'AuthSection',
   components: {
   },
-  props: [],
+  props: { editor: Boolean, admin: Boolean },
   data () {
     return {
       // https://mailtolink.me/
@@ -31,7 +43,7 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(['user', 'loginUrl'])
+    ...mapGetters(['user', 'loginUrl', 'isEditor', 'isAdmin'])
   },
   watch: {
 

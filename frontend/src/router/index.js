@@ -52,6 +52,11 @@ const routes = [
     component: () => import(/* webpackChunkName: "import" */ '../views/Import.vue')
   },
   {
+    path: '/import/new',
+    name: 'importNew',
+    component: () => import(/* webpackChunkName: "import" */ '../views/Import.vue')
+  },
+  {
     path: '/approve',
     name: 'approve',
     component: () => import(/* webpackChunkName: "approve" */ '../views/Approve.vue')

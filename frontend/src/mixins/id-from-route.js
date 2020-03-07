@@ -6,14 +6,14 @@ export default {
     },
     watch: {
         $route(to, from) {
-            this.processRoute();
-          }
+            this.processRouteId();
+        }
     },
     mounted() {
-        this.processRoute();
+        this.processRouteId();
     },
     methods: {
-        processRoute() {
+        processRouteId() {
             this.id = parseInt(this.$route.params.id);
         }
     }

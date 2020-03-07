@@ -159,6 +159,10 @@ const getObject = function(r) {
             stratum: r[`location_stratum`],
             note: r[`location_note`],
             id: r[`location_id`]
+        },
+        valid: {
+            review: r[`valid_review`],
+            approve: r[`valid`]
         }
     }
 }
@@ -194,7 +198,7 @@ const changeState = async function(params, body, auth) {
     if(state == 'approved') {
         // check if the dataset is valid    
         var valid = false;
-        var validR = db.query({table: 'import', sql: `SELECT COUNT(import.valid) as invalid FROM `
+        var validR = await db.query({table: 'import', sql: `SELECT COUNT(import.valid) as invalid FROM `
         + `${joind} WHERE dataset.id = ? AND ${aw} AND valid=0`, values: [id]});
         valid = validR[0].invalid == 0;
         if(!valid) {
@@ -359,7 +363,9 @@ const importRow = async function(conn, ds, r, state, cache) {
 
     row['dataset_id'] = ds;
     row['changed'] = 1;
+    row['valid_review'] = 0;
     row['valid'] = 0;
+
     try { 
         await db.cquery(conn, {table: 'import', sql: 'INSERT INTO import SET ?', values: [row]});
     } catch (err) {
@@ -478,6 +484,8 @@ const updateRow = async function(params, body, auth) {
     });
     delete(newAttrs.id);
     delete(newAttrs['dataset_id']);
+    delete(newAttrs['valid']);
+    delete(newAttrs['valid_review']);
     newAttrs.changed = 1;
 
     if(newAttrs['location_lat']) {
@@ -532,7 +540,7 @@ const updateColumn = async function(params, body, auth) {
     var ds = parseInt(params.id);
     var aw = getAuthWhere(auth);
     var column = getColumnName(params.column);
-    if(column == 'dataset_id') {
+    if(column == 'dataset_id' || column == 'valid' || column == 'valid_review' || column == 'changed') {
         throw 'Cannot update this column';
     }
     
@@ -661,7 +669,7 @@ const validate = async function(params) {
      // Tcovert timestamps
      // dont do this here
 
-     state.progress += 1;
+     
 
     // step 2: update all foreign keys
 
@@ -680,47 +688,52 @@ const validate = async function(params) {
 
     await db.cquery(c,{table: 'import', sql:`UPDATE ${joinv} SET `
     + ` sex_id = sex.id, life_stage_id = life_stage.id, measure_id = measure.id, method_id = method.id, trait_id = trait.id,`
-    + ` reference_id = reference.id,  location_id = location.id, habitat_global_id = habitat_global.id, country_id = country.id,`
+    + ` reference_id = reference.id,  location_id = location.id, location_habitat_global_id = habitat_global.id, location_country_id = country.id,`
     + ` taxonomy_id = COALESCE(taxonomy.id, taxonomy_name.taxonomy_id)`
     + ` WHERE changed = 1 AND dataset_id = ? AND ${aw}`, values: [ds] });
 
     state.progress += 1;
 
     // step 3: set the valid attribute to 1 if all the necesssary foreign keys are filled in and other conditions are met
-    
-    await db.cquery(c,{table: 'import', sql:`UPDATE import SET valid = 1, changed = 0 WHERE`
+    await db.cquery(c,{table: 'import', sql:`UPDATE import SET valid_review = 1 WHERE`
     + ` (sex IS NULL OR sex_id IS NOT NULL) AND`
     + ` (life_stage IS NULL OR life_stage_id IS NOT NULL) AND`
     + ` (measure_id IS NOT NULL) AND`
     + ` (value IS NOT NULL) AND`
-    + ` (trait_id IS NOT NULL) AND`
-    + ` (method_id IS NOT NULL) AND`
-    + ` (reference_id IS NOT NULL) AND`
+    + ` (trait_id IS NOT NULL OR trait_abbrev IS NOT NULL OR (trait_name IS NOT NULL AND trait_description IS NOT NULL)) AND`
+    // method is not required
+    //+ ` (method_id IS NOT NULL OR method_abbrev IS NOT NULL OR (method_name IS NOT NULL AND method_description IS NOT NULL)) AND`
+    + ` (reference IS NOT NULL) AND`
     + ` (original_name IS NOT NULL AND taxonomy_id IS NOT NULL) AND`
     + ` (sample_size IS NULL OR sample_size_numeric IS NOT NULL) AND`
     + ` (frequency IS NULL OR frequency_numeric IS NOT NULL) AND`
-    //+ ` (event_date IS NULL OR event_date_start IS NOT NULL) AND`
-    /* all location fields are null OR location_id is filled in
-    `location_lat` VARCHAR(45) NULL,
-    `location_lon` VARCHAR(45) NULL,
-    `location_precision` VARCHAR(45) NULL,
-    `location_altitude` VARCHAR(45) NULL,
-    `location_locality` TEXT NULL,
-    `location_country_code` VARCHAR(45) NULL,
-    `location_habitat_global` VARCHAR(255) NULL,
-    `location_habitat` TEXT NULL,
-    `location_microhabitat` TEXT NULL,
-    `location_stratum` TEXT NULL,
-    `location_note` TEXT NULL,
-    */
     + ` (location_lat IS NULL OR location_lat_conv IS NOT NULL) AND`
     + ` (location_lon IS NULL OR location_lon_conv IS NOT NULL) AND`
+    + ` (location_country IS NULL OR location_country_id IS NOT NULL) AND`
+    + ` (location_habitat_global IS NULL OR location_habitat_global_id IS NOT NULL) AND`
+    //+ ` (event_date IS NULL OR event_date_start IS NOT NULL) AND`
+    + ` (value_numeric IS NULL OR value_numeric = value OR (value = 'true' AND value_numeric = 1) OR (value = 'false' AND value_numeric = 0)) AND`
+    + ` dataset_id = ? AND changed = 1 AND ${aw}`, values: [ds] });
+
+    state.progress += 1;
+
+    // step 4: set the valid attribute to 1 if the record is valid for review and also trait_id, method_id, 
+
+    await db.cquery(c,{table: 'import', sql:`UPDATE import SET valid = 1 WHERE valid_review = 1 AND`
+    + ` (trait_id IS NOT NULL) AND`
+    //+ ` (method_id IS NOT NULL) AND`
+    + ` (reference_id IS NOT NULL) AND`
+    //+ ` (event_date IS NULL OR event_date_start IS NOT NULL) AND`
+    /* all location fields are null OR location_id is filled in */
     + ` ((location_abbrev IS NULL AND location_lat IS NULL AND location_lon IS NULL AND location_precision IS NULL AND location_altitude IS NULL AND `
     + ` location_locality IS NULL AND location_country_code IS NULL AND location_habitat_global IS NULL AND location_habitat IS NULL AND `
     + ` location_microhabitat IS NULL AND location_stratum IS NULL AND location_note IS NULL) OR location_id IS NOT NULL) AND`
-    + ` (value_numeric IS NULL OR value_numeric = value OR (value = 'true' AND value_numeric = 1) OR (value = 'false' AND value_numeric = 0)) AND`
     + ` dataset_id = ? AND changed = 1 AND ${aw}`, values: [ds] });
     
+    // step 5 reset the changed attribute for all the records (also for the invalid ones)
+    await db.cquery(c,{table: 'import', sql:`UPDATE import SET changed = 0 WHERE changed = 1 AND`
+    + ` dataset_id = ? AND changed = 1 AND ${aw}`, values: [ds] });
+
     state.progress += 1;
     state.completed = true;
     
