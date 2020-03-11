@@ -47,6 +47,9 @@ CREATE TABLE IF NOT EXISTS `spider_traits_db`.`taxonomy` (
   `reference_id` INT NULL,
   PRIMARY KEY (`id`),
   INDEX `taxonomy_reference_fk_idx` (`reference_id` ASC),
+  INDEX `family_idx` (`family` ASC),
+  INDEX `genus_idx` (`genus` ASC),
+  INDEX `taxon_idx` (`genus` ASC, `species` ASC, `subspecies` ASC),
   CONSTRAINT `taxonomy_reference_fk`
     FOREIGN KEY (`reference_id`)
     REFERENCES `spider_traits_db`.`reference` (`id`)
@@ -198,7 +201,10 @@ CREATE TABLE IF NOT EXISTS `spider_traits_db`.`country` (
   `alpha2_code` VARCHAR(5) NOT NULL,
   `alpha3_code` VARCHAR(5) NULL,
   `name` VARCHAR(255) NOT NULL,
-  PRIMARY KEY (`id`))
+  PRIMARY KEY (`id`),
+  INDEX `alpha3_code_idx` (`alpha3_code` ASC),
+  INDEX `name_idx` (`name` ASC),
+  INDEX `code_name_idx` (`alpha3_code` ASC, `name` ASC))
 ENGINE = InnoDB;
 
 
@@ -214,7 +220,7 @@ CREATE TABLE IF NOT EXISTS `spider_traits_db`.`location` (
   `lon` DECIMAL(11,8) NULL COMMENT 'The geographic longitude (in decimal degrees, using the spatial reference system WGS84) of the geographic center of a Location. Positive values are east of the Greenwich Meridian, negative values are west of it. Legal values lie between -180 and 180, inclusive. (e.g. 102.478922; -0.4767; etc.)\n',
   `precision` DECIMAL(11,8) NULL COMMENT 'A decimal representation of the precision of the coordinates given in the decimalLatitude and decimalLongitude.',
   `altitude` INT NULL COMMENT 'Altitude above the sea level in meters. (e.g. 700, 3462, etc.)',
-  `locality` TEXT NULL COMMENT 'The original textual description of the place. (e.g. Municipality of Helsinki; small hill close to the river; Mout Fuji)',
+  `locality` VARCHAR(255) NULL COMMENT 'The original textual description of the place. (e.g. Municipality of Helsinki; small hill close to the river; Mount Fuji)',
   `country_id` INT NULL COMMENT 'The standard code for the country. (e.g. CZ, IT, BR, etc.)',
   `habitat_global_id` INT NULL COMMENT 'A description of the global habitat based on IUCN habitats – https://www.iucnredlist.org/resources/habitat-classification-scheme (e.g. Savanna - Dry; Forest, etc.)',
   `habitat` TEXT NULL COMMENT 'Verbatim description of the habitat (e.g. forest, grassland, cave, CORINE habitat code, etc.)\n',
@@ -225,6 +231,7 @@ CREATE TABLE IF NOT EXISTS `spider_traits_db`.`location` (
   INDEX `habitat_global_fk_idx` (`habitat_global_id` ASC),
   INDEX `location_country_fk_idx` (`country_id` ASC),
   UNIQUE INDEX `abbrev_UNIQUE` (`abbrev` ASC),
+  INDEX `locality_idx` (`locality` ASC),
   CONSTRAINT `location_habitat_global_fk`
     FOREIGN KEY (`habitat_global_id`)
     REFERENCES `spider_traits_db`.`habitat_global` (`id`)
@@ -249,12 +256,17 @@ CREATE TABLE IF NOT EXISTS `spider_traits_db`.`dataset` (
   `authors` VARCHAR(4096) NULL,
   `uploader` VARCHAR(255) NOT NULL,
   `email` VARCHAR(255) NULL,
+  `authors_email` VARCHAR(255) NULL,
   `date` DATETIME NOT NULL,
   `notes` TEXT NULL,
   `imported` TINYINT(1) NOT NULL,
   `sub` VARCHAR(45) NOT NULL,
+  `message` VARCHAR(4096) NULL,
   PRIMARY KEY (`id`),
-  UNIQUE INDEX `name_UNIQUE` (`name` ASC))
+  UNIQUE INDEX `name_UNIQUE` (`name` ASC),
+  INDEX `authors_idx` (`authors` ASC),
+  INDEX `imported_idx` (`imported` ASC),
+  INDEX `sub_idx` (`sub` ASC))
 ENGINE = InnoDB;
 
 
@@ -275,6 +287,7 @@ CREATE TABLE IF NOT EXISTS `spider_traits_db`.`data` (
   `life_stage_id` INT NULL COMMENT 'Categorical variable. One of: egg, spiderling, juvenile, adult, all\n',
   `frequency` DECIMAL(9,4) NULL COMMENT 'Real number. Relative frequency of occurrence. \n',
   `sample_size` INT NULL COMMENT 'Integer. Total number of observation per record.\n',
+  `event_date_text` VARCHAR(255) NULL COMMENT 'The date-time or interval associated to the trait. Examples: 1963-03-08T14:07-0600 (8 Mar 1963 at 2:07pm in the time zone six hours earlier than UTC). 2009-02-20T08:40Z (20 February 2009 8:40am UTC). 2018-08-29T15:19 (3:19pm local time on 29 August 2018). 1809-02-12 (some time during 12 February 1809). 1906-06 (some time in June 1906). 1971 (some time in the year 1971). 2007-03-01T13:00:00Z/2008-05-11T15:30:00Z (some time during the interval between 1 March 2007 1pm UTC and 11 May 2008 3:30pm UTC). 1900/1909 (some time during the interval between the beginning of the year 1900 and the end of the year 1909). 2007-11-13/15 (some time in the interval between 13 November 2007 and 15 November 2007).\n',
   `event_date_start` DATETIME NULL COMMENT 'The date-time or interval associated to the trait. Examples: 1963-03-08T14:07-0600 (8 Mar 1963 at 2:07pm in the time zone six hours earlier than UTC). 2009-02-20T08:40Z (20 February 2009 8:40am UTC). 2018-08-29T15:19 (3:19pm local time on 29 August 2018). 1809-02-12 (some time during 12 February 1809). 1906-06 (some time in June 1906). 1971 (some time in the year 1971). 2007-03-01T13:00:00Z/2008-05-11T15:30:00Z (some time during the interval between 1 March 2007 1pm UTC and 11 May 2008 3:30pm UTC). 1900/1909 (some time during the interval between the beginning of the year 1900 and the end of the year 1909). 2007-11-13/15 (some time in the interval between 13 November 2007 and 15 November 2007).\n',
   `event_date_end` DATETIME NULL COMMENT 'The date-time or interval associated to the trait. Examples: 1963-03-08T14:07-0600 (8 Mar 1963 at 2:07pm in the time zone six hours earlier than UTC). 2009-02-20T08:40Z (20 February 2009 8:40am UTC). 2018-08-29T15:19 (3:19pm local time on 29 August 2018). 1809-02-12 (some time during 12 February 1809). 1906-06 (some time in June 1906). 1971 (some time in the year 1971). 2007-03-01T13:00:00Z/2008-05-11T15:30:00Z (some time during the interval between 1 March 2007 1pm UTC and 11 May 2008 3:30pm UTC). 1900/1909 (some time during the interval between the beginning of the year 1900 and the end of the year 1909). 2007-11-13/15 (some time in the interval between 13 November 2007 and 15 November 2007).\n',
   `row_link` INT NULL COMMENT 'for multidimensional data, i.e. use same numbers for rows that contain data from same individuals or populations obtained in the same context\n',
@@ -293,6 +306,10 @@ CREATE TABLE IF NOT EXISTS `spider_traits_db`.`data` (
   INDEX `dataset_fk_idx` (`dataset_id` ASC),
   INDEX `reference_fk_idx` (`reference_id` ASC),
   INDEX `data_location_fk_idx` (`location_id` ASC),
+  INDEX `row_link_idx` (`row_link` ASC),
+  INDEX `event_date_start_idx` (`event_date_start` ASC),
+  INDEX `event_date_end_idx` (`event_date_end` ASC),
+  INDEX `event_date_text_idx` (`event_date_text` ASC),
   CONSTRAINT `data_taxonomy_fk`
     FOREIGN KEY (`taxonomy_id`)
     REFERENCES `spider_traits_db`.`taxonomy` (`id`)
@@ -385,19 +402,22 @@ CREATE TABLE IF NOT EXISTS `spider_traits_db`.`import` (
   `method_abbrev` VARCHAR(45) NULL,
   `method_name` VARCHAR(255) NULL,
   `method_description` TEXT NULL,
-  `reference` TEXT NULL,
+  `reference` VARCHAR(4096) NULL,
+  `reference_abbrev` VARCHAR(45) NULL,
   `reference_doi` VARCHAR(255) NULL,
+  `location_abbrev` VARCHAR(45) NULL,
   `location_lat` VARCHAR(45) NULL,
   `location_lon` VARCHAR(45) NULL,
   `location_precision` VARCHAR(45) NULL,
   `location_altitude` VARCHAR(45) NULL,
-  `location_locality` TEXT NULL,
+  `location_locality` VARCHAR(255) NULL,
   `location_country_code` VARCHAR(45) NULL,
   `location_habitat_global` VARCHAR(255) NULL,
   `location_habitat` TEXT NULL,
   `location_microhabitat` TEXT NULL,
   `location_stratum` TEXT NULL,
   `location_note` TEXT NULL,
+  `taxonomy_id` INT NULL,
   `sex_id` INT NULL,
   `life_stage_id` INT NULL,
   `measure_id` INT NULL,
@@ -405,10 +425,18 @@ CREATE TABLE IF NOT EXISTS `spider_traits_db`.`import` (
   `trait_id` INT NULL,
   `reference_id` INT NULL,
   `location_id` INT NULL,
-  `habitat_global_id` INT NULL,
-  `country_id` INT NULL,
+  `location_habitat_global_id` INT NULL,
+  `location_country_id` INT NULL,
   `event_date_start` DATETIME NULL,
   `event_date_end` DATETIME NULL,
+  `value_numeric` DECIMAL(15,4) NULL,
+  `frequency_numeric` DECIMAL(9,4) NULL,
+  `sample_size_numeric` INT NULL,
+  `location_lat_conv` DECIMAL(11,8) NULL,
+  `location_lon_conv` DECIMAL(11,8) NULL,
+  `changed` TINYINT(1) NOT NULL,
+  `valid` TINYINT(1) NOT NULL,
+  `valid_review` TINYINT(1) NOT NULL,
   PRIMARY KEY (`id`),
   INDEX `import_dataset_fk_idx` (`dataset_id` ASC),
   INDEX `import_sex_fk_idx` (`sex_id` ASC),
@@ -417,9 +445,32 @@ CREATE TABLE IF NOT EXISTS `spider_traits_db`.`import` (
   INDEX `import_trait_kf_idx` (`trait_id` ASC),
   INDEX `import_reference_fk_idx` (`reference_id` ASC),
   INDEX `import_location_fk_idx` (`location_id` ASC),
-  INDEX `import_habitat_global_fk_idx` (`habitat_global_id` ASC),
-  INDEX `import_country_fk_idx` (`country_id` ASC),
+  INDEX `import_habitat_global_fk_idx` (`location_habitat_global_id` ASC),
+  INDEX `import_country_fk_idx` (`location_country_id` ASC),
   INDEX `import_life_stage_fk_idx` (`life_stage_id` ASC),
+  INDEX `import_valid_idx` (`valid` ASC),
+  INDEX `import_valid_review_idx` (`valid_review` ASC),
+  INDEX `import_changed_idx` (`changed` ASC),
+  INDEX `import_original_name_idx` (`original_name` ASC),
+  INDEX `import_wsc_lsid_idx` (`wsc_lsid` ASC),
+  INDEX `import_trait_abbrev_idx` (`trait_abbrev` ASC),
+  INDEX `import_trait_name_idx` (`trait_name` ASC),
+  INDEX `import_value_idx` (`value` ASC),
+  INDEX `import_measure_idx` (`measure` ASC),
+  INDEX `import_sex_idx` (`sex` ASC),
+  INDEX `import_life_stage_idx` (`life_stage` ASC),
+  INDEX `import_event_date_idx` (`event_date` ASC),
+  INDEX `import_row_link` (`row_link` ASC),
+  INDEX `import_method_abbrev_idx` (`method_abbrev` ASC),
+  INDEX `import_method_name_idx` (`method_name` ASC),
+  INDEX `import_refrence_abbrev_idx` (`reference_abbrev` ASC),
+  INDEX `import_reference_idx` (`reference` ASC),
+  INDEX `import_reference_doi_idx` (`reference_doi` ASC),
+  INDEX `import_location_abbrev_idx` (`location_abbrev` ASC),
+  INDEX `import_location_lat_idx` (`location_lat` ASC),
+  INDEX `import_location_lon_idx` (`location_lon` ASC),
+  INDEX `import_location_hg_idx` (`location_habitat_global` ASC),
+  INDEX `import_location_cc_idx` (`location_country_code` ASC),
   CONSTRAINT `import_dataset_fk`
     FOREIGN KEY (`dataset_id`)
     REFERENCES `spider_traits_db`.`dataset` (`id`)
@@ -461,12 +512,12 @@ CREATE TABLE IF NOT EXISTS `spider_traits_db`.`import` (
     ON DELETE NO ACTION
     ON UPDATE NO ACTION,
   CONSTRAINT `import_habitat_global_fk`
-    FOREIGN KEY (`habitat_global_id`)
+    FOREIGN KEY (`location_habitat_global_id`)
     REFERENCES `spider_traits_db`.`habitat_global` (`id`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION,
   CONSTRAINT `import_country_fk`
-    FOREIGN KEY (`country_id`)
+    FOREIGN KEY (`location_country_id`)
     REFERENCES `spider_traits_db`.`country` (`id`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
