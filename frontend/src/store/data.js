@@ -57,28 +57,22 @@ export default {
             payload.params = getParams(payload.filter);
             context.commit('link', { value: payload.params });
             //console.log(payload.params);
-            try {
-                var data = await context.dispatch('list', payload, { root: true });
-                if(data.count) {
+            var data = await context.dispatch('list', payload, { root: true });
+            if(data){    
+              if(data.count) {
                     context.commit('total', { value: data.count});
                 }
-                context.commit('list', { value: data.items});
-            } catch(err) {
-                console.error(err);
-                throw(err);
+              context.commit('list', { value: data.items});
             }
         },
         autocomplete: async function(context, payload) {
           //console.log(`data/autocomplete ${payload.entity}`);
           //console.dir(payload);
           payload.endpoint = `autocomplete/data`;
-          try {
-              var data = await context.dispatch('get', payload, { root: true });
-              context.commit('autocomplete', { value: data.items, entity: payload.entity });
-          } catch(err) {
-              console.error(err);
-              throw(err);
+          var data = await context.dispatch('get', payload, { root: true });
+          if(data) {
+            context.commit('autocomplete', { value: data.items, entity: payload.entity });
           }
-      }
+        }
     },
   }

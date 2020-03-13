@@ -93,7 +93,7 @@ export default {
       }
 
       this.loading = true;
-      this.$store.dispatch(`${this.list}/${this.listAction}`,params).then(() => {this.loading = false; }, (err) => { this.$store.dispatch('notify', { error: true, text: `Unable to retrieve ${this.list}.`})});
+      this.$store.dispatch(`${this.list}/${this.listAction}`,params).then(() => {this.loading = false; });
     }),
     autocomplete: debounce(500, function(p) {
 
@@ -117,7 +117,7 @@ export default {
       if(!p.field.showAll) {
         query.count = 10;
       } 
-      this.$store.dispatch(`${this.list}/${this.autocompleteAction}`, { query }).then(() => {this.acloading = false; }, (err) => { this.$store.dispatch('notify', { error: true, text: `Unable to retrieve autocomplete.`})});
+      this.$store.dispatch(`${this.list}/${this.autocompleteAction}`, { query }).then(() => {this.acloading = false; });
     }),
     searchUpdate(term) {
       this.$store.commit(`${this.list}/search`, { value: term });

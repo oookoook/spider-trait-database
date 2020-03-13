@@ -11,12 +11,7 @@
       :loading="loading"
       class="elevation-1"
     >
-    
-    <template v-slot:item.eventDate="{item}">
-        <span v-if="item.eventDate.start">{{ new Date(item.eventDate.start).toISOString() }}</span>
-        <span v-if="item.eventDate.end">;{{ new Date(item.eventDate.end).toISOString() }}</span>
-    </template>
-
+  
     <template v-slot:item.location="{item}">
         <span v-if="item.location">{{ location.abbrev }}</span>
     </template>
@@ -51,7 +46,9 @@ export default {
         { text: 'Sample size', value: 'sampleSize' },
         { text: 'Method', value: 'method.abbrev'},
         { text: 'Location', value: 'location'},
-        { text: 'Event date', value: 'eventDate'},
+        { text: 'Event date text', value: 'eventDate.text'},
+        { text: 'Event date start', value: 'eventDate.start'},
+        { text: 'Event date end', value: 'eventDate.end'},
         { text: 'Dataset', value: 'dataset.name'},
         { text: 'Reference', value: 'reference'},
         { text: 'Related records', value: 'rowLink'}

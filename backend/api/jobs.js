@@ -4,15 +4,22 @@ const hasRights = function(job, auth) {
     return auth.isEditor || job.owner == auth.sub;
 }
 
-const list = function() {
-    return jm.listJobs();
+const list = function(auth) {
+    if(auth.isAEditor) {
+        return { jobs: jm.listJobs() };
+    } else {
+        return {
+            jobs: jm.listJobs(auth.sub)
+        };
+    }
+    
 }
 
 const get = function(params, auth) {
     var job = jm.getJob(params.id)
     var r = hasRights(job, auth);
     if(r) {
-        return job;
+        return { job };
     }
 }
 

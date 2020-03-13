@@ -32,41 +32,33 @@ export default (endpoint) => {
         list: async function(context, payload) {
             console.log(`${endpoint}/list`);
             payload.endpoint = endpoint;
-            payload.currCount = context.state.total;
-            try {
-                var data = await context.dispatch('list', payload, { root: true });
+            payload.currCount = context.state.total;                
+            var data = await context.dispatch('list', payload, { root: true });
+            if(data) {    
                 if(data.count) {
                     context.commit('total', { value: data.count});
                 }
                 context.commit('list', { value: data.items});
-            } catch(err) {
-                console.error(err);
-                throw(err);
             }
         },
         get: async function(context, payload) {
             console.log(`${endpoint}/get`);
             payload.endpoint = endpoint;
             payload.params = payload.id;
-            try {
-                var data = await context.dispatch('get', payload, { root: true });
+            var data = await context.dispatch('get', payload, { root: true });
+            if(data) {
                 context.commit('entity', { value: data.item });
-            } catch(err) {
-                console.error(err);
-                throw(err);
             }
         },
         autocomplete: async function(context, payload) {
             console.log(`${endpoint}/autocomplete`);
             //console.dir(payload);
             payload.endpoint = `autocomplete/${endpoint}`;
-            try {
-                var data = await context.dispatch('get', payload, { root: true });
+            var data = await context.dispatch('get', payload, { root: true });
+            if(data) {
                 context.commit('autocomplete', { value: data.items });
-            } catch(err) {
-                console.error(err);
-                throw(err);
             }
+            
         },
         create: async function(context, payload) {
             console.log(`${endpoint}/create`);
@@ -75,17 +67,11 @@ export default (endpoint) => {
             p.endpoint = `${endpoint}`;
             p.auth = true;
             p.body = payload;
-            try {
-                var data = await context.dispatch('create', p, { root: true });
+           
+            var data = await context.dispatch('post', p, { root: true });
                 // the api module returns false uf user is not authenticated
-                if(data) {
-                    return data.id;
-                } else {
-                    throw 'Unauthenticated user';
-                }  
-            } catch(err) {
-                console.error(err);
-                throw(err);
+            if(data) {
+                return data.id;
             }
         },
         update: async function(context, payload) {
@@ -93,18 +79,24 @@ export default (endpoint) => {
             //console.dir(payload);
             var p = {};
             p.endpoint = `${endpoint}`;
+            p.params = payload.id;
             p.auth = true;
             p.body = payload;
 
-            try {
-                var r = await context.dispatch('update', p, { root: true });
-                // the api module returns false uf user is not authenticated
-                return r;
-            } catch(err) {
-                console.error(err);
-                throw(err);
-            }
+            var r = await context.dispatch('put', p, { root: true });
+            return r;
         },
+        delete: async function(context, payload) {
+            console.log(`${endpoint}/delete`);
+            //console.dir(payload);
+            var p = {};
+            p.endpoint = `${endpoint}`;
+            p.auth = true;
+            p.params = payload.id;
+
+            var r = await context.dispatch('delete', p, { root: true });
+            return r;
+        }
     },
   }
 };

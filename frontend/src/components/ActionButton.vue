@@ -1,8 +1,16 @@
 <template>
     <span>
-    <v-tooltip top v-if="tooltip" >
+    <v-tooltip top v-if="tooltip || toolbar || menu">
       <template v-slot:activator="{ on }">
-        <v-btn @click="click" icon v-on="on"><v-icon :color="color">{{ icon }}</v-icon></v-btn>
+        <v-btn @click="click" 
+        :icon="tooltip" 
+        :text="toolbar" 
+        :fab="menu" 
+        :dark="menu" 
+        :small="menu" 
+        :color="color"
+        v-on="on"
+        ><v-icon>{{ icon }}</v-icon></v-btn>
       </template>
       <span>{{ text }}</span>
     </v-tooltip>
@@ -16,7 +24,8 @@ export default {
   name: 'ActionButton',
   components: {
   },
-  props: { icon: { type: String, default: 'mdi-plus-circle' }, text: { type: String, default: 'Add new' }, color: String, tooltip: Boolean },
+  props: { icon: { type: String, default: 'mdi-plus-circle' }, text: { type: String, default: 'Add new' }, 
+  color: String, tooltip: Boolean, toolbar: Boolean, menu: Boolean },
   data () {
     return {
 

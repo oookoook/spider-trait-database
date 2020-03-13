@@ -75,6 +75,7 @@ const authenticate = function(context, payload) {
             // log off the user in the frontend
             context.commit('user', {value: null});
             context.dispatch('notify', { error: true, text: 'Please log in to perform this action.'});
+            console.error('Unauthenticated user');
             return Promise.resolve(false);
         }
     } else {
@@ -105,8 +106,8 @@ export default {
                 return result.body;
             } catch (err) {
                 console.error(err);
-                //context.dispatch('notify', { error: true, text: 'Unable to connect to the backend.'});
-                throw err;
+                this.$store.dispatch('notify', { error: true, text: `Unable to get recors.`});
+                return false;
             }
         },
 
@@ -120,12 +121,12 @@ export default {
             return result.body;
             } catch (err) {
                 console.error(err);
-                //context.dispatch('notify', { error: true, text: 'Unable to connect to the backend.'});
-                throw err;
+                this.$store.dispatch('notify', { error: true, text: `Unable to get record.`});
+                return false;
             }
         },
 
-        create: async function(context, payload) {
+        post: async function(context, payload) {
             var url = getUrl(payload);
             if(!await authenticate(context, payload)) {
                 return false;
@@ -135,12 +136,12 @@ export default {
                 return result.body;
             } catch (err) {
                 console.error(err);
-                //context.dispatch('notify', { error: true, text: 'Unable to connect to the backend.'});
-                throw err;
+                this.$store.dispatch('notify', { error: true, text: `Unable to create record.`});
+                return false;
             }
         },
 
-        update: async function(context, payload) {
+        put: async function(context, payload) {
             var url = getUrl(payload);
             if(!await authenticate(context, payload)) {
                 return false;
@@ -150,8 +151,22 @@ export default {
             return result.body;
             } catch (err) {
                 console.error(err);
-                //context.dispatch('notify', { error: true, text: 'Unable to connect to the backend.'});
-                throw err;
+                this.$store.dispatch('notify', { error: true, text: `Unable to update record.`});
+                return false;
+            }
+        },
+        delete: async function(context, payload) {
+            var url = getUrl(payload);
+            if(!await authenticate(context, payload)) {
+                return false;
+            }
+            try {
+                var result = await Vue.http.delete(url, { params: payload.query });
+            return result.body;
+            } catch (err) {
+                console.error(err);
+                this.$store.dispatch('notify', { error: true, text: `Unable to delete record.`});
+                return false;
             }
         }
     }

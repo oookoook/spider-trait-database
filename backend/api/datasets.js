@@ -60,6 +60,8 @@ const get = async function(params, auth, showImport) {
         r.valid.review = validRR.results[0].invalid == 0;
     }
      
+    r.authorsEmail = r[`authors_email`];
+    delete(r[`authors_email`]);
      setState(r);
      // JavaScript dates are serialized badly in JSON
      r.date = r.date.valueOf();
@@ -103,7 +105,7 @@ const remove = async function(params, auth) {
 }
 
 module.exports = function(dbClient) {
-    // TODO check sorting ny state form UI
+    // TODO check sorting by state from UI
     db = dbClient;
     db.addSynonyms('datasets', 'dataset', {state: `imported`});
     return {

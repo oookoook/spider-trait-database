@@ -40,6 +40,7 @@ const list = async function(params, limits) {
     var results = await db.query({ table: 'data', sql: `SELECT data.*, taxonomy.wsc_id, taxonomy.wsc_lsid, taxonomy.family, taxonomy.genus, taxonomy.species, taxonomy.subspecies, `
      + `trait.id, trait.abbrev, trait.name, trait_category.id, trait_category.name, `
      + `measure.id, measure.name, sex.id, sex.name, life_stage.id, life_stage.name, method.id, method.abbrev, method.name, `
+     + `event_date_text, event_date_start, event_date_end, `
      + `location.id, location.locality, habitat_global.id, habitat_global.name, country.id, country.alpha3_code, country.name, `
      + `dataset.id, dataset.name, dataset.authors, reference.id, reference.abbrev `
      + `FROM ${join} WHERE ${cond.clause}`
@@ -52,7 +53,8 @@ const list = async function(params, limits) {
                 frequency: r.data.frequency,
                 sampleSize: r.data.sample_size,
                 eventDate: { 
-                    start: r.data.event_date_start.toJSON(), 
+                    text: r.data.event_date_text,
+                    start: r.data.event_date_start.toJSON(),     
                     end: r.data.event_date_end.toJSON()
                 },
                 taxonomy: r.taxonomy,
@@ -94,6 +96,7 @@ const csv =  async function(params, limits, tmpDir) {
      + `taxonomy.family, taxonomy.genus, taxonomy.species, taxonomy.subspecies, `
      + `trait.abbrev as trait, trait.name as traitFullName, trait_category.name as traitCategory, data.value, data.value_numeric, `
      + `measure.name as measure, sex.name as sex, life_stage.name as lifeStage, data.frequency, data.sample_size as sampleSize, method.abbrev as method, method.name as methodFullName, `
+     + `event_date_text as eventDateText, event_date_start as eventDateStart, event_date_end as eventDateEnd, `
      + `location.abbrev as location, location.lat as decimalLatitude, location.lon as decimalLongitude, location.precision as coordinatePrecision, location.altitude, location.locality as verbatimLocality, `
      + `country.alpha3_code as countryCode, country.name as countryName, habitat_global.name as habitatGlobal, habitat_global.number as habitatGlobalNumber,`
      + `location.habitat as habitatVerbatim, location.microhabitat as microhabitatVerbatim, location.stratum as stratumVerbatim, location.note as notePosition, `

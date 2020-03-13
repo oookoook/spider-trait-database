@@ -14,6 +14,7 @@ import user from './user'
 import ui from './ui'
 import api from './api'
 import data from './data'
+import editor from './editor'
 import EntityModule from './entity-module'
 
 
@@ -31,6 +32,7 @@ export default new Vuex.Store({
     datasets: new EntityModule('datasets'),
     references: new EntityModule('references'),
     imports: new EntityModule('import'),
+    editor,
     data
   }
 })

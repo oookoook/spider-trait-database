@@ -15,7 +15,7 @@ const locations = require('./locations')(db);
 const taxonomy = require('./taxonomy')(db);
 const datasets = require('./datasets')(db);
 const data = require('./data')(db);
-const importx = require('./import')(db);
+const imports = require('./import')(db);
 
 router.use(auth.resourcesAuth);
 
@@ -162,11 +162,11 @@ router.route('/import/')
 .get(requiresAuth(), auth.isContributor, function (req, res) {      
     datasets.list(req.recordLimit, req.resourcesAuth, true).then(r => res.json(r)).catch(e => { console.log(e); res.sendStatus(400); });
   })
-  /* Datasets are created in the datasets endpoint
+  // Datasets are created in the datasets endpoint, but this is added for convenience
   .post(requiresAuth(), auth.isContributor, function (req, res) {
-      // creates a new dataset
-  });
-  */
+    datasets.create(req.body, req.resourcesAuth).then(r => res.json(r)).catch(e => { console.log(e); res.sendStatus(400); });
+  })
+
 
 
 router.route('/import/:id')
@@ -177,51 +177,56 @@ router.route('/import/:id')
   .put(requiresAuth(), auth.isContributor, function (req, res) {
     // used for sending the dataset to approval and for approving the dataset. If the dataset is approved,
     // all the records are transferred from the import table to the data table - that's why this is not handled by the datasets endpoint 
-    importx.changeState(req.params, req.body, req.resourcesAuth);
-  });
+    imports.changeState(req.params, req.body, req.resourcesAuth);
+  })
+  .delete(requiresAuth(), auth.isContributor, function (req, res) {
+    // this is handled by the dataset endpoint, added for convenience
+    datasets.remove(req.params, req.resourcesAuth).then(r => res.json(r)).catch(e => { console.log(e); res.sendStatus(400); });
+  })
+
 
 
 router.route('/import/:id/data')
   // gets data for a given dataset
   .get(requiresAuth(), auth.isContributor, function (req, res) {
-    importx.list(req.params, req.recordLimit, req.resourcesAuth).then(r => res.json(r)).catch(e => { console.log(e); res.sendStatus(400); });
+    imports.list(req.params, req.recordLimit, req.resourcesAuth).then(r => res.json(r)).catch(e => { console.log(e); res.sendStatus(400); });
   })
   .put(requiresAuth(), auth.isContributor, fileUpload(uploadOpts), function (req, res) {
     // uploads a file to already existing dataset
     // returns only a jobId that can be used to track the progress
     // in the background transfers rows from the file to the import table
-    importx.uploadFile(req.params, req.body, req.files, req.resourcesAuth).then(r => res.json(r)).catch(e => { console.log(e); res.sendStatus(400); });
+    imports.uploadFile(req.params, req.body, req.files, req.resourcesAuth).then(r => res.json(r)).catch(e => { console.log(e); res.sendStatus(400); });
   })
   .delete(requiresAuth(), auth.isContributor, function (req, res) {
     // delete all the records for a given dataset in the import table
-    importx.deleteRecords(req.params, req.resourcesAuth);
+    imports.deleteRecords(req.params, req.resourcesAuth);
   });
 
 router.route('/import/:id/row/:row')
   .get(requiresAuth(), auth.isContributor, function (req, res) {
-    importx.getRow(req.params, req.resourcesAuth).then(r => res.json(r)).catch(e => { console.log(e); res.sendStatus(400); });
+    imports.getRow(req.params, req.resourcesAuth).then(r => res.json(r)).catch(e => { console.log(e); res.sendStatus(400); });
    })
   .put(requiresAuth(), auth.isContributor, function (req, res) {
-    importx.updateRow(req.params, req.body, req.resourcesAuth).then(r => res.json(r)).catch(e => { console.log(e); res.sendStatus(400); });
+    imports.updateRow(req.params, req.body, req.resourcesAuth).then(r => res.json(r)).catch(e => { console.log(e); res.sendStatus(400); });
    })
   .delete(requiresAuth(), auth.isContributor, function (req, res) {
-    importx.deleteRow(req.params, req.resourcesAuth).then(r => res.json(r)).catch(e => { console.log(e); res.sendStatus(400); });
+    imports.deleteRow(req.params, req.resourcesAuth).then(r => res.json(r)).catch(e => { console.log(e); res.sendStatus(400); });
   });
 
 router.route('/import/:id/column/:column')
   .get(requiresAuth(), auth.isContributor, function (req, res) {
   // used for getting the distinct entities that must be created
-  importx.getColumn(req.params, req.resourcesAuth).then(r => res.json(r)).catch(e => { console.log(e); res.sendStatus(400); });
+  imports.getColumn(req.params, req.resourcesAuth).then(r => res.json(r)).catch(e => { console.log(e); res.sendStatus(400); });
   })
   .put(requiresAuth(), auth.isContributor, function (req, res) {
     // used for batch value replacements
-    importx.updateColumn(req.params, req.body, req.resourcesAuth).then(r => res.json(r)).catch(e => { console.log(e); res.sendStatus(400); });
+    imports.updateColumn(req.params, req.body, req.resourcesAuth).then(r => res.json(r)).catch(e => { console.log(e); res.sendStatus(400); });
    });
    
 router.route('/jobs/')
-    .get(requiresAuth(), auth.isAdmin, function (req, res) {
-      // used for getting the distinct entities that must be created
-      jobs.list().then(r => res.json(r)).catch(e => { console.log(e); res.sendStatus(400); });
+    .get(requiresAuth(), auth.isContributor, function (req, res) {
+      // used for getting the list of running jobs
+      jobs.list(req.resourcesAuth).then(r => res.json(r)).catch(e => { console.log(e); res.sendStatus(400); });
      });
 
 router.route('/jobs/:id')

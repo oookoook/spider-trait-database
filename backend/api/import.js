@@ -117,8 +117,8 @@ const getObject = function(r) {
         },
         eventDate: {
             raw: r[`event_date`],
-            start: r[`event_date_start`].toJSON(),
-            end: r[`event_date_end`].toJSON()
+            start: r[`event_date_start`] ? r[`event_date_start`].toJSON() : null,
+            end: r[`event_date_end`] ? r[`event_date_end`].toJSON() : null
         },
         rowLink: r[`row_link`],
         method: {
@@ -216,6 +216,8 @@ const changeState = async function(params, body, auth) {
         case 'approved': imp = 3; break; 
     }
 
+    // TODO send notification email
+
     if(imp < 2) {
         await db.query({table: 'dataset', sql: `UPDATE dataset SET imported = ?, message = ? WHERE id = ? AND ${getAuthWhere(auth)}`, values: [imp, msg, id] });
         return {
@@ -230,8 +232,7 @@ const changeState = async function(params, body, auth) {
     var state = { total: 6, progress: 0, errors: [], completed: false }
     var jobId = jm.createJob(auth.sub, state, transferToData, { id, aw });
     return {
-        jobId,
-        state
+        job: jm.getJob(jobId)
     };
 }
 
@@ -382,6 +383,10 @@ const uploadFile = async function(params, body, files, auth) {
     // uploads a file to already existing dataset
     // returns only a jobId that can be used to track the progress
     // in the background transfers rows from the file to the import table
+    
+    // file is uploaded
+    params.state.progress += 1;
+    
     var ds = parseInt(params.id);
 
     var dscheck = await db.query({table: 'dataset', sql: `SELECT id FROM dataset WHERE id=? AND ${getAuthWhere(auth)}`, values: [ds]});
@@ -394,7 +399,7 @@ const uploadFile = async function(params, body, files, auth) {
         throw 'File size is too large';
     }
     var fpath = f.tempFilePath;
-    if(f.mimetype == 'application/vnd.ms-excel') {
+    if(f.mimetype == 'application/vnd.ms-excel' || f.mimetype == 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet') {
         fpath = await convertToCSV(f);
     } else if(f.mimetype != 'text/csv') {
         throw 'Unknown file format';
@@ -434,8 +439,9 @@ const uploadFile = async function(params, body, files, auth) {
         params.state.completed = true;
     };
 
-    // +1 to the total is the validation step
-    var jobId = jm.createJob(auth.sub, total + 3, ifunc, { ds });
+    // +3 to the total is the validation step
+    // + 1 to the totat is the file upload
+    var jobId = jm.createJob(auth.sub, total + 4, ifunc, { ds });
     return {
         job: jm.getJob(jobId)    
     };
@@ -451,6 +457,9 @@ const deleteRecords = async function(params, auth) {
 }
 
 const getColumnName = function(val) {
+    if(!val) {
+        return null;
+    }
     if(val == 'taxonomy.wscLsid') {
         return `wsc_lsid`;
     }
@@ -543,39 +552,53 @@ const updateColumn = async function(params, body, auth) {
     if(column == 'dataset_id' || column == 'valid' || column == 'valid_review' || column == 'changed') {
         throw 'Cannot update this column';
     }
-    
-    // allow to change value in one column based on the value in another
-    var vc = getColumnName(body.valueColumn);
-
-    var ov = body.oldValue;
     var nv = body.newValue;
-
+    // allow to change value in one column based on the value in another
+    
+    // add support for array of columns (for setting up the location abbrev)
+    var vc = null;
+    var ov = null; 
+    if(body.multipleColumns) {
+        vc = body.valueColumns.map(c =>getColumnName(c));
+        ov = body.oldValues;
+    } else {
+        vc = [ getColumnName(body.valueColumn) || column ];
+        ov = [ body.oldValue ];
+    }
+    if(vc.length != ov.length) {
+        throw 'Number of columns and number of values does not match';
+    }
+    var clauses = [];
+    for(var i = 0; i < vc.length; i++) {
+        clauses.push(`${db.escapeId(vc[i])}=${db.escape(ov[i])}`)
+    }
+    var cw = clauses.join(' AND ');
     if(column == 'location_lat' || column == 'location_lon') {
         var convVal = conv.parseCoord(newValue);
-        await db.query({table: 'import', sql:`UPDATE ${joind} SET ${db.escapeId(column + '_conv')} = ? WHERE dataset_id = ? AND ?? = ? AND ${aw}`, values: [convVal, ds, vc || column, ov] });
+        await db.query({table: 'import', sql:`UPDATE ${joind} SET ${db.escapeId(column + '_conv')} = ? WHERE ${cw} AND dataset_id = ? AND ${aw}`, values: [convVal, ds] });
     }
 
     // convert numeric values
     if(column == 'value') {
         var numVal = conv.parseNumber(nv);
-        await db.query({table: 'import', sql:`UPDATE ${joind} SET value_numeric = ? WHERE dataset_id = ? AND ?? = ? AND ${aw}`, values: [numVal, ds, vc || column, ov] });
+        await db.query({table: 'import', sql:`UPDATE ${joind} SET value_numeric = ? WHERE ${cw} AND dataset_id = ? AND ${aw}`, values: [numVal, ds] });
     }
     if(column == 'frequency') {
         var numVal = conv.parseNumber(nv);
-        await db.query({table: 'import', sql:`UPDATE ${joind} SET frequency_numeric = ? WHERE dataset_id = ? AND ?? = ? AND ${aw}`, values: [numVal, ds, vc || column, ov] });
+        await db.query({table: 'import', sql:`UPDATE ${joind} SET frequency_numeric = ? WHERE ${cw} AND dataset_id = ? AND ${aw}`, values: [numVal, ds] });
     }
     if(column == 'sample_size') {
         var numVal = conv.parseNumber(nv);
-        await db.query({table: 'import', sql:`UPDATE ${joind} SET sample_size_numeric = ? WHERE dataset_id = ? AND ?? = ? AND ${aw}`, values: [numVal, ds, vc || column, ov] });
+        await db.query({table: 'import', sql:`UPDATE ${joind} SET sample_size_numeric = ? WHERE ${cw} AND dataset_id = ? AND ${aw}`, values: [numVal, ds] });
     }
 
     // convert timestamps (start, end)
     if(column == 'event_date') {
         var { s, e } = conv.parseEvent(nv);
-        await db.query({table: 'import', sql:`UPDATE ${joind} SET event_date_start = ?, event_date_end = ? WHERE dataset_id = ? AND ?? = ? AND ${aw}`, values: [s, e, ds, vc || column, ov] });
+        await db.query({table: 'import', sql:`UPDATE ${joind} SET event_date_start = ?, event_date_end = ? WHERE ${cw} AND dataset_id = ? AND ${aw}`, values: [s, e, ds ] });
     }
 
-    var results = await db.query({table: 'import', sql:`UPDATE ${joind} SET ?? = ?, changed = 1 WHERE dataset_id = ? AND ?? = ? AND ${aw}`, values: [column, nv, ds, vc || column, ov] });
+    var results = await db.query({table: 'import', sql:`UPDATE ${joind} SET ?? = ?, changed = 1 WHERE ${wc} AND dataset_id = ? AND ${aw}`, values: [column, nv, ds ] });
     
     // run the validation as a new job and return a job id
     //validate(ds, aw); 
@@ -743,9 +766,13 @@ const validate = async function(params) {
     }
 }
 
+var synonyms = {
+    'valid.review': 'valid_review',
+    'valid.approve': 'valid'
+}
 
 module.exports = function(dbClient) {
-    db = dbClient;
+    db = dbClient('import', synonyms);
     return {
         list,
         changeState,

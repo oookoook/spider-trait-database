@@ -1,4 +1,4 @@
-const { v4: uuidv4 } = require('uuid');
+const shortid = require('shortid');
 
 var jobs = {};
 
@@ -12,7 +12,7 @@ const gjs = function(j) {
 }
 
 const createJob = function(owner, total, func, params) {
-    var jobId = uuidv4();
+    var jobId = shortid.generate();
     var state = { total, progress: 0, errors: [], completed: false, aborted: false }
     // passes the state to the function
     params.state = state;
@@ -24,9 +24,14 @@ const getJob = function(id) {
     
 }
 
+/*
+const getJobForUser = function(owner) {
+    return gjs(jobs.find((j) => j.owner == owner));
+}
+*/
 
-const listJobs = function() {
-    return Object.keys(jobs).map(id => gjs(jobs[id]));
+const listJobs = function(owner) {
+    return Object.keys(jobs).map(id => gjs(jobs[id])).filter(j => owner == null || j.owner == owner);
 }
 
 const removeJob = function(id) {
@@ -39,5 +44,5 @@ module.exports = {
     createJob,
     getJob,
     listJobs,
-    removeJob,
+    removeJob
 }

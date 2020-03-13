@@ -1,10 +1,4 @@
 <template>
-  <v-card>
-    <v-card-title>
-      Created datasets
-      <v-spacer />
-      <action-button color="primary" @click="$emit('showNew')" tooltip></action-button>
-    </v-card-title>
   <v-data-table
       :headers="headers"
       :items="items"
@@ -49,7 +43,6 @@
     </template>
 
     </v-data-table>
-  </v-card>
 </template>
 
 <script>

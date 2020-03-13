@@ -1,6 +1,6 @@
 <template>
   <div>
-    <slot :loading="loading" :item="item" v-if="id">
+    <slot :loading="loading" :item="item" v-if="id || create">
     {{ JSON.stringify(item) }}
     </slot>
   </div>
@@ -13,14 +13,24 @@ export default {
   name: 'EntityProvider',
   components: {
   },
-  props: { list: String, id: Number },
+  props: { list: String, id: Number, create: Boolean, template: Object },
   data () {
     return {
+      loading: false
     }
   },
   computed: {
-    item() {
-      return this.$store.state[this.list].entity;
+    item: {
+      get() {
+        if(this.create && !this.id && this.template) {
+          return this.template;
+        }
+        return this.$store.state[this.list].entity;
+      },
+      set(val) {
+        console.log('Item setter called');
+        save(val);
+      }
     }
   },
   watch: {
@@ -37,7 +47,16 @@ export default {
         return;
       }
       this.loading = true;
-      this.$store.dispatch(`${this.list}/get`,{ id: this.id }).then(() => {this.loading = false; }, (err) => { this.$store.dispatch('notify', { error: true, text: `Unable to retrieve ${this.list}.`})});
+      this.$store.dispatch(`${this.list}/get`,{ id: this.id }).then(() => {this.loading = false; });
+    },
+    save(val) {
+      var action = create ? 'create' : 'update';
+      this.loading = true;
+        this.$store.dispatch(`${list}/${action}`, val)
+        .then((id) => { 
+          this.loading= false; 
+          this.$emit(action, id ? id : this.id); 
+        });
     }
   },
   created () {
