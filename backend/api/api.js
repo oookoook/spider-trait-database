@@ -202,6 +202,12 @@ router.route('/import/:id/data')
     imports.deleteRecords(req.params, req.resourcesAuth);
   });
 
+  router.route('/import/:id/data/export')
+  // gets data for a given dataset in CSV
+  .get(requiresAuth(), auth.isContributor, function (req, res) {
+    imports.exportCsv(req.params, req.resourcesAuth,  settings.files.tmpDir).then(r => res.download(r)).catch(e => { console.log(e); res.sendStatus(400); });
+  })
+
 router.route('/import/:id/row/:row')
   .get(requiresAuth(), auth.isContributor, function (req, res) {
     imports.getRow(req.params, req.resourcesAuth).then(r => res.json(r)).catch(e => { console.log(e); res.sendStatus(400); });

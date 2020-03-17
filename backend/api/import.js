@@ -1,6 +1,7 @@
 const conv = require('../util/converter');
 const XLSX = require('xlsx');
 const fcsv = require('fast-csv');
+const csv = require('../util/csv');
 const jm = require('../util/job-manager');
 const { snakeCase, camelCase } = require('change-case');
 
@@ -94,6 +95,7 @@ const getObject = function(r) {
         value: {
             raw: r[`value`],
             numeric: r[`value_numeric`],
+            requiresNumeric: r[`require_numeric_value`]
         },
         measure: {
             raw: r[`measure`],
@@ -116,7 +118,7 @@ const getObject = function(r) {
             numeric: r[`sample_size_numeric`]
         },
         eventDate: {
-            raw: r[`event_date`],
+            text: r[`event_date`],
             start: r[`event_date_start`] ? r[`event_date_start`].toJSON() : null,
             end: r[`event_date_end`] ? r[`event_date_end`].toJSON() : null
         },
@@ -128,7 +130,7 @@ const getObject = function(r) {
             id: r[`method_id`]
         },
         reference: {
-            raw: r[`reference`],
+            fullCitation: r[`reference`],
             abbrev: r[`reference_abbrev`],
             doi: r[`reference_doi`],
             id: r[`reference_id`]
@@ -143,10 +145,16 @@ const getObject = function(r) {
                 raw: r[`location_lon`],
                 conv: r[`location_lon_conv`],
             },
-            precision: r[`location_precision`],
-            altitude: r[`location_altitude`],
+            precision: {
+                raw: r[`location_precision`],
+                numeric: r[`location_precision_numeric`]
+            },
+            altitude: {
+                raw: r[`location_altitude`],
+                numeric: r[`location_altitude_numeric`]
+            },
             locality: r[`location_locality`],
-            countryCode: {
+            country: {
                 raw: r[`location_country_code`],
                 id: r[`location_country_id`]
             },
@@ -177,6 +185,16 @@ const list = async function(params, limits, auth) {
    
     res.items = results.map(r => getObject(r)); 
     return res;
+}
+
+const exportCsv = async function(params, auth, tmpDir) {
+    var id = parseInt(params.id);
+    var aw = getAuthWhere(auth);
+        
+    var dstream = db.squery({table: 'import', sql:`SELECT import.* `
+    + `FROM ${joind} WHERE dataset_id = ? AND ${aw}`, values: [id], nestTables: false, hasWhere: true });
+   
+    return await csv.write(tmpDir, `spider-traits-import-${id}-${Date.now()}.csv`, dstream);
 }
 
 const changeState = async function(params, body, auth) {
@@ -349,6 +367,8 @@ const importRow = async function(conn, ds, r, state, cache) {
    row['value_numeric'] = conv.parseNumber(row['value']); 
    row['frequency_numeric'] = conv.parseNumber(row['frequency']); 
    row['sample_size_numeric'] =conv.parseNumber(row['sample_size']);
+   row['location_altitude_numeric'] =conv.parseNumber(row['location_altitude']);
+   row['location_precision_numeric'] =conv.parseNumber(row['location_precision']);
 
     // convert timestamps (start, end)
     if(row['event_date']) {
@@ -466,6 +486,12 @@ const getColumnName = function(val) {
     if(val == 'taxonomy.originalName') {
         return `original_name`;
     }
+    if(val == 'reference.fullCitation') {
+        return `reference`;
+    }
+    if(val == 'eventDate.text') {
+        return `event_date`;
+    }
     return snakeCase(i.replace('.raw','').replace('.', '_'));
 }
 
@@ -513,7 +539,15 @@ const updateRow = async function(params, body, auth) {
         newAttrs['frequency_numeric'] = conv.parseNumber(newAttrs['frequency']);
     }
     if(newAttrs['sample_size']) {
-        newAttrs['sample_size'] = conv.parseNumber(newAttrs['sample_size']);
+        newAttrs['sample_size_numeric'] = conv.parseNumber(newAttrs['sample_size']);
+    }
+
+    if(newAttrs['location_precision']) {
+        newAttrs['location_precision_numeric'] = conv.parseNumber(newAttrs['location_precision']);
+    }
+
+    if(newAttrs['location_altitude']) {
+        newAttrs['location_altitude_numeric'] = conv.parseNumber(newAttrs['location_altitude']);
     }
     
     // convert timestamps (start, end)
@@ -592,6 +626,16 @@ const updateColumn = async function(params, body, auth) {
         await db.query({table: 'import', sql:`UPDATE ${joind} SET sample_size_numeric = ? WHERE ${cw} AND dataset_id = ? AND ${aw}`, values: [numVal, ds] });
     }
 
+    if(column == 'location_precision') {
+        var numVal = conv.parseNumber(nv);
+        await db.query({table: 'import', sql:`UPDATE ${joind} SET location_precision_numeric = ? WHERE ${cw} AND dataset_id = ? AND ${aw}`, values: [numVal, ds] });
+    }
+
+    if(column == 'location_altitude') {
+        var numVal = conv.parseNumber(nv);
+        await db.query({table: 'import', sql:`UPDATE ${joind} SET location_altitude_numeric = ? WHERE ${cw} AND dataset_id = ? AND ${aw}`, values: [numVal, ds] });
+    }
+
     // convert timestamps (start, end)
     if(column == 'event_date') {
         var { s, e } = conv.parseEvent(nv);
@@ -647,15 +691,18 @@ const getColumn = async function(params, auth) {
     var res = await db.prepareListResponse(limits, 'import', aw, [], joind);
         
     var results = await db.query({table: 'import', sql:`SELECT DISTINCT ${colSql} `
-    + `FROM ${joind} WHERE dataset_id = ? AND ${aw}`, values: [id], nestTables: false, limits, hasWhere: true });
+    + `FROM ${joind} WHERE dataset_id = ? AND ${aw}`, values: [ds], nestTables: false, limits, hasWhere: true });
 
     var remstr = ['location_', 'method_', 'trait_', 'reference_', 'event_date_'];
     // compute the names of the object properties
     var oprops = [];
     cols.forEach(c => {
         var oprop = c;
-        if(oprop == 'reference' || oprop == 'event_date') {
-            oprop = 'raw';
+        if(oprop == 'reference') {
+            oprop = 'fullCitation'
+        }
+        if(oprop == 'event_date') {
+            oprop = 'text';
         } else {
             remstr.forEach(s => { oprop = oprop.replace(s, '') });
             oprop = camelCase(oprop);
@@ -712,13 +759,14 @@ const validate = async function(params) {
     await db.cquery(c,{table: 'import', sql:`UPDATE ${joinv} SET `
     + ` sex_id = sex.id, life_stage_id = life_stage.id, measure_id = measure.id, method_id = method.id, trait_id = trait.id,`
     + ` reference_id = reference.id,  location_id = location.id, location_habitat_global_id = habitat_global.id, location_country_id = country.id,`
-    + ` taxonomy_id = COALESCE(taxonomy.id, taxonomy_name.taxonomy_id)`
+    + ` taxonomy_id = CASE WHEN taxonomy.id IS NOT NULL AND taxonomy_name.taxonomy_id IS NOT NULL AND taxonomy.id <> taxonomy_name.taxonomy_id THEN NULL ELSE COALESCE(taxonomy.id, taxonomy_name.taxonomy_id)`
+    + ` require_numeric_value = CASE WHEN data_type.name NOT IN ('Character') THEN 1 ELSE 0`
     + ` WHERE changed = 1 AND dataset_id = ? AND ${aw}`, values: [ds] });
 
     state.progress += 1;
 
     // step 3: set the valid attribute to 1 if all the necesssary foreign keys are filled in and other conditions are met
-    await db.cquery(c,{table: 'import', sql:`UPDATE import SET valid_review = 1 WHERE`
+    await db.cquery(c,{table: 'import', sql:`UPDATE ${joind} SET valid_review = 1 WHERE`
     + ` (sex IS NULL OR sex_id IS NOT NULL) AND`
     + ` (life_stage IS NULL OR life_stage_id IS NOT NULL) AND`
     + ` (measure_id IS NOT NULL) AND`
@@ -732,17 +780,19 @@ const validate = async function(params) {
     + ` (frequency IS NULL OR frequency_numeric IS NOT NULL) AND`
     + ` (location_lat IS NULL OR location_lat_conv IS NOT NULL) AND`
     + ` (location_lon IS NULL OR location_lon_conv IS NOT NULL) AND`
+    + ` (location_altitude IS NULL OR location_altitude_numeric IS NOT NULL) AND`
+    + ` (location_precision IS NULL OR location_precision_numeric IS NOT NULL) AND`
     + ` (location_country IS NULL OR location_country_id IS NOT NULL) AND`
     + ` (location_habitat_global IS NULL OR location_habitat_global_id IS NOT NULL) AND`
     //+ ` (event_date IS NULL OR event_date_start IS NOT NULL) AND`
-    + ` (value_numeric IS NULL OR value_numeric = value OR (value = 'true' AND value_numeric = 1) OR (value = 'false' AND value_numeric = 0)) AND`
+    + ` (require_numeric_value = 0 OR value_numeric = value OR (value = 'true' AND value_numeric = 1) OR (value = 'false' AND value_numeric = 0)) AND`
     + ` dataset_id = ? AND changed = 1 AND ${aw}`, values: [ds] });
 
     state.progress += 1;
 
     // step 4: set the valid attribute to 1 if the record is valid for review and also trait_id, method_id, 
 
-    await db.cquery(c,{table: 'import', sql:`UPDATE import SET valid = 1 WHERE valid_review = 1 AND`
+    await db.cquery(c,{table: 'import', sql:`UPDATE ${joind} SET valid = 1 WHERE valid_review = 1 AND`
     + ` (trait_id IS NOT NULL) AND`
     //+ ` (method_id IS NOT NULL) AND`
     + ` (reference_id IS NOT NULL) AND`
@@ -754,7 +804,7 @@ const validate = async function(params) {
     + ` dataset_id = ? AND changed = 1 AND ${aw}`, values: [ds] });
     
     // step 5 reset the changed attribute for all the records (also for the invalid ones)
-    await db.cquery(c,{table: 'import', sql:`UPDATE import SET changed = 0 WHERE changed = 1 AND`
+    await db.cquery(c,{table: 'import', sql:`UPDATE ${joind} SET changed = 0 WHERE changed = 1 AND`
     + ` dataset_id = ? AND changed = 1 AND ${aw}`, values: [ds] });
 
     state.progress += 1;
@@ -775,6 +825,7 @@ module.exports = function(dbClient) {
     db = dbClient('import', synonyms);
     return {
         list,
+        exportCsv,
         changeState,
         uploadFile,
         deleteRecords,

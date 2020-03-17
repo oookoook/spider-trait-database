@@ -13,9 +13,9 @@
           :cellId="item.id" :cellProp="h.value" 
           :selectedId.sync="selectedId" 
           :selectedProp.sync="selectedProp"
-          :invalid="!isValid(item, h.value)"
-          @select="selectCell">
-            <span>{{ getValue(item, h.value) }}</span>
+          :invalid="isPropValid(item, h.value) === true"
+          @select="selectCell(e, item)">
+            <span>{{ getPropValue(item, h.value) }}</span>
           </selectable-cell>
           <!--
           <action-menu>
@@ -35,6 +35,7 @@
 
 <script>
 
+import ImportProps from '../mixins/import-props'
 import ListTable from '../mixins/list-table'
 
 import ActionButton from './ActionButton'
@@ -43,7 +44,7 @@ import SelectableCell from './SelectableCell'
 
 export default {
   name: 'EditTable',
-  mixins: [ListTable],
+  mixins: [ListTable, ImportProps],
   components: {
     ActionButton,
     ActionMenu,
@@ -51,24 +52,6 @@ export default {
   },
   data () {
     return {
-      // TODO proper columns
-      headers: [
-        { text: 'Id', value: 'id' },
-        { text: 'WSC LSID', value: 'wsc.lsid' },
-        { text: 'Original name', value: 'originalName' },
-        { text: 'Trait ID', value: 'trait.abbrev' },
-        { text: 'Trait value', value: 'value' },
-        { text: 'Measure', value: 'measure' },
-        { text: 'Sex', value: 'sex' },
-        { text: 'Life stage', value: 'lifeStage' },
-        { text: 'Frequency', value: 'frequency' },
-        { text: 'Sample size', value: 'sampleSize' },
-        { text: 'Method', value: 'method.abbrev'},
-        { text: 'Location', value: 'location'},
-        { text: 'Event date', value: 'eventDate'},
-        { text: 'Reference', value: 'reference.raw'},
-        { text: 'Related records', value: 'rowLink'}
-      ],
       selectedId: null,
       selectedProp: null
     }
@@ -79,27 +62,10 @@ export default {
   watch: {
   },
   methods: {
-    getValue(item, h) {
-      //console.dir(item);
-      // from input such as 'eventDate.start' gets value item[eventDate][start]
-      var i = item;
-      var v = null;
-      var a = h.split('.');
-      var pos = 0;
-      while(pos < a.length) {
-        v = i[a[pos]];
-        i = i[a[pos]];
-        pos+=1;
-      }
-      return v;
-    },
-    isValid(item, h) {
-      var val = this.getValue(item, h);
-      // TODO define rules for cell validity
-      return true;
-    },
-    selectCell(e) {
+    selectCell(e, item) {
       //console.dir(e);
+      // e = { id: this.cellId, prop: this.cellProp }
+      e.item = item;
       this.$emit('selectCell', e);
     }
   },

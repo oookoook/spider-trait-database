@@ -58,7 +58,8 @@ Data manipulating methods should not be called from the API - Taxonomy will be s
 */
 const synonyms = {
     'wsc.id': 'taxonomy.wsc_id',
-    'wsc.lsid': 'taxonomy.wsc_lsid'
+    'wsc.lsid': 'taxonomy.wsc_lsid',
+    'taxonomy.originalName': 'taxonomy_name.name'
 }
 
 module.exports = function(dbClient) {

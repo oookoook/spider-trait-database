@@ -262,8 +262,10 @@ const createEntity = async function (opts) {
     delete(obj.id);
     console.dir(obj);
     var r = await query({table, sql: `INSERT INTO ${table} SET ?`, values: [obj] });
+    obj.id = r.insertId; 
     return {
-        id: r.insertId
+        id: r.insertId,
+        entity: obj
     }
 }
 
@@ -313,8 +315,10 @@ const updateEntity = async function (opts) {
     // we don't want to update the id
     delete(obj.id);
     var r = await query({table, sql: `UPDATE \`${table}\` SET ? WHERE id = ? ${getAuthWhere(auth)}`, values: [obj, id] });
+    obj.id = id;
     return {
-        id
+        id,
+        entity: obj
     }
 }
 

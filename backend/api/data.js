@@ -1,8 +1,6 @@
 var db = null;
 
-const fcsv = require('fast-csv');
-const fs = require('fs');
-const path = require('path');
+const csv = require('../util/csv');
 
 var join = `data `
 + `LEFT JOIN taxonomy ON data.taxonomy_id = taxonomy.id `
@@ -104,38 +102,7 @@ const csv =  async function(params, limits, tmpDir) {
      + `FROM ${join} WHERE ${cond.clause}`
      , values: cond.values, nestTables: false, limits, hasWhere: true});
     
-    var p = path.resolve(tmpDir, `spider-traits-${new Date().valueOf()}.csv`);
-    
-    await new Promise((resolve, reject) => {
-
-    var cstream = fcsv.format({headers: true})
-        .on('error', err => reject(err))
-        .on('finish', () => resolve(path));
-    
-    const fstream = fs.createWriteStream(p, { encoding: 'utf8' });
-    cstream.pipe(fstream);
-
-    dstream
-        .on('error', function(err) {
-        // Handle error, an 'end' event will be emitted after this as well
-        console.log(err);
-        })
-        .on('fields', function(fields) {
-        // the field packets for the rows to follow
-        })
-        .on('result', function(row) {
-        // Pausing the connnection is useful if your processing involves I/O
-        connection.pause();
-        cstream.write(row);    
-        connection.resume();
-      })
-      .on('end', function() {
-        // all rows have been received
-        cstream.end();
-      });
-        
-    });
-    return p;
+    return await csv.write(tmpDir, `spider-traits-${Date.now()}.csv`, dstream);
 }
 
 const synonyms = {

@@ -13,8 +13,8 @@
           <action-button  color="error" text="Show invalid rows" icon="mdi-close-outline" toolbar />
         </v-btn-toggle>
         <v-divider vertical class="mx-3" />
-          <v-btn-toggle group dense mandatory v-model="editMode">  
-            <action-button text="Edit only the selected row" icon="mdi-table-row" toolbar />
+          <v-btn-toggle group dense mandatory v-model="editModeRaw">  
+            <action-button text="Edit only the selected cell" icon="mdi-table-row" toolbar />
             <action-button text="Edit the selected value in the whole column" icon="mdi-table-column" toolbar />
             <action-button text="Use this value as rule for value change" icon="mdi-table-search" toolbar />
             <action-button text="View distinct values in the selected column" icon="mdi-format-list-numbered" toolbar />
@@ -23,6 +23,7 @@
         <v-divider vertical class="mx-3" />
         <v-spacer />
         <v-divider vertical class="mx-3" />
+        <action-button text="Download as CSV" icon="mdi-download" toolbar @click="download" />
         <action-button v-if="!editor && isValid" color="success" text="Send for review" icon="mdi-send" toolbar @click="review" />
         <action-button v-if="!editor && !isValid" color="warning" text="Send for review (dataset invalid)" icon="mdi-send" toolbar @click="review"/>
         <action-button v-if="editor" color="error" text="Reject" icon="mdi-undo" toolbar @click="reject"/>
@@ -31,7 +32,7 @@
 
         <edit-table editor
         :items="list" 
-        :loading="loading" 
+        :loading="loadingData" 
         :total="total"
         :options="options" 
         @selectCell="selectCell" 
@@ -39,7 +40,7 @@
       
         <!--
           Dataset editor
-          TODO Data modifier
+          Data modifier
             - list of columns - old value, new value (autocomplete)
             - right part of the screen: two options: 
                - Edit value where record id IS row id
@@ -47,6 +48,7 @@
                  or setting up the value based on values in a different column)
           File uploader
           Deletion Confirmation dialogs
+          TODO distinct lists
         -->
         
         <v-bottom-sheet v-model="dsEdit">
@@ -60,10 +62,16 @@
               <v-card-title>{{ confirm.title || 'Confirm action' }}</v-card-title>
               <v-card-text><span>{{ confirm.text }}</span> Are you sure?</v-card-text>
               <v-card-actions>
-                  <action-button text="Cancel" @click="confirm.dialog = false" icon="mdi-cancel">
-                  <action-button text="Confirm" @click="confirm.action" icon="mdi-check">
+                  <action-button text="Cancel" @click="confirm.dialog = false" icon="mdi-cancel" />
+                  <action-button text="Confirm" @click="confirm.action" icon="mdi-check" />
               </v-card-actions>
             </v-card>
+        </v-bottom-sheet>
+        <v-bottom-sheet v-model="edit.dialog">
+            <edit-dialog :type="editMode" :selection="selectedCell" @cancel="edit.dialog = false" @save="edit.action" />
+        </v-bottom-sheet>
+        <v-bottom-sheet v-model="distinct.dialog">
+            <distinct-dialog :editor="editor" :selection="selectedCell" @cancel="distinct.dialog = false" @create="createEntity" />
         </v-bottom-sheet>
         
         <!--
@@ -82,6 +90,7 @@
 import { mapState, mapGetters } from 'vuex'
 import ActionButton from './ActionButton'
 import EditTable from './EditTable'
+import EditDialog from './EditDialog'
 import DatasetForm from './DatasetForm'
 import UploadForm from './UploadForm'
 import ListProvider from './ListProvider'
@@ -91,6 +100,7 @@ export default {
   components: {
     ActionButton,
     EditTable,
+    EditDialog,
     DatasetForm,
     UploadForm,
     ListProvider
@@ -99,8 +109,9 @@ export default {
   data () {
     return {
         validityFilter: 0,
-        editMode: 0,
+        editModeRaw: 0,
         loading: false,
+        loadingData: false,
         dsEdit: false,
         upload: false,
         options: null,
@@ -111,7 +122,10 @@ export default {
           action: () => {}
         },
         jobCompletedAction: null,
-        cellEdit: false,
+        edit: {
+          dialog: false,
+          action: () => {}
+        },
         /*
         items: [
           {id: 1, originalName: 'Ahoj', wsc: {lsid: 0}, method: {}, trait: {}, reference: {} },
@@ -149,6 +163,15 @@ export default {
     isValid() {
       return this.dataset && this.dataset.valid.review;
     },
+    editMode() {
+      switch(this.editModeRaw) {
+        case 0 : return 'cell';
+        case 1: return 'column';
+        case 2: return 'rule';
+        case 3: return 'distinct';
+        case 4: return 'delete';
+      }
+    },
     ...mapGetters('editor', ['job', 'list', 'total'])
   },
   watch: {
@@ -170,7 +193,14 @@ export default {
   methods: {
     selectCell(e) {
       this.selectedCell = e;
-      this.cellEdit = true;
+      switch(editMode) {
+        
+        case 'cell': editCell(); break;
+        case 'column': 
+        case 'rule': editColumn(); break;
+        case 'distinct': showDistinct(); break;
+        case 'delete': deleteRow(); break;
+      }
     },
     refreshDS() {
       if(this.id) {
@@ -181,7 +211,7 @@ export default {
     uploadFile(f) {
       //console.dir(f);
       this.jobCompletedAction = this.getData;
-      this.$store.dispatch(`editor/upload`,{ file: f });
+      this.$store.dispatch(`editor/upload`,{ dataset: this.id, file: f });
     },
     updateDataset() {
       this.loading = true;
@@ -193,8 +223,9 @@ export default {
       this.confirm.showMessage = false;
       this.confirm.action = () => {
         this.loading = true;
-        this.$store.dispatch('editor/deleteData', { id: this.id}).then(() => { this.loading = false; this.getData(); });
+        this.$store.dispatch('editor/deleteData', { id: this.id}).then(() => { this.loading = false; this.refreshDS(); this.getData(); });
       }
+      this.confirm.dialog = true;
     },
     deleteDataset() {
       this.confirm.title = 'Delete dataset';
@@ -204,6 +235,17 @@ export default {
         this.loading = true;
         this.$store.dispatch('datasets/delete', { id: this.id}).then(() => { this.loading = false; this.$router.push(editor ? '/approve' : '/import') });
       }
+      this.confirm.dialog = true;
+    },
+    deleteRow() {
+      this.confirm.title = 'Delete row';
+      this.confirm.text = 'The selected row will be deleted.';
+      this.confirm.showMessage = false;
+      this.confirm.action = () => {
+        this.loading = true;
+        this.$store.dispatch('editor/deleteRow', { dataset: this.id, id: this.selectedCell.id}).then(() => { this.loading = false; this.refreshDS(); this.getData(); });
+      }
+      this.confirm.dialog = true;
     },
     approve() {
       this.confirm.title = 'Approve dataset';
@@ -214,6 +256,7 @@ export default {
         this.$store.dispatch('editor/changeState', { id: this.id, message: null, state: 'approved'}).then(() => {this.loading = false;});
       },
       this.jobCompletedAction = () => { this.$router.push('/approve')  };
+      this.confirm.dialog = true;
     },
     reject() {
       this.confirm.title = 'Reject dataset';
@@ -224,6 +267,7 @@ export default {
         this.loading = true;
         this.$store.dispatch('editor/changeState', { id: this.id, message: this.confirm.message, state: 'rejected'}).then(() => { this.loading = false; this.$router.push('/approve') });
       }
+      this.confirm.dialog = true;
     },
     review() {
       this.confirm.title = 'Submit dataset for a review';
@@ -237,6 +281,28 @@ export default {
         this.loading = true;
         this.$store.dispatch('editor/changeState', { id: this.id, message: this.confirm.message, state: 'reviewed'}).then(() => { this.loading = false; this.$router.push('/import') });
       }
+      this.confirm.dialog = true;
+    },
+    download() {
+      this.$store.dispatch(`editor/download`,{ dataset: this.id });
+    },
+    editCell() {
+      this.edit.action = (e) => {
+        this.$store.dispatch('editor/editRow', { dataset: this.id, id: this.selectedCell.id, changes: e}).then(() => { this.loading = false; this.refreshDS(); this.getData(); });
+      };
+      this.edit.dialog = true;
+    },
+    editColumn() {
+      this.edit.action = (e) => {
+        e.dataset = this.id;
+        e.id = this.selectedCell.id;
+        this.$store.dispatch('editor/editRow', e).then(() => { this.loading = false; });
+      };
+      this.jobCompletedAction = () => { this.refreshDS(); this.getData(); };
+      this.edit.dialog = true;
+    },
+    showDistinct() {
+      // TODO show distinct
     },
     getData(params) {
       if(this.id) {
@@ -257,8 +323,8 @@ export default {
           var c = editor ? 'valid.review' : 'valid.approve';
           params.filter[c] = this.validityFilter == 1 ? true : false;
         }
-        this.loading = true;
-        this.$store.dispatch(`editor/list`,{ id: this.id, params }).then(() => {this.loading = false; });
+        this.loadingData = true;
+        this.$store.dispatch(`editor/list`,{ id: this.id, params }).then(() => {this.loadingData= false; });
       }
     }
   },
