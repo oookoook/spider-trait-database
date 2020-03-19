@@ -508,15 +508,38 @@ const getRow = async function(params, auth) {
     }
 }
 
+const getPropsFromObject = function(o) {
+    var output = {};
+    Object.keys(o).forEach(k => {
+        if(typeof o[k] === 'object') {
+            var childAttrs = getAttrsFromObject(o[k]);
+            Object.keys(childAttrs).forEach(ca => {
+                output[`${k}.${ca}`] = childAtrrs[ca];
+            });
+        } else {
+            output[k] = o[k];
+        }
+    })
+    return output;
+}
+
 const updateRow = async function(params, body, auth) {
     var ds = parseInt(params.id);
     var row = parseInt(param.row);
     var aw = getAuthWhere(auth);
     var newAttrs = {};
     // convert to snake case
+    /*
     Object.keys(body).forEach(i => {
         newAttrs[getColumnName(i)] = body[i];
     });
+    */
+    var props = getPropsFromObject(body);
+    
+    Object.keys(props).forEach(i => {
+        newAttrs[getColumnName(i)] = props[i];
+    });
+
     delete(newAttrs.id);
     delete(newAttrs['dataset_id']);
     delete(newAttrs['valid']);
@@ -666,6 +689,7 @@ const getColumn = async function(params, auth) {
     var column = getColumnName(params.column);
     var cols = null;
 
+    var entity = null;
     // there are some special cases
     if(column == 'taxonomy') {
         cols = ['original_name', 'wsc_lsid'];
@@ -683,6 +707,9 @@ const getColumn = async function(params, auth) {
         throw "Unknown column";
     } else if(!cols) {
         cols = [column];
+    } else {
+        // there are cols from the special cases - the netity column was specified
+        entity = column;
     }
     
     var colSql = cols.map(c => db.escapeId(c)).join(',');
@@ -712,12 +739,20 @@ const getColumn = async function(params, auth) {
 
     
     res.items = results.map(r => {
+        /*
         var o = {};
+        var e = o;
+        if(entity) {
+            o[entity] = {};
+            e = o[entity];
+        }
         // assign the values from results to the correct object properties
         cols.forEach((c, i) => {
-            o[oprops[i]] = results[c];
+            e[oprops[i]] = results[c];
         });
         return o;
+        */
+       return getObject(r);
     });
     return res;
 }

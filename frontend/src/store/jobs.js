@@ -14,7 +14,8 @@ export default {
   namespaced: false,
   state: {
     job: null,
-    allJobs: null
+    allJobs: null,
+    errors: null,
   },
   mutations: {
     job(state, payload) {
@@ -22,15 +23,22 @@ export default {
     },
     allJobs(state, payload) {
       state.allJobs = payload.value;
+    },
+    errors(state, payload) {
+      state.errors = payload.value;
     }
   },
   getters: {
     job: (state) => state.job,
-    allJobs: (state) => state.allJobs
+    allJobs: (state) => state.allJobs,
+    errors: (state) => state.errors
   },
   actions: {
     refreshJob: async function (context, payload) {
       var j = context.getters.job;
+      context.commit('errors', {
+        value: j.errors.map((e,i) => {return {text: e, id: i}})
+      });
       if (j.completed) {
         context.commit('job', {
           value: null
@@ -50,6 +58,10 @@ export default {
       var p = {};
       p.endpoint = `jobs`;
       p.params = j.id;
+      if(!j.id || j.id=='local') {
+        // if there is no ID, it's local job, there is nothing to update from the backend
+        return;
+      }
       var data = await context.dispatch('get', p, {
         root: true
       });
@@ -73,6 +85,10 @@ export default {
     },
 
     createJob: async function (context, payload) {
+      // reset the errors
+      context.commit('errors', {
+        value: null
+      });
       if (payload.job) {
         context.commit('job', {
           value: payload.job

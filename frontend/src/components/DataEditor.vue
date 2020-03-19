@@ -13,12 +13,12 @@
           <action-button  color="error" text="Show invalid rows" icon="mdi-close-outline" toolbar />
         </v-btn-toggle>
         <v-divider vertical class="mx-3" />
-          <v-btn-toggle group dense mandatory v-model="editModeRaw">  
-            <action-button text="Edit only the selected cell" icon="mdi-table-row" toolbar />
-            <action-button text="Edit the selected value in the whole column" icon="mdi-table-column" toolbar />
-            <action-button text="Use this value as rule for value change" icon="mdi-table-search" toolbar />
-            <action-button text="View distinct values in the selected column" icon="mdi-format-list-numbered" toolbar />
-            <action-button text="Delete selected row" icon="mdi-table-row-remove" toolbar/>
+          <v-btn-toggle group dense mandatory v-model="editMode">  
+            <action-button text="Edit only the selected cell" icon="mdi-table-row" toolbar value="cell" />
+            <action-button text="Edit the selected value in the whole column" icon="mdi-table-column" toolbar value="column"/>
+            <action-button text="Use this value as rule for value change" icon="mdi-table-search" toolbar value="rule"/>
+            <action-button text="View distinct values in the selected column" icon="mdi-format-list-numbered" toolbar value="distinct" />
+            <action-button text="Delete selected row" icon="mdi-table-row-remove" toolbar value="delete"/>
           </v-btn-toggle>
         <v-divider vertical class="mx-3" />
         <v-spacer />
@@ -71,9 +71,20 @@
             <edit-dialog :type="editMode" :selection="selectedCell" @cancel="edit.dialog = false" @save="edit.action" />
         </v-bottom-sheet>
         <v-bottom-sheet v-model="distinct.dialog">
-            <distinct-dialog :editor="editor" :selection="selectedCell" @cancel="distinct.dialog = false" @create="createEntity" />
+            <distinct-dialog :editor="editor" :dataset="id" :prop-name="selectedCell.prop" @cancel="distinct.dialog = false" @create="createEntity" @rule="ruleDistinct" @column="columnDistinct"/>
         </v-bottom-sheet>
-        
+        <v-bottom-sheet v-model="log.dialog">
+          <v-card>
+              <v-card-title>Error Log</v-card-title>
+            <v-card-text>
+            <v-data-table v-if="errors" :items="errors" headers="[{value: 'id', text: 'ID'},{value: 'Messgae', text: 'text'}]">
+            </v-data-table>
+            </v-card-text>
+            <v-card-actions>
+              <action-button text="Close" @click="log.dialog = false" icon="mdi-cancel" />
+            </v-card-actions>
+          </v-card> 
+        </v-bottom-sheet>
         <!--
           Overlay showing the progress
           -->
@@ -88,19 +99,24 @@
 
 <script>
 import { mapState, mapGetters } from 'vuex'
+import {mixin as VueTimers} from 'vue-timers'
+
 import ActionButton from './ActionButton'
 import EditTable from './EditTable'
 import EditDialog from './EditDialog'
+import DistinctDialog from './DistinctDialog'
 import DatasetForm from './DatasetForm'
 import UploadForm from './UploadForm'
 import ListProvider from './ListProvider'
 
 export default {
   name: 'DataEditor',
+  mixins: [VueTimers],
   components: {
     ActionButton,
     EditTable,
     EditDialog,
+    DistinctDialog,
     DatasetForm,
     UploadForm,
     ListProvider
@@ -109,7 +125,8 @@ export default {
   data () {
     return {
         validityFilter: 0,
-        editModeRaw: 0,
+        //editModeRaw: 0,
+        editMode: 'cell',
         loading: false,
         loadingData: false,
         dsEdit: false,
@@ -126,6 +143,13 @@ export default {
           dialog: false,
           action: () => {}
         },
+        log: {
+          dialog: false
+        },
+        selectedCell: null,
+        distinct: {
+          dialog: false
+        }
         /*
         items: [
           {id: 1, originalName: 'Ahoj', wsc: {lsid: 0}, method: {}, trait: {}, reference: {} },
@@ -143,7 +167,6 @@ export default {
           {id: 13, originalName: 'Ahoj', wsc: {lsid: 0}, method: {}, trait: {}, reference: {} }
         ],
         */
-        selectedCell: null,
   }
   },
   computed: {
@@ -163,7 +186,9 @@ export default {
     isValid() {
       return this.dataset && this.dataset.valid.review;
     },
-    editMode() {
+    /*
+    editMode: {
+      get() {
       switch(this.editModeRaw) {
         case 0 : return 'cell';
         case 1: return 'column';
@@ -171,8 +196,20 @@ export default {
         case 3: return 'distinct';
         case 4: return 'delete';
       }
+      },
+      set(val) {
+        switch(val) {
+        case 'cell' : this.editModeRaw = 0; break;
+        case 'column': this.editModeRaw = 1; break;
+        case 'rule': this.editModeRaw = 2; break;
+        case 'distinct': this.editModeRaw = 3; break;
+        case 'delete': this.editModeRaw = 4; break;
+      }
+      }
     },
-    ...mapGetters('editor', ['job', 'list', 'total'])
+    */
+    ...mapGetters('editor', ['list', 'total']),
+    ...mapGetters('jobs',['job', 'errors'])
   },
   watch: {
     id(val) {
@@ -183,7 +220,10 @@ export default {
     },
     job(val, oldVal) {
       if(oldVal && !val && this.jobCompletedAction) {
+        this.$timer.stop('refreshJob');
         this.jobCompletedAction();
+      } else {
+        this.$timer.start('refreshJob');
       }
     },
     validityFilter(val) {
@@ -296,13 +336,44 @@ export default {
       this.edit.action = (e) => {
         e.dataset = this.id;
         e.id = this.selectedCell.id;
-        this.$store.dispatch('editor/editRow', e).then(() => { this.loading = false; });
+        this.$store.dispatch('editor/editColumn', e).then(() => { this.loading = false; });
       };
       this.jobCompletedAction = () => { this.refreshDS(); this.getData(); };
       this.edit.dialog = true;
     },
     showDistinct() {
-      // TODO show distinct
+      this.distinct.dialog = true;
+    },
+    createEntity(evt) {
+      if(evt.entity) {
+        this.loading = true;
+        this.$store.dispatch(`${evt.endpoint}/create`, evt.entity).then(() => { this.loading = false; });
+      } else {
+        this.jobCompletedAction = () => { this.showLog(); };
+        this.$store.dispatch(`editor/createMultiple`, evt);
+      }
+    },
+    showLog() {
+      if(this.errors && this.errors.length > 0) {
+        this.log.dialog = true;
+      }
+    },
+    columnDistinct(evt) {
+      this.replaceDistinct('column', evt);
+    },
+    ruleDistinct(evt) {
+      this.replaceDistinct('rule', evt);
+    },
+    replaceDistinct(mode, evt) {
+      // rule or column
+      this.editMode = mode;
+      if(evt.prop && evt.prop != this.selectedCell.prop) {
+        this.selectedCell.prop = evt.prop;
+      }
+      var o = {};
+      this.entityPropDict[this.selectedCell.prop].save(o, evt.value);
+      this.selectedCell.item = o;
+      this.editColumn();
     },
     getData(params) {
       if(this.id) {
@@ -328,11 +399,17 @@ export default {
       }
     }
   },
+  refreshJob() {
+    this.$store.dispatch(`jobs/refreshJob`);  
+  },
   created () {
 
   },
   mounted () {
-  }
+  },
+  timers: {
+    refreshJob: { time: 3000, repeat: true }
+  },
 }
 </script>
 <style scoped>

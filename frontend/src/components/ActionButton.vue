@@ -7,7 +7,7 @@
         :text="toolbar" 
         :fab="menu" 
         :dark="menu" 
-        :small="menu" 
+        :small="menu || small" 
         :color="color"
         v-on="on"
         ><v-icon>{{ icon }}</v-icon></v-btn>
@@ -25,7 +25,7 @@ export default {
   components: {
   },
   props: { icon: { type: String, default: 'mdi-plus-circle' }, text: { type: String, default: 'Add new' }, 
-  color: String, tooltip: Boolean, toolbar: Boolean, menu: Boolean },
+  color: String, tooltip: Boolean, toolbar: Boolean, menu: Boolean, small: Boolean },
   data () {
     return {
 

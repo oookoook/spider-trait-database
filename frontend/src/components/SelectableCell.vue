@@ -26,11 +26,15 @@ export default {
     selectedId(val, oldVal) {
       if(val != this.cellId) {
         this.selected = false;
+      } else if(this.cellProp == this.selectedProp){
+        this.selected = true;
       }
     },
     selectedProp(val, oldVal) {
       if(val != this.cellProp) {
         this.selected = false;
+      } else if(this.cellId = this.selectedId){
+        this.selected = true;
       }
     }
   },

@@ -10,7 +10,7 @@ export default {
   name: 'component',
   components: {
   },
-  props: [],
+  props: {},
   data () {
     return {
 

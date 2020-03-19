@@ -151,7 +151,8 @@ export default {
     save() {
       var e = {};
       if(type == 'row') {
-        e[this.modifiedProp] = this.modifiedValue;
+        //e[this.modifiedProp] = this.modifiedValue;
+        this.modifiedProp.save(e, this.modifiedValue);
       } else {
         e.column = this.modifiedProp;
         e.newValue = this.modifiedValue;

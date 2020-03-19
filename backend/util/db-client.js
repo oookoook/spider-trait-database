@@ -253,9 +253,12 @@ const createEntity = async function (opts) {
     var {body, table, auth, prepareForSql, validate} = opts;
     var obj = body;
     if (typeof validate == 'function') {
-        var vr = validate(obj);
-        if (!vr) {
-            throw 'Object validation failed';
+        var vr = await validate(obj);
+        if (vr !== true) {
+            return { 
+                error: 'validation',
+                validation: vr
+            }
         }
     }
     prepareForSql(obj, auth);
@@ -282,9 +285,6 @@ const deleteEntity = async function (opts) {
     var {params, table, auth} = opts;
     var id = parseInt(params.id);
 
-    var values = [id];
-    
-
     var r = await query({table, sql: `DELETE FROM ${table} WHERE id=? ${getAuthWhere(auth)}`, values: [id] });
     if(r.affectedRows > 0) {
         return {
@@ -306,9 +306,12 @@ const updateEntity = async function (opts) {
         throw 'IDs in params and body does not match'
     }
     if (typeof validate == 'function') {
-        var vr = validate(obj);
-        if (!vr) {
-            throw 'Object validation failed';
+        var vr = await validate(obj);
+        if (vr !== true) {
+            return { 
+                error: 'validation',
+                validation: vr
+            }
         }
     }
     prepareForSql(obj, auth);
