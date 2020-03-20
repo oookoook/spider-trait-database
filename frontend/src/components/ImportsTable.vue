@@ -34,7 +34,7 @@
 
     <template v-slot:item.actions="{ item }">
       <entity-link-cell v-if="canEdit(item.state)" tooltip="Edit the dataset" :link="`/prepare/${item.id}`" icon="mdi-pencil" />
-      <action-button v-if="canDelete(item.state)" icon="mdi-delete-forever-outline" text="Permanently delete" @click="delete(item.id)"/>
+      <action-button v-if="canDelete(item.state)" icon="mdi-delete-forever-outline" text="Permanently delete" @click="$emit('remove', item)"/>
       <entity-link-cell v-if="item.state == 'approved'" tooltip="Set as filter in the data explorer" :link="`data/dataset/${item.id}`" icon="mdi-filter" />
     </template>
 
@@ -99,10 +99,6 @@ export default {
         } 
       }
     },
-    delete(id) {
-      // TODO show a confirmation dialog
-      // force the user to type in 'yes' before continuing
-    }
   },
   created () {
 

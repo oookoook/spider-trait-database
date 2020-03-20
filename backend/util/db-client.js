@@ -252,6 +252,7 @@ const getAutocomplete = async function(endpoint, valueField, textField, search, 
 const createEntity = async function (opts) {
     var {body, table, auth, prepareForSql, validate} = opts;
     var obj = body;
+    prepareForSql(obj, auth);
     if (typeof validate == 'function') {
         var vr = await validate(obj);
         if (vr !== true) {
@@ -261,7 +262,6 @@ const createEntity = async function (opts) {
             }
         }
     }
-    prepareForSql(obj, auth);
     delete(obj.id);
     console.dir(obj);
     var r = await query({table, sql: `INSERT INTO ${table} SET ?`, values: [obj] });

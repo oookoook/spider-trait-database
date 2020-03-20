@@ -30,8 +30,25 @@ const get = async function(params) {
     }}
 }
 
+// validate reference - check if abbrev is unique
+const validate = async function(reference) {
+    if(!reference.abbrev || reference.abbrev.length == 0) {
+        return 'Reference abbrev. cannot be empty';
+    }
+
+    if(!reference.fullCitation || reference.fullCitation.length == 0) {
+        return 'Reference full citation cannot be empty';
+    }
+
+    var r = await db.query({table: 'reference', sql: 'SELECT reference.id FROM reference WHERE abbrev = ?', values: [reference.abbrev], nestTables: false});
+    return (r.items.length == 0 || (reference.id && r.items[0].id == reference.id)) ? true : 'Reference abbrev. is already used.';
+}
+
 const prepareForSql = function(reference) {
-    delete(reference.id);
+    // prepare reference - create the abbrev
+    if(!reference.abbrev) {
+        reference.abbrev = db.unique((reference.fullCitation || '').replace(/[\W ]/,'').substring(0, 25));
+    }
 }
 
 const validate = function(reference) {

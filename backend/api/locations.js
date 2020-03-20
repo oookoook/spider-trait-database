@@ -58,24 +58,49 @@ const get = async function(params) {
     };
 }
 
+// validate location - check if abbrev is unique
+const validate = async function(location) {
+    if(!location.abbrev || location.abbrev.length == 0) {
+        return 'Location abbrev. cannot be empty';
+    }
+
+    var r = await db.query({table: 'location', sql: 'SELECT location.id FROM location WHERE abbrev = ?', values: [location.abbrev], nestTables: false});
+    return (r.items.length == 0 || (location.id && r.items[0].id == location.id)) ? true : 'Location abbrev. is already used.';
+}
+
 const prepareForSql = function(location) {
+    // prepare location
+    // create abbrev if not provided
+    if(!location.abbrev) {
+        var a = [];
+        if(location.country && location.country.code) {
+            a.push(location.country.code);
+        }
+        if(location.habitatGlobal && location.habitatGlobal.name) {
+            a.push(location.habitatGlobal.name);
+        }
+        if(location.locality) {
+            a.push(location.locality);
+        }
+
+        location.abbrev = db.unique(a.join('-').replace(/[\W ]/,'').substring(0, 25));
+    }
     location.habitat_global_id = (location.habitatGlobal) ? location.habitatGlobal.id : null;
     location.country_id = (location.country) ? location.country.id : null;
     location.lat = (location.coords) ? location.coords.lat : null;
     location.lon = (location.coords) ? location.coords.lon : null;
     location.precision = (location.coords) ? location.coords.precision : null;
-    delete location.id;
     delete location.habitatGlobal;
     delete location.country;
     delete location.coords;
 }
 
 const create = async function(body) {
-    return await db.createEntity({ body, table: 'location', prepareForSql});
+    return await db.createEntity({ body, table: 'location', prepareForSql, validate});
 }
 
 const update = async function(params, body) {
-    return await db.updateEntity({params, body, table: 'location', prepareForSql});
+    return await db.updateEntity({params, body, table: 'location', prepareForSql, validate});
 }
 
 const remove = async function(params) {

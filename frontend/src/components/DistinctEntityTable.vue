@@ -6,7 +6,7 @@
       :server-items-length="total"
       :loading="loading"
       v-model="selected"
-      :selectable-key="editor? 'valid.appprove' : 'valid.review'"
+      selectable-key="valid.selectable"
       dense
       :show-select="editor"
     >
@@ -16,8 +16,9 @@
     </template>
 
     <template v-slot:item.actions="{ item }">
-      <action-button tooltip v-if="editor && item.valid.appprove" icon="mdi-plus" text="Create entity" @click="create(item)"/>
-      <info-icon color="warining" v-if="(editor && !item.valid.appprove) || (!editor && !item.valid.review)" text="Item is not valid" icon="mdi-alert-circle-outline">
+      <action-button tooltip v-if="editor && !item.valid.invalid && !item.valid.created" icon="mdi-plus" text="Create entity" @click="create(item)"/>
+      <info-icon color="success" v-if="item.valid.created" text="Entity created" icon="mdi-check-bold">
+      <info-icon color="warining" v-if="item.valid.invalid" :text="item.valid.message" icon="mdi-alert-circle-outline">
     </template>
 
     </v-data-table>

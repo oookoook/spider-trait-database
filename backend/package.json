@@ -19,6 +19,7 @@
     "express-openid-connect": "^0.7.0",
     "fast-csv": "^4.1.1",
     "mysql": "^2.18.1",
+    "nodemailer": "^6.4.6",
     "shortid": "^2.2.15",
     "xlsx": "^0.15.5"
   }

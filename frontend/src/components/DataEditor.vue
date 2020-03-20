@@ -48,7 +48,8 @@
                  or setting up the value based on values in a different column)
           File uploader
           Deletion Confirmation dialogs
-          TODO distinct lists
+          distinct lists
+          Log
         -->
         
         <v-bottom-sheet v-model="dsEdit">

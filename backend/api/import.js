@@ -7,7 +7,7 @@ const { snakeCase, camelCase } = require('change-case');
 
 
 var db = null;
-
+var mail = null; 
 
 const columns = [
   `wsc_lsid`,
@@ -15,6 +15,7 @@ const columns = [
   `trait_abbrev`,
   `trait_name`,
   `trait_description`,
+  `trait_data_type`,
   `value`,
   `measure`,
   `sex`,
@@ -55,7 +56,8 @@ const join = 'import LEFT JOIN trait ON import.trait_id = trait.id '
 
 const joind = 'import LEFT JOIN dataset ON import.dataset_id';
 
-const joinv = 'import LEFT JOIN trait ON import.trait_abbrev = trait.abbrev LEFT JOIN data_type ON trait.data_type_id = data_type.id'
+const joinv = 'import LEFT JOIN trait ON import.trait_abbrev = trait.abbrev '
+            + 'LEFT JOIN data_type ON import.trait_data_type = data_type.name OR trait.data_type_id = data_type.id'
             + 'LEFT JOIN taxonomy ON import.wsc_lsid = taxonomy.wsc_lsid '
             + 'LEFT JOIN taxonomy_names ON import.original_name = taxonomy_names.name'
             + 'LEFT JOIN sex ON import.sex = sex.name '
@@ -90,6 +92,10 @@ const getObject = function(r) {
             abbrev: r[`trait_abbrev`],
             name: r[`trait_name`],
             description: r[`trait_description`],
+            dataType: {
+                raw: r[`trait_data_type`],
+                id: r[`trait_data_type_id`]
+            },
             id: r[`trait_id`]
         },
         value: {
@@ -197,6 +203,11 @@ const exportCsv = async function(params, auth, tmpDir) {
     return await csv.write(tmpDir, `spider-traits-import-${id}-${Date.now()}.csv`, dstream);
 }
 
+const getUploaderEmail = async function(id) {
+    var record = await db.query({table: 'dataset', sql: `SELECT email FROM dataset WHERE id = ?`, values: [id]});
+    return record[0].email;
+}
+
 const changeState = async function(params, body, auth) {
     var id = parseInt(params.id);
     
@@ -226,6 +237,14 @@ const changeState = async function(params, body, auth) {
         
     }
 
+    // send notification email
+    switch(state) {
+        case 'created': mail.send({subject: 'Dataset added', text: 'A new dataset was created by a contributor.'}); break; // this will never happen
+        case 'rejected': mail.send({ to: await getUploaderEmail(id), subject: 'Dataset rejected', text: 'Your dataset was rejected by an editor. You can find more details at {BASEURL}/import'}); break;
+        case 'reviewed': mail.send({subject: 'Dataset review requested', text: 'A new dataset was sbmitted for a review by a contributor. You can find more details at {BASEURL}/approve'}); break;
+        case 'approved': mail.send({ to: await getUploaderEmail(id), subject: 'Dataset approved', text: `Your dataset was approved by an editor. You can view the dataset detil at {BASEURL}/dataset/${id}`}) break; 
+    }
+
     var imp;
     switch(state) {
         case 'created': imp = 0; break;
@@ -233,8 +252,6 @@ const changeState = async function(params, body, auth) {
         case 'reviewed': imp = 2; break;
         case 'approved': imp = 3; break; 
     }
-
-    // TODO send notification email
 
     if(imp < 2) {
         await db.query({table: 'dataset', sql: `UPDATE dataset SET imported = ?, message = ? WHERE id = ? AND ${getAuthWhere(auth)}`, values: [imp, msg, id] });
@@ -692,14 +709,22 @@ const getColumn = async function(params, auth) {
     var entity = null;
     // there are some special cases
     if(column == 'taxonomy') {
-        cols = ['original_name', 'wsc_lsid'];
+        cols = ['original_name', 'wsc_lsid', 'taxonomy_id'];
     } else if(column == 'reference') {
-        cols = ['reference', 'reference_abbrev', 'reference_doi'];
+        cols = ['reference', 'reference_abbrev', 'reference_doi', 'reference_id'];
     } else if(column == 'event_date') {
         cols = ['event_date', 'event_date_start', 'event_date_end'];
     } else if(!columns.includes(column)) {
         // method, location, trait
         cols = columns.filter(c => c.indexOf(column) == 0);
+        cols.push(`${column}_id`);
+        if(column == 'location') {
+            cols.push('location_country_id');
+            cols.push('location_habitat_global_id');
+        }
+        if(column == 'trait') {
+            cols.push('trait_data_type_id');
+        }
     }
 
     if(cols && !cols.length) {
@@ -720,6 +745,7 @@ const getColumn = async function(params, auth) {
     var results = await db.query({table: 'import', sql:`SELECT DISTINCT ${colSql} `
     + `FROM ${joind} WHERE dataset_id = ? AND ${aw}`, values: [ds], nestTables: false, limits, hasWhere: true });
 
+    /*
     var remstr = ['location_', 'method_', 'trait_', 'reference_', 'event_date_'];
     // compute the names of the object properties
     var oprops = [];
@@ -736,7 +762,7 @@ const getColumn = async function(params, auth) {
         }
         oprops.push(oprop);
     })
-
+    */
     
     res.items = results.map(r => {
         /*
@@ -792,7 +818,7 @@ const validate = async function(params) {
   */
 
     await db.cquery(c,{table: 'import', sql:`UPDATE ${joinv} SET `
-    + ` sex_id = sex.id, life_stage_id = life_stage.id, measure_id = measure.id, method_id = method.id, trait_id = trait.id,`
+    + ` sex_id = sex.id, life_stage_id = life_stage.id, measure_id = measure.id, method_id = method.id, trait_id = trait.id, trait_data_type_id = data_type.id, `
     + ` reference_id = reference.id,  location_id = location.id, location_habitat_global_id = habitat_global.id, location_country_id = country.id,`
     + ` taxonomy_id = CASE WHEN taxonomy.id IS NOT NULL AND taxonomy_name.taxonomy_id IS NOT NULL AND taxonomy.id <> taxonomy_name.taxonomy_id THEN NULL ELSE COALESCE(taxonomy.id, taxonomy_name.taxonomy_id)`
     + ` require_numeric_value = CASE WHEN data_type.name NOT IN ('Character') THEN 1 ELSE 0`
@@ -806,7 +832,7 @@ const validate = async function(params) {
     + ` (life_stage IS NULL OR life_stage_id IS NOT NULL) AND`
     + ` (measure_id IS NOT NULL) AND`
     + ` (value IS NOT NULL) AND`
-    + ` (trait_id IS NOT NULL OR trait_abbrev IS NOT NULL OR (trait_name IS NOT NULL AND trait_description IS NOT NULL)) AND`
+    + ` (trait_id IS NOT NULL OR trait_abbrev IS NOT NULL OR (trait_name IS NOT NULL AND trait_description IS NOT NULL AND trait_data_type IS NOT NULL)) AND`
     // method is not required
     //+ ` (method_id IS NOT NULL OR method_abbrev IS NOT NULL OR (method_name IS NOT NULL AND method_description IS NOT NULL)) AND`
     + ` (reference IS NOT NULL) AND`
@@ -856,7 +882,8 @@ var synonyms = {
     'valid.approve': 'valid'
 }
 
-module.exports = function(dbClient) {
+module.exports = function(dbClient, mailClient) {
+    mail = mailClient;
     db = dbClient('import', synonyms);
     return {
         list,

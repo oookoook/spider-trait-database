@@ -59,20 +59,34 @@ const get = async function(params) {
     }}
 }
 
+// validate trait - check if abbrev is unique
+const validate = async function(trait) {
+    if(!trait.abbrev || trait.abbrev.length == 0) {
+        return 'Trait abbrev. cannot be empty';
+    }
+
+    if(trait.data_type_id == null) {
+        return 'Trait data type cannot be empty';
+    }
+
+    var r = await db.query({table: 'trait', sql: 'SELECT trait.id FROM trait WHERE abbrev = ?', values: [trait.abbrev], nestTables: false});
+    return (r.items.length == 0 || (trait.id && r.items[0].id == trait.id)) ? true : 'Trait abbrev. is already used.';
+}
+
 const prepareForSql = function(trait) {
+    // prepare trait
     trait.trait_category_id = (trait.category) ? trait.category.id : null;
     trait.data_type_id = (trait.dataType) ? trait.dataType.id : null;
-    delete trait.id;
     delete trait.category;
     delete trait.dataType;
 }
 
 const create = async function(body) {
-    return await db.createEntity({body, table: 'trait', prepareForSql});
+    return await db.createEntity({body, table: 'trait', prepareForSql, validate});
 }
 
 const update = async function(params, body) {
-    return await db.updateEntity({params, body, table: 'trait', prepareForSql});
+    return await db.updateEntity({params, body, table: 'trait', prepareForSql, validate});
 }
 
 const remove = async function(params) {

@@ -41,7 +41,7 @@ export default {
     DistinctEntityTable,
     DistinctValueList
   },
-  props: { editor: Boolean, propName: String, dataset: Number },
+  props: { propName: String, dataset: Number },
   data () {
     return {
       showEntities: true
@@ -61,7 +61,8 @@ export default {
       return {
         dataset: this.dataset,
         entity: this.ent,
-        column: this.ent ? this.prop.entity : this.prop 
+        column: this.ent ? this.prop.entity : this.prop,
+        editor: this.editor
       }
     },
     tableHeaders() {
@@ -79,13 +80,13 @@ export default {
       this.$emit('column', evt);
     },
     create(evt) {
-      var e = { endpoint: this.prop.createEndpoint };
+      var e = { endpoint: this.getEntityEndpoint(this.prop.entity) };
       if(Array.isArray(evt)) {
-        e.entities = evt;
+        e.entities = evt.map(i => i[this.prop.entity]);
       } else {
         e.entity = evt;
       }
-      this.$emit('create', e);
+      this.$emit('create', e[this.prop.entity]);
     }
   },
   created () {

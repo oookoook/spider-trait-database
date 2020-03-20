@@ -27,5 +27,9 @@ module.exports = {
         import: {
             sizeLimitMB: 100
         }
-    }
+    },
+    mail: {
+        disabled: true
+    },
+    baseUrl: 'http://localhost:8080'
 }

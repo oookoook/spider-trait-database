@@ -36,5 +36,15 @@ module.exports = {
         import: {
             sizeLimitMB: 100
         }
-    }
+    },
+    mail: {
+        sender: 'spidertraits@group.muni.cz',
+        admins: 'spidertraits@group.muni.cz',
+        host: 'rs.cesnet.cz',
+        port: 25,
+        secure: false,
+        user: null,
+        pass: null
+    },
+    baseUrl: 'https://spidertraits.sci.muni.cz'
 }

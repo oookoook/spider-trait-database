@@ -40,9 +40,13 @@ export default {
       return this.entityProps[propName].text;
     },
     getEntityHeaders(entity) {
-        return this.$store.getters[`editor/distinctEntityHeaders`](entity);
+      return this.$store.getters[`editor/distinctEntityHeaders`](entity);
     },
     isEntityValid(entity, item) {
       return this.$store.getters[`editor/isEntityValid`](entity, item, this.editor);
+    },
+    getEntityEndpoint(entity) {
+      return this.$store.getters[`editor/entityEndpoint`](entity);
+    }
   }
 }

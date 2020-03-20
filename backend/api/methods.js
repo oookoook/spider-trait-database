@@ -38,18 +38,28 @@ const get = async function(params) {
     }}
 }
 
+// validate method - check if abbrev is unique
+const validate = async function(method) {
+    if(!method.abbrev || method.abbrev.length == 0) {
+        return 'Method abbrev. cannot be empty';
+    }
+
+    var r = await db.query({table: 'method', sql: 'SELECT method.id FROM method WHERE abbrev = ?', values: [method.abbrev], nestTables: false});
+    return (r.items.length == 0 || (method.id && r.items[0].id == method.id)) ? true : 'Method abbrev. is already used.';
+}
+
 const prepareForSql = function(method) {
+    // prepare method
     method.reference_id = (method.reference) ? method.reference.id : null;
-    delete(method.id);
     delete(method.reference);
 }
 
 const create = async function(body) {
-    return await db.createEntity({ body, table: 'method', prepareForSql});
+    return await db.createEntity({ body, table: 'method', prepareForSql, validate});
 }
 
 const update = async function(params, body) {
-    return await db.updateEntity({params, body, table: 'method', prepareForSql});
+    return await db.updateEntity({params, body, table: 'method', prepareForSql, validate});
 }
 
 const remove = async function(params) {
