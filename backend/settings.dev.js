@@ -23,7 +23,7 @@ module.exports = {
         database: 'spider_traits_db'
     },
     files: {
-        tmpDir: './test',
+        tmpDir: './test/tmp',
         import: {
             sizeLimitMB: 100
         }

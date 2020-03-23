@@ -16,6 +16,7 @@ const taxonomy = require('./taxonomy')(db);
 const datasets = require('./datasets')(db);
 const data = require('./data')(db);
 const imports = require('./import')(db);
+const jobs = require('./jobs');
 
 router.use(auth.resourcesAuth);
 
@@ -199,7 +200,7 @@ router.route('/import/:id/data')
   })
   .delete(requiresAuth(), auth.isContributor, function (req, res) {
     // delete all the records for a given dataset in the import table
-    imports.deleteRecords(req.params, req.resourcesAuth);
+    imports.deleteRecords(req.params, req.resourcesAuth).then(r => res.json(r)).catch(e => { console.log(e); res.sendStatus(400); });
   });
 
   router.route('/import/:id/data/export')

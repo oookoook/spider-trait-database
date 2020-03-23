@@ -1,12 +1,14 @@
 const getJobUpdate = function (ojs, njs) {
   return {
     id: njs.id,
-    progress: Math.floor(njs.state.progress / njs.state.total * 100),
-    completed: njs.state.completed,
-    aborted: njs.state.aborted,
     title: ojs.title,
     start: ojs.start,
-    errors: njs.state.errors
+    state: {
+      progress: Math.min(100, Math.floor(njs.state.progress / njs.state.total * 100)),
+      completed: njs.state.completed,
+      aborted: njs.state.aborted,
+      errors: njs.state.errors
+    }
   };
 }
 
@@ -37,15 +39,15 @@ export default {
     refreshJob: async function (context, payload) {
       var j = context.getters.job;
       context.commit('errors', {
-        value: j.errors.map((e,i) => {return {text: e, id: i}})
+        value: j.state.errors.map((e,i) => {return {text: e, id: i}})
       });
-      if (j.completed) {
+      if (j.state.completed) {
         context.commit('job', {
           value: null
         });
         return;
       }
-      if (j.aborted) {
+      if (j.state.aborted) {
         console.dir(j.state.errors);
         context.dispatch('notify', {
           error: true,
@@ -54,6 +56,7 @@ export default {
         context.commit('job', {
           value: null
         });
+        return;
       }
       var p = {};
       p.endpoint = `jobs`;
@@ -96,11 +99,15 @@ export default {
       } else if (payload.title) {
         var j = {
           id: null,
-          progress: 0,
+          
           title: payload.title,
           start: Date.now(),
-          completed: false,
-          aborted: false
+          state: 
+          { progress: 0,
+            completed: false,
+            aborted: false,
+            errors: []
+          }
         }
         context.commit('job', {
           value: j

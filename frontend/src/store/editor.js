@@ -28,6 +28,9 @@ export default {
     },
   },
   getters: {
+    downloadLink: (state, getters, rootState, rootGetters) => (id) => {
+      return `${rootGetters.baseUrl}import/${id}/data/export`;
+    },
     autocomplete: (state) => (entity) => state.autocomplete[entity],
     entityProps: (state) => state.entityProps,
     propsDict: (state) => {
@@ -38,7 +41,7 @@ export default {
     headers: (state) => {
       return state.entityProps.map(p => {
         var o = p.table || {};
-        o.text = p.text;
+        o.text = p.text.replace(' ','\xa0');
         o.value = p.name;
         return o;
       });
@@ -73,7 +76,7 @@ export default {
       payload.currCount = context.state.total;
       payload.params = `${payload.id}/data`;
       payload.auth = true;
-      var data = await context.dispatch('list', payload.params, {
+      var data = await context.dispatch('list', payload, {
         root: true
       });
       if (data) {
@@ -88,7 +91,7 @@ export default {
       }
     },
     autocomplete: async function (context, payload) {
-      payload.endpoint = `autocomplete/import`;
+      payload.endpoint = `autocomplete/${payload.endpoint}`;
       var data = await context.dispatch('get', payload, {
         root: true
       });
@@ -172,24 +175,26 @@ export default {
       }
     },
     editColumn: async function (context, payload) {
-      var p = {};
+      console.dir(payload);
+      var p = { body: {}};
       p.endpoint = `import`;
       p.params = `${payload.dataset}/column/${payload.column}`;
       p.auth = true;
-      if (p.multipleColumns) {
-        p.valueColumns = payload.valueColumns;
-        p.oldValues = payload.oldValues;
+      if (payload.multipleColumns) {
+        p.body.valueColumns = payload.valueColumns;
+        p.body.oldValues = payload.oldValues;
         p.multipleColumns = true;
       } else {
-        p.valueColumn = payload.valueColumn;
-        p.oldValue = payload.oldValue;
+        p.body.valueColumn = payload.valueColumn;
+        p.body.oldValue = payload.oldValue;
       }
-      p.newValue = payload.newValue;
+      p.body.newValue = payload.newValue;
       var data = await context.dispatch('put', p, {
         root: true
       });
       if (data) {
-        await context.dispatch('createjob', data, {
+        data.title='Updating data...';
+        await context.dispatch('createJob', data, {
           root: true
         });
         return data.affected;

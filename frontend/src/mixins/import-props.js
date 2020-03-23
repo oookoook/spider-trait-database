@@ -1,3 +1,5 @@
+import { mapGetters } from 'vuex'
+
 export default {
   props: { editor: Boolean },
   data() {
@@ -6,7 +8,7 @@ export default {
     }
   },
   computed: {
-    ...mapGetters('editor', ['entityProps', 'entityPropsDict', 'headers'])
+    ...mapGetters('editor', ['entityProps', 'propsDict', 'headers'])
   },
   watch: {},
   mounted() {},
@@ -26,18 +28,30 @@ export default {
       }
       return v;
       */
-     return this.entityProps[propName].displayValue(item);
+     return this.propsDict[propName].displayValue(item);
+    },
+    getPropFormattedValue(item, propName) {
+      var v = this.getPropValue(item, propName);
+      if(v != null && typeof v == 'string') {
+        v = v.replace(' ', '\xa0');
+      }
+      return v;
     },
     isPropValid(item, propName) {
-      return this.entityProps[propName].isValid(item, this.editor);
+      //console.log(propName);
+      return this.propsDict[propName].isValid(item, this.editor);
     },
     getPropForeignMatch(item, propName) {
       // return the ID of foreign key if available
-      return this.entityProps[propName].foreignMatchValue(item);
+      return this.propsDict[propName].foreignMatchValue(item);
     },
     getPropName(propName) {
+      if(!propName) {
+        return '';
+      }
+      //console.log(`propName: ${propName}`);
       // return prop name
-      return this.entityProps[propName].text;
+      return this.propsDict[propName].text;
     },
     getEntityHeaders(entity) {
       return this.$store.getters[`editor/distinctEntityHeaders`](entity);

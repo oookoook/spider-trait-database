@@ -4,8 +4,9 @@ import Vuex from 'vuex'
 import VuexPersist from 'vuex-persist'
 const vuexPersist = new VuexPersist({
   storage: window.localStorage,
-  // save only the lastRoute and user info
-  filter: (mutation) => ['lastRoute', 'user', 'lastAction'].includes(mutation.type)
+  // save only the user and jobs
+  modules: ['jobs', 'user']
+  //reducer: (state) => ['lastRoute', 'user', 'lastAction', 'job', 'errors'].includes(mutation.type)
 })
 
 Vue.use(Vuex)
@@ -15,6 +16,7 @@ import ui from './ui'
 import api from './api'
 import data from './data'
 import editor from './editor'
+import jobs from './jobs'
 import EntityModule from './entity-module'
 
 
@@ -33,6 +35,7 @@ export default new Vuex.Store({
     references: new EntityModule('references'),
     imports: new EntityModule('import'),
     editor,
-    data
+    data,
+    jobs
   }
 })

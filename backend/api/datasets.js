@@ -1,6 +1,6 @@
 var db = null;
 
-const getWhere = function(auth, showImport) {
+const getWhere = function(auth, showImport, remove) {
     if(!auth || !showImport) {
         return 'imported = 3';
     }
@@ -9,7 +9,8 @@ const getWhere = function(auth, showImport) {
         return 'imported < 3';
     }
     if(auth.isContributor && showImport) {
-        return `sub = ${db.escape(auth.user)}`;
+        var q = remove ? 'imported < 3 AND ' : '';
+        return `${q}sub = ${db.escape(auth.user)}`;
     }
 }
 
@@ -54,10 +55,10 @@ const get = async function(params, auth, showImport) {
      if(showImport) {
         var validR = await db.query({table: 'import', sql: `SELECT COUNT(import.valid) as invalid FROM `
         + `import LEFT JOIN dataset ON import.dataset_id = dataset.id WHERE dataset.id = ? AND ${where} AND valid=0`, values: [id]});
-        r.valid.approve = validR.results[0].invalid == 0;
+        r.valid.approve = validR[0].invalid == 0;
         var validRR = await db.query({table: 'import', sql: `SELECT COUNT(import.valid) as invalid FROM `
         + `import LEFT JOIN dataset ON import.dataset_id = dataset.id WHERE dataset.id = ? AND ${where} AND valid_review=0`, values: [id]});
-        r.valid.review = validRR.results[0].invalid == 0;
+        r.valid.review = validRR[0].invalid == 0;
     }
      
     r.authorsEmail = r[`authors_email`];
@@ -97,7 +98,7 @@ const update = async function(params, body, auth) {
 const remove = async function(params, auth) {
     // delete all the records in the import and data tables
     var id = parseInt(params.id);
-    var aw = getWhere(auth, true);
+    var aw = getWhere(auth, true, true);
     await db.query({table: 'import', sql: `DELETE import FROM import JOIN dataset ON import.dataset_id = dataset.id WHERE dataset_id = ? AND ${aw}`, values: [id] });
     await db.query({table: 'data', sql: `DELETE data FROM data JOIN dataset ON data.dataset_id = dataset.id WHERE dataset_id = ? AND ${aw}`, values: [id] });
 

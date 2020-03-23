@@ -6,20 +6,20 @@
       <action-button  v-if="!editor" color="primary" @click="showNewDialog(true)" tooltip></action-button>
     </v-card-title>
   <v-bottom-sheet v-if="!editor" v-model="showNew">
-    <entity-provider list="imports" create  :template="dataset" v-slot="i" @save="prepare">
-      <dataset-form @hide="showNewDialog(false)" :loading="i.loading" v-model="i.item" create></dataset-form>
+    <entity-provider list="imports" create  :template="dataset" v-slot="i" @create="prepare">
+      <dataset-form @hide="showNewDialog(false)" :loading="i.loading" v-model="i.item" @save="i.save" create></dataset-form>
     </entity-provider>
   </v-bottom-sheet>
   <v-bottom-sheet v-model="remove.dialog">
-    <v-card>
+    <v-card v-if="this.dataset && this.remove.dialog">
       <v-card-title>Confirm deletion of the dataset {{ dataset.name }}</v-card-title>
       <v-card-subititle>The whole dataset and all its data will be permanently removed from the database. Are you sure to continue?</v-card-subititle>
       <v-card-text>
-        <v-text-field label="Confirmation" hint="Type in yes" v-model="remove.confirm" prepend-icon="mdi-shield-check-outline">
+        <v-text-field label="Confirmation" hint="Type in yes" v-model="remove.confirm" prepend-icon="mdi-shield-check-outline" />
       </v-card-text>
       <v-card-actions>
           <action-button text="Cancel" @click="remove.dialog = false" icon="mdi-cancel" />
-          <action-button color="warning" text="Delete" @click="remove" icon="mdi-delete-forever-outline" />
+          <action-button color="warning" text="Delete" @click="removeDs" icon="mdi-delete-forever-outline" />
       </v-card-actions>
     </v-card>
   </v-bottom-sheet>
@@ -29,8 +29,9 @@
     :loading="i.loading" 
     :total="i.total" 
     @update="i.update"
-    @delete="showRemove" 
-    @showNew="showNewDialog(true)" />
+    @delete="showRemove" >
+      <action-button color="primary" @click="showNewDialog(true)"></action-button>
+    </imports-table>
   </list-provider>
   </v-card>
 </template>
@@ -69,7 +70,7 @@ export default {
   watch: {
     $route(to, from) {
         this.processRoute();
-    }
+    },
   },
   methods: {
     processRoute() {
@@ -101,7 +102,7 @@ export default {
       this.dataset = ds;
       this.remove.dialog = true;
     },
-    remove() {
+    removeDs() {
       if(this.remove.confirm != 'yes') {
         this.$store.dispatch('notify', {error: true, text: 'You did not confirm the deletion.'});
         return;

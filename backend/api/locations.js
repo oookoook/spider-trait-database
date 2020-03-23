@@ -79,6 +79,9 @@ const prepareForSql = function(location) {
         if(location.habitatGlobal && location.habitatGlobal.name) {
             a.push(location.habitatGlobal.name);
         }
+        if(location.habitatVerbatim) {
+            a.push(location.habitatVerbatim);
+        }
         if(location.locality) {
             a.push(location.locality);
         }

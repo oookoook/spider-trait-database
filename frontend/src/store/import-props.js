@@ -62,6 +62,7 @@ export default [
         if(!i.trait.abbrev && !i.trait.description) {
           return 'Provide Trait Description when Trait ID is not set.'
         }
+        return true;
       }
     },
     { 
@@ -71,7 +72,7 @@ export default [
       displayValue: (i) => i.trait.dataType.raw,
       save: (o, v) => {if(!o.trait) o.trait={}; if(!o.trait.dataType) o.trait.dataType = {}; o.trait.dataType.raw = v; }, 
       isValid: (i, e) => !!i.trait.dataType.id || 'Value does not match any existing data type',
-      autocomplete: { endpoint: 'locations', valueField: 'country.code', textField: ['country.code', 'country.name'] }
+      autocomplete: { endpoint: 'traits', valueField: 'data_type.name' }
     },
     { 
       name: 'method.abbrev',
@@ -117,6 +118,7 @@ export default [
         if(!i.method.abbrev && !i.method.description) {
           return 'Provide Method Description when Method ID is not set.'
         }
+        return true;
       }
     },
     { 
@@ -231,7 +233,7 @@ export default [
       name: 'location.lat',
       text: 'Latitude',
       entity: 'location', 
-      displayValue: (i) => i.location.lat.conv || location.lat.raw,
+      displayValue: (i) => i.location.lat.conv || i.location.lat.raw,
       save: (o, v) => {if(!o.location) o.location={}; if(!o.location.lat) o.location.lat = {}; o.location.lat.raw = v; }, 
       isValid: (i, e) => !i.location.lat.raw || !!i.location.lat.conv || 'Value cannot be converted to a valid latitude.',
     },
@@ -239,7 +241,7 @@ export default [
       name: 'location.lon',
       text: 'Longitude',
       entity: 'location', 
-      displayValue: (i) => i.location.lon.conv || location.lon.raw,
+      displayValue: (i) => i.location.lon.conv || i.location.lon.raw,
       save: (o, v) => {if(!o.location) o.location={}; if(!o.location.lon) o.location.lon = {}; o.location.lat.raw = v; }, 
       isValid: (i, e) => !i.location.lon.raw || !!i.location.lon.conv || 'Value cannot be converted to a valid longitude.',
     },

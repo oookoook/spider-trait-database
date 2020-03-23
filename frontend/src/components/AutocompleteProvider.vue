@@ -17,7 +17,7 @@ export default {
   name: 'ListProvider',
   components: {
   },
-  props: { list: String, entity: String, textField: [String,Array], valueField: String, showAll: Boolean },
+  props: { list: String, entity: String, textField: [String,Array], valueField: String, showAll: Boolean, endpoint: String },
   data () {
     return {
       loading: false,
@@ -46,7 +46,7 @@ export default {
         query.count = 10;
       } 
       this.loading = true;
-      this.$store.dispatch(`${this.list}/autocomplete`, { query, entity: this.entity }).then(() => {this.loading = false; this.items=this.$store.getters[`${this.list}/autocomplete`](this.entity)}, (err) => { this.$store.dispatch('notify', { error: true, text: `Unable to retrieve autocomplete.`})});
+      this.$store.dispatch(`${this.list}/autocomplete`, { query, entity: this.entity, endpoint: this.endpoint }).then(() => {this.loading = false; this.items=this.$store.getters[`${this.list}/autocomplete`](this.entity)}, (err) => { this.$store.dispatch('notify', { error: true, text: `Unable to retrieve autocomplete.`})});
     },
     autocomplete: debounce(500, function(p) {
 
@@ -68,6 +68,8 @@ export default {
 
     }
   },
+  mounted() { 
+  }
 }
 </script>
 <style scoped>

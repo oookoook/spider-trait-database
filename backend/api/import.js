@@ -1,5 +1,4 @@
 const conv = require('../util/converter');
-const XLSX = require('xlsx');
 const fcsv = require('fast-csv');
 const csv = require('../util/csv');
 const jm = require('../util/job-manager');
@@ -45,29 +44,29 @@ const columns = [
 ];
 
 const join = 'import LEFT JOIN trait ON import.trait_id = trait.id '
-            + 'LEFT JOIN taxonomy ON import.taxonomy_id = taxonomy.id'
+            + 'LEFT JOIN taxonomy ON import.taxonomy_id = taxonomy.id '
             + 'LEFT JOIN sex ON import.sex_id = sex.id '
             + 'LEFT JOIN life_stage ON import.life_stage_id = life_stage.id '
             + 'LEFT JOIN measure ON import.measure_id = measure.id '
             + 'LEFT JOIN method ON import.method_id = method.id '       
-            + 'LEFT JOIN reference ON import.reference_id = reference.id'
-            + 'LEFT JOIN location ON import.location_id = location.id'
+            + 'LEFT JOIN reference ON import.reference_id = reference.id '
+            + 'LEFT JOIN location ON import.location_id = location.id '
             + 'LEFT JOIN dataset ON import.dataset_id';
 
-const joind = 'import LEFT JOIN dataset ON import.dataset_id';
+const joind = 'import LEFT JOIN dataset ON import.dataset_id = dataset.id';
 
 const joinv = 'import LEFT JOIN trait ON import.trait_abbrev = trait.abbrev '
-            + 'LEFT JOIN data_type ON import.trait_data_type = data_type.name OR trait.data_type_id = data_type.id'
+            + 'LEFT JOIN data_type ON import.trait_data_type = data_type.name OR trait.data_type_id = data_type.id '
             + 'LEFT JOIN taxonomy ON import.wsc_lsid = taxonomy.wsc_lsid '
-            + 'LEFT JOIN taxonomy_names ON import.original_name = taxonomy_names.name'
+            + 'LEFT JOIN taxonomy_name ON import.original_name = taxonomy_name.name '
             + 'LEFT JOIN sex ON import.sex = sex.name '
             + 'LEFT JOIN life_stage ON import.life_stage = life_stage.name '
             + 'LEFT JOIN measure ON import.measure = measure.name '
             + 'LEFT JOIN method ON import.method_abbrev = method.abbrev '
             + 'LEFT JOIN country ON import.location_country_code = country.alpha3_code '
             + 'LEFT JOIN habitat_global ON import.location_habitat_global = habitat_global.name '
-            + 'LEFT JOIN reference ON import.reference_doi = reference.doi OR import.reference = reference.fullCitation'
-            + 'LEFT JOIN location ON import.location_abbrev = location.abbrev'
+            + 'LEFT JOIN reference ON import.reference_doi = reference.doi OR import.reference = reference.full_citation '
+            + 'LEFT JOIN location ON import.location_abbrev = location.abbrev '
             + 'LEFT JOIN dataset ON import.dataset_id';
 
 const getAuthWhere = function(auth) {
@@ -83,6 +82,7 @@ const getObject = function(r) {
     // convert to camelCase from snake case
     // serialize timestamps
     return {
+        id: r[`id`],
         taxonomy: {
             wscLsid: r[`wsc_lsid`],
             originalName: r[`original_name`],
@@ -196,11 +196,14 @@ const list = async function(params, limits, auth) {
 const exportCsv = async function(params, auth, tmpDir) {
     var id = parseInt(params.id);
     var aw = getAuthWhere(auth);
-        
-    var dstream = db.squery({table: 'import', sql:`SELECT import.* `
+    var c = await db.getConnection();
+    var dstream = db.squery(c, {table: 'import', sql:`SELECT import.* `
     + `FROM ${joind} WHERE dataset_id = ? AND ${aw}`, values: [id], nestTables: false, hasWhere: true });
    
-    return await csv.write(tmpDir, `spider-traits-import-${id}-${Date.now()}.csv`, dstream);
+    var r = await csv.get(tmpDir, `spider-traits-import-${id}-${Date.now()}.csv`, dstream, c);
+    console.log(r);
+    db.releaseConnection(c);
+    return r;
 }
 
 const getUploaderEmail = async function(id) {
@@ -242,7 +245,7 @@ const changeState = async function(params, body, auth) {
         case 'created': mail.send({subject: 'Dataset added', text: 'A new dataset was created by a contributor.'}); break; // this will never happen
         case 'rejected': mail.send({ to: await getUploaderEmail(id), subject: 'Dataset rejected', text: 'Your dataset was rejected by an editor. You can find more details at {BASEURL}/import'}); break;
         case 'reviewed': mail.send({subject: 'Dataset review requested', text: 'A new dataset was sbmitted for a review by a contributor. You can find more details at {BASEURL}/approve'}); break;
-        case 'approved': mail.send({ to: await getUploaderEmail(id), subject: 'Dataset approved', text: `Your dataset was approved by an editor. You can view the dataset detil at {BASEURL}/dataset/${id}`}) break; 
+        case 'approved': mail.send({ to: await getUploaderEmail(id), subject: 'Dataset approved', text: `Your dataset was approved by an editor. You can view the dataset detil at {BASEURL}/dataset/${id}`}); break; 
     }
 
     var imp;
@@ -325,51 +328,29 @@ const transferToData = async function(params) {
     state.completed = true;
 }
 
-const convertToCSV = async function(f) {
-    var wb = XLSX.readFile(f);
-    /* generate array of arrays */
-    var sheetName = wb.SheetNames[0];
-    if(wb.SheetNames.includes('Data')) {
-        sheetName = 'Data';
-    }
-    var nf = `${f}.csv`;
-    //data = XLSX.utils.sheet_to_csv(wb.Sheets[sheetName], {header:1});
-    // wait for the file to convert
-    await new Promise(
-        function(resolve, reject) {
-            var stream = XLSX.stream.to_csv(wb.Sheets[sheetName], {header:1});
-            stream.pipe(fs.createWriteStream(nf));
-            stream.on('error', (err) => {
-                reject(err);
-            });
-            stream.on('end', () => {
-                resolve();
-            });
-        });
-    return nf;
-}
-
 const importRow = async function(conn, ds, r, state, cache) {
     var row = {};
     // copy the values and convert to snake case
+    //console.dir(r);
     Object.keys(r).forEach(k => {
-        var c = snakeCase(k);
+        var c = snakeCase(k).toLowerCase();
+        //console.dir(c);
         if(columns.includes(c)) {
             row[c] = r[k];
         }
     });
-
+    //console.dir(row);
     // caches the parsed values
     const gfc = (field, func) => {
         var v = row[field];
         if(!v) {
             return null;
         }
-        if(cache[`${f}|${v}`]) {
-            return cache[`${f}|${v}`];
+        if(cache[`${field}|${v}`]) {
+            return cache[`${field}|${v}`];
         } else {
             var nv = func(v);
-            cache[`${f}|${v}`] = nv;
+            cache[`${field}|${v}`] = nv;
             return nv;
         }
     }
@@ -404,16 +385,17 @@ const importRow = async function(conn, ds, r, state, cache) {
     row['valid_review'] = 0;
     row['valid'] = 0;
 
+    //console.dir(row);
+
     try { 
         await db.cquery(conn, {table: 'import', sql: 'INSERT INTO import SET ?', values: [row]});
     } catch (err) {
+        console.log(err);
         state.errors.push(err);
+        return false;
     }
     state.progress += 1;
-    if(state.progress + state.errors.length == state.total) {
-        return true;
-    }
-    return false;
+    return true;
 }
 
 const uploadFile = async function(params, body, files, auth) {
@@ -422,7 +404,6 @@ const uploadFile = async function(params, body, files, auth) {
     // in the background transfers rows from the file to the import table
     
     // file is uploaded
-    params.state.progress += 1;
     
     var ds = parseInt(params.id);
 
@@ -436,35 +417,39 @@ const uploadFile = async function(params, body, files, auth) {
         throw 'File size is too large';
     }
     var fpath = f.tempFilePath;
+    //console.dir(fpath);
     if(f.mimetype == 'application/vnd.ms-excel' || f.mimetype == 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet') {
-        fpath = await convertToCSV(f);
+        fpath = await csv.convert(fpath);
     } else if(f.mimetype != 'text/csv') {
         throw 'Unknown file format';
     }
-    var total = 0;
-    // firts passthrough - just get the number of lines
-    fcsv.parseFile(fpath)
-    .on('end', rowCount => { total = rowCount });
-
+    // first passthrough - just get the number of lines
+    var total = await new Promise((resolve,reject) => {
+    fcsv.parseFile(fpath, {headers: true})
+    .on('data', () => {})
+    .on('end', rowCount => resolve(rowCount));
+    });
+    //console.log(`Total: ${total}`);
     var ifunc = async (params) => {
+        // + 1 - the file was uploaded
+        params.state.progress += 1;
+
+        var conn = await db.getConnection();
+
         // this promise will resolve when the last row is inserted into the db
         // the data events are fired asynchronously (they are not waiting for processing the previous row) and the queries are queued by the mysql client
         // releaseConnection is also queued and can be basically ignored in the flow 
         await new Promise((resolve, reject) => {
-        var conn = db.getConnection();
         var valCache = {};
-        fcsv.parseFile(fpath)
+        fcsv.parseFile(fpath, {headers: true})
         .on('error', error => { params.state.errors.push[error]; params.state.aborted = true; resolve(); })
         .on('data', async row => {  
-            // we are waiting here, but another data event was already fired - the events are not waiting for each other
-            var last = await importRow(conn, params.ds, row, cache);
-            // the import row func detected that it's the last one to execute
-            if(last) {
-                // resolving the promise and continuing to validation
-                resolve();
-            }
+            // we are running async code here here, but another data event was already fired - the events are not waiting for each other
+            importRow(conn, params.ds, row, params.state, valCache);
         })
-        .on('end', rowCount => { db.releaseConnection(conn) });
+        // when the last record is added to the db queue, an callback is attached to the connection release
+        // when the connection is released, the callback is called
+        .on('end', rowCount => { /* console.log('csv processing ended'); */ db.releaseConnection(conn, () => resolve()) });
         });
         // now all the records are saved in the db or the import was aborted due to the error
         if(params.state.aborted) {
@@ -487,7 +472,7 @@ const uploadFile = async function(params, body, files, auth) {
 const deleteRecords = async function(params, auth) {
     var id = parseInt(params.id);
     //https://www.mysqltutorial.org/mysql-delete-join/
-    var r = await d.query({table, sql: `DELETE import FROM ${joind} WHERE dataset_id=? AND ${getAuthWhere(auth)}`, values: [id] });
+    await db.query({table: 'import', sql: `DELETE import FROM ${joind} WHERE dataset_id=? AND ${getAuthWhere(auth)}`, values: [id] });
     return {
         id
     }
@@ -509,7 +494,7 @@ const getColumnName = function(val) {
     if(val == 'eventDate.text') {
         return `event_date`;
     }
-    return snakeCase(i.replace('.raw','').replace('.', '_'));
+    return snakeCase(val.replace('.raw','').replace('.', '_'));
 }
 
 const getRow = async function(params, auth) {
@@ -527,22 +512,28 @@ const getRow = async function(params, auth) {
 
 const getPropsFromObject = function(o) {
     var output = {};
+    //console.log('Input object: ');
+    //console.dir(o);
     Object.keys(o).forEach(k => {
+        //console.log('Prop key: ');
+        //console.dir(k);
         if(typeof o[k] === 'object') {
-            var childAttrs = getAttrsFromObject(o[k]);
+            var childAttrs = getPropsFromObject(o[k]);
             Object.keys(childAttrs).forEach(ca => {
-                output[`${k}.${ca}`] = childAtrrs[ca];
+                output[`${k}.${ca}`] = childAttrs[ca];
             });
         } else {
             output[k] = o[k];
         }
     })
+    //console.log('Output: ');
+    //console.dir(output);
     return output;
 }
 
 const updateRow = async function(params, body, auth) {
     var ds = parseInt(params.id);
-    var row = parseInt(param.row);
+    var row = parseInt(params.row);
     var aw = getAuthWhere(auth);
     var newAttrs = {};
     // convert to snake case
@@ -556,6 +547,8 @@ const updateRow = async function(params, body, auth) {
     Object.keys(props).forEach(i => {
         newAttrs[getColumnName(i)] = props[i];
     });
+
+    console.dir(newAttrs);
 
     delete(newAttrs.id);
     delete(newAttrs['dataset_id']);
@@ -598,10 +591,10 @@ const updateRow = async function(params, body, auth) {
     }
 
     // the dataset id is not really needed - the row IDs are autoincremented
-    await db.query({table: 'import', sql:`UPDATE ${joind} SET ? WHERE dataset_id = ? AND id=? AND ${aw}`, values: [newAttrs, ds, row] });
+    await db.query({table: 'import', sql:`UPDATE ${joind} SET ? WHERE dataset_id = ? AND import.id=? AND ${aw}`, values: [newAttrs, ds, row] });
     validate({ds, aw});
     return { 
-        id
+        row
     }
 }
 
@@ -611,7 +604,7 @@ const deleteRow = async function(params, auth) {
     var row = parseInt(param.row);
     var aw = getAuthWhere(auth);
     // the dataset id is not really needed - the row IDs are autoincremented globally
-    var results = await db.query({table: 'import', sql:`DELETE import FROM ${joind} WHERE dataset_id = ? AND id=? AND ${aw}`, values: [ds, row] });
+    var results = await db.query({table: 'import', sql:`DELETE import FROM ${joind} WHERE dataset_id = ? AND import.id=? AND ${aw}`, values: [ds, row] });
      //var r = results[0];
      return {
         dataset: ds, 
@@ -644,7 +637,7 @@ const updateColumn = async function(params, body, auth) {
     }
     var clauses = [];
     for(var i = 0; i < vc.length; i++) {
-        clauses.push(`${db.escapeId(vc[i])}=${db.escape(ov[i])}`)
+        clauses.push(`${db.escapeId(vc[i])}${ov[i] ? '=' : ' IS ' }${db.escape(ov[i])}`)
     }
     var cw = clauses.join(' AND ');
     if(column == 'location_lat' || column == 'location_lon') {
@@ -682,7 +675,13 @@ const updateColumn = async function(params, body, auth) {
         await db.query({table: 'import', sql:`UPDATE ${joind} SET event_date_start = ?, event_date_end = ? WHERE ${cw} AND dataset_id = ? AND ${aw}`, values: [s, e, ds ] });
     }
 
-    var results = await db.query({table: 'import', sql:`UPDATE ${joind} SET ?? = ?, changed = 1 WHERE ${wc} AND dataset_id = ? AND ${aw}`, values: [column, nv, ds ] });
+    /*
+    console.dir(body);
+    console.dir(column);
+    console.dir(nv);
+    console.dir(cw);
+    */
+    var results = await db.query({table: 'import', sql:`UPDATE ${joind} SET ?? = ?, changed = 1 WHERE ${cw} AND dataset_id = ? AND ${aw}`, values: [column, nv, ds ] });
     
     // run the validation as a new job and return a job id
     //validate(ds, aw); 
@@ -787,41 +786,13 @@ const validate = async function(params) {
     var { ds, aw, state } = params;
     state = state || { progress: 0 };
     c = await db.getConnection();
-     
-    // step 1: convert all values to numeric where possible
-    // this will set 0 when conversion is not possible 
-    // don't do this here - do it when row or column values are saved (just one conversion occurs for the whole batch) and when the data are imported 
-    /*
-    await db.cquery(c,{table: 'import', sql:`UPDATE ${joinv} SET`
-     + ` value_numeric = CONVERT(REPLACE(REPLACE(REPLACE(value,'true', 1),'false',0), ',','.'), DECIMAL(15,4))`
-     + ` WHERE data_type.name NOT IN ('Character') AND changed = 1 dataset_id = ? AND ${aw}`, values: [ds] });
-    */
-
-     // Tcovert timestamps
-     // dont do this here
-
-     
-
-    // step 2: update all foreign keys
-
-    /*
-    `sex_id` INT NULL, x
-  `life_stage_id` INT NULL, x
-  `measure_id` INT NULL, x
-  `method_id` INT NULL, x
-  `trait_id` INT NULL, x
-  `reference_id` INT NULL, x
-  `location_id` INT NULL,
-  `habitat_global_id` INT NULL,
-  `country_id` INT NULL,
-  `taxonomy_id` INT NULL, x
-  */
 
     await db.cquery(c,{table: 'import', sql:`UPDATE ${joinv} SET `
     + ` sex_id = sex.id, life_stage_id = life_stage.id, measure_id = measure.id, method_id = method.id, trait_id = trait.id, trait_data_type_id = data_type.id, `
-    + ` reference_id = reference.id,  location_id = location.id, location_habitat_global_id = habitat_global.id, location_country_id = country.id,`
-    + ` taxonomy_id = CASE WHEN taxonomy.id IS NOT NULL AND taxonomy_name.taxonomy_id IS NOT NULL AND taxonomy.id <> taxonomy_name.taxonomy_id THEN NULL ELSE COALESCE(taxonomy.id, taxonomy_name.taxonomy_id)`
-    + ` require_numeric_value = CASE WHEN data_type.name NOT IN ('Character') THEN 1 ELSE 0`
+    + ` import.reference_id = reference.id,  location_id = location.id, location_habitat_global_id = habitat_global.id, location_country_id = country.id,`
+    + ` import.taxonomy_id = CASE WHEN taxonomy.id IS NOT NULL AND taxonomy_name.taxonomy_id IS NOT NULL AND taxonomy.id <> taxonomy_name.taxonomy_id THEN NULL `
+    + ` ELSE COALESCE(taxonomy.id, taxonomy_name.taxonomy_id) END, `
+    + ` require_numeric_value = CASE WHEN data_type.name <> 'Character' THEN 1 ELSE 0 END `
     + ` WHERE changed = 1 AND dataset_id = ? AND ${aw}`, values: [ds] });
 
     state.progress += 1;
@@ -843,7 +814,7 @@ const validate = async function(params) {
     + ` (location_lon IS NULL OR location_lon_conv IS NOT NULL) AND`
     + ` (location_altitude IS NULL OR location_altitude_numeric IS NOT NULL) AND`
     + ` (location_precision IS NULL OR location_precision_numeric IS NOT NULL) AND`
-    + ` (location_country IS NULL OR location_country_id IS NOT NULL) AND`
+    + ` (location_country_code IS NULL OR location_country_id IS NOT NULL) AND`
     + ` (location_habitat_global IS NULL OR location_habitat_global_id IS NOT NULL) AND`
     //+ ` (event_date IS NULL OR event_date_start IS NOT NULL) AND`
     + ` (require_numeric_value = 0 OR value_numeric = value OR (value = 'true' AND value_numeric = 1) OR (value = 'false' AND value_numeric = 0)) AND`
@@ -856,7 +827,7 @@ const validate = async function(params) {
     await db.cquery(c,{table: 'import', sql:`UPDATE ${joind} SET valid = 1 WHERE valid_review = 1 AND`
     + ` (trait_id IS NOT NULL) AND`
     //+ ` (method_id IS NOT NULL) AND`
-    + ` (reference_id IS NOT NULL) AND`
+    + ` (import.reference_id IS NOT NULL) AND`
     //+ ` (event_date IS NULL OR event_date_start IS NOT NULL) AND`
     /* all location fields are null OR location_id is filled in */
     + ` ((location_abbrev IS NULL AND location_lat IS NULL AND location_lon IS NULL AND location_precision IS NULL AND location_altitude IS NULL AND `
@@ -884,7 +855,8 @@ var synonyms = {
 
 module.exports = function(dbClient, mailClient) {
     mail = mailClient;
-    db = dbClient('import', synonyms);
+    db = dbClient;
+    db.addSynonyms('import', synonyms);
     return {
         list,
         exportCsv,

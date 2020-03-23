@@ -22,12 +22,13 @@ export default {
   name: 'DataFilter',
   components: {
   },
-  props: { loading: Boolean, items: Array, icon: String, label: String, value: [String, Number] },
+  props: { loading: Boolean, items: Array, icon: String, label: String, value: [String, Number], preload: Boolean  },
   data () {
     return {
       search: null,
       autocompleteInput: null,
       waitingForFill: false,
+      internalChange: true
       //localAutocompleteItems: null,
     }
   },
@@ -50,18 +51,18 @@ export default {
 
       // this is an internal change from the autocomplete
       //this.localAutocompleteItems = [ val ];
+      this.internalChange = true;
       this.$emit('input', val ? val.value : null);
     },
     value(val, oldVal) {
       if(!val) {
         return;
+      }
+      if(this.internalChange) {
+        this.internalChange = false;
+        return;
       } 
-      // this is an external change from the parent 
-      console.log(`${this.label}: External change of the search value`);
-      // send an event to the autocomplete provider to load the items
-      this.waitingForFill = true;
-      this.$emit('init', val);
-      // when the items are loaded, the items watcher will do the work
+      this.changeSearch(val);
     },
     items() {
       if(this.items && this.items.length && this.waitingForFill) {
@@ -89,6 +90,14 @@ export default {
   methods: {
     autocomplete() {
       this.$emit('autocomplete', { term: this.autocompleteInput });
+    },
+    changeSearch(val) {
+      // this is an external change from the parent 
+      console.log(`${this.label}: External change of the search value`);
+      // send an event to the autocomplete provider to load the items
+      this.waitingForFill = true;
+      this.$emit('init', val);
+      // when the items are loaded, the items watcher will do the work
     }
     
   },
@@ -96,6 +105,14 @@ export default {
 
   },
   mounted () {
+    if(this.value) {
+      this.changeSearch(this.value);
+      return;
+    }
+    if(this.preload && (!this.items || this.items.length == 0)){
+      console.log(`${this.label}: DataFilter preload...`)
+      this.$emit('autocomplete', { term: '' });
+    }
   }
 }
 </script>

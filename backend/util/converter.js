@@ -107,7 +107,7 @@ The date-time or interval associated to the trait. Examples:
 */
 const parseEvent = function(val) {
     // TODO implement the event parsing
-    return { start: Date.parse(val), end: null };
+    return { start: new Date(Date.parse(val)), end: null };
 }
 
 module.exports = {

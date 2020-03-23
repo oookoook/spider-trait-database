@@ -39,7 +39,7 @@
     </template>
 
     <template v-slot:no-data>
-      <action-button color="primary" @click="$emit('showNew')"></action-button>
+          <slot />
     </template>
 
     </v-data-table>

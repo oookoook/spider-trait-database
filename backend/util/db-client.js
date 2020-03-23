@@ -2,6 +2,8 @@ const mysql = require('mysql');
 const settings = require('../settings');
 const shortid = require('shortid');
 
+var releaseWatcher = {};
+
 var pool = mysql.createPool({
     connectionLimit: settings.db.connections,
     host: settings.db.host,
@@ -9,6 +11,20 @@ var pool = mysql.createPool({
     password: settings.db.password,
     database: settings.db.database
 });
+
+pool.on('release', function (connection) {
+    //console.log(`Conn ${connection.threadId} released`);
+    if(releaseWatcher[connection.threadId])
+    {
+        //console.log(`Conn ${connection.threadId} has callback`);
+        var f = releaseWatcher[connection.threadId];
+        delete(releaseWatcher[connection.threadId]);
+        f();
+    }
+    //console.log('Connection %d released', connection.threadId);
+});
+
+
 
 var synonyms = {
     endpoints: {}
@@ -99,8 +115,8 @@ const cquery = function (c, opt) {
     });
 }
 
-const squery = function (opt) {
-    return pool.query(getQueryParams(opt));
+const squery = function (c, opt) {
+    return c.query(getQueryParams(opt));
 }
 
 const getConnection = function () {
@@ -115,7 +131,11 @@ const getConnection = function () {
     });
 }
 
-const releaseConnection = function (c) {
+const releaseConnection = function (c, callback) {
+    if(callback) {
+        //console.log('Conn release watcher added');
+        releaseWatcher[c.threadId] = callback;
+    }
     c.release();
 }
 

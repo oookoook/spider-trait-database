@@ -106,7 +106,7 @@ export default {
                 return result.body;
             } catch (err) {
                 console.error(err);
-                this.$store.dispatch('notify', { error: true, text: `Unable to get recors.`});
+                context.dispatch('notify', { error: true, text: `Unable to get records.`});
                 return false;
             }
         },
@@ -121,7 +121,7 @@ export default {
             return result.body;
             } catch (err) {
                 console.error(err);
-                this.$store.dispatch('notify', { error: true, text: `Unable to get record.`});
+                context.dispatch('notify', { error: true, text: `Unable to get record.`});
                 return false;
             }
         },
@@ -136,7 +136,7 @@ export default {
                 return result.body;
             } catch (err) {
                 console.error(err);
-                this.$store.dispatch('notify', { error: true, text: `Unable to create record.`});
+                context.dispatch('notify', { error: true, text: `Unable to create record.`});
                 return false;
             }
         },
@@ -151,7 +151,7 @@ export default {
             return result.body;
             } catch (err) {
                 console.error(err);
-                this.$store.dispatch('notify', { error: true, text: `Unable to update record.`});
+                context.dispatch('notify', { error: true, text: `Unable to update record.`});
                 return false;
             }
         },
@@ -165,7 +165,7 @@ export default {
             return result.body;
             } catch (err) {
                 console.error(err);
-                this.$store.dispatch('notify', { error: true, text: `Unable to delete record.`});
+                context.dispatch('notify', { error: true, text: `Unable to delete record.`});
                 return false;
             }
         }

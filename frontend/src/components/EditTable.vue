@@ -13,9 +13,9 @@
           :cellId="item.id" :cellProp="h.value" 
           :selectedId.sync="selectedId" 
           :selectedProp.sync="selectedProp"
-          :invalid="isPropValid(item, h.value) === true"
-          @select="selectCell(e, item)">
-            <span>{{ getPropValue(item, h.value) }}</span>
+          :invalid="isPropValid(item, h.value) !== true"
+          @select="(e) => selectCell(e, item)">
+            <span>{{ getPropFormattedValue(item, h.value) }}</span>
           </selectable-cell>
           <!--
           <action-menu>
@@ -29,7 +29,9 @@
         
         </tr> 
     </template>
-
+    <template v-slot:no-data>
+          <slot />
+    </template>
     </v-data-table>
 </template>
 

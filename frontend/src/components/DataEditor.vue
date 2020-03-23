@@ -1,7 +1,7 @@
 <template>
   <v-card :loading="loading">
     <v-card-title>Data editor</v-card-title>
-      <v-toolbar dense class="my-3">
+      <v-toolbar dense color="accent" class="elevation-0 my-3">
         <action-button text="Dataset detail" icon="mdi-card-text-outline" toolbar @click="dsEdit = true" />
         <action-button color="success" text="Upload data" icon="mdi-upload" toolbar @click="upload = true" />
         <action-button text="Delete all the data" icon="mdi-table-remove" toolbar @click="deleteData"/>
@@ -13,17 +13,17 @@
           <action-button  color="error" text="Show invalid rows" icon="mdi-close-outline" toolbar />
         </v-btn-toggle>
         <v-divider vertical class="mx-3" />
-          <v-btn-toggle group dense mandatory v-model="editMode">  
-            <action-button text="Edit only the selected cell" icon="mdi-table-row" toolbar value="cell" />
-            <action-button text="Edit the selected value in the whole column" icon="mdi-table-column" toolbar value="column"/>
-            <action-button text="Use this value as rule for value change" icon="mdi-table-search" toolbar value="rule"/>
-            <action-button text="View distinct values in the selected column" icon="mdi-format-list-numbered" toolbar value="distinct" />
-            <action-button text="Delete selected row" icon="mdi-table-row-remove" toolbar value="delete"/>
+          <v-btn-toggle group dense mandatory v-model="editModeRaw">  
+            <action-button text="Edit only the selected cell" icon="mdi-table-row" toolbar />
+            <action-button text="Edit the selected value in the whole column" icon="mdi-table-column" toolbar />
+            <action-button text="Use this value as rule for value change" icon="mdi-table-search" toolbar />
+            <action-button text="View distinct values in the selected column" icon="mdi-format-list-numbered" toolbar />
+            <action-button text="Delete selected row" icon="mdi-table-row-remove" toolbar />
           </v-btn-toggle>
         <v-divider vertical class="mx-3" />
         <v-spacer />
         <v-divider vertical class="mx-3" />
-        <action-button text="Download as CSV" icon="mdi-download" toolbar @click="download" />
+        <action-button text="Download as CSV" icon="mdi-download" toolbar :link="downloadLink" external />
         <action-button v-if="!editor && isValid" color="success" text="Send for review" icon="mdi-send" toolbar @click="review" />
         <action-button v-if="!editor && !isValid" color="warning" text="Send for review (dataset invalid)" icon="mdi-send" toolbar @click="review"/>
         <action-button v-if="editor" color="error" text="Reject" icon="mdi-undo" toolbar @click="reject"/>
@@ -35,8 +35,11 @@
         :loading="loadingData" 
         :total="total"
         :options="options" 
-        @selectCell="selectCell" 
-         />
+        @selectCell="selectCell"
+        @update="getData" 
+         >
+          <action-button color="primary" text="Upload data" icon="mdi-upload" @click="upload = true"></action-button>
+        </edit-table>
       
         <!--
           Dataset editor
@@ -64,7 +67,7 @@
               <v-card-text><span>{{ confirm.text }}</span> Are you sure?</v-card-text>
               <v-card-actions>
                   <action-button text="Cancel" @click="confirm.dialog = false" icon="mdi-cancel" />
-                  <action-button text="Confirm" @click="confirm.action" icon="mdi-check" />
+                  <action-button text="Confirm" color="warning" @click="confirm.action" icon="mdi-check" />
               </v-card-actions>
             </v-card>
         </v-bottom-sheet>
@@ -72,13 +75,13 @@
             <edit-dialog :type="editMode" :selection="selectedCell" @cancel="edit.dialog = false" @save="edit.action" />
         </v-bottom-sheet>
         <v-bottom-sheet v-model="distinct.dialog">
-            <distinct-dialog :editor="editor" :dataset="id" :prop-name="selectedCell.prop" @cancel="distinct.dialog = false" @create="createEntity" @rule="ruleDistinct" @column="columnDistinct"/>
+            <distinct-dialog v-if="selectedCell" :editor="editor" :dataset="id" :prop-name="selectedCell.prop" @cancel="distinct.dialog = false" @create="createEntity" @rule="ruleDistinct" @column="columnDistinct"/>
         </v-bottom-sheet>
         <v-bottom-sheet v-model="log.dialog">
           <v-card>
               <v-card-title>Error Log</v-card-title>
             <v-card-text>
-            <v-data-table v-if="errors" :items="errors" headers="[{value: 'id', text: 'ID'},{value: 'Messgae', text: 'text'}]">
+            <v-data-table v-if="errors" :items="errors" headers="[{value: 'id', text: 'ID'},{value: 'Message', text: 'text'}]">
             </v-data-table>
             </v-card-text>
             <v-card-actions>
@@ -90,9 +93,9 @@
           Overlay showing the progress
           -->
         <v-overlay :value="job != null">
-          <v-progress-circular :size="300" :width="30" :value="job.progress" color="warning">
+          <v-progress-circular v-if="job != null" :size="300" :width="30" :value="job.state.progress" color="warning">
             {{ job.title }} <br/>
-            {{ job.progress }}% <br/>
+            {{ job.state.progress }}% <br/>
           </v-progress-circular>
         </v-overlay>
   </v-card>
@@ -101,6 +104,7 @@
 <script>
 import { mapState, mapGetters } from 'vuex'
 import {mixin as VueTimers} from 'vue-timers'
+import IdFromRoute from '../mixins/id-from-route'
 
 import ActionButton from './ActionButton'
 import EditTable from './EditTable'
@@ -112,7 +116,7 @@ import ListProvider from './ListProvider'
 
 export default {
   name: 'DataEditor',
-  mixins: [VueTimers],
+  mixins: [VueTimers, IdFromRoute],
   components: {
     ActionButton,
     EditTable,
@@ -126,8 +130,8 @@ export default {
   data () {
     return {
         validityFilter: 0,
-        //editModeRaw: 0,
-        editMode: 'cell',
+        editModeRaw: 0,
+        //editMode: 'cell',
         loading: false,
         loadingData: false,
         dsEdit: false,
@@ -151,23 +155,6 @@ export default {
         distinct: {
           dialog: false
         }
-        /*
-        items: [
-          {id: 1, originalName: 'Ahoj', wsc: {lsid: 0}, method: {}, trait: {}, reference: {} },
-          {id: 2, originalName: 'Ahoj', wsc: {lsid: 0}, method: {}, trait: {}, reference: {} },
-          {id: 3, originalName: 'Ahoj', wsc: {lsid: 0}, method: {}, trait: {}, reference: {} },
-          {id: 4, originalName: 'Ahoj', wsc: {lsid: 0}, method: {}, trait: {}, reference: {} },
-          {id: 5, originalName: 'Ahoj', wsc: {lsid: 0}, method: {}, trait: {}, reference: {} },
-          {id: 6, originalName: 'Ahoj', wsc: {lsid: 0}, method: {}, trait: {}, reference: {} },
-          {id: 7, originalName: 'Ahoj', wsc: {lsid: 0}, method: {}, trait: {}, reference: {} },
-          {id: 8, originalName: 'Ahoj', wsc: {lsid: 0}, method: {}, trait: {}, reference: {} },
-          {id: 9, originalName: 'Ahoj', wsc: {lsid: 0}, method: {}, trait: {}, reference: {} },
-          {id: 10, originalName: 'Ahoj', wsc: {lsid: 0}, method: {}, trait: {}, reference: {} },
-          {id:11, originalName: 'Ahoj', wsc: {lsid: 0}, method: {}, trait: {}, reference: {} },
-          {id: 12, originalName: 'Ahoj', wsc: {lsid: 0}, method: {}, trait: {}, reference: {} },
-          {id: 13, originalName: 'Ahoj', wsc: {lsid: 0}, method: {}, trait: {}, reference: {} }
-        ],
-        */
   }
   },
   computed: {
@@ -185,9 +172,9 @@ export default {
       }
     },
     isValid() {
-      return this.dataset && this.dataset.valid.review;
+      return this.dataset && this.total > 0 && this.dataset.valid.review;
     },
-    /*
+    
     editMode: {
       get() {
       switch(this.editModeRaw) {
@@ -208,9 +195,15 @@ export default {
       }
       }
     },
-    */
-    ...mapGetters('editor', ['list', 'total']),
-    ...mapGetters('jobs',['job', 'errors'])
+    downloadLink() {
+      if(this.dataset) {
+        return this.$store.getters['editor/downloadLink'](this.dataset.id);
+      } else {
+        return '';
+      }
+    },
+    ...mapState('editor', ['list', 'total']),
+    ...mapGetters(['job', 'errors'])
   },
   watch: {
     id(val) {
@@ -220,27 +213,39 @@ export default {
       }
     },
     job(val, oldVal) {
-      if(oldVal && !val && this.jobCompletedAction) {
+      if(oldVal && !val) {
         this.$timer.stop('refreshJob');
-        this.jobCompletedAction();
+        if(this.jobCompletedAction) {
+          this.jobCompletedAction();
+        }
       } else {
         this.$timer.start('refreshJob');
       }
     },
     validityFilter(val) {
       this.getData();
+    },
+    /*
+    editMode() {
+      if(this.selectedCell) {
+        selectCell()
+      }
     }
+    */
   },
   methods: {
     selectCell(e) {
       this.selectedCell = e;
-      switch(editMode) {
-        
-        case 'cell': editCell(); break;
+      //console.log(this.editMode);
+      this.showEdit();
+    },
+    showEdit() {
+      switch(this.editMode) {
+        case 'cell': this.editCell(); break;
         case 'column': 
-        case 'rule': editColumn(); break;
-        case 'distinct': showDistinct(); break;
-        case 'delete': deleteRow(); break;
+        case 'rule': this.editColumn(); break;
+        case 'distinct': this.showDistinct(); break;
+        case 'delete': this.deleteRow(); break;
       }
     },
     refreshDS() {
@@ -252,6 +257,7 @@ export default {
     uploadFile(f) {
       //console.dir(f);
       this.jobCompletedAction = this.getData;
+      this.upload = false;
       this.$store.dispatch(`editor/upload`,{ dataset: this.id, file: f });
     },
     updateDataset() {
@@ -264,7 +270,7 @@ export default {
       this.confirm.showMessage = false;
       this.confirm.action = () => {
         this.loading = true;
-        this.$store.dispatch('editor/deleteData', { id: this.id}).then(() => { this.loading = false; this.refreshDS(); this.getData(); });
+        this.$store.dispatch('editor/deleteData', { id: this.id}).then(() => { this.loading = false; this.confirm.dialog = false; this.refreshDS(); this.getData(); });
       }
       this.confirm.dialog = true;
     },
@@ -324,12 +330,14 @@ export default {
       }
       this.confirm.dialog = true;
     },
+    /*
     download() {
       this.$store.dispatch(`editor/download`,{ dataset: this.id });
     },
+    */
     editCell() {
       this.edit.action = (e) => {
-        this.$store.dispatch('editor/editRow', { dataset: this.id, id: this.selectedCell.id, changes: e}).then(() => { this.loading = false; this.refreshDS(); this.getData(); });
+        this.$store.dispatch('editor/editRow', { dataset: this.id, id: this.selectedCell.id, changes: e}).then(() => { this.loading = false; this.edit.dialog=false; this.refreshDS(); this.getData(); });
       };
       this.edit.dialog = true;
     },
@@ -337,7 +345,7 @@ export default {
       this.edit.action = (e) => {
         e.dataset = this.id;
         e.id = this.selectedCell.id;
-        this.$store.dispatch('editor/editColumn', e).then(() => { this.loading = false; });
+        this.$store.dispatch('editor/editColumn', e).then(() => { this.loading = false; this.edit.dialog=false; });
       };
       this.jobCompletedAction = () => { this.refreshDS(); this.getData(); };
       this.edit.dialog = true;
@@ -396,17 +404,22 @@ export default {
           params.filter[c] = this.validityFilter == 1 ? true : false;
         }
         this.loadingData = true;
-        this.$store.dispatch(`editor/list`,{ id: this.id, params }).then(() => {this.loadingData= false; });
+        params.id = this.id;
+        //console.dir(params);
+        this.$store.dispatch(`editor/list`, params).then(() => {this.loadingData= false; });
       }
+    },
+    refreshJob() {
+      this.$store.dispatch(`refreshJob`);  
     }
-  },
-  refreshJob() {
-    this.$store.dispatch(`jobs/refreshJob`);  
   },
   created () {
 
   },
   mounted () {
+    if(this.job) {
+      this.$timer.start('refreshJob');
+    }
   },
   timers: {
     refreshJob: { time: 3000, repeat: true }

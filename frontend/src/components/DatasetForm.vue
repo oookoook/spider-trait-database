@@ -82,7 +82,7 @@ export default {
   props: { value: Object, loading: Boolean, create: Boolean },
   data () {
     return {
-      dataset: this.value,
+      dataset: Object.assign({}, this.value || {}),
       valid: false,
       nameRules: [
         v => !!v || 'Dataset Name is required',
@@ -111,14 +111,16 @@ export default {
   },
   watch: {
     value(val) {
-      this.dataset = val;
+      this.dataset = Object.assign({}, this.value || {});
     }
   },
   methods: {
     save() {
       this.$refs.form.validate();
       if(this.valid) {
-        this.$emit('value', this.dataset);
+        console.log('save event called');
+        this.$emit('input', this.dataset);
+        this.$emit('save', this.dataset);
       } else {
         this.$store.dispatch('notify', {error: true, text: 'Please correct the invalid inputs before saving.'})
       }

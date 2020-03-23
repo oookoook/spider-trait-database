@@ -51,10 +51,6 @@ const prepareForSql = function(reference) {
     }
 }
 
-const validate = function(reference) {
-    return true;
-}
-
 const create = async function(body) {
     return await db.createEntity({body, table: 'reference', prepareForSql, validate});
 }

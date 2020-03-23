@@ -1,6 +1,6 @@
 <template>
   <div>
-    <slot :loading="loading" :item="item" v-if="id || create">
+    <slot :loading="loading" :item="item" :save="save" v-if="id || create">
     {{ JSON.stringify(item) }}
     </slot>
   </div>
@@ -39,7 +39,7 @@ export default {
     },
     id() {
       this.get();
-    }
+    },
   },
   methods: {
     get() {
@@ -50,9 +50,9 @@ export default {
       this.$store.dispatch(`${this.list}/get`,{ id: this.id }).then(() => {this.loading = false; });
     },
     save(val) {
-      var action = create ? 'create' : 'update';
+      var action = this.create ? 'create' : 'update';
       this.loading = true;
-        this.$store.dispatch(`${list}/${action}`, val)
+        this.$store.dispatch(`${this.list}/${action}`, val)
         .then((id) => { 
           this.loading= false; 
           this.$emit(action, id ? id : this.id); 

@@ -2,9 +2,20 @@ const shortid = require('shortid');
 
 var jobs = {};
 
-const gjs = function(j) {
+const gjs = function(id, j) {
+    if(!j) {
+        return {
+            id,
+            state: {
+                aborted: true,
+                progress: 1,
+                total: 1,
+                errors: ['Job not found - server was probably restarted']
+            }
+        }
+    }
     return {
-        id: j.id,
+        id: id,
         state: j.state,
         start: j.start,
         owner: j.owner
@@ -17,10 +28,11 @@ const createJob = function(owner, total, func, params) {
     // passes the state to the function
     params.state = state;
     jobs[jobId] = { owner, state, promise: func(params), start: new Date().valueOf() };
+    return jobId;
 }
 
 const getJob = function(id) {
-    return gjs(jobs[id]);
+    return gjs(id, jobs[id]);
     
 }
 
@@ -31,7 +43,7 @@ const getJobForUser = function(owner) {
 */
 
 const listJobs = function(owner) {
-    return Object.keys(jobs).map(id => gjs(jobs[id])).filter(j => owner == null || j.owner == owner);
+    return Object.keys(jobs).map(id => gjs(id, jobs[id])).filter(j => owner == null || j.owner == owner);
 }
 
 const removeJob = function(id) {

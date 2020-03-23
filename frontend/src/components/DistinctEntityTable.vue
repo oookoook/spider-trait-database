@@ -17,8 +17,8 @@
 
     <template v-slot:item.actions="{ item }">
       <action-button tooltip v-if="editor && !item.valid.invalid && !item.valid.created" icon="mdi-plus" text="Create entity" @click="create(item)"/>
-      <info-icon color="success" v-if="item.valid.created" text="Entity created" icon="mdi-check-bold">
-      <info-icon color="warining" v-if="item.valid.invalid" :text="item.valid.message" icon="mdi-alert-circle-outline">
+      <info-icon color="success" v-if="item.valid.created" text="Entity created" icon="mdi-check-bold" />
+      <info-icon color="warining" v-if="item.valid.invalid" :text="item.valid.message" icon="mdi-alert-circle-outline" />
     </template>
 
     </v-data-table>
@@ -27,7 +27,7 @@
 <script>
 import ListTable from '../mixins/list-table'
 import ActionButton from './ActionButton'
-import ActionButton from './InfoIcon'
+import InfoIcon from './InfoIcon'
 export default {
   name: 'DistinctEntityTable',
   mixins: [ ListTable ],

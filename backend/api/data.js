@@ -1,6 +1,6 @@
 var db = null;
 
-const csv = require('../util/csv');
+const csvu = require('../util/csv');
 
 var join = `data `
 + `LEFT JOIN taxonomy ON data.taxonomy_id = taxonomy.id `
@@ -89,8 +89,8 @@ const csv =  async function(params, limits, tmpDir) {
     var cond = getCondition(params);
     var res = await db.prepareListResponse(limits, 'data', cond.clause, cond.values, join);
     limits.limit = res.count;
-
-    var dstream = db.squery({ table: 'data', sql: `SELECT data.id, taxonomy.wsc_lsid, data.original_name as originalName, `
+    var c = await db.getConnection();
+    var dstream = db.squery(c, { table: 'data', sql: `SELECT data.id, taxonomy.wsc_lsid, data.original_name as originalName, `
      + `taxonomy.family, taxonomy.genus, taxonomy.species, taxonomy.subspecies, `
      + `trait.abbrev as trait, trait.name as traitFullName, trait_category.name as traitCategory, data.value, data.value_numeric, `
      + `measure.name as measure, sex.name as sex, life_stage.name as lifeStage, data.frequency, data.sample_size as sampleSize, method.abbrev as method, method.name as methodFullName, `
@@ -102,7 +102,9 @@ const csv =  async function(params, limits, tmpDir) {
      + `FROM ${join} WHERE ${cond.clause}`
      , values: cond.values, nestTables: false, limits, hasWhere: true});
     
-    return await csv.write(tmpDir, `spider-traits-${Date.now()}.csv`, dstream);
+    var f = await csvu.get(tmpDir, `spider-traits-${Date.now()}.csv`, dstream, c);
+    db.releaseConnection(c);
+    return f;
 }
 
 const synonyms = {
@@ -112,6 +114,7 @@ const synonyms = {
     'trait.name': 'trait.name',
     'taxonomy.family': 'taxonomy.family', 
     */
+    'rowLink': 'row_link',
     'location.habitatGlobal.id': 'habitat_global.id',
     'location.habitatGlobal.name': 'habitat_global.name',
     'location.habitatGlobal.category': 'habitat_global.category',

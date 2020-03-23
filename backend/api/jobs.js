@@ -1,10 +1,10 @@
-const jm = require('../job-manager');
+const jm = require('../util/job-manager');
 
 const hasRights = function(job, auth) {
-    return auth.isEditor || job.owner == auth.sub;
+    return auth.isEditor || job.owner == auth.sub || job.owner == null;
 }
 
-const list = function(auth) {
+const list = async function(auth) {
     if(auth.isAEditor) {
         return { jobs: jm.listJobs() };
     } else {
@@ -15,7 +15,7 @@ const list = function(auth) {
     
 }
 
-const get = function(params, auth) {
+const get = async function(params, auth) {
     var job = jm.getJob(params.id)
     var r = hasRights(job, auth);
     if(r) {
@@ -23,7 +23,7 @@ const get = function(params, auth) {
     }
 }
 
-const remove = function(params, auth) {
+const remove = async function(params, auth) {
     var id = params.id;
     var job = jm.getJob(id);
     var r = hasRights(job, auth);
