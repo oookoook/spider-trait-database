@@ -40,7 +40,7 @@ const getListParams = function(payload) {
         params.offset = offset;
         params.limit = limit;
     }
-    if(searchValue) {
+    if(searchValue != null) {
         params.searchField = searchField;
         params.searchValue = searchValue;
         params.searchLike = searchLike;
@@ -133,6 +133,11 @@ export default {
             }
             try {
                 var result = await Vue.http.post(url, payload.body, { params: payload.query });
+                if(result.body.error) {
+                    if(result.body.error == 'validation') {
+                        context.dispatch('notify', { error: true, text: result.body.validation});
+                    }
+                }
                 return result.body;
             } catch (err) {
                 console.error(err);

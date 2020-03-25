@@ -23,14 +23,15 @@
         <v-divider vertical class="mx-3" />
         <v-spacer />
         <v-divider vertical class="mx-3" />
-        <action-button text="Download as CSV" icon="mdi-download" toolbar :link="downloadLink" external />
+        <action-button text="Download as CSV" icon="mdi-download" toolbar :download="downloadLink" />
         <action-button v-if="!editor && isValid" color="success" text="Send for review" icon="mdi-send" toolbar @click="review" />
         <action-button v-if="!editor && !isValid" color="warning" text="Send for review (dataset invalid)" icon="mdi-send" toolbar @click="review"/>
         <action-button v-if="editor" color="error" text="Reject" icon="mdi-undo" toolbar @click="reject"/>
-        <action-button v-if="editor" color="success" text="Approve" icon="mdi-stamper" toolbar @click="approve"/>
+        <info-icon v-if="editor && !isValid" color="warning" icon="mdi-cancel" text="Dataset is not valid" toolbar />
+        <action-button v-if="editor && isValid" color="success" text="Approve" icon="mdi-stamper" toolbar @click="approve"/>
       </v-toolbar>
 
-        <edit-table editor
+        <edit-table :editor="editor"
         :items="list" 
         :loading="loadingData" 
         :total="total"
@@ -56,7 +57,7 @@
         -->
         
         <v-bottom-sheet v-model="dsEdit">
-            <dataset-form @hide="dsEdit = false" @save="updateDataset" :loading="loading" v-model="dataset"></dataset-form>
+            <dataset-form @hide="dsEdit = false" :loading="loading" v-model="dataset"></dataset-form>
         </v-bottom-sheet>
         <v-bottom-sheet v-model="upload">
             <upload-form @upload="uploadFile" @hide="upload = false"/>
@@ -64,15 +65,17 @@
         <v-bottom-sheet v-model="confirm.dialog">
             <v-card>
               <v-card-title>{{ confirm.title || 'Confirm action' }}</v-card-title>
-              <v-card-text><span>{{ confirm.text }}</span> Are you sure?</v-card-text>
+              <v-card-text><p><span>{{ confirm.text }}</span> Are you sure?</p>
+              <v-textarea v-if="confirm.message.show" v-model="confirm.message.text" :placeholder="confirm.message.placeholder" />
+              </v-card-text>
               <v-card-actions>
-                  <action-button text="Cancel" @click="confirm.dialog = false" icon="mdi-cancel" />
+                  <action-button text="Cancel" @click="confirm.dialog = false" icon="mdi-close" />
                   <action-button text="Confirm" color="warning" @click="confirm.action" icon="mdi-check" />
               </v-card-actions>
             </v-card>
         </v-bottom-sheet>
         <v-bottom-sheet v-model="edit.dialog">
-            <edit-dialog :type="editMode" :selection="selectedCell" @cancel="edit.dialog = false" @save="edit.action" />
+            <edit-dialog :editor="editor" :type="editMode" :selection="selectedCell" @cancel="edit.dialog = false" @save="edit.action" />
         </v-bottom-sheet>
         <v-bottom-sheet v-model="distinct.dialog">
             <distinct-dialog v-if="selectedCell" :editor="editor" :dataset="id" :prop-name="selectedCell.prop" @cancel="distinct.dialog = false" @create="createEntity" @rule="ruleDistinct" @column="columnDistinct"/>
@@ -85,7 +88,7 @@
             </v-data-table>
             </v-card-text>
             <v-card-actions>
-              <action-button text="Close" @click="log.dialog = false" icon="mdi-cancel" />
+              <action-button text="Close" @click="log.dialog = false" icon="mdi-close" />
             </v-card-actions>
           </v-card> 
         </v-bottom-sheet>
@@ -104,9 +107,9 @@
 <script>
 import { mapState, mapGetters } from 'vuex'
 import {mixin as VueTimers} from 'vue-timers'
-import IdFromRoute from '../mixins/id-from-route'
 
 import ActionButton from './ActionButton'
+import InfoIcon from './InfoIcon'
 import EditTable from './EditTable'
 import EditDialog from './EditDialog'
 import DistinctDialog from './DistinctDialog'
@@ -116,9 +119,10 @@ import ListProvider from './ListProvider'
 
 export default {
   name: 'DataEditor',
-  mixins: [VueTimers, IdFromRoute],
+  mixins: [VueTimers],
   components: {
     ActionButton,
+    InfoIcon,
     EditTable,
     EditDialog,
     DistinctDialog,
@@ -126,7 +130,7 @@ export default {
     UploadForm,
     ListProvider
   },
-  props: {editor: Boolean},
+  props: {isEditor: Boolean, id: Number},
   data () {
     return {
         validityFilter: 0,
@@ -141,6 +145,11 @@ export default {
           dialog: false,
           title: null,
           text: null,
+          message: {
+            show: false,
+            text: null,
+            placeholder: null
+          },
           action: () => {}
         },
         jobCompletedAction: null,
@@ -158,21 +167,32 @@ export default {
   }
   },
   computed: {
+    editor() {
+      if(!this.dataset) {
+        return false;
+      }
+      return this.isEditor && this.dataset.state == 'reviewed';
+    },
     dataset: {
       get() {
         return this.$store.state.imports.entity;
       },
-      set() {
-        this.$store.dispatch(`imports/update`, val)
+      set(val, oldVal) {
+        // name did not changed - remove it form the object so no new unique id is added
+        if(val.name == oldVal.name) {
+          delete(val.name);
+        }
+        this.$store.dispatch(`datasets/update`, val)
         .then(() => { 
           this.loading= false;
+          this.dsEdit = false;
           // updates the dataset prop
           this.refreshDS();
         })
       }
     },
     isValid() {
-      return this.dataset && this.total > 0 && this.dataset.valid.review;
+      return this.dataset && this.total > 0 && ((!this.editor && this.dataset.valid.review) || (this.editor && this.dataset.valid.approve));
     },
     
     editMode: {
@@ -260,14 +280,16 @@ export default {
       this.upload = false;
       this.$store.dispatch(`editor/upload`,{ dataset: this.id, file: f });
     },
+    /* Handled by the watcher
     updateDataset() {
       this.loading = true;
-      this.$store.dispatch(`datasets/update`, this.dataset).then(() => {this.loading = false});
+      this.$store.dispatch(`datasets/update`, this.dataset).then(() => {this.loading = false; this.refreshDS();});
     },
+    */
     deleteData() {
       this.confirm.title = 'Delete data';
       this.confirm.text = 'All the data in the dataset will be deleted.';
-      this.confirm.showMessage = false;
+      this.confirm.message.show = false;
       this.confirm.action = () => {
         this.loading = true;
         this.$store.dispatch('editor/deleteData', { id: this.id}).then(() => { this.loading = false; this.confirm.dialog = false; this.refreshDS(); this.getData(); });
@@ -277,27 +299,27 @@ export default {
     deleteDataset() {
       this.confirm.title = 'Delete dataset';
       this.confirm.text = 'The whole dataset will be deleted.';
-      this.confirm.showMessage = false;
+      this.confirm.message.show = false;
       this.confirm.action = () => {
         this.loading = true;
-        this.$store.dispatch('datasets/delete', { id: this.id}).then(() => { this.loading = false; this.$router.push(editor ? '/approve' : '/import') });
+        this.$store.dispatch('datasets/delete', { id: this.id}).then(() => { this.loading = false; this.$router.push(this.editor ? '/approve' : '/import') });
       }
       this.confirm.dialog = true;
     },
     deleteRow() {
       this.confirm.title = 'Delete row';
       this.confirm.text = 'The selected row will be deleted.';
-      this.confirm.showMessage = false;
+      this.confirm.message.show = false;
       this.confirm.action = () => {
         this.loading = true;
-        this.$store.dispatch('editor/deleteRow', { dataset: this.id, id: this.selectedCell.id}).then(() => { this.loading = false; this.refreshDS(); this.getData(); });
+        this.$store.dispatch('editor/deleteRow', { dataset: this.id, id: this.selectedCell.id}).then(() => { this.loading = false; this.confirm.dialog = false; this.refreshDS(); this.getData(); });
       }
       this.confirm.dialog = true;
     },
     approve() {
       this.confirm.title = 'Approve dataset';
       this.confirm.text = 'The dataset will be approved and the data will become available for public.';
-      this.confirm.showMessage = false;
+      this.confirm.message.show = false;
       this.confirm.action = () => {
         this.loading = true;
         this.$store.dispatch('editor/changeState', { id: this.id, message: null, state: 'approved'}).then(() => {this.loading = false;});
@@ -308,11 +330,11 @@ export default {
     reject() {
       this.confirm.title = 'Reject dataset';
       this.confirm.text = 'The dataset will be rejected. The contributor will be able to fix the data and then resend them for a review.';
-      this.confirm.showMessage = true;
-      this.confirm.message = "Enter a message for the contributor explaining the rejection.";
+      this.confirm.message.show = true;
+      this.confirm.message.placeholder = "Enter a message for the contributor explaining the rejection.";
       this.confirm.action = () => {
         this.loading = true;
-        this.$store.dispatch('editor/changeState', { id: this.id, message: this.confirm.message, state: 'rejected'}).then(() => { this.loading = false; this.$router.push('/approve') });
+        this.$store.dispatch('editor/changeState', { id: this.id, message: this.confirm.message.text, state: 'rejected'}).then(() => { this.loading = false; this.$router.push('/approve') });
       }
       this.confirm.dialog = true;
     },
@@ -322,11 +344,11 @@ export default {
       if(!this.dataset.valid.review) {
         this.confirm.warning += 'Attention! Your dataset is not valid for a review. If possible, fix all the marked problems before submitting.'
       }
-      this.confirm.showMessage = true;
-      this.confirm.message = "Enter a message for the editor if you want to tell them someting about your data (e.g. reason why the data re not valid).";
+      this.confirm.message.show = true;
+      this.confirm.message.placeholder = "Enter a message for the editor if you want to tell them someting about your data (e.g. reason why the data re not valid).";
       this.confirm.action = () => {
         this.loading = true;
-        this.$store.dispatch('editor/changeState', { id: this.id, message: this.confirm.message, state: 'reviewed'}).then(() => { this.loading = false; this.$router.push('/import') });
+        this.$store.dispatch('editor/changeState', { id: this.id, message: this.confirm.message.text, state: 'reviewed'}).then(() => { this.loading = false; this.$router.push('/import') });
       }
       this.confirm.dialog = true;
     },
@@ -354,12 +376,40 @@ export default {
       this.distinct.dialog = true;
     },
     createEntity(evt) {
-      if(evt.entity) {
+      if(evt.entity.value) {
         this.loading = true;
-        this.$store.dispatch(`${evt.endpoint}/create`, evt.entity).then(() => { this.loading = false; });
-      } else {
-        this.jobCompletedAction = () => { this.showLog(); };
+        this.$store.dispatch(`${evt.endpoint}/create`, evt.entity.value)
+        .then((data) => {
+          if(data.error) {
+            return Promise.resolve();
+          }
+          // after creation do a column change with the entity vals and the returned abbrevs
+          var payload = evt.columns;
+          payload.dataset = this.dataset.id;
+          var o = {};
+          o[evt.entity.name] = data.entity;
+          payload.multipleColumns = true;
+          payload.newValue = evt.entity.match.displayValue(o);
+          return this.$store.dispatch(`editor/editColumn`, payload );
+          })
+          .then((data) => { this.loading = false; this.refreshDS(); this.getData(); });
+      } else if(evt.entity.values) {
+        this.confirm.title = 'Batch entity creation';
+        this.confirm.text = `You are about to create ${evt.entities.length} entities.`;
+        this.confirm.message.show = false;
+        this.confirm.action = () => {
+        this.loading = true;
+        this.jobCompletedAction = () => { this.showLog(); this.refreshDS(); this.getData(); };
+        evt.dataset = this.dataset.id;
         this.$store.dispatch(`editor/createMultiple`, evt);
+        this.confirm.dialog = true;
+        // after creation is completed run ad-hoc validation 
+        this.$store.dispatch(`editor/validate`, {id: this.dataset.id});
+      }
+      
+
+      
+        
       }
     },
     showLog() {
@@ -376,12 +426,16 @@ export default {
     replaceDistinct(mode, evt) {
       // rule or column
       this.editMode = mode;
+      /*
       if(evt.prop && evt.prop != this.selectedCell.prop) {
         this.selectedCell.prop = evt.prop;
       }
       var o = {};
-      this.entityPropDict[this.selectedCell.prop].save(o, evt.value);
+      this.propsDict[this.selectedCell.prop].save(o, evt.value);
       this.selectedCell.item = o;
+      */
+      this.selectedCell = evt;
+      this.distinct.dialog = false;
       this.editColumn();
     },
     getData(params) {
@@ -400,8 +454,9 @@ export default {
           this.options = params.options;  
         }
         if(this.validityFilter != 0) {
-          var c = editor ? 'valid.review' : 'valid.approve';
-          params.filter[c] = this.validityFilter == 1 ? true : false;
+          params.searchField = this.editor ? 'valid.approve' : 'valid.review';
+          //console.log(this.validityFilter);
+          params.search = this.validityFilter == 1 ? true : false;
         }
         this.loadingData = true;
         params.id = this.id;

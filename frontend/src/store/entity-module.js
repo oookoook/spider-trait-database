@@ -71,7 +71,7 @@ export default (endpoint) => {
             var data = await context.dispatch('post', p, { root: true });
                 // the api module returns false uf user is not authenticated
             if(data) {
-                return data.id;
+                return data;
             }
         },
         update: async function(context, payload) {

@@ -53,9 +53,9 @@ export default {
       var action = this.create ? 'create' : 'update';
       this.loading = true;
         this.$store.dispatch(`${this.list}/${action}`, val)
-        .then((id) => { 
+        .then((data) => { 
           this.loading= false; 
-          this.$emit(action, id ? id : this.id); 
+          this.$emit(action, data && data.id ? id : this.id); 
         });
     }
   },

@@ -144,6 +144,7 @@ export default {
         this.modifiedValue = this.isRule ? null : this.originalValue; //this.getPropValue(val.item, val.prop);
         
         if(this.modifiedProp && this.modifiedProp.autocomplete) {
+          //console.log(`Assigning to foreign match: ${this.modifiedProp.name}`);
           this.foreignMatchValue =  p.displayValue(val.item);//p.foreignMatchValue(val.item);
         }
       } else {

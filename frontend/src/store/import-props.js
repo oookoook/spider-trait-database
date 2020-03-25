@@ -23,7 +23,7 @@ export default [
       entity: 'trait', 
       displayValue: (i) => i.trait.abbrev,
       save: (o, v) => {if(!o.trait) o.trait={}; o.trait.abbrev = v; }, 
-      isValid: (i, e) => !!i.trait.id || (!e && i.trait.name && i.trait.description) || 'Trait Abbrev. must be set',
+      isValid: (i, e) => !!i.trait.id || (!e && !!i.trait.name && !!i.trait.description && !!i.trait.dataType) || (e === 'create' && !!i.trait.abbrev) || 'Trait Abbrev. must be set and the trait must exist.',
       autocomplete: { endpoint: 'traits', valueField: 'abbrev', textField: ['abbrev', 'name'] }
     },
     { 
@@ -72,7 +72,16 @@ export default [
       displayValue: (i) => i.trait.dataType.raw,
       save: (o, v) => {if(!o.trait) o.trait={}; if(!o.trait.dataType) o.trait.dataType = {}; o.trait.dataType.raw = v; }, 
       isValid: (i, e) => !!i.trait.dataType.id || 'Value does not match any existing data type',
-      autocomplete: { endpoint: 'traits', valueField: 'data_type.name' }
+      autocomplete: { endpoint: 'traits', valueField: 'dataType.name' }
+    },
+    { 
+      name: 'trait.category',
+      text: 'Trait category', 
+      entity: 'trait',
+      displayValue: (i) => i.trait.category.raw,
+      save: (o, v) => {if(!o.trait) o.trait={}; if(!o.trait.category) o.trait.category = {}; o.trait.category.raw = v; }, 
+      isValid: (i, e) => !!i.trait.id || !!i.trait.category.id || 'Value does not match any existing trait category',
+      autocomplete: { endpoint: 'traits', valueField: 'category.name' }
     },
     { 
       name: 'method.abbrev',
@@ -80,8 +89,8 @@ export default [
       entity: 'method', 
       displayValue: (i) => i.method.abbrev,
       save: (o, v) => {if(!o.method) o.method={}; o.method.abbrev = v; }, 
-      isValid: (i, e) => !!i.method.id || (!e && i.method.name && i.method.description) || 'Method Abbrev. must be set',
-      autocomplete: { endpoint: 'methods', valueField: 'name', textField: ['name'] }
+      isValid: (i, e) => !!i.method.id || (!e && !!i.method.name && !!i.method.description) || (e === 'create' && !!i.method.abbrev) || 'Method Abbrev. must be set and the method must exist.',
+      autocomplete: { endpoint: 'methods', valueField: 'abbrev', textField: ['abbrev','name'] }
     },
     { 
       name: 'method.name',
@@ -133,7 +142,7 @@ export default [
       text: 'Measure', 
       displayValue: (i) => i.measure.raw,
       save: (o, v) => {if(!o.measure) o.measure={}; o.measure.raw = v; },   
-      isValid: (i, e) => !i.measure.raw || !!i.measure.id || 'Value does not match any of the possible values',
+      isValid: (i, e) => !!i.measure.id || 'Value does not match any of the possible values',
       autocomplete: { endpoint: 'data', valueField: 'measure.name' }
     },
     { 
@@ -197,7 +206,7 @@ export default [
       entity: 'reference', 
       displayValue: (i) => i.reference.fullCitation,
       save: (o, v) => {if(!o.reference) o.reference={}; o.reference.fullCitation = v; },  
-      isValid: (i, e) => !!i.reference.id || (!e && i.reference.fullCitation) || 'Reference must be set',
+      isValid: (i, e) => !!i.reference.id || !!i.reference.fullCitation || 'Reference must be set',
       
     },
     { 
@@ -206,7 +215,7 @@ export default [
       entity: 'reference', 
       displayValue: (i) => i.reference.abbrev, 
       save: (o, v) => {if(!o.reference) o.reference={}; o.reference.abbrev = v; },  
-      isValid: (i, e) => !!i.reference.id || (!e && i.reference.fullCitation) || e==='create' || 'Reference must be set',
+      isValid: (i, e) => !!i.reference.id || (!e && !!i.reference.fullCitation) || e==='create' || 'Reference Abbrev. must be set and the reference must exist.',
       autocomplete: { endpoint: 'references', valueField: 'abbrev', textField: ['abbrev', 'fullCitation'] }
     },
     { 
@@ -226,7 +235,7 @@ export default [
       // the valid function checks if all the props of the location are null  
       isValid: (i, e) => !!i.location.id || !e || e==='create' || 
       Object.keys(i.location).reduce((k, total) => total && (i.location[k] == null || (typeof i.location[k] == 'object' && i.location[k].raw == null)), true) 
-      || 'Location must be set',
+      || 'Location Abbrev. must be set',
       autocomplete: { endpoint: 'locations', valueField: 'abbrev', textField: ['abbrev', 'country.code', 'locality', 'habitatGlobal.name'] }
     },
     { 

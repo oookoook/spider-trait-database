@@ -28,7 +28,7 @@ export default {
       search: null,
       autocompleteInput: null,
       waitingForFill: false,
-      internalChange: true
+      internalChange: false
       //localAutocompleteItems: null,
     }
   },
@@ -51,18 +51,22 @@ export default {
 
       // this is an internal change from the autocomplete
       //this.localAutocompleteItems = [ val ];
+      //console.log(`Setting internal change to true ${val}`);
       this.internalChange = true;
       this.$emit('input', val ? val.value : null);
     },
     value(val, oldVal) {
-      if(!val) {
+      //console.log('Data Filter registered value change');
+      if(!val && !this.preload) {
+        //console.log('Doing nothing');
         return;
       }
       if(this.internalChange) {
+        //console.log('This was an internal change');
         this.internalChange = false;
         return;
       } 
-      this.changeSearch(val);
+      this.changeSearch(val || '');
     },
     items() {
       if(this.items && this.items.length && this.waitingForFill) {
@@ -93,7 +97,7 @@ export default {
     },
     changeSearch(val) {
       // this is an external change from the parent 
-      console.log(`${this.label}: External change of the search value`);
+      //console.log(`${this.label}: External change of the search value`);
       // send an event to the autocomplete provider to load the items
       this.waitingForFill = true;
       this.$emit('init', val);
@@ -110,7 +114,7 @@ export default {
       return;
     }
     if(this.preload && (!this.items || this.items.length == 0)){
-      console.log(`${this.label}: DataFilter preload...`)
+      //console.log(`${this.label}: DataFilter preload...`)
       this.$emit('autocomplete', { term: '' });
     }
   }

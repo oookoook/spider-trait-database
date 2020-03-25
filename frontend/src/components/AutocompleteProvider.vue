@@ -61,7 +61,7 @@ export default {
         this.getData(p);
       }),
     init(val) {
-      console.log(`${this.entity} init called`)
+      //console.log(`${this.entity} init called`)
       // can't call the autocomplete because of the debounce 
       //this.autocomplete({ term: val, searchByValue: true })
       this.getData({ term: val, searchByValue: true });

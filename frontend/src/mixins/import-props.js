@@ -14,26 +14,17 @@ export default {
   mounted() {},
   methods: {
     getPropValue(item, propName) {
-      /*
-      //console.dir(item);
-      // from input such as 'eventDate.start' gets value item[eventDate][start]
-      var i = item;
-      var v = null;
-      var a = prop.split('.');
-      var pos = 0;
-      while (pos < a.length) {
-        v = i[a[pos]];
-        i = i[a[pos]];
-        pos += 1;
-      }
-      return v;
-      */
      return this.propsDict[propName].displayValue(item);
     },
     getPropFormattedValue(item, propName) {
+      //console.log(propName);
       var v = this.getPropValue(item, propName);
       if(v != null && typeof v == 'string') {
-        v = v.replace(' ', '\xa0');
+       //console.log(`replacing spaces in ${v}`);
+        v = v.replace(/\s/g, '\xa0');
+        if(v.length > 25) {
+          v = v.substring(0, 25) + '...';
+        }
       }
       return v;
     },
@@ -54,13 +45,19 @@ export default {
       return this.propsDict[propName].text;
     },
     getEntityHeaders(entity) {
-      return this.$store.getters[`editor/distinctEntityHeaders`](entity);
+      return this.$store.getters[`editor/entityHeaders`](entity);
     },
     isEntityValid(entity, item) {
       return this.$store.getters[`editor/isEntityValid`](entity, item, this.editor);
     },
     getEntityEndpoint(entity) {
       return this.$store.getters[`editor/entityEndpoint`](entity);
+    },
+    getEntityMatch(entity) {
+      return this.$store.getters[`editor/entityMatch`](entity);
+    },
+    getDistinctEntityProps(entity) {
+      return this.$store.getters[`editor/distinctEntityProps`](entity);
     }
   }
 }

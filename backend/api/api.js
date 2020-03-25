@@ -4,9 +4,11 @@ const router = express.Router();
 const { requiresAuth } = require('express-openid-connect');
 
 
+const settings = require('../settings');
 const auth = require('../util/auth');
 const db = require('../util/db-client');
-const settings = require('../settings');
+const mail = require('../util/mail')(settings);
+
 
 const traits = require('./traits')(db);
 const methods = require('./methods')(db);
@@ -15,7 +17,7 @@ const locations = require('./locations')(db);
 const taxonomy = require('./taxonomy')(db);
 const datasets = require('./datasets')(db);
 const data = require('./data')(db);
-const imports = require('./import')(db);
+const imports = require('./import')(db, mail);
 const jobs = require('./jobs');
 
 router.use(auth.resourcesAuth);
@@ -208,6 +210,12 @@ router.route('/import/:id/data')
   .get(requiresAuth(), auth.isContributor, function (req, res) {
     imports.exportCsv(req.params, req.resourcesAuth,  settings.files.tmpDir).then(r => res.download(r)).catch(e => { console.log(e); res.sendStatus(400); });
   })
+  
+  router.route('/import/:id/validate')
+  // allow ad-hoc validation
+  .put(requiresAuth(), auth.isEditor, function (req, res) {
+    imports.startValidation(req.params, req.resourcesAuth).then(r => res.download(r)).catch(e => { console.log(e); res.sendStatus(400); });
+  })
 
 router.route('/import/:id/row/:row')
   .get(requiresAuth(), auth.isContributor, function (req, res) {
@@ -223,7 +231,7 @@ router.route('/import/:id/row/:row')
 router.route('/import/:id/column/:column')
   .get(requiresAuth(), auth.isContributor, function (req, res) {
   // used for getting the distinct entities that must be created
-  imports.getColumn(req.params, req.resourcesAuth).then(r => res.json(r)).catch(e => { console.log(e); res.sendStatus(400); });
+  imports.getColumn(req.params, req.recordLimit, req.resourcesAuth).then(r => res.json(r)).catch(e => { console.log(e); res.sendStatus(400); });
   })
   .put(requiresAuth(), auth.isContributor, function (req, res) {
     // used for batch value replacements

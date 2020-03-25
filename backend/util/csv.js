@@ -37,7 +37,7 @@ const get = async function(tmpDir, filename, dstream, connection) {
       });
         
     });
-    console.log(p);
+    //console.log(p);
     return p;
 }
 

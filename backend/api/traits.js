@@ -69,8 +69,12 @@ const validate = async function(trait) {
         return 'Trait data type cannot be empty';
     }
 
+    if(trait.trait_category_id == null) {
+        return 'Trait category cannot be empty';
+    }
+
     var r = await db.query({table: 'trait', sql: 'SELECT trait.id FROM trait WHERE abbrev = ?', values: [trait.abbrev], nestTables: false});
-    return (r.items.length == 0 || (trait.id && r.items[0].id == trait.id)) ? true : 'Trait abbrev. is already used.';
+    return (r.length == 0 || (trait.id && r[0].id == trait.id)) ? true : 'Trait abbrev. is already used.';
 }
 
 const prepareForSql = function(trait) {

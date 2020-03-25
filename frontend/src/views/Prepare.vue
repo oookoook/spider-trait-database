@@ -1,7 +1,7 @@
 <template>
   <v-container fluid>
     <auth-section v-slot="{isEditor}">
-      <data-editor :editor="isEditor" :id="id" />
+      <data-editor :is-editor="isEditor" :id="id" />
     </auth-section>
   </v-container>
 </template>

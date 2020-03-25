@@ -41,7 +41,7 @@ const validate = async function(reference) {
     }
 
     var r = await db.query({table: 'reference', sql: 'SELECT reference.id FROM reference WHERE abbrev = ?', values: [reference.abbrev], nestTables: false});
-    return (r.items.length == 0 || (reference.id && r.items[0].id == reference.id)) ? true : 'Reference abbrev. is already used.';
+    return (r.length == 0 || (reference.id && r[0].id == reference.id)) ? true : 'Reference abbrev. is already used.';
 }
 
 const prepareForSql = function(reference) {

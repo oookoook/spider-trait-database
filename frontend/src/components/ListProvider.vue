@@ -54,7 +54,7 @@ export default {
   watch: {
     filter: {
       handler() {
-        console.log('filter changed, updating list provider...');
+        //console.log('filter changed, updating list provider...');
         this.update();
       },
       deep:true

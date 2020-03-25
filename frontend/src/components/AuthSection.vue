@@ -22,7 +22,7 @@
         Spider Trait Database (<a :href="`mailto:${adminMail}`">{{adminMail}}</a>).
       </v-card-text>
     </v-card>
-    <slot v-else :editor="isEditor" :admin="isAdmin" :user="user">
+    <slot v-else :isEditor="isEditor" :isAdmin="isAdmin" :user="user">
     </slot>
   </div>
 </template>

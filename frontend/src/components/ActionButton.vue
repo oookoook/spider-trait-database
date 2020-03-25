@@ -10,13 +10,13 @@
         :small="menu || small" 
         :color="color"
         v-on="on"
-        :href="link"
-        :target="link ? '_blank' : null"
+        :href="download"
+        :target="download ? '_blank' : null"
         ><v-icon>{{ icon }}</v-icon></v-btn>
       </template>
       <span>{{ text }}</span>
     </v-tooltip>
-    <v-btn v-else text @click="click" :color="color" :href="link"><v-icon left>{{ icon }}</v-icon> {{ text }}</v-btn>
+    <v-btn v-else text @click="click" :color="color" :href="download"><v-icon left>{{ icon }}</v-icon> {{ text }}</v-btn>
     </span>
 </template>
 

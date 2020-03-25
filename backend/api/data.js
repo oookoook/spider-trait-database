@@ -124,6 +124,7 @@ const synonyms = {
     'location.country.name': 'country.name',
     'trait.category.id':'trait_category.id',
     'trait.category.name':'trait_category.name',
+    'lifeStage.name':'life_stage.name'
 }
 
 module.exports = function(dbClient) {

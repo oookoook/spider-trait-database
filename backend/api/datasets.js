@@ -76,13 +76,20 @@ const prepareForCreate = function(dataset, auth) {
     dataset.sub = auth.sub;
     dataset.name = db.unique(dataset.name);
     dataset.date = new Date();
+    dataset['authors_email'] = dataset.authorsEmail;
+    delete(dataset.authorsEmail);
 }
 
 const prepareForUpdate = function(dataset, auth) {
     // state cant be changed here
     delete(dataset.state);
     delete(dataset.sub);
+    delete(dataset.valid);
     delete(dataset.date);
+    dataset.name = db.unique(dataset.name);
+    dataset['authors_email'] = dataset.authorsEmail;
+    delete(dataset.authorsEmail);
+    
 }
 
 
@@ -106,7 +113,6 @@ const remove = async function(params, auth) {
 }
 
 module.exports = function(dbClient) {
-    // TODO check sorting by state from UI
     db = dbClient;
     db.addSynonyms('datasets', 'dataset', {state: `imported`});
     return {

@@ -16,7 +16,7 @@ const send = async function (message) {
     if(!message.to) {
         message.to = admins;
     }
-    message = message.replace('{BASEURL}', baseUrl);
+    message.text = message.text.replace('{BASEURL}', baseUrl);
     try {
         await transporter.sendMail(message);
     } catch(err) {
@@ -26,7 +26,7 @@ const send = async function (message) {
 }
 
 module.exports = (settings) => {
-    disabled = !settings.mail || settings.mail.enabled;
+    disabled = !settings || !settings.mail || settings.mail.enabled;
     if (disabled) {
         return;
     }
@@ -47,7 +47,7 @@ module.exports = (settings) => {
             console.log('Unable to connect to SMTP server');
             console.log(error);
         } else {
-            console.log('Mail server configuration verified');
+            //console.log('Mail server configuration verified');
         }
     });
 

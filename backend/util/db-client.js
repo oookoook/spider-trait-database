@@ -51,6 +51,8 @@ const addLimits = function (values, limits, table, hasWhere, aggregate, customWh
     } else if(limits.search) {
         //whereClause = ` ${searchStart} ${mysql.escapeId(table+'.'+limits.search.field)} ${op} '${mysql.escape(limits.search.value)}${wildcard}'`;
         whereClause = ` ${searchStart} ?? ${op} ?`;
+        
+        //console.log(`${table} ${limits.search.field} ${getSynonym(table, limits.search.field)}`);
         values.push(getSynonym(table, limits.search.field));
         values.push(`${wildcard}${limits.search.value}${wildcard}`);
     }
@@ -155,9 +157,16 @@ const limits = function (req, res, next) {
     }
 
     if (req.query.searchField && req.query.searchValue) {
+        var v = req.query.searchValue;
+        if(v === 'true') {
+            v = 1;
+        }
+        if(v === 'false') {
+            v = 0;
+        }
         req.recordLimit.search = {
             field: req.query.searchField,
-            value: req.query.searchValue,
+            value: v,
             like: req.query.searchLike && req.query.searchLike == 'true'
         };
     }
@@ -172,20 +181,25 @@ const limits = function (req, res, next) {
     next();
 }
 
-const prepareListResponse = async function (limits, table, customWhereClause, customWhereValues, join) {
+const prepareListResponse = async function (limits, table, customWhereClause, customWhereValues, join, distinctSql) {
     var res = {
         items: null,
         limit: limits.limit,
         offset: limits.offset,
         count: null
     };
-    if (limits.count) {
+    if (limits.count && !distinctSql) {
         // count is limited when using filter
         var r = await query({table, sql: `SELECT COUNT(${table}.id) as count FROM ${join ? join : table}`, limits, aggregate: true, customWhereClause, values: customWhereValues});
         var count = r[0].count;
-        //console.dir(count);
+        res.count = count;
+    } else if (limits.count && distinctSql) {
+        //console.log('Preparing distinct response');
+        var r = await query({table, sql: `SELECT COUNT(DISTINCT ${distinctSql}) as count FROM ${join ? join : table}`, limits, aggregate: true, customWhereClause, values: customWhereValues});
+        var count = r[0].count;
         res.count = count;
     }
+    
     return res;
 }
 
@@ -283,7 +297,7 @@ const createEntity = async function (opts) {
         }
     }
     delete(obj.id);
-    console.dir(obj);
+    //console.dir(obj);
     var r = await query({table, sql: `INSERT INTO ${table} SET ?`, values: [obj] });
     obj.id = r.insertId; 
     return {
@@ -337,6 +351,7 @@ const updateEntity = async function (opts) {
     prepareForSql(obj, auth);
     // we don't want to update the id
     delete(obj.id);
+    //console.dir(obj);
     var r = await query({table, sql: `UPDATE \`${table}\` SET ? WHERE id = ? ${getAuthWhere(auth)}`, values: [obj, id] });
     obj.id = id;
     return {

@@ -31,6 +31,8 @@ export default {
       }
       else if (this.invalid && this.selected) {
         color = '#FFCDD2';
+      } else if(this.selected) {
+        color = '#F5F5F5';
       }
       return {
         cursor:'cell',

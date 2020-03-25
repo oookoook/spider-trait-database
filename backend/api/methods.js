@@ -45,7 +45,7 @@ const validate = async function(method) {
     }
 
     var r = await db.query({table: 'method', sql: 'SELECT method.id FROM method WHERE abbrev = ?', values: [method.abbrev], nestTables: false});
-    return (r.items.length == 0 || (method.id && r.items[0].id == method.id)) ? true : 'Method abbrev. is already used.';
+    return (r.length == 0 || (method.id && r[0].id == method.id)) ? true : 'Method abbrev. is already used.';
 }
 
 const prepareForSql = function(method) {

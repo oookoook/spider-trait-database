@@ -65,7 +65,7 @@ const validate = async function(location) {
     }
 
     var r = await db.query({table: 'location', sql: 'SELECT location.id FROM location WHERE abbrev = ?', values: [location.abbrev], nestTables: false});
-    return (r.items.length == 0 || (location.id && r.items[0].id == location.id)) ? true : 'Location abbrev. is already used.';
+    return (r.length == 0 || (location.id && r[0].id == location.id)) ? true : 'Location abbrev. is already used.';
 }
 
 const prepareForSql = function(location) {

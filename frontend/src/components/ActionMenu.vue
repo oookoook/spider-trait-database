@@ -4,7 +4,10 @@
       direction="bottom"
       :open-on-hover="false"
     >
-      <template v-slot:activator>
+      <template v-slot:activator="{on}">
+        <!--
+        <slot name="activator" v-if="customActivator" :on="on"/>
+        -->
         <v-btn
           v-model="open"
           icon
@@ -26,7 +29,9 @@ export default {
   name: 'ActionMenu',
   components: {
   },
-  props: [],
+  props: {
+    customActivator: Boolean
+  },
   data () {
     return {
       open: false

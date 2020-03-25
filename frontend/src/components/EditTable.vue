@@ -17,16 +17,6 @@
           @select="(e) => selectCell(e, item)">
             <span>{{ getPropFormattedValue(item, h.value) }}</span>
           </selectable-cell>
-          <!--
-          <action-menu>
-            <action-button color="success" text="Distinct values in column" icon="mdi-format-list-numbered" menu />
-            <action-button color="success" text="Edit only this row" icon="mdi-table-row" menu />
-            <action-button color="success" text="Edit the value in the whole column" icon="mdi-table-column" menu />
-            <action-button color="success" text="Use this value as rule for value change" icon="mdi-table-search" menu />
-          </action-menu>
-          </td>
-          -->
-        
         </tr> 
     </template>
     <template v-slot:no-data>
@@ -39,17 +29,12 @@
 
 import ImportProps from '../mixins/import-props'
 import ListTable from '../mixins/list-table'
-
-import ActionButton from './ActionButton'
-import ActionMenu from './ActionMenu'
 import SelectableCell from './SelectableCell'
 
 export default {
   name: 'EditTable',
   mixins: [ListTable, ImportProps],
   components: {
-    ActionButton,
-    ActionMenu,
     SelectableCell
   },
   data () {

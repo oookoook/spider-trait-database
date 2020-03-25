@@ -46,7 +46,7 @@ export default {
         return o;
       });
     },
-    distinctEntityHeaders: (state) => (entity) => {
+    entityHeaders: (state) => (entity) => {
       return state.entityProps.filter(p=> p.entity == entity).map(p => {
         var o = p.table || {};
         o.text = p.text;
@@ -54,12 +54,28 @@ export default {
         return o;
       });
     },
+    distinctEntityProps: (state) => (entity) => {
+      return state.entityProps.filter(p=> p.entity == entity).map(p => p.name);
+    },
+    entityMatch: (state, getters) => (entity) => {
+      return getters.propsDict[`${entity}.abbrev`];
+    },
+    //distinctEntityItems: (state) => state.distinctList,map(i => ),
     isEntityValid: (state) => (entity, item, editor) => {
       if(editor === 'create' && item[entity].id != null) {
         // the item is already created
         return false;
       }
-      return state.entityProps.filter(p=> p.entity == entity).reduce((total, p) => p.isValid(item, editor) && total, true);
+      //return state.entityProps.filter(p=> p.entity == entity).reduce((total, p) => { var r = p.isValid(item, editor); console.log(`${p.name} ${r}`); return r && total }, true);
+      var r = state.entityProps.filter(p=> p.entity == entity).reduce((total, p) => {
+        if(typeof total == 'string') {
+          return total;
+        }
+        // the v is either true or string
+        var v =  p.isValid(item, editor);
+        return v;
+      }, true);
+      return r;
     },
     entityEndpoint: (state) => (entity) => {
       switch(entity) {
@@ -175,7 +191,7 @@ export default {
       }
     },
     editColumn: async function (context, payload) {
-      console.dir(payload);
+      //console.dir(payload);
       var p = { body: {}};
       p.endpoint = `import`;
       p.params = `${payload.dataset}/column/${payload.column}`;
@@ -183,30 +199,35 @@ export default {
       if (payload.multipleColumns) {
         p.body.valueColumns = payload.valueColumns;
         p.body.oldValues = payload.oldValues;
-        p.multipleColumns = true;
+        p.body.multipleColumns = true;
       } else {
         p.body.valueColumn = payload.valueColumn;
         p.body.oldValue = payload.oldValue;
       }
       p.body.newValue = payload.newValue;
+      if(payload.validation != null & payload.validation == false) {
+        p.body.validation = false;
+      }
       var data = await context.dispatch('put', p, {
         root: true
       });
       if (data) {
-        data.title='Updating data...';
-        await context.dispatch('createJob', data, {
-          root: true
-        });
+        if(data.job) {
+          data.title='Updating data...';
+          await context.dispatch('createJob', data, {
+            root: true
+          });
+        }
         return data.affected;
       }
     },
     distinctList: async function (context, payload) {
-      var p = {};
-      p.endpoint = `import`;
+      
+      payload.endpoint = `import`;
       payload.currCount = context.state.distinctTotal;
 
-      p.params = `${payload.filter.dataset}/column/${payload.filter.column}`;
-      p.auth = true;
+      payload.params = `${payload.filter.dataset}/column/${payload.filter.column}`;
+      payload.auth = true;
 
       var data = await context.dispatch('list', payload, {
         root: true
@@ -221,11 +242,11 @@ export default {
           // asses validity of the values
           data.items.forEach(i => {
             var v = context.getters.isEntityValid(payload.filter.column, i, payload.filter.editor ? 'create' : false);
-
+            console.dir(v);
             i.valid = { 
               invalid: v !== true && v !== false,
               created: v === false,
-              message: v === false,
+              message: v, //v === false,
               selectable: v === true  
             };
           });
@@ -248,9 +269,11 @@ export default {
       }
     },
     changeState: async function(context, payload) {
+      var p = {};
       p.endpoint = `import`;
       p.params = `${payload.id}`;
-      payload.auth = true;
+      p.auth = true;
+      p.body = payload;
       // payload.message and payload.state are provided from the component
       var data = await context.dispatch('put', p, {
         root: true
@@ -266,8 +289,8 @@ export default {
     },
     createMultiple: async function(context, payload) {
       var j = { id: null, title: 'Creating entities...', state: { progress: 0, total: payload.entities.length, errors: [] }};
-      for(var i = 0; i < payload.entities.length; i++) {
-        var e = payload.entities[i];
+      for(var i = 0; i < payload.entity.values.length; i++) {
+        var e = payload.entity.values[i];
         //console.dir(payload);
         var p = {};
         p.endpoint = `${payload.endpoint}`;
@@ -277,9 +300,15 @@ export default {
         var data = await context.dispatch('post', p, { root: true });
         // the api module returns false uf user is not authenticated
         
-        if(data && data.id) {
+        if(data && data.id && data.entity) {
+          // use the entity.abbrev and do the column changes (disable validation for the requests)
+          var pc = Object.assign({}, payload.columns);
+          var o = {};
+          o[payload.entity.name] = data.entity;
+          pc.newValue = payload.entity.match.displayValue(o);
+          pc.oldValues = payload.entity.oldValues[i];
+          await this.$store.dispatch(`editColumn`, pc);
           j.state.progress++;
-          
         } else if(data && data.error == 'validation') {
           j.state.errors.push(`${JSON.stringify(e)}: ${data.validation}`);
         }
@@ -290,7 +319,27 @@ export default {
       }
       j.state.completed = true;
       await context.dispatch('updateJob', { job: j}, { root: true });
-    }
+    },
 
+    validate: async function(context, payload) {
+      var p = {};
+      p.endpoint = `import`;
+      p.params = `${payload.id}/validate`;
+      p.auth = true;
+      p.body = null;
+      // payload.message and payload.state are provided from the component
+      var data = await context.dispatch('put', p, {
+        root: true
+      });
+      if (data) {
+        if(data.job) {
+          data.job.title = 'Validating...';
+          await context.dispatch('createjob', data, {
+            root: true
+          });
+        }
+        return true;
+      }  
+    }
   },
 }

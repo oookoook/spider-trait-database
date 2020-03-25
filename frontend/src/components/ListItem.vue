@@ -1,8 +1,8 @@
 <template>
   <v-list-item>
-    <v-list-item-avatar>
+    <v-list-item-icon>
       <v-icon>{{icon}}</v-icon>
-    </v-list-item-avatar>
+    </v-list-item-icon>
 
     <v-list-item-content>
       <v-list-item-subtitle>{{title}}</v-list-item-subtitle>
