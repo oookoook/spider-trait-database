@@ -49,6 +49,7 @@ const get = async function(tmpDir, filename, dstream, connection) {
     return p;
 }
 
+// https://github.com/SheetJS/sheetjs/issues/718
 const convert = async function(f) {
   var wb = XLSX.readFile(f, {cellText:false, cellDates:true});
     /* generate array of arrays */
