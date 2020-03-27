@@ -19,8 +19,8 @@
       class="elevation-1"
     >
     
-    <template v-slot:item.locality="{ item }">
-      <entity-link-cell :text="item.locality" tooltip="View the location detail" :link="`/locations/${item.id}`" />
+    <template v-slot:item.abbrev="{ item }">
+      <entity-link-cell :text="item.abbrev" tooltip="View the location detail" :link="`/locations/${item.id}`" />
     </template>
     
 
@@ -46,9 +46,10 @@ export default {
         { text: 'Locality', valueField: 'locality' }
       ],
       headers: [
-        { text: 'Locality', value: 'locality' },
+        { text: 'Location ID', value: 'abbrev' },
         { text: 'Country code', value: 'country.code' },
         { text: 'Country name', value: 'country.name' },
+        { text: 'Locality', value: 'locality' },
         { text: 'Global habitat (IUCN)', value: 'habitatGlobal.name' },
         { text: 'Actions', value: 'actions', sortable: false}
       ]

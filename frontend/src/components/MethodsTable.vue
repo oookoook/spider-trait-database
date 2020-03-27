@@ -24,7 +24,7 @@
     </template>
     
     <template v-slot:item.reference="{ item }">
-      <entity-link-cell v-if="item.reference" :text="item.reference.abbrev" tooltip="View the reference detail" :link="`/references/${item.reference.id}`" />
+      <entity-link-cell v-if="item.reference.id" :text="item.reference.abbrev" tooltip="View the reference detail" :link="`/references/${item.reference.id}`" />
     </template>
 
     <template v-slot:item.actions="{ item }">
