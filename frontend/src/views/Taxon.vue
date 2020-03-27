@@ -5,7 +5,10 @@
   </entity-provider>
   
   <list-provider v-if="id" list="data" entity="species" :id="id"  v-slot="i">
-    <data-preview-table :items="i.items" :loading="i.loading" :total="i.total" @update="i.update"/>
+    <v-card>
+      <v-card-title>Data preview</v-card-title>
+      <data-preview-table :items="i.items" :loading="i.loading" :total="i.total" @update="i.update"/>
+    </v-card>
   </list-provider>
   
   </v-container>

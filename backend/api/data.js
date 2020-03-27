@@ -39,7 +39,7 @@ const list = async function(params, limits) {
      + `trait.id, trait.abbrev, trait.name, trait_category.id, trait_category.name, `
      + `measure.id, measure.name, sex.id, sex.name, life_stage.id, life_stage.name, method.id, method.abbrev, method.name, `
      + `event_date_text, event_date_start, event_date_end, `
-     + `location.id, location.locality, habitat_global.id, habitat_global.name, country.id, country.alpha3_code, country.name, `
+     + `location.id, location.abbrev, location.locality, habitat_global.id, habitat_global.name, country.id, country.alpha3_code, country.name, `
      + `dataset.id, dataset.name, dataset.authors, reference.id, reference.abbrev `
      + `FROM ${join} WHERE ${cond.clause}`
      , values: cond.values, nestTables: true, limits, hasWhere: true});    
@@ -91,7 +91,10 @@ const list = async function(params, limits) {
                     habitatGlobal: r.habitat_global,
                 },
                 dataset: r.dataset,
-                reference: r.reference,
+                reference: {
+                    id: r.reference.id,
+                    abbrev: r.reference.abbrev,
+                },
                 rowLink: r.data.row_link
             }
         });
@@ -111,7 +114,7 @@ const csv =  async function(params, limits, tmpDir) {
      + `location.abbrev as location, location.lat as decimalLatitude, location.lon as decimalLongitude, location.precision as coordinatePrecision, location.altitude, location.locality as verbatimLocality, `
      + `country.alpha3_code as countryCode, country.name as countryName, habitat_global.name as habitatGlobal, habitat_global.number as habitatGlobalNumber,`
      + `location.habitat as habitatVerbatim, location.microhabitat as microhabitatVerbatim, location.stratum as stratumVerbatim, location.note as notePosition, `
-     + `dataset.id as dataset, dataset.name as datasetName, reference.abbrev as reference, reference.full_citation as referenceFull, reference.doi as referenceDOI, data.row_link as rowLinks `
+     + `dataset.name as datasetName, reference.abbrev as reference, reference.full_citation as referenceFull, reference.doi as referenceDOI, data.row_link as rowLinks `
      + `FROM ${join} WHERE ${cond.clause}`
      , values: cond.values, nestTables: false, limits, hasWhere: true});
     

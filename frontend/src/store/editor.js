@@ -254,7 +254,7 @@ export default {
           // asses validity of the values
           data.items.forEach(i => {
             var v = context.getters.isEntityValid(payload.filter.column, i, payload.filter.editor ? 'create' : false);
-            console.dir(v);
+            //console.dir(v);
             i.valid = { 
               invalid: v !== true && v !== false,
               created: v === false,
@@ -300,7 +300,10 @@ export default {
       }
     },
     createMultiple: async function(context, payload) {
-      var j = { id: null, title: 'Creating entities...', state: { progress: 0, total: payload.entity.values.length, errors: [] }};
+      // freeing up the memory
+      context.commit('distinctList', {value: []});
+      context.commit('distinctTotal', {value: 0});
+      var j = { id: null, title: 'Creating entities...', state: { progress: 0, total: payload.entity.values.length, completed: false, aborted: false, errors: [] }};
       for(var i = 0; i < payload.entity.values.length; i++) {
         var e = payload.entity.values[i];
         //console.dir(payload);
@@ -326,7 +329,9 @@ export default {
         else {
           j.state.errors.push(`${JSON.stringify(e)}: Server error`);
         }
-        await context.dispatch('updateJob', { job: j}, { root: true });
+        if(j.state.progress % 10 == 0) {
+          await context.dispatch('updateJob', { job: j}, { root: true });
+        }
       }
       j.state.completed = true;
       await context.dispatch('updateJob', { job: j}, { root: true });

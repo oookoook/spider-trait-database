@@ -72,6 +72,7 @@ const joinv = 'import LEFT JOIN trait ON import.trait_abbrev = trait.abbrev '
             + 'LEFT JOIN reference refd ON import.reference_doi = refd.doi '
             + 'LEFT JOIN reference reff ON import.reference = reff.full_citation '
             + 'LEFT JOIN location ON import.location_abbrev = location.abbrev '
+            + 'LEFT JOIN location loccoord ON import.location_lat_conv = loccoord.lat AND import.location_lon_conv = loccoord.lon '
             + 'LEFT JOIN dataset ON import.dataset_id = dataset.id';
 
 const getAuthWhere = function(auth) {
@@ -152,17 +153,19 @@ const getObject = function(r) {
         },
         location: {
             abbrev: r[`location_abbrev`],
-            lat: {
-                raw: r[`location_lat`],
-                conv: r[`location_lat_conv`],
-            },
-            lon: {
-                raw: r[`location_lon`],
-                conv: r[`location_lon_conv`],
-            },
-            precision: {
-                raw: r[`location_precision`],
-                numeric: r[`location_precision_numeric`]
+            coords: {
+                lat: {
+                    raw: r[`location_lat`],
+                    conv: r[`location_lat_conv`],
+                },
+                lon: {
+                    raw: r[`location_lon`],
+                    conv: r[`location_lon_conv`],
+                },
+                precision: {
+                    raw: r[`location_precision`],
+                    numeric: r[`location_precision_numeric`]
+                }
             },
             altitude: {
                 raw: r[`location_altitude`],
@@ -268,7 +271,7 @@ const changeState = async function(params, body, auth) {
         case 'approved': imp = 3; break; 
     }
 
-    console.log(imp);
+    //console.log(imp);
 
     if(imp < 3) {
         await db.query({table: 'dataset', sql: `UPDATE dataset SET imported = ?, message = ? WHERE id = ? AND ${getAuthWhere(auth)}`, values: [imp, msg, id] });
@@ -507,6 +510,9 @@ const getColumnName = function(val) {
     if(val == 'location.country') {
         return `location_country_code`;
     }
+    if(val.indexOf('.coords')>0) {
+        val = val.replace('.coords','');
+    }
     return snakeCase(val.replace('.raw','').replace('.', '_'));
 }
 
@@ -648,7 +654,7 @@ const updateColumn = async function(params, body, auth) {
     var cw = clauses.join(' AND ');
     
     if(column == 'location_lat' || column == 'location_lon') {
-        var convVal = conv.parseCoord(newValue);
+        var convVal = conv.parseCoord(nv);
         await db.query({table: 'import', sql:`UPDATE ${joind} SET ${db.escapeId(column + '_conv')} = ? WHERE ${cw} AND dataset_id = ? AND ${aw}`, values: [convVal, ds] });
     }
 
@@ -785,7 +791,7 @@ const getColumn = async function(params, limits, auth) {
 const startValidation = async function(params, body, auth) {
     var ds = parseInt(params.id);
     var aw = getAuthWhere(auth);
-    console.dir(body);
+    //console.dir(body);
     if(body.all && body.all === true) {
         await db.query({table: 'import', sql:`UPDATE ${joind} SET changed = 1 WHERE dataset_id = ? AND ${aw}`, values: [ ds ] });
     }
@@ -805,7 +811,8 @@ const validate = async function(params) {
     await db.cquery(c,{table: 'import', sql:`UPDATE ${joinv} SET `
     + ` sex_id = sex.id, life_stage_id = life_stage.id, measure_id = measure.id, method_id = method.id, trait_id = trait.id, trait_data_type_id = data_type.id, `
     + ` import.trait_category_id = trait_category.id, `
-    + ` import.reference_id = COALESCE(refa.id, refd.id, reff.id),  location_id = location.id, location_habitat_global_id = habitat_global.id, `
+    + ` import.reference_id = COALESCE(refa.id, refd.id, reff.id),  `
+    + ` location_id = COALESCE(location.id, loccoord.id), location_habitat_global_id = habitat_global.id, `
     + ` location_country_id = COALESCE(country3.id,country2.id), `
     + ` import.taxonomy_id = CASE WHEN taxonomy.id IS NOT NULL AND taxonomy_name.taxonomy_id IS NOT NULL AND taxonomy.id <> taxonomy_name.taxonomy_id THEN NULL `
     + ` ELSE COALESCE(taxonomy.id, taxonomy_name.taxonomy_id) END, `
@@ -822,13 +829,14 @@ const validate = async function(params) {
     + ` (value IS NOT NULL) AND`
     + ` (trait_id IS NOT NULL OR (trait_name IS NOT NULL AND trait_description IS NOT NULL AND trait_data_type_id IS NOT NULL AND trait_category_id IS NOT NULL)) AND`
     // method is not required
-    + ` ((method_name IS NULL AND method_description IS NULL) OR (method_name IS NOT NULL AND method_description IS NOT NULL)) AND`
+    + ` (method_id IS NOT NULL OR (method_name IS NULL AND method_description IS NULL) OR (method_name IS NOT NULL AND method_description IS NOT NULL)) AND`
     + ` (reference IS NOT NULL) AND`
     + ` (original_name IS NOT NULL AND taxonomy_id IS NOT NULL) AND`
     + ` (sample_size IS NULL OR sample_size_numeric IS NOT NULL) AND`
     + ` (frequency IS NULL OR frequency_numeric IS NOT NULL) AND`
     + ` (location_lat IS NULL OR location_lat_conv IS NOT NULL) AND`
     + ` (location_lon IS NULL OR location_lon_conv IS NOT NULL) AND`
+    + ` ((location_lat_conv IS NULL AND location_lon_conv IS NULL) OR (location_lat_conv IS NOT NULL AND location_lon_conv IS NOT NULL)) AND`
     + ` (location_altitude IS NULL OR location_altitude_numeric IS NOT NULL) AND`
     + ` (location_precision IS NULL OR location_precision_numeric IS NOT NULL) AND`
     + ` (location_country_code IS NULL OR location_country_id IS NOT NULL) AND`
@@ -869,8 +877,21 @@ const validate = async function(params) {
 var synonyms = {
     'taxonomy.wscLsid': 'wsc_lsid',
     'location.abbrev': 'location_abbrev',
-    'location.lon': 'location_lon',
-    'location.lat': 'location_lat',
+    'location.coords.lon': 'location_lon',
+    'location.coords.lat': 'location_lat',
+    'location.coords.precision': 'location_precision',
+    'location.altitude': `location_altitude`,
+    'location.locality': `location_locality`,
+    'location.country.code': `location_country_code`,
+    'location.habitatGlobal': `location_habitat_global`,
+    'location.habitat': `location_habitat`,
+    'location.microhabitat': `location_microhabitat`,
+    'location.stratum': `location_stratum`,
+    'location.note': `location_note`,
+    'reference.fullCitation': 'reference',
+    'reference.abbrev': 'reference_abbrev',
+    'reference.doi': `reference_doi`,
+    'location.abbrev': `location_abbrev`,
     'valid.review': 'valid_review',
     'valid.approve': 'valid'
 }

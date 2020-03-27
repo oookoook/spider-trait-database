@@ -50,7 +50,7 @@ const get = async function(tmpDir, filename, dstream, connection) {
 }
 
 const convert = async function(f) {
-  var wb = XLSX.readFile(f);
+  var wb = XLSX.readFile(f, {cellText:false, cellDates:true});
     /* generate array of arrays */
     var sheetName = wb.SheetNames[0];
     if(wb.SheetNames.includes('Data')) {

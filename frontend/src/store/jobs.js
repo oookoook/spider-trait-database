@@ -4,7 +4,7 @@ const getJobUpdate = function (ojs, njs) {
     title: ojs.title,
     start: ojs.start,
     state: {
-      progress: Math.min(100, Math.floor(njs.state.progress / njs.state.total * 100)),
+      progress: Math.min(100, Math.floor((njs.state.progress / njs.state.total) * 100)),
       completed: njs.state.completed,
       aborted: njs.state.aborted,
       errors: njs.state.errors

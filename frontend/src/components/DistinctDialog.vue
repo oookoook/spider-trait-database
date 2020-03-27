@@ -1,7 +1,7 @@
 <template>
   <v-card>
     <v-card-title>Distinct values for {{ prop.text }}</v-card-title>
-    <v-card-text style="height: 500px">
+    <v-card-text style="height: 400px">
     <list-provider list="editor" list-action="distinctList" list-state="distinctList" total-state="distinctTotal"
     :filter="filter" v-slot="i">
      <distinct-entity-table v-if="ent"
@@ -120,10 +120,6 @@ export default {
         }
       };
       if(Array.isArray(evt)) {
-        if(evt.length == 0) {
-          this.$store.dispatch('notify', {error: true, text: 'No valid entities to create.'});
-          return;
-        }
         e.entity.values = evt.map(i => i[this.prop.entity]);
         e.entity.oldValues = [];
         // array of array with the old values

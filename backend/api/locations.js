@@ -64,24 +64,28 @@ const validate = async function(location) {
         return 'Location abbrev. cannot be empty';
     }
 
+    if(!((location.lat == null && location.lon == null) || (location.lat != null && location.lon != null))) {
+        return 'Both coordinates must be set.';
+    }
+
     var r = await db.query({table: 'location', sql: 'SELECT location.id FROM location WHERE abbrev = ?', values: [location.abbrev], nestTables: false});
     return (r.length == 0 || (location.id && r[0].id == location.id)) ? true : 'Location abbrev. is already used.';
 }
 
-const prepareForSql = function(location) {
+const prepareForSql = async function(location) {
     // prepare location
     // create abbrev if not provided
     if(!location.abbrev) {
         var a = [];
         if(location.country && location.country.id) {
             var cr = await db.query({table: 'country', sql: 'SELECT alpha3_code FROM country WHERE id = ?', values: [location.country.id], nestTables: false});
-            if(cr && cr.length >0) {
+            if(cr && cr.length > 0) {
                 a.push(cr[0].alpha3_code);
             }
         }
         if(location.habitatGlobal && location.habitatGlobal.id) {
             var hgr = await db.query({table: 'habitat_global', sql: 'SELECT name FROM habitat_global WHERE id = ?', values: [location.habitatGlobal.id], nestTables: false}); 
-            if(hgr && hgr.lenth >0) {
+            if(hgr && hgr.lenth > 0) {
                 a.push(hgr[0].name);
             }
         }
@@ -96,9 +100,23 @@ const prepareForSql = function(location) {
     }
     location.habitat_global_id = (location.habitatGlobal) ? location.habitatGlobal.id : null;
     location.country_id = (location.country) ? location.country.id : null;
-    location.lat = (location.coords) ? location.coords.lat : null;
-    location.lon = (location.coords) ? location.coords.lon : null;
-    location.precision = (location.coords) ? location.coords.precision : null;
+    if(location.coords) {
+        if(typeof location.coords.lat == 'object') {
+            location.lat = location.coords.lat.conv;
+        } else {
+            location.lat = location.coords.lat;
+        }
+        if(typeof location.coords.lon == 'object') {
+            location.lon = location.coords.lon.conv;
+        } else {
+            location.lon = location.coords.lon;
+        }
+        if(typeof location.coords.precision == 'object') {
+            location.precision = location.coords.precision.numeric;
+        } else {
+            location.precision = location.coords.precision;
+        }
+    }
     delete location.habitatGlobal;
     delete location.country;
     delete location.coords;

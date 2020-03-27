@@ -9,7 +9,7 @@
     >
     
     <template v-slot:header.actions="{}">
-      <action-button tooltip small v-if="editor" icon="mdi-playlist-plus" text="Create all entites" @click="createBatch()"/>
+      <action-button tooltip small v-if="editor" icon="mdi-playlist-plus" text="Create all entites" :loading="loadingBtn == -1" @click="loadingBtn = -1; createBatch()"/>
     </template>
     
     <!--
@@ -23,10 +23,11 @@
     
     <template v-slot:item="{item, headers }">
         <tr>
-            <td v-for="h in headers" :key="h.value">
+            <td v-for="(h,index) in headers" :key="h.value">
               <!-- <v-simple-checkbox v-if="h.value=='data-table-select'"  :value="isSelected && item.valid.selectable" :disabled="!item.valid.selectable" /> -->
               <span v-if="h.value == 'actions'">
-                <action-button tooltip small v-if="editor && !item.valid.invalid && !item.valid.created" icon="mdi-plus" text="Create entity" @click="create(item)"/>
+                <action-button tooltip small v-if="editor && !item.valid.invalid && !item.valid.created" icon="mdi-plus" text="Create entity" 
+                :loading="loadingBtn == index" @click="loadingBtn = index; create(item)"/>
                 <info-icon color="success" v-if="item.valid.created" text="Entity created" icon="mdi-check-bold" />
                 <info-icon color="warning" v-if="item.valid.invalid" :text="item.valid.message" icon="mdi-alert-circle-outline" />
               </span>
@@ -39,6 +40,7 @@
 </template>
 
 <script>
+import { mapGetters } from 'vuex'
 import ListTable from '../mixins/list-table'
 import ImportProps from '../mixins/import-props'
 import ActionButton from './ActionButton'
@@ -56,23 +58,34 @@ export default {
   },
   data () {
     return {
-      selected: []
+      loadingBtn: null
     }
   },
   computed: {
     tableHeaders() {
       return this.getEntityHeaders(this.entity).concat([{text: 'Actions', value: 'actions', sortable: false }]);
     },
+    ...mapGetters(['job'])
   },
   watch: {
-
+    job(val, oldVal) {
+      if(oldVal && !val) {
+        this.update();
+      }
+    }
   },
   methods: {
     create(item) {
       this.$emit('create', item);
     },
     createBatch() {
-      this.$emit('create', this.items.filter(i => i.valid.selectable));
+      var c = this.items.filter(i => i.valid.selectable);
+      if(c.length == 0) {
+        this.$store.dispatch('notify', {error: true, text: 'No valid entities to create.'});
+        this.loadingBtn = null;
+        return;
+      }
+      this.$emit('create', c);
     }
   },
   created () {

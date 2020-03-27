@@ -25,7 +25,7 @@
         <v-divider vertical class="mx-3" />
         <v-spacer />
         <v-divider vertical class="mx-3" />
-        <action-button text="Refresh the table" icon="mdi-refresh" toolbar @click="getData()" />
+        <action-button text="Refresh the table" icon="mdi-refresh" toolbar @click="refreshDS(); getData();" />
         <action-button text="Revalidate the whole dataset" icon="mdi-check-all" toolbar @click="validate" />
         <action-button v-if="!editor && isValid" color="success" text="Send for review" icon="mdi-send" toolbar @click="review" />
         <action-button v-if="!editor && !isValid" color="warning" text="Send for review (dataset invalid)" icon="mdi-send" toolbar @click="review"/>
@@ -76,7 +76,7 @@
               </v-card-text>
               <v-card-actions>
                   <action-button text="Cancel" @click="confirm.dialog = false" icon="mdi-close" />
-                  <action-button text="Confirm" color="warning" @click="confirm.action" icon="mdi-check" />
+                  <action-button text="Confirm" color="warning" :loading="loading" @click="confirm.action" icon="mdi-check" />
               </v-card-actions>
             </v-card>
         </v-bottom-sheet>
@@ -282,7 +282,7 @@ export default {
       }
     },
     validate() {
-      this.jobCompletedAction = this.getData;
+      //this.jobCompletedAction = () => { this.getData(); this.refreshDS(); };
       this.$store.dispatch(`editor/validate`,{ id: this.id, all: true });
     },
     refreshDS() {

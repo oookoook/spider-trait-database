@@ -60,20 +60,19 @@
     <v-tabs
       v-model="tab"
       grow
-      icons-and-text
+      
     >
+    <!--Preview icons-and-text-->
     <v-tab href="#preview">
-        Preview
-        <v-icon>mdi-eye-outline</v-icon>
+        <!--<v-icon>mdi-eye-outline</v-icon>-->
+        <info-icon icon="mdi-eye-outline" text="Preview"/>
     </v-tab>
-    <v-tab href="#raw">
-        Raw
-        <v-icon>mdi-table-large</v-icon>
-    </v-tab>
+    <!-- Raw -->
+    <v-tab href="#raw"><info-icon icon="mdi-table-large" text="Raw data view"/></v-tab>
 
     <v-tabs-items v-model="tab">
       <v-tab-item value="preview">
-        <data-preview-table :items="i.items" :loading="i.loading" :total="i.total" :options="i.options" @update="i.update" />
+        <data-preview-table hide-title :items="i.items" :loading="i.loading" :total="i.total" :options="i.options" @update="i.update" />
       </v-tab-item>
       <v-tab-item value="raw">
         <v-responsive>
@@ -91,6 +90,7 @@
 import { mapState, mapGetters } from 'vuex'
 import AutocompleteProvider from '../components/AutocompleteProvider'
 import ActionButton from '../components/ActionButton'
+import InfoIcon from '../components/InfoIcon'
 import ListProvider from '../components/ListProvider'
 import DataExportTable from '../components/DataExportTable'
 import DataPreviewTable from '../components/DataPreviewTable'
@@ -105,7 +105,8 @@ export default {
     ListProvider,
     DataExportTable,
     DataPreviewTable,
-    DataFilter
+    DataFilter,
+    InfoIcon
   },
   props: [],
   data () {

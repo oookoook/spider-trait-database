@@ -1,8 +1,10 @@
 <template>
+  <!--
   <v-card>
     <v-card-title>
       Raw data
     </v-card-title>
+  -->
   <v-data-table
       :headers="headers"
       :items="items"
@@ -21,7 +23,7 @@
     </template>
 
     </v-data-table>
-  </v-card>
+  <!-- </v-card> -->
 </template>
 
 <script>
@@ -39,18 +41,19 @@ export default {
         { text: 'Original name', value: 'originalName' },
         { text: 'Trait ID', value: 'trait.abbrev' },
         { text: 'Trait value', value: 'value' },
-        { text: 'Measure', value: 'measure' },
-        { text: 'Sex', value: 'sex' },
-        { text: 'Life stage', value: 'lifeStage' },
+        { text: 'Measure', value: 'measure.name' },
+        { text: 'Sex', value: 'sex.name' },
+        { text: 'Life stage', value: 'lifeStage.name' },
         { text: 'Frequency', value: 'frequency' },
         { text: 'Sample size', value: 'sampleSize' },
         { text: 'Method', value: 'method.abbrev'},
-        { text: 'Location', value: 'location'},
         { text: 'Event date text', value: 'eventDate.text'},
         { text: 'Event date start', value: 'eventDate.start'},
         { text: 'Event date end', value: 'eventDate.end'},
         { text: 'Dataset', value: 'dataset.name'},
-        { text: 'Reference', value: 'reference'},
+        { text: 'Reference (preview)', value: 'reference.abbrev'},
+        { text: 'Location (preview)', value: 'location.abbrev'},
+        { text: 'Country code', value: 'location.country.code'},
         { text: 'Related records', value: 'rowLink'}
       ]
     }

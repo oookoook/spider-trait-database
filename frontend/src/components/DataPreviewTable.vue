@@ -1,8 +1,11 @@
 <template>
-  <v-card>
-    <v-card-title>
+  
+    <!--
+      <v-card>
+    <v-card-title v-if="!hideTitle">
       Data preview
     </v-card-title>
+    -->
   <v-data-table
       :headers="headers"
       :items="items"
@@ -61,7 +64,9 @@
     </template>
 
     </v-data-table>
+    <!--
   </v-card>
+  -->
 </template>
 
 <script>
@@ -77,6 +82,9 @@ export default {
         ListItem
   },
   mixins: [DataTable],
+  props: {
+    hideTitle: Boolean
+  },
   data () {
     return {
       headers: [
