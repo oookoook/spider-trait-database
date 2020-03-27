@@ -287,6 +287,13 @@ const getAutocomplete = async function(endpoint, valueField, textField, search, 
     //console.log(sql);
     //console.dir(values);
     var r = await query({sql, values});
+    //console.log(`${r.text} ${typeof r.text}`)
+    r.forEach(i => {
+    if(i.text && typeof i.text != 'string') {
+        console.log('casting text');
+        i.text = i.text.toString();
+    }
+    });
     return r;
 }
 
