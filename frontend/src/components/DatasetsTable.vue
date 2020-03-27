@@ -64,7 +64,7 @@ export default {
         { text: 'Uploader', value: 'uploader'},
         { text: 'Uploaded', value: 'uploaded'},
         //{ text: 'Approved', value: 'approved'},
-        { text: 'Actions', value: 'actions'}
+        { text: 'Actions', value: 'actions', sortable: false }
       ]
     }
   },

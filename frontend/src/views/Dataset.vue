@@ -22,7 +22,7 @@ export default {
   mixins: [IdFromRoute],
   components: {
     EntityProvider,
-    DatasettDetail,
+    DatasetDetail,
     ListProvider,
     DataPreviewTable
   },

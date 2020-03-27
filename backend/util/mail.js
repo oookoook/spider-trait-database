@@ -7,11 +7,6 @@ var baseUrl = null;
 var disabled = false;
 
 const send = async function (message) {
-    if (disabled) {
-        console.log('Mailing disabled');
-        console.dir(message);
-        return;
-    }
     message.from = `"Spider Trait Database" <${sender}>`;
     if(!message.to) {
         message.to = admins;
@@ -22,13 +17,20 @@ const send = async function (message) {
     } catch(err) {
         console.log('Unable to send mail message');
         console.log(err);
+        return;
     }
 }
 
 module.exports = (settings) => {
-    disabled = !settings || !settings.mail || settings.mail.enabled;
+    disabled = !settings || !settings.mail || settings.mail.disabled;
     if (disabled) {
-        return;
+        return {
+            send: (message) => {
+                console.log('Mailing disabled');
+                console.dir(message);
+                return;
+            }
+        }
     }
     sender = settings.mail.sender;
     admins = settings.mail.admins;

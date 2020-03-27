@@ -58,7 +58,7 @@ export default {
         { text: 'Reference ID', value: 'abbrev' },
         { text: 'Full citation', value: 'data-table-expand' },
         { text: 'DOI', value: 'doi' },
-        { text: 'Actions', value: 'actions'}
+        { text: 'Actions', value: 'actions', sortable: false}
       ]
     }
   },

@@ -7,6 +7,8 @@ import '@mdi/font/css/materialdesignicons.css'
 
 Vue.use(Vuetify)
 
+// https://coolors.co/00af3f-2274a5-f75c03-f1c40f-d90368
+
 export default new Vuetify({
     theme: {
       themes: {

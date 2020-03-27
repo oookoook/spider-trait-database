@@ -59,7 +59,7 @@ export default {
         { text: 'Author', value: 'author'},
         { text: 'Year', value: 'year'},
         /*{ text: 'Reference', value: 'reference'},*/
-        { text: 'Actions', value: 'actions'}
+        { text: 'Actions', value: 'actions', sortable: false}
       ]
     }
   },

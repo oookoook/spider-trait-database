@@ -13,7 +13,7 @@
       show-expand
     >
     <template v-slot:item.taxon="{ item }">
-        <entity-link-cell :abbrev="item.originalName" :text="item.taxonomy.wsc_lsid" tooltip="View in the World Spider Catalog (opens in a new tab)" external :link="`https://wsc.nmbe.ch/species/${item.taxonomy.wsc_id}`" />
+        <entity-link-cell :abbrev="item.originalName" :text="item.taxonomy.wsc.lsId" tooltip="View in the World Spider Catalog (opens in a new tab)" external :link="`https://wsc.nmbe.ch/species/${item.taxonomy.wsc_id}`" />
     </template>
 
     <template v-slot:item.trait="{item}">
@@ -25,7 +25,7 @@
     </template>
 
     <template v-slot:item.location="{item}">
-        <entity-link-cell :text="item.location.abbrev" tooltip="View the location detail" :link="`/locations/${item.location.id}`" />
+        <entity-link-cell v-if="item.location.abbrev" :text="item.location.abbrev" tooltip="View the location detail" :link="`/locations/${item.location.id}`" />
     </template>
 
     <template v-slot:item.dataset="{item}">
@@ -37,21 +37,26 @@
     </template>
 
     <template v-slot:item.rowLink="{ item }">
-      <entity-link-cell v-if="item.rowLink" icon="mdi-filter" tooltip="Filter related records in the data explorer" :link="`/data/row-link/${item.dataset.id}+${item.rowLink}`" />
+      <entity-link-cell v-if="item.rowLink" icon="mdi-filter" tooltip="Filter related records in the data explorer" :link="`/data/row-link/${item.rowLink}`" />
     </template>
 
     <template v-slot:expanded-item="{ headers, item }">
       <td :colspan="headers.length">
+        <v-container>
+        
         <v-list dense two-line subheader>
             <v-subheader>Observation details</v-subheader>
-            <list-item title="Measure" :text="item.measure" icon="mdi-chart-bell-curve" />
-            <list-item title="Sex" :text="item.sex" icon="mdi-gender-male-female" />
-            <list-item title="Life stage" :text="item.lifeStage" icon="mdi-egg" />
+            <list-item title="Measure" :text="item.measure.name" icon="mdi-chart-bell-curve" />
+            <list-item title="Sex" :text="item.sex.name" icon="mdi-gender-male-female" />
+            <list-item title="Life stage" :text="item.lifeStage.name" icon="mdi-egg" />
             <list-item title="Frequency" :text="item.frequency" icon="mdi-ab-testing" />
             <list-item title="Sample size" :text="item.sampleSize" icon="mdi-numeric" />
+            <list-item v-if="item.eventDate && item.eventDate.text" title="Event date" :text="item.eventDate.text" icon="mdi-calendar" />
             <list-item v-if="item.eventDate && item.eventDate.start" title="Event start" :text="new Date(item.eventDate.start).toISOString()" icon="mdi-calendar-arrow-right" />
             <list-item v-if="item.eventDate && item.eventDate.end" title="Event end" :text="new Date(item.eventDate.end).toISOString()" icon="mdi-calendar-arrow-left" />
         </v-list>
+     
+        </v-container>
       </td>
     </template>
 
@@ -62,12 +67,14 @@
 <script>
 
 import EntityLinkCell from '../components/EntityLinkCell'
+import ListItem from '../components/ListItem'
 import DataTable from '../mixins/data-table'
 
 export default {
   name: 'DataPreviewTable',
   components: {
         EntityLinkCell,
+        ListItem
   },
   mixins: [DataTable],
   data () {

@@ -36,6 +36,9 @@ export default [
         if(e === 'create') {
           return true;
         }
+        if(i.method.id) {
+          return true;
+        }
         if(i.trait.abbrev && i.trait.name && !e) {
           return 'Do not provide Trait Name when Trait ID is set.'
         }
@@ -54,6 +57,9 @@ export default [
       //foreignMatchValue: (i) => i.taxonomy.wscLsid,
       isValid: (i, e) => {
         if(e === 'create') {
+          return true;
+        }
+        if(i.method.id) {
           return true;
         }
         if(i.trait.abbrev && i.trait.description && !e) {
@@ -89,7 +95,8 @@ export default [
       entity: 'method', 
       displayValue: (i) => i.method.abbrev,
       save: (o, v) => {if(!o.method) o.method={}; o.method.abbrev = v; }, 
-      isValid: (i, e) => !!i.method.id || (!e && !!i.method.name && !!i.method.description) || (e === 'create' && !!i.method.abbrev) || 'Method Abbrev. must be set and the method must exist.',
+      isValid: (i, e) => !!i.method.id || (!e && (!!i.method.name || !!i.method.description)) 
+      || (e === 'create' && !!i.method.abbrev) || (!i.method.name && !i.method.description) || 'Method Abbrev. must be set and the method must exist if any of the Method attributes is filled in.',
       autocomplete: { endpoint: 'methods', valueField: 'abbrev', textField: ['abbrev','name'] }
     },
     { 
@@ -102,11 +109,14 @@ export default [
         if(e === 'create') {
           return true;
         }
+        if(i.method.id) {
+          return true;
+        }
         if(i.method.abbrev && i.method.name && !e) {
           return 'Do not provide Method Name when Method ID is set.'
         }
-        if(!i.method.abbrev && !i.method.name) {
-          return 'Provide Method Name when Method ID is not set.'
+        if(!i.method.abbrev && !i.method.name && !!i.method.description) {
+          return 'Provide Method Name when Method description is set.'
         }
         return true;
       }
@@ -121,11 +131,14 @@ export default [
         if(e === 'create') {
           return true;
         }
+        if(i.method.id) {
+          return true;
+        }
         if(i.method.abbrev && i.method.description && !e) {
           return 'Do not provide Method Description when Method ID is set.'
         }
-        if(!i.method.abbrev && !i.method.description) {
-          return 'Provide Method Description when Method ID is not set.'
+        if(!i.method.abbrev && i.method.name && !i.method.description) {
+          return 'Provide Method Description when Method Name is set.'
         }
         return true;
       }
@@ -234,15 +247,15 @@ export default [
       save: (o, v) => {if(!o.location) o.location={}; o.location.abbrev = v; },
       // the valid function checks if all the props of the location are null  
       isValid: (i, e) => !!i.location.id || !e || e==='create' || 
-      Object.keys(i.location).reduce((k, total) => total && (i.location[k] == null || (typeof i.location[k] == 'object' && i.location[k].raw == null)), true) 
+      Object.keys(i.location).reduce((total, k) => total && (i.location[k] == null || (i.location[k] != null && i.location[k].raw == null)), true) 
       || 'Location Abbrev. must be set',
-      autocomplete: { endpoint: 'locations', valueField: 'abbrev', textField: ['abbrev', 'country.code', 'locality', 'habitatGlobal.name'] }
+      autocomplete: { endpoint: 'locations', valueField: 'abbrev', textField: ['abbrev', 'locality' ] }
     },
     { 
       name: 'location.lat',
       text: 'Latitude',
       entity: 'location', 
-      displayValue: (i) => i.location.lat.conv || i.location.lat.raw,
+      displayValue: (i) => i.location.lat.raw,
       save: (o, v) => {if(!o.location) o.location={}; if(!o.location.lat) o.location.lat = {}; o.location.lat.raw = v; }, 
       isValid: (i, e) => !i.location.lat.raw || !!i.location.lat.conv || 'Value cannot be converted to a valid latitude.',
     },
@@ -250,7 +263,7 @@ export default [
       name: 'location.lon',
       text: 'Longitude',
       entity: 'location', 
-      displayValue: (i) => i.location.lon.conv || i.location.lon.raw,
+      displayValue: (i) => i.location.lon.raw,
       save: (o, v) => {if(!o.location) o.location={}; if(!o.location.lon) o.location.lon = {}; o.location.lat.raw = v; }, 
       isValid: (i, e) => !i.location.lon.raw || !!i.location.lon.conv || 'Value cannot be converted to a valid longitude.',
     },
@@ -272,7 +285,7 @@ export default [
     },
     { 
       name: 'location.locality',
-      text: 'WSC LSID', 
+      text: 'Locality', 
       entity: 'location',
       displayValue: (i) => i.location.locality,
       save: (o, v) => {if(!o.location) o.location={}; o.location.locality = v; },   

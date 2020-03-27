@@ -13,11 +13,11 @@
     >
   
     <template v-slot:item.location="{item}">
-        <span v-if="item.location">{{ location.abbrev }}</span>
+        <span v-if="item.location">{{ item.location.abbrev }}</span>
     </template>
 
     <template v-slot:item.reference="{item}">
-        <span v-if="item.reference">{{ reference.abbrev }}</span>
+        <span v-if="item.reference">{{ item.reference.abbrev }}</span>
     </template>
 
     </v-data-table>
@@ -35,7 +35,7 @@ export default {
     return {
       headers: [
         { text: 'Id', value: 'id' },
-        { text: 'WSC LSID', value: 'wsc.lsid' },
+        { text: 'WSC LSID', value: 'taxonomy.wsc.lsId' },
         { text: 'Original name', value: 'originalName' },
         { text: 'Trait ID', value: 'trait.abbrev' },
         { text: 'Trait value', value: 'value' },

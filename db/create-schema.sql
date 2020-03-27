@@ -22,10 +22,13 @@ DROP TABLE IF EXISTS `spider_traits_db`.`reference` ;
 CREATE TABLE IF NOT EXISTS `spider_traits_db`.`reference` (
   `id` INT NOT NULL AUTO_INCREMENT,
   `doi` VARCHAR(255) NULL,
-  `full_citation` VARCHAR(4096) NULL,
+  `full_citation` VARCHAR(1024) NOT NULL,
   `abbrev` VARCHAR(255) NOT NULL,
   PRIMARY KEY (`id`),
-  UNIQUE INDEX `abbrev_UNIQUE` (`abbrev` ASC))
+  UNIQUE INDEX `abbrev_UNIQUE` (`abbrev` ASC),
+  INDEX `full_citation_idx` (`full_citation` ASC),
+  INDEX `doi_idx` (`doi` ASC),
+  INDEX `all_idx` (`abbrev` ASC, `full_citation` ASC, `doi` ASC))
 ENGINE = InnoDB;
 
 
@@ -50,6 +53,7 @@ CREATE TABLE IF NOT EXISTS `spider_traits_db`.`taxonomy` (
   INDEX `family_idx` (`family` ASC),
   INDEX `genus_idx` (`genus` ASC),
   INDEX `taxon_idx` (`genus` ASC, `species` ASC, `subspecies` ASC),
+  INDEX `wsclsid_idx` (`wsc_lsid` ASC),
   CONSTRAINT `taxonomy_reference_fk`
     FOREIGN KEY (`reference_id`)
     REFERENCES `spider_traits_db`.`reference` (`id`)
@@ -66,7 +70,8 @@ DROP TABLE IF EXISTS `spider_traits_db`.`trait_category` ;
 CREATE TABLE IF NOT EXISTS `spider_traits_db`.`trait_category` (
   `id` INT NOT NULL AUTO_INCREMENT,
   `name` VARCHAR(45) NULL,
-  PRIMARY KEY (`id`))
+  PRIMARY KEY (`id`),
+  INDEX `name_idx` (`name` ASC))
 ENGINE = InnoDB;
 
 
@@ -78,7 +83,8 @@ DROP TABLE IF EXISTS `spider_traits_db`.`data_type` ;
 CREATE TABLE IF NOT EXISTS `spider_traits_db`.`data_type` (
   `id` INT NOT NULL AUTO_INCREMENT,
   `name` VARCHAR(45) NULL,
-  PRIMARY KEY (`id`))
+  PRIMARY KEY (`id`),
+  INDEX `name_idx` (`name` ASC))
 ENGINE = InnoDB;
 
 
@@ -127,7 +133,8 @@ DROP TABLE IF EXISTS `spider_traits_db`.`measure` ;
 CREATE TABLE IF NOT EXISTS `spider_traits_db`.`measure` (
   `id` INT NOT NULL AUTO_INCREMENT,
   `name` VARCHAR(45) NOT NULL COMMENT 'valid categories: single observation; mean; median; min; max\n',
-  PRIMARY KEY (`id`))
+  PRIMARY KEY (`id`),
+  INDEX `name_idx` (`name` ASC))
 ENGINE = InnoDB;
 
 
@@ -139,7 +146,8 @@ DROP TABLE IF EXISTS `spider_traits_db`.`sex` ;
 CREATE TABLE IF NOT EXISTS `spider_traits_db`.`sex` (
   `id` INT NOT NULL AUTO_INCREMENT,
   `name` VARCHAR(45) NOT NULL COMMENT 'Categorical variable; female, male; both; unknown\n',
-  PRIMARY KEY (`id`))
+  PRIMARY KEY (`id`),
+  INDEX `name_idx` (`name` ASC))
 ENGINE = InnoDB;
 
 
@@ -151,7 +159,8 @@ DROP TABLE IF EXISTS `spider_traits_db`.`life_stage` ;
 CREATE TABLE IF NOT EXISTS `spider_traits_db`.`life_stage` (
   `id` INT NOT NULL AUTO_INCREMENT,
   `name` VARCHAR(45) NOT NULL COMMENT 'Categorical variable. One of: egg, spiderling, juvenile, adult, all\n',
-  PRIMARY KEY (`id`))
+  PRIMARY KEY (`id`),
+  INDEX `name_idx` (`name` ASC))
 ENGINE = InnoDB;
 
 
@@ -187,7 +196,8 @@ CREATE TABLE IF NOT EXISTS `spider_traits_db`.`habitat_global` (
   `category` VARCHAR(255) NULL,
   `name` VARCHAR(255) NOT NULL,
   `number` VARCHAR(10) NOT NULL,
-  PRIMARY KEY (`id`))
+  PRIMARY KEY (`id`),
+  INDEX `name_idx` (`name` ASC))
 ENGINE = InnoDB;
 
 
@@ -204,7 +214,8 @@ CREATE TABLE IF NOT EXISTS `spider_traits_db`.`country` (
   PRIMARY KEY (`id`),
   INDEX `alpha3_code_idx` (`alpha3_code` ASC),
   INDEX `name_idx` (`name` ASC),
-  INDEX `code_name_idx` (`alpha3_code` ASC, `name` ASC))
+  INDEX `code_name_idx` (`alpha3_code` ASC, `name` ASC),
+  INDEX `alpha2_code_idx` (`alpha2_code` ASC))
 ENGINE = InnoDB;
 
 
@@ -253,7 +264,7 @@ DROP TABLE IF EXISTS `spider_traits_db`.`dataset` ;
 CREATE TABLE IF NOT EXISTS `spider_traits_db`.`dataset` (
   `id` INT NOT NULL AUTO_INCREMENT,
   `name` VARCHAR(255) NOT NULL,
-  `authors` VARCHAR(4096) NULL,
+  `authors` VARCHAR(1024) NULL,
   `uploader` VARCHAR(255) NOT NULL,
   `email` VARCHAR(255) NULL,
   `authors_email` VARCHAR(255) NULL,
@@ -370,6 +381,7 @@ CREATE TABLE IF NOT EXISTS `spider_traits_db`.`taxonomy_name` (
   `valid` TINYINT(1) NOT NULL,
   PRIMARY KEY (`id`),
   INDEX `taxonomy_name_taxonomy_fk_idx` (`taxonomy_id` ASC),
+  INDEX `name_idx` (`name` ASC),
   CONSTRAINT `taxonomy_name_taxonomy_fk`
     FOREIGN KEY (`taxonomy_id`)
     REFERENCES `spider_traits_db`.`taxonomy` (`id`)
@@ -404,7 +416,7 @@ CREATE TABLE IF NOT EXISTS `spider_traits_db`.`import` (
   `method_abbrev` VARCHAR(45) NULL,
   `method_name` VARCHAR(255) NULL,
   `method_description` TEXT NULL,
-  `reference` VARCHAR(4096) NULL,
+  `reference` VARCHAR(1024) NULL,
   `reference_abbrev` VARCHAR(45) NULL,
   `reference_doi` VARCHAR(255) NULL,
   `location_abbrev` VARCHAR(45) NULL,

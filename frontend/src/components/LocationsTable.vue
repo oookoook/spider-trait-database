@@ -50,7 +50,7 @@ export default {
         { text: 'Country code', value: 'country.code' },
         { text: 'Country name', value: 'country.name' },
         { text: 'Global habitat (IUCN)', value: 'habitatGlobal.name' },
-        { text: 'Actions', value: 'actions'}
+        { text: 'Actions', value: 'actions', sortable: false}
       ]
     }
   },

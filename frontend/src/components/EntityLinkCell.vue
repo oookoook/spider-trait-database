@@ -24,7 +24,7 @@ export default {
   name: 'EntityLinkCell',
   components: {
   },
-  props: { external: Boolean, link: String, icon: { type: String, default: 'mdi-eye' }, abbrev: String, text: String, tooltip: { type: String, default: 'View detail' } },
+  props: { external: Boolean, link: String, icon: { type: String, default: 'mdi-eye-outline' }, abbrev: String, text: String, tooltip: { type: String, default: 'View detail' } },
   data () {
     return {
 

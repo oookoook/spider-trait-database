@@ -59,6 +59,7 @@ export default {
       //console.log('Data Filter registered value change');
       if(!val && !this.preload) {
         //console.log('Doing nothing');
+        this.search = null;
         return;
       }
       if(this.internalChange) {
@@ -71,7 +72,7 @@ export default {
     items() {
       if(this.items && this.items.length && this.waitingForFill) {
         // we have items, value is set, but search is empty - we have to set it
-        this.search = this.items.find(i => i.value = this.value);
+        this.search = this.items.find(i => i.value == this.value);
         // this will trigger the search watcher
       }
     },

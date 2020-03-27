@@ -1,7 +1,7 @@
 <template>
   <v-container>
   <entity-provider list="methods" :id="id" v-slot="i">
-    <trait-detail :item="i.item" />
+    <method-detail :item="i.item" />
   </entity-provider>
   
   <list-provider v-if="id" list="data" entity="method" :id="id" v-slot="i">

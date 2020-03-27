@@ -180,7 +180,7 @@ router.route('/import/:id')
   .put(requiresAuth(), auth.isContributor, function (req, res) {
     // used for sending the dataset to approval and for approving the dataset. If the dataset is approved,
     // all the records are transferred from the import table to the data table - that's why this is not handled by the datasets endpoint 
-    imports.changeState(req.params, req.body, req.resourcesAuth);
+    imports.changeState(req.params, req.body, req.resourcesAuth).then(r => res.json(r)).catch(e => { console.log(e); res.sendStatus(400); });
   })
   .delete(requiresAuth(), auth.isContributor, function (req, res) {
     // this is handled by the dataset endpoint, added for convenience
@@ -214,7 +214,7 @@ router.route('/import/:id/data')
   router.route('/import/:id/validate')
   // allow ad-hoc validation
   .put(requiresAuth(), auth.isEditor, function (req, res) {
-    imports.startValidation(req.params, req.resourcesAuth).then(r => res.download(r)).catch(e => { console.log(e); res.sendStatus(400); });
+    imports.startValidation(req.params, req.body, req.resourcesAuth).then(r => res.json(r)).catch(e => { console.log(e); res.sendStatus(400); });
   })
 
 router.route('/import/:id/row/:row')
@@ -236,6 +236,10 @@ router.route('/import/:id/column/:column')
   .put(requiresAuth(), auth.isContributor, function (req, res) {
     // used for batch value replacements
     imports.updateColumn(req.params, req.body, req.resourcesAuth).then(r => res.json(r)).catch(e => { console.log(e); res.sendStatus(400); });
+   })
+   router.route('/import/:id/column/:column/:value')
+   .delete(requiresAuth(), auth.isContributor, function (req, res) {
+    imports.deleteColumn(req.params, req.resourcesAuth).then(r => res.json(r)).catch(e => { console.log(e); res.sendStatus(400); });
    });
    
 router.route('/jobs/')

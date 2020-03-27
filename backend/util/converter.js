@@ -4,7 +4,7 @@
 
 const getSign = function(letter) {
     var l = letter.toUpperCase();
-    if(l == 'E' || l == 'W') {
+    if(l == 'S' || l == 'W') {
         return -1;
     } else {
         return 1;

@@ -1,7 +1,7 @@
 <template>
   <v-card>
     <v-card-title>Distinct values for {{ prop.text }}</v-card-title>
-    <v-card-text>
+    <v-card-text style="height: 500px">
     <list-provider list="editor" list-action="distinctList" list-state="distinctList" total-state="distinctTotal"
     :filter="filter" v-slot="i">
      <distinct-entity-table v-if="ent"
@@ -127,7 +127,7 @@ export default {
         e.entity.values = evt.map(i => i[this.prop.entity]);
         e.entity.oldValues = [];
         // array of array with the old values
-        evt.forEach(i => { e.columns.oldValues.push(this.getDistinctEntityProps(this.prop.entity).map(p=> this.getPropValue(i, p)));});
+        evt.forEach(i => { e.entity.oldValues.push(this.getDistinctEntityProps(this.prop.entity).map(p=> this.getPropValue(i, p)));});
         e.columns.validation = false;
       } else {
         e.entity.value = evt[this.prop.entity];

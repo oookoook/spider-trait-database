@@ -51,7 +51,7 @@ export default {
         { text: 'Method ID', value: 'abbrev' },
         { text: 'Method Name', value: 'name' },
         { text: 'Reference', value: 'reference'},
-        { text: 'Actions', value: 'actions'}
+        { text: 'Actions', value: 'actions', sortable: false}
       ]
     }
   },

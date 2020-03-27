@@ -5,7 +5,7 @@
       <v-card-text v-if="item">
       {{ item.description }}
       </v-card-text>
-        <v-list  v-if="item" three-line>
+        <v-list  v-if="item && item.reference && item.reference.id" three-line>
           <list-item v-if="item.reference" title="Reference" :text="item.reference.fullCitation" icon="mdi-bookmark-multiple-outline" :link="`/references/${item.reference.id}`" />  
         </v-list>
         <v-card-actions  v-if="item">

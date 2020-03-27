@@ -1,6 +1,7 @@
 <template>
   <v-card>
     <v-card-title><v-icon left>mdi-magnify</v-icon>Data explorer<v-spacer />
+    <action-button text="Reset filters" icon="mdi-eraser" @click="reset" />
     <!-- Share link button -->
     <v-menu v-model="shareMenu" :close-on-content-click="false" :nudge-width="600">
       <template v-slot:activator="{ on: menu }">
@@ -89,6 +90,7 @@
 <script>
 import { mapState, mapGetters } from 'vuex'
 import AutocompleteProvider from '../components/AutocompleteProvider'
+import ActionButton from '../components/ActionButton'
 import ListProvider from '../components/ListProvider'
 import DataExportTable from '../components/DataExportTable'
 import DataPreviewTable from '../components/DataPreviewTable'
@@ -98,6 +100,7 @@ import DataFilter from '../components/DataFilter'
 export default {
   name: 'DataExplorer',
   components: {
+    ActionButton,
     AutocompleteProvider,
     ListProvider,
     DataExportTable,
@@ -197,8 +200,14 @@ export default {
         // there are the entity params - this is the full route
         this.filters.forEach(i => { var term = p[i.entity.replace('-','')]; i.search = (term != '*') ? term : null });
         //console.dir(this.filters);
+      } else {
+        // just the plain path - reset all the filters
+        this.filters.forEach(f => { f.search = null });
       }
 
+    },
+    reset() {
+      this.$router.push('/data');
     }
   },
   created () {

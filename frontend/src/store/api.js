@@ -34,6 +34,8 @@ const getListParams = function(payload) {
     var sortField = (payload.options.sortBy && payload.options.sortBy[0]) ? payload.options.sortBy[0] : null;
     var sortDirection = (payload.options.sortDesc && payload.options.sortDesc[0]) ? 'desc' : 'asc';
 
+    //sortField = adjustSortField(sortField);
+
     var params = {};
     // 0 for offset is a valid value
     if(offset != null && limit) {

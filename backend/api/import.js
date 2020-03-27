@@ -59,17 +59,20 @@ const joind = 'import LEFT JOIN dataset ON import.dataset_id = dataset.id';
 const joinv = 'import LEFT JOIN trait ON import.trait_abbrev = trait.abbrev '
             + 'LEFT JOIN data_type ON import.trait_data_type = data_type.name OR trait.data_type_id = data_type.id '
             + 'LEFT JOIN trait_category ON import.trait_category = trait_category.name '
-            + 'LEFT JOIN taxonomy ON import.wsc_lsid = taxonomy.wsc_lsid '
-            + 'LEFT JOIN taxonomy_name ON import.original_name = taxonomy_name.name '
+            + 'LEFT JOIN taxonomy ON import.wsc_lsid IS NOT NULL AND import.wsc_lsid = taxonomy.wsc_lsid '
+            + 'LEFT JOIN taxonomy_name ON import.original_name IS NOT NULL AND import.original_name = taxonomy_name.name '
             + 'LEFT JOIN sex ON import.sex = sex.name '
             + 'LEFT JOIN life_stage ON import.life_stage = life_stage.name '
             + 'LEFT JOIN measure ON import.measure = measure.name '
             + 'LEFT JOIN method ON import.method_abbrev = method.abbrev '
-            + 'LEFT JOIN country ON import.location_country_code = country.alpha3_code '
+            + 'LEFT JOIN country country3 ON import.location_country_code = country3.alpha3_code '
+            + 'LEFT JOIN country country2 ON import.location_country_code = country2.alpha2_code '
             + 'LEFT JOIN habitat_global ON import.location_habitat_global = habitat_global.name '
-            + 'LEFT JOIN reference ON import.reference_doi = reference.doi OR import.reference = reference.full_citation '
+            + 'LEFT JOIN reference refa ON import.reference_abbrev = refa.abbrev ' 
+            + 'LEFT JOIN reference refd ON import.reference_doi = refd.doi '
+            + 'LEFT JOIN reference reff ON import.reference = reff.full_citation '
             + 'LEFT JOIN location ON import.location_abbrev = location.abbrev '
-            + 'LEFT JOIN dataset ON import.dataset_id';
+            + 'LEFT JOIN dataset ON import.dataset_id = dataset.id';
 
 const getAuthWhere = function(auth) {
     var c = '';
@@ -265,10 +268,11 @@ const changeState = async function(params, body, auth) {
         case 'approved': imp = 3; break; 
     }
 
-    //console.log(imp);
+    console.log(imp);
 
     if(imp < 3) {
         await db.query({table: 'dataset', sql: `UPDATE dataset SET imported = ?, message = ? WHERE id = ? AND ${getAuthWhere(auth)}`, values: [imp, msg, id] });
+        console.log('Returning...');
         return {
             id
         };
@@ -278,8 +282,7 @@ const changeState = async function(params, body, auth) {
     // USE job manager
 
 
-    var state = { total: 6, progress: 0, errors: [], completed: false }
-    var jobId = jm.createJob(auth.sub, state, transferToData, { id, aw });
+    var jobId = jm.createJob(auth.sub, 6, transferToData, { id, aw });
     return {
         job: jm.getJob(jobId)
     };
@@ -324,7 +327,7 @@ const transferToData = async function(params) {
     + ` sample_size, event_date_text, event_date_start, event_date_end, method_id, location_id, reference_id, dataset_id, row_link) `
     + ` SELECT taxonomy_id, original_name, trait_id, value, value_numeric, measure_id, sex_id, life_stage_id, frequency_numeric, `
     + ` sample_size_numeric, event_date, event_date_start, event_date_end, method_id, location_id, reference_id, dataset_id, CONVERT(row_link, UNSIGNED) `
-    + ` FROM import WHERE dataset_id = ? AND ${aw}`, values: [ds] });
+    + ` FROM ${joind} WHERE dataset_id = ? AND ${aw}`, values: [id] });
     
     state.progress+=1;
     // DELETE FROM import WHERE dataset_id = ?
@@ -332,7 +335,7 @@ const transferToData = async function(params) {
     
     state.progress+=1;
 
-    await db.cquery(c, {table: 'dataset', sql: `UPDATE dataset SET imported = 2, message = null WHERE id = ? AND ${aw}`, values: [id] });
+    await db.cquery(c, {table: 'dataset', sql: `UPDATE dataset SET imported = 3, message = null WHERE id = ? AND ${aw}`, values: [id] });
     state.progress+=1;
     db.releaseConnection(c);
     
@@ -435,11 +438,7 @@ const uploadFile = async function(params, body, files, auth) {
         throw 'Unknown file format';
     }
     // first passthrough - just get the number of lines
-    var total = await new Promise((resolve,reject) => {
-    fcsv.parseFile(fpath, {headers: true})
-    .on('data', () => {})
-    .on('end', rowCount => resolve(rowCount));
-    });
+    var total = await csv.rows(fpath);
     //console.log(`Total: ${total}`);
     var ifunc = async (params) => {
         // + 1 - the file was uploaded
@@ -452,7 +451,7 @@ const uploadFile = async function(params, body, files, auth) {
         // releaseConnection is also queued and can be basically ignored in the flow 
         await new Promise((resolve, reject) => {
         var valCache = {};
-        fcsv.parseFile(fpath, {headers: true})
+        fcsv.parseFile(fpath, {headers: true, ignoreEmpty: true})
         .on('error', error => { params.state.errors.push[error]; params.state.aborted = true; resolve(); })
         .on('data', async row => {  
             // we are running async code here here, but another data event was already fired - the events are not waiting for each other
@@ -468,13 +467,13 @@ const uploadFile = async function(params, body, files, auth) {
         }
         
         await validate({ds, aw: getAuthWhere(auth), state: params.state});
-        params.state.progress += 1;
+        params.state.progress += 1000;
         params.state.completed = true;
     };
 
-    // +3 to the total is the validation step
-    // + 1 to the totat is the file upload
-    var jobId = jm.createJob(auth.sub, total + 4, ifunc, { ds });
+    // +16000 to the total is the validation step
+    // + 1000 to the totat is the file upload
+    var jobId = jm.createJob(auth.sub, total + 1000 + 16000, ifunc, { ds });
     return {
         job: jm.getJob(jobId)    
     };
@@ -504,6 +503,9 @@ const getColumnName = function(val) {
     }
     if(val == 'eventDate.text') {
         return `event_date`;
+    }
+    if(val == 'location.country') {
+        return `location_country_code`;
     }
     return snakeCase(val.replace('.raw','').replace('.', '_'));
 }
@@ -680,39 +682,43 @@ const updateColumn = async function(params, body, auth) {
         await db.query({table: 'import', sql:`UPDATE ${joind} SET event_date_start = ?, event_date_end = ? WHERE ${cw} AND dataset_id = ? AND ${aw}`, values: [s, e, ds ] });
     }
 
-    
+    /*
     console.dir(body);
     console.dir(column);
     console.dir(nv);
     console.dir(cw);
-    
+    */
     var results = await db.query({table: 'import', sql:`UPDATE ${joind} SET ?? = ?, changed = 1 WHERE ${cw} AND dataset_id = ? AND ${aw}`, values: [column, nv, ds ] });
     
     // run the validation as a new job and return a job id
     //validate(ds, aw); 
     
     // run validation only if not disabled
-    var disableValidation = body.validation != null && disableValidation == 'false';
-    if(disableValidation) {
+    if(body.validation != null && body.validation == false) {
         return {
             affected: results.affectedRows
         }
     }
 
-    var jobId = jm.createJob(auth.sub, 3, validate, { ds, aw });
+    var jobId = jm.createJob(auth.sub, 16000, validate, { ds, aw });
     return {
         job: jm.getJob(jobId),    
         affected: results.affectedRows 
     };
 }
 
-const startValidation = async function(params, auth) {
+deleteColumn = async function(params, auth) {
     var ds = parseInt(params.id);
     var aw = getAuthWhere(auth);
-    var jobId = jm.createJob(auth.sub, 3, validate, { ds, aw });
+    var column = getColumnName(params.column);
+    if(!columns.includes(column)) {
+        throw 'Cannot delete by this column';
+    }
+    var v = params.value;
+    var results = await db.query({table: 'import', sql:`DELETE import FROM ${joind} WHERE dataset_id = ? AND ??=? AND ${aw}`, values: [ds, column, v] });
     return {
-        job: jm.getJob(jobId),    
-    };
+        affected: results.affectedRows
+    }
 }
 
 const getColumn = async function(params, limits, auth) {
@@ -731,7 +737,7 @@ const getColumn = async function(params, limits, auth) {
     // there are some special cases
     if(column == 'taxonomy') {
         cols = ['original_name', 'wsc_lsid', 'taxonomy_id'];
-    } else if(column == 'reference') {
+    } else if(column == 'reference' && params.column == 'reference') { // reference.fullCitation is also translated as reference
         cols = ['reference', 'reference_abbrev', 'reference_doi', 'reference_id'];
     } else if(column == 'event_date') {
         cols = ['event_date', 'event_date_start', 'event_date_end'];
@@ -740,6 +746,8 @@ const getColumn = async function(params, limits, auth) {
         cols = columns.filter(c => c.indexOf(column) == 0);
         cols.push(`${column}_id`);
         if(column == 'location') {
+            cols.push('location_lat_conv');
+            cols.push('location_lon_conv');
             cols.push('location_country_id');
             cols.push('location_habitat_global_id');
         }
@@ -759,67 +767,52 @@ const getColumn = async function(params, limits, auth) {
         entity = column;
     }
     
-    var colSql = cols.map(c => db.escapeId(c)).join(',');
+    var colEsc = cols.map(c => db.escapeId(c))
+    var colSql = colEsc.join(',');
 
 
-    var res = await db.prepareListResponse(limits, 'import', aw, [], joind, colSql);
+    var res = await db.prepareListResponse(limits, 'import', aw, [], joind, colEsc);
         
     var results = await db.query({table: 'import', sql:`SELECT DISTINCT ${colSql} `
     + `FROM ${joind} WHERE dataset_id = ? AND ${aw}`, values: [ds], nestTables: false, limits, hasWhere: true });
 
-    /*
-    var remstr = ['location_', 'method_', 'trait_', 'reference_', 'event_date_'];
-    // compute the names of the object properties
-    var oprops = [];
-    cols.forEach(c => {
-        var oprop = c;
-        if(oprop == 'reference') {
-            oprop = 'fullCitation'
-        }
-        if(oprop == 'event_date') {
-            oprop = 'text';
-        } else {
-            remstr.forEach(s => { oprop = oprop.replace(s, '') });
-            oprop = camelCase(oprop);
-        }
-        oprops.push(oprop);
-    })
-    */
-    
     res.items = results.map(r => {
-        /*
-        var o = {};
-        var e = o;
-        if(entity) {
-            o[entity] = {};
-            e = o[entity];
-        }
-        // assign the values from results to the correct object properties
-        cols.forEach((c, i) => {
-            e[oprops[i]] = results[c];
-        });
-        return o;
-        */
        return getObject(r);
     });
     return res;
+}
+
+const startValidation = async function(params, body, auth) {
+    var ds = parseInt(params.id);
+    var aw = getAuthWhere(auth);
+    console.dir(body);
+    if(body.all && body.all === true) {
+        await db.query({table: 'import', sql:`UPDATE ${joind} SET changed = 1 WHERE dataset_id = ? AND ${aw}`, values: [ ds ] });
+    }
+    
+    var jobId = jm.createJob(auth.sub, 16000, validate, { ds, aw });
+    return {
+        job: jm.getJob(jobId),    
+    };
 }
 
 const validate = async function(params) {
     var { ds, aw, state } = params;
     state = state || { progress: 0 };
     c = await db.getConnection();
+    state.progress += 1000;
 
     await db.cquery(c,{table: 'import', sql:`UPDATE ${joinv} SET `
     + ` sex_id = sex.id, life_stage_id = life_stage.id, measure_id = measure.id, method_id = method.id, trait_id = trait.id, trait_data_type_id = data_type.id, `
     + ` import.trait_category_id = trait_category.id, `
-    + ` import.reference_id = reference.id,  location_id = location.id, location_habitat_global_id = habitat_global.id, location_country_id = country.id,`
+    + ` import.reference_id = COALESCE(refa.id, refd.id, reff.id),  location_id = location.id, location_habitat_global_id = habitat_global.id, `
+    + ` location_country_id = COALESCE(country3.id,country2.id), `
     + ` import.taxonomy_id = CASE WHEN taxonomy.id IS NOT NULL AND taxonomy_name.taxonomy_id IS NOT NULL AND taxonomy.id <> taxonomy_name.taxonomy_id THEN NULL `
     + ` ELSE COALESCE(taxonomy.id, taxonomy_name.taxonomy_id) END, `
     + ` require_numeric_value = CASE WHEN data_type.name <> 'Character' THEN 1 ELSE 0 END `
     + ` WHERE changed = 1 AND dataset_id = ? AND ${aw}`, values: [ds] });
 
-    state.progress += 1;
+    state.progress += 5000;
 
     // step 3: set the valid attribute to 1 if all the necesssary foreign keys are filled in and other conditions are met
     await db.cquery(c,{table: 'import', sql:`UPDATE ${joind} SET valid_review = 1 WHERE`
@@ -829,7 +822,7 @@ const validate = async function(params) {
     + ` (value IS NOT NULL) AND`
     + ` (trait_id IS NOT NULL OR (trait_name IS NOT NULL AND trait_description IS NOT NULL AND trait_data_type_id IS NOT NULL AND trait_category_id IS NOT NULL)) AND`
     // method is not required
-    //+ ` (method_id IS NOT NULL OR method_abbrev IS NOT NULL OR (method_name IS NOT NULL AND method_description IS NOT NULL)) AND`
+    + ` ((method_name IS NULL AND method_description IS NULL) OR (method_name IS NOT NULL AND method_description IS NOT NULL)) AND`
     + ` (reference IS NOT NULL) AND`
     + ` (original_name IS NOT NULL AND taxonomy_id IS NOT NULL) AND`
     + ` (sample_size IS NULL OR sample_size_numeric IS NOT NULL) AND`
@@ -844,13 +837,14 @@ const validate = async function(params) {
     + ` (require_numeric_value = 0 OR value_numeric = value OR (value = 'true' AND value_numeric = 1) OR (value = 'false' AND value_numeric = 0)) AND`
     + ` dataset_id = ? AND changed = 1 AND ${aw}`, values: [ds] });
 
-    state.progress += 1;
+    state.progress += 5000;
 
     // step 4: set the valid attribute to 1 if the record is valid for review and also trait_id, method_id, 
 
     await db.cquery(c,{table: 'import', sql:`UPDATE ${joind} SET valid = 1 WHERE valid_review = 1 AND`
     + ` (trait_id IS NOT NULL) AND`
     //+ ` (method_id IS NOT NULL) AND`
+    + ` (method_id IS NOT NULL OR (method_name IS NULL AND method_description IS NULL)) AND`
     + ` (import.reference_id IS NOT NULL) AND`
     //+ ` (event_date IS NULL OR event_date_start IS NOT NULL) AND`
     /* all location fields are null OR location_id is filled in */
@@ -863,7 +857,7 @@ const validate = async function(params) {
     await db.cquery(c,{table: 'import', sql:`UPDATE ${joind} SET changed = 0 WHERE changed = 1 AND`
     + ` dataset_id = ? AND changed = 1 AND ${aw}`, values: [ds] });
 
-    state.progress += 1;
+    state.progress += 5000;
     state.completed = true;
     
     db.releaseConnection(c);
@@ -873,6 +867,10 @@ const validate = async function(params) {
 }
 
 var synonyms = {
+    'taxonomy.wscLsid': 'wsc_lsid',
+    'location.abbrev': 'location_abbrev',
+    'location.lon': 'location_lon',
+    'location.lat': 'location_lat',
     'valid.review': 'valid_review',
     'valid.approve': 'valid'
 }
@@ -892,6 +890,7 @@ module.exports = function(dbClient, mailClient) {
         deleteRow,
         updateColumn,
         getColumn,
+        deleteColumn,
         startValidation
     }
 }

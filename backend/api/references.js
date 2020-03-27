@@ -36,7 +36,7 @@ const validate = async function(reference) {
         return 'Reference abbrev. cannot be empty';
     }
 
-    if(!reference.fullCitation || reference.fullCitation.length == 0) {
+    if(!reference.full_citation || reference.full_citation.length == 0) {
         return 'Reference full citation cannot be empty';
     }
 
@@ -47,8 +47,11 @@ const validate = async function(reference) {
 const prepareForSql = function(reference) {
     // prepare reference - create the abbrev
     if(!reference.abbrev) {
-        reference.abbrev = db.unique((reference.fullCitation || '').replace(/[\W ]/,'').substring(0, 25));
+        reference.abbrev = db.unique((reference.fullCitation || '')//.replace(/[\W ]/,'')
+        .substr(0, Math.min(reference.fullCitation.indexOf(')'), 40)));
     }
+    reference['full_citation'] = reference.fullCitation;
+    delete(reference.fullCitation);
 }
 
 const create = async function(body) {

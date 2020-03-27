@@ -4,12 +4,20 @@ const path = require('path');
 const XLSX = require('xlsx');
 
 
+const rows = function (path) {
+    return new Promise((resolve,reject) => {
+        fcsv.parseFile(path, {headers: true, ignoreEmpty: true})
+        .on('data', () => {})
+        .on('end', rowCount => resolve(rowCount));
+        });
+}
+
 const get = async function(tmpDir, filename, dstream, connection) {
     var p = path.resolve(tmpDir, filename);
     
     await new Promise((resolve, reject) => {
 
-    var cstream = fcsv.format({headers: true})
+    var cstream = fcsv.format({headers: true })
         .on('error', err => reject(err))
         
     
@@ -53,7 +61,7 @@ const convert = async function(f) {
     // wait for the file to convert
     await new Promise(
         function(resolve, reject) {
-            var stream = XLSX.stream.to_csv(wb.Sheets[sheetName], {header:1, dateNF:'YYYY-MM-DD'});
+            var stream = XLSX.stream.to_csv(wb.Sheets[sheetName], {header:1, dateNF:'yyyy"-"mm"-"dd'});
             stream.pipe(fs.createWriteStream(nf));
             stream.on('error', (err) => {
                 reject(err);
@@ -67,5 +75,6 @@ const convert = async function(f) {
 
 module.exports = {
     get,
-    convert
+    convert,
+    rows
 }

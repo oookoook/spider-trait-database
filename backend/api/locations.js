@@ -73,11 +73,17 @@ const prepareForSql = function(location) {
     // create abbrev if not provided
     if(!location.abbrev) {
         var a = [];
-        if(location.country && location.country.code) {
-            a.push(location.country.code);
+        if(location.country && location.country.id) {
+            var cr = await db.query({table: 'country', sql: 'SELECT alpha3_code FROM country WHERE id = ?', values: [location.country.id], nestTables: false});
+            if(cr && cr.length >0) {
+                a.push(cr[0].alpha3_code);
+            }
         }
-        if(location.habitatGlobal && location.habitatGlobal.name) {
-            a.push(location.habitatGlobal.name);
+        if(location.habitatGlobal && location.habitatGlobal.id) {
+            var hgr = await db.query({table: 'habitat_global', sql: 'SELECT name FROM habitat_global WHERE id = ?', values: [location.habitatGlobal.id], nestTables: false}); 
+            if(hgr && hgr.lenth >0) {
+                a.push(hgr[0].name);
+            }
         }
         if(location.habitatVerbatim) {
             a.push(location.habitatVerbatim);

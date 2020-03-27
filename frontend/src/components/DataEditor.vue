@@ -4,6 +4,7 @@
       <v-toolbar dense color="accent" class="elevation-0 my-3">
         <action-button text="Dataset detail" icon="mdi-card-text-outline" toolbar @click="dsEdit = true" />
         <action-button color="success" text="Upload data" icon="mdi-upload" toolbar @click="upload = true" />
+        <action-button text="Download as CSV" icon="mdi-download" toolbar :download="downloadLink" />
         <action-button text="Delete all the data" icon="mdi-table-remove" toolbar @click="deleteData"/>
         <action-button text="Delete the dataset" icon="mdi-delete-forever-outline" toolbar @click="deleteDataset" />
         <v-divider vertical class="mx-3" />
@@ -19,11 +20,13 @@
             <action-button text="Use this value as rule for value change" icon="mdi-table-search" toolbar />
             <action-button text="View distinct values in the selected column" icon="mdi-format-list-numbered" toolbar />
             <action-button text="Delete selected row" icon="mdi-table-row-remove" toolbar />
+            <action-button text="Delete all rows containing selected value" icon="mdi-table-column-remove" toolbar />
           </v-btn-toggle>
         <v-divider vertical class="mx-3" />
         <v-spacer />
         <v-divider vertical class="mx-3" />
-        <action-button text="Download as CSV" icon="mdi-download" toolbar :download="downloadLink" />
+        <action-button text="Refresh the table" icon="mdi-refresh" toolbar @click="getData()" />
+        <action-button text="Revalidate the whole dataset" icon="mdi-check-all" toolbar @click="validate" />
         <action-button v-if="!editor && isValid" color="success" text="Send for review" icon="mdi-send" toolbar @click="review" />
         <action-button v-if="!editor && !isValid" color="warning" text="Send for review (dataset invalid)" icon="mdi-send" toolbar @click="review"/>
         <action-button v-if="editor" color="error" text="Reject" icon="mdi-undo" toolbar @click="reject"/>
@@ -66,6 +69,9 @@
             <v-card>
               <v-card-title>{{ confirm.title || 'Confirm action' }}</v-card-title>
               <v-card-text><p><span>{{ confirm.text }}</span> Are you sure?</p>
+              <v-alert v-if="confirm.warning" type="warning">
+                {{confirm.warning}}
+              </v-alert>
               <v-textarea v-if="confirm.message.show" v-model="confirm.message.text" :placeholder="confirm.message.placeholder" />
               </v-card-text>
               <v-card-actions>
@@ -77,7 +83,7 @@
         <v-bottom-sheet v-model="edit.dialog">
             <edit-dialog :editor="editor" :type="editMode" :selection="selectedCell" @cancel="edit.dialog = false" @save="edit.action" />
         </v-bottom-sheet>
-        <v-bottom-sheet v-model="distinct.dialog">
+        <v-bottom-sheet v-model="distinct.dialog" scrollable>
             <distinct-dialog v-if="selectedCell" :editor="editor" :dataset="id" :prop-name="selectedCell.prop" @cancel="distinct.dialog = false" @create="createEntity" @rule="ruleDistinct" @column="columnDistinct"/>
         </v-bottom-sheet>
         <v-bottom-sheet v-model="log.dialog">
@@ -96,7 +102,7 @@
           Overlay showing the progress
           -->
         <v-overlay :value="job != null">
-          <v-progress-circular v-if="job != null" :size="300" :width="30" :value="job.state.progress" color="warning">
+          <v-progress-circular v-if="job != null" :size="300" :width="30" :value="job.state.progress" color="secondary">
             {{ job.title }} <br/>
             {{ job.state.progress }}% <br/>
           </v-progress-circular>
@@ -145,6 +151,7 @@ export default {
           dialog: false,
           title: null,
           text: null,
+          warning: null,
           message: {
             show: false,
             text: null,
@@ -203,6 +210,7 @@ export default {
         case 2: return 'rule';
         case 3: return 'distinct';
         case 4: return 'delete';
+        case 5: return 'deleteMultiple';
       }
       },
       set(val) {
@@ -212,6 +220,7 @@ export default {
         case 'rule': this.editModeRaw = 2; break;
         case 'distinct': this.editModeRaw = 3; break;
         case 'delete': this.editModeRaw = 4; break;
+        case 'deleteMultiple': this.editModeRaw = 5; break;
       }
       }
     },
@@ -237,6 +246,9 @@ export default {
         this.$timer.stop('refreshJob');
         if(this.jobCompletedAction) {
           this.jobCompletedAction();
+        } else {
+          this.refreshDS();
+          this.getData();
         }
       } else {
         this.$timer.start('refreshJob');
@@ -266,7 +278,12 @@ export default {
         case 'rule': this.editColumn(); break;
         case 'distinct': this.showDistinct(); break;
         case 'delete': this.deleteRow(); break;
+        case 'deleteMultiple': this.deleteColumn(); break;
       }
+    },
+    validate() {
+      this.jobCompletedAction = this.getData;
+      this.$store.dispatch(`editor/validate`,{ id: this.id, all: true });
     },
     refreshDS() {
       if(this.id) {
@@ -316,13 +333,25 @@ export default {
       }
       this.confirm.dialog = true;
     },
+    deleteColumn() {
+      this.confirm.title = 'Delete rows';
+      var prop = this.$store.getters[`editor/propsDict`][this.selectedCell.prop];
+      var value = prop.displayValue(this.selectedCell.item);
+      this.confirm.text = `All rows with the value ${value} in the column ${prop.text} will be deleted.`;
+      this.confirm.message.show = false;
+      this.confirm.action = () => {
+        this.loading = true;
+        this.$store.dispatch('editor/deleteColumn', { dataset: this.id, column: this.selectedCell.prop, value }).then(() => { this.loading = false; this.confirm.dialog = false; this.refreshDS(); this.getData(); });
+      }
+      this.confirm.dialog = true;
+    },
     approve() {
       this.confirm.title = 'Approve dataset';
       this.confirm.text = 'The dataset will be approved and the data will become available for public.';
       this.confirm.message.show = false;
       this.confirm.action = () => {
         this.loading = true;
-        this.$store.dispatch('editor/changeState', { id: this.id, message: null, state: 'approved'}).then(() => {this.loading = false;});
+        this.$store.dispatch('editor/changeState', { id: this.id, message: null, state: 'approved'}).then(() => { this.confirm.dialog=false; this.loading = false;});
       },
       this.jobCompletedAction = () => { this.$router.push('/approve')  };
       this.confirm.dialog = true;
@@ -342,13 +371,13 @@ export default {
       this.confirm.title = 'Submit dataset for a review';
       this.confirm.text = 'The dataset will be submitted for a review to the editors.';
       if(!this.dataset.valid.review) {
-        this.confirm.warning += 'Attention! Your dataset is not valid for a review. If possible, fix all the marked problems before submitting.'
+        this.confirm.warning = 'Attention! Your dataset is not valid for a review. If possible, fix all the marked problems before submitting.'
       }
       this.confirm.message.show = true;
       this.confirm.message.placeholder = "Enter a message for the editor if you want to tell them someting about your data (e.g. reason why the data re not valid).";
       this.confirm.action = () => {
         this.loading = true;
-        this.$store.dispatch('editor/changeState', { id: this.id, message: this.confirm.message.text, state: 'reviewed'}).then(() => { this.loading = false; this.$router.push('/import') });
+        this.$store.dispatch('editor/changeState', { id: this.id, message: this.confirm.message.text, state: 'reviewed'}).then(() => { this.loading = false; this.confirm.warning = null; this.$router.push('/import') });
       }
       this.confirm.dialog = true;
     },
@@ -394,22 +423,25 @@ export default {
           })
           .then((data) => { this.loading = false; this.refreshDS(); this.getData(); });
       } else if(evt.entity.values) {
+        this.distinct.dialog = false;
         this.confirm.title = 'Batch entity creation';
-        this.confirm.text = `You are about to create ${evt.entities.length} entities.`;
+        this.confirm.text = `You are about to create ${evt.entity.values.length} entities.`;
         this.confirm.message.show = false;
         this.confirm.action = () => {
-        this.loading = true;
-        this.jobCompletedAction = () => { this.showLog(); this.refreshDS(); this.getData(); };
-        evt.dataset = this.dataset.id;
-        this.$store.dispatch(`editor/createMultiple`, evt);
-        this.confirm.dialog = true;
-        // after creation is completed run ad-hoc validation 
-        this.$store.dispatch(`editor/validate`, {id: this.dataset.id});
-      }
-      
-
-      
+          this.confirm.dialog = false;
+          this.loading = true;
+          this.jobCompletedAction = () => { 
+            this.showLog(); 
+            this.jobCompletedAction = () => { this.refreshDS(); this.getData(); };
+            this.$store.dispatch(`editor/validate`, {id: this.dataset.id});
+          }
+          evt.columns.dataset = this.dataset.id;
+          this.$store.dispatch(`editor/createMultiple`, evt);
         
+          // after creation is completed run ad-hoc validation 
+          
+      }
+      this.confirm.dialog = true;  
       }
     },
     showLog() {

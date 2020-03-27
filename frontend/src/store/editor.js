@@ -213,12 +213,24 @@ export default {
       });
       if (data) {
         if(data.job) {
-          data.title='Updating data...';
+          data.job.title='Updating data...';
           await context.dispatch('createJob', data, {
             root: true
           });
         }
         return data.affected;
+      }
+    },
+    deleteColumn: async function (context, payload) {
+      var p = {};
+      p.endpoint = `import`;
+      p.params = `${payload.dataset}/column/${payload.column}/${encodeURIComponent(payload.value)}`;
+      p.auth = true;
+      var data = await context.dispatch('delete', p, {
+        root: true
+      });
+      if (data) {
+        return true;
       }
     },
     distinctList: async function (context, payload) {
@@ -280,7 +292,7 @@ export default {
       });
       if (data) {
         if(data.job) {
-          await context.dispatch('createjob', data, {
+          await context.dispatch('createJob', data, {
             root: true
           });
         }
@@ -288,7 +300,7 @@ export default {
       }
     },
     createMultiple: async function(context, payload) {
-      var j = { id: null, title: 'Creating entities...', state: { progress: 0, total: payload.entities.length, errors: [] }};
+      var j = { id: null, title: 'Creating entities...', state: { progress: 0, total: payload.entity.values.length, errors: [] }};
       for(var i = 0; i < payload.entity.values.length; i++) {
         var e = payload.entity.values[i];
         //console.dir(payload);
@@ -298,7 +310,6 @@ export default {
         p.body = e;
         await context.dispatch('createJob', { job: j }, { root: true });
         var data = await context.dispatch('post', p, { root: true });
-        // the api module returns false uf user is not authenticated
         
         if(data && data.id && data.entity) {
           // use the entity.abbrev and do the column changes (disable validation for the requests)
@@ -307,7 +318,7 @@ export default {
           o[payload.entity.name] = data.entity;
           pc.newValue = payload.entity.match.displayValue(o);
           pc.oldValues = payload.entity.oldValues[i];
-          await this.$store.dispatch(`editColumn`, pc);
+          await context.dispatch(`editColumn`, pc);
           j.state.progress++;
         } else if(data && data.error == 'validation') {
           j.state.errors.push(`${JSON.stringify(e)}: ${data.validation}`);
@@ -326,7 +337,7 @@ export default {
       p.endpoint = `import`;
       p.params = `${payload.id}/validate`;
       p.auth = true;
-      p.body = null;
+      p.body = payload.all ? {all: true} : null;
       // payload.message and payload.state are provided from the component
       var data = await context.dispatch('put', p, {
         root: true
@@ -334,7 +345,7 @@ export default {
       if (data) {
         if(data.job) {
           data.job.title = 'Validating...';
-          await context.dispatch('createjob', data, {
+          await context.dispatch('createJob', data, {
             root: true
           });
         }

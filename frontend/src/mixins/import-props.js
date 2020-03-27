@@ -22,8 +22,8 @@ export default {
       if(v != null && typeof v == 'string') {
        //console.log(`replacing spaces in ${v}`);
         v = v.replace(/\s/g, '\xa0');
-        if(v.length > 25) {
-          v = v.substring(0, 25) + '...';
+        if(v.length > 35) {
+          v = v.substring(0, 32) + '...';
         }
       }
       return v;

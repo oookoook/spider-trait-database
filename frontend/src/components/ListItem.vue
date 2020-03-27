@@ -6,7 +6,7 @@
 
     <v-list-item-content>
       <v-list-item-subtitle>{{title}}</v-list-item-subtitle>
-      <v-list-item-title>{{text}}</v-list-item-title>
+      <v-list-item-title><span v-if="text">{{text}}</span><slot v-else></slot></v-list-item-title>
     </v-list-item-content>
 
     <v-list-item-action v-if="link">
@@ -32,7 +32,7 @@ export default {
   components: {},
   props: { icon: {type: String, default: 'mdi-information'}, 
   title: String, 
-  text: String, 
+  text: [String, Number], 
   link: String, 
   external: Boolean, 
   linkIcon: {type: String, default: 'mdi-eye-outline'}, 

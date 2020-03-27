@@ -48,9 +48,14 @@ const addLimits = function (values, limits, table, hasWhere, aggregate, customWh
     var whereClause = '';
     if(customWhereClause){
         whereClause = ` ${searchStart} ${customWhereClause}`;
-    } else if(limits.search) {
+    } else {
+        ` ${searchStart} 1=1`;
+    }
+    if(limits.search) {
         //whereClause = ` ${searchStart} ${mysql.escapeId(table+'.'+limits.search.field)} ${op} '${mysql.escape(limits.search.value)}${wildcard}'`;
-        whereClause = ` ${searchStart} ?? ${op} ?`;
+        //console.log(`has search: `);
+        //console.dir(limits.search);
+        whereClause += ` AND ?? ${op} ?`;
         
         //console.log(`${table} ${limits.search.field} ${getSynonym(table, limits.search.field)}`);
         values.push(getSynonym(table, limits.search.field));
@@ -181,21 +186,23 @@ const limits = function (req, res, next) {
     next();
 }
 
-const prepareListResponse = async function (limits, table, customWhereClause, customWhereValues, join, distinctSql) {
+const prepareListResponse = async function (limits, table, customWhereClause, customWhereValues, join, distinctCols) {
     var res = {
         items: null,
         limit: limits.limit,
         offset: limits.offset,
         count: null
     };
-    if (limits.count && !distinctSql) {
+    if (limits.count && !distinctCols) {
         // count is limited when using filter
         var r = await query({table, sql: `SELECT COUNT(${table}.id) as count FROM ${join ? join : table}`, limits, aggregate: true, customWhereClause, values: customWhereValues});
         var count = r[0].count;
         res.count = count;
-    } else if (limits.count && distinctSql) {
-        //console.log('Preparing distinct response');
-        var r = await query({table, sql: `SELECT COUNT(DISTINCT ${distinctSql}) as count FROM ${join ? join : table}`, limits, aggregate: true, customWhereClause, values: customWhereValues});
+    } else if (limits.count && distinctCols) {
+        //console.log(`Preparing distinct response ${distinctCols} ${join ? join : table}`);
+        //var r = await query({table, sql: `SELECT COUNT(*) as count FROM ( SELECT DISTINCT ${distinctSql} FROM ${join ? join : table}) ${table}`, limits, aggregate: true, customWhereClause, values: customWhereValues});
+        //console.log(`SELECT COUNT(DISTINCT ${distinctCols.map(c => `COALESCE(${c}, '')`).join(',')}) as COUNT FROM ${join ? join : table}`);
+        var r = await query({table, sql: `SELECT COUNT(DISTINCT ${distinctCols.map(c => `COALESCE(${c}, '')`).join(',')}) as count FROM ${join ? join : table}`, limits, aggregate: true, customWhereClause, values: customWhereValues});
         var count = r[0].count;
         res.count = count;
     }
@@ -361,7 +368,12 @@ const updateEntity = async function (opts) {
 }
 
 const unique = function(val) {
-    return `${val}-${shortid.generate()}`;
+    if(val && val.length > 0) {
+        return `${val}-${shortid.generate()}`;
+    } else {
+        return shortid.generate();
+    }
+    
 }
 
 const addSynonyms = function(endpoint, mainTable, tableSynonyms) {

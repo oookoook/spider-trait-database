@@ -52,10 +52,23 @@ const list = async function(params, limits) {
                 sampleSize: r.data.sample_size,
                 eventDate: { 
                     text: r.data.event_date_text,
-                    start: r.data.event_date_start.toJSON(),     
-                    end: r.data.event_date_end.toJSON()
+                    start: r.data.event_date_start ? r.data.event_date_start.toJSON() : null,     
+                    end: r.data.event_date_end ? r.data.event_date_end.toJSON() : null
                 },
-                taxonomy: r.taxonomy,
+                taxonomy: {
+                    wsc: {
+                        id: r.taxonomy.wsc_id,
+                        lsId: r.taxonomy.wsc_lsid,
+                    },
+                    /*
+                    family: taxonomy.family, 
+                    genus: taxonomy.genus, 
+                    species: taxonomy.species, 
+                    subspecies: taxonomy.subspecies,
+                    */
+                    originalName: r.data.original_name,
+                    id: r.taxonomy.id
+                },
                 trait: {
                     id: r.trait.id,
                     abbrev: r.trait.abbrev,
@@ -79,7 +92,7 @@ const list = async function(params, limits) {
                 },
                 dataset: r.dataset,
                 reference: r.reference,
-                rowLink: r.row_link
+                rowLink: r.data.row_link
             }
         });
     return res;
@@ -115,6 +128,7 @@ const synonyms = {
     'taxonomy.family': 'taxonomy.family', 
     */
     'rowLink': 'row_link',
+    'originalName': 'original_name',
     'location.habitatGlobal.id': 'habitat_global.id',
     'location.habitatGlobal.name': 'habitat_global.name',
     'location.habitatGlobal.category': 'habitat_global.category',
@@ -124,7 +138,13 @@ const synonyms = {
     'location.country.name': 'country.name',
     'trait.category.id':'trait_category.id',
     'trait.category.name':'trait_category.name',
-    'lifeStage.name':'life_stage.name'
+    'lifeStage.name':'life_stage.name',
+    'taxon': 'original_name',
+    'location': 'location.abbrev',
+    'method': 'method.abbrev',
+    'reference': 'reference.abbrev',
+    'trait': 'trait.abbrev',
+    'dataset': 'dataset.name'
 }
 
 module.exports = function(dbClient) {
