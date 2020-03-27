@@ -290,7 +290,7 @@ const getAutocomplete = async function(endpoint, valueField, textField, search, 
     //console.log(`${r.text} ${typeof r.text}`)
     r.forEach(i => {
     if(i.text && typeof i.text != 'string') {
-        console.log('casting text');
+        //console.log('casting text');
         i.text = i.text.toString();
     }
     });
