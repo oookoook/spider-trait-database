@@ -8,7 +8,7 @@
       </v-card-text>
       -->
         <v-list  v-if="item" three-line>
-          <list-item title="LSID" :text="item.wsc.lsid" icon="mdi-identifier" link-icon="mdi-spider" link-tooltip="View in the World Spider Catalog (opens in a new tab)" :link="`https://wsc.nmbe.ch/species/${item.wsc.id}`" external/>
+          <list-item title="LSID" :text="item.wsc.lsid" icon="mdi-identifier" link-icon="mdi-spider" link-tooltip="View in the World Spider Catalog (opens in a new tab)" :link="getWscLink(item)" external/>
           <!--
           <list-item title="Family" :text="item.family" icon="mdi-spider-web" />
           <list-item title="Genus" :text="item.genus" icon="mdi-spider-thread" />
@@ -28,9 +28,11 @@
 <script>
 
 import ListItem from '../components/ListItem'
+import Taxons from '../mixins/taxons'
 
 export default {
   name: 'TaxonDetail',
+  mixins: [ Taxons ],
   components: {
     ListItem
   },

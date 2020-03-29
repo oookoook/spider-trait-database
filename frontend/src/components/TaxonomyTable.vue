@@ -25,7 +25,7 @@
     
 
     <template v-slot:item.actions="{ item }">
-    <entity-link-cell icon="mdi-spider" tooltip="View in the World Spider Catalog (opens in a new tab)" external :link="`https://wsc.nmbe.ch/species/${item.wsc.id}`" />
+    <entity-link-cell icon="mdi-spider" tooltip="View in the World Spider Catalog (opens in a new tab)" external :link="getWscLink(item)" />
 
     <entity-link-cell tooltip="Set as filter in the data explorer" :link="`data/species/${item.id}`" icon="mdi-filter" />
     </template>
@@ -36,10 +36,11 @@
 <script>
 
 import ListTable from '../mixins/list-table'
+import Taxons from '../mixins/taxons'
 
 export default {
   name: 'TaxonomyTable',
-  mixins: [ ListTable ],
+  mixins: [ ListTable, Taxons ],
   data () {
     return {
       searchFields: [
@@ -68,14 +69,7 @@ export default {
   watch: {
   },
   methods: {
-    getTaxon(item) {
-      var t = [ item.genus, item.species];
-      if(item.subspecies) {
-        t.push(item.subspecies);
-      }
-      //console.dir(t);
-      return t.join(' ');
-    }
+    
   },
   created () {
 
