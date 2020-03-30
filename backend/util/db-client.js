@@ -16,7 +16,7 @@ pool.on('release', function (connection) {
     //console.log(`Conn ${connection.threadId} released`);
     if(releaseWatcher[connection.threadId])
     {
-        //console.log(`Conn ${connection.threadId} has callback`);
+        console.log(`Conn ${connection.threadId} has callback`);
         var f = releaseWatcher[connection.threadId];
         delete(releaseWatcher[connection.threadId]);
         f();
@@ -300,7 +300,7 @@ const getAutocomplete = async function(endpoint, valueField, textField, search, 
 const createEntity = async function (opts) {
     var {body, table, auth, prepareForSql, validate} = opts;
     var obj = body;
-    prepareForSql(obj, auth);
+    await prepareForSql(obj, auth);
     if (typeof validate == 'function') {
         var vr = await validate(obj);
         if (vr !== true) {
@@ -348,6 +348,7 @@ const updateEntity = async function (opts) {
     var { params, body, table, auth, prepareForSql, validate } = opts;
     var id = parseInt(params.id);
     var obj = body;
+    prepareForSql(obj, auth);
     if (obj.id && id != obj.id) {
         console.log(`IDs in params and body does not match for entity in table ${table} : ${id} ${obj.id}`);
         console.dir(obj);
@@ -362,7 +363,7 @@ const updateEntity = async function (opts) {
             }
         }
     }
-    prepareForSql(obj, auth);
+    
     // we don't want to update the id
     delete(obj.id);
     //console.dir(obj);

@@ -104,8 +104,8 @@ export default {
       }
       switch(this.type) {
         case 'cell': return `Where record ID is ${this.selection.id}`;
-        case 'column': return `Where the current value is ${this.originalValue != null ? this.originalValue : '[empty]'}`;
-        case 'rule': return this.valueProp ? `Where value of the ${this.valueProp.name} column is ${this.originalValue != null ? this.originalValue : '[empty]'}` : '...';
+        case 'column': return `Where the current value is "${this.originalValue != null ? this.originalValue : '[empty]'}"`;
+        case 'rule': return this.valueProp ? `Where value of the ${this.valueProp.name} column is "${this.originalValue != null ? this.originalValue : '[empty]'}"` : '...';
       }
     },
     isValid() {
@@ -163,7 +163,7 @@ export default {
         this.modifiedProp.save(e, this.modifiedValue);
       } else {
         e.column = this.modifiedProp.name;
-        e.newValue = this.modifiedValue;
+        e.newValue = this.modifiedValue == '' ? null : this.modifiedValue;
         e.oldValue = this.originalValue;
         if(this.valueProp) {
           //console.log('has value prop');

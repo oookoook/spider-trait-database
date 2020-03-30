@@ -275,7 +275,7 @@ const changeState = async function(params, body, auth) {
 
     if(imp < 3) {
         await db.query({table: 'dataset', sql: `UPDATE dataset SET imported = ?, message = ? WHERE id = ? AND ${getAuthWhere(auth)}`, values: [imp, msg, id] });
-        console.log('Returning...');
+        //console.log('Returning...');
         return {
             id
         };
@@ -442,6 +442,7 @@ const uploadFile = async function(params, body, files, auth) {
     }
     // first passthrough - just get the number of lines
     var total = await csv.rows(fpath);
+    var cnt = total;
     //console.log(`Total: ${total}`);
     var ifunc = async (params) => {
         // + 1 - the file was uploaded
@@ -458,11 +459,16 @@ const uploadFile = async function(params, body, files, auth) {
         .on('error', error => { params.state.errors.push[error]; params.state.aborted = true; resolve(); })
         .on('data', async row => {  
             // we are running async code here here, but another data event was already fired - the events are not waiting for each other
-            importRow(conn, params.ds, row, params.state, valCache);
+            await importRow(conn, params.ds, row, params.state, valCache);
+            cnt-=1;
+            if(cnt == 0) {
+                console.log('Last row processed');
+                resolve();
+            }
         })
         // when the last record is added to the db queue, an callback is attached to the connection release
         // when the connection is released, the callback is called
-        .on('end', rowCount => { /* console.log('csv processing ended'); */ db.releaseConnection(conn, () => resolve()) });
+        .on('end', rowCount => { console.log('csv processing ended - conn released'); db.releaseConnection(conn); /*db.releaseConnection(conn, () => resolve())*/ });
         });
         // now all the records are saved in the db or the import was aborted due to the error
         if(params.state.aborted) {
@@ -565,8 +571,8 @@ const updateRow = async function(params, body, auth) {
 
     delete(newAttrs.id);
     delete(newAttrs['dataset_id']);
-    delete(newAttrs['valid']);
-    delete(newAttrs['valid_review']);
+    newAttrs['valid'] = 0;
+    newAttrs['valid_review'] = 0;
     newAttrs.changed = 1;
 
     if(newAttrs['location_lat']) {
@@ -632,6 +638,9 @@ const updateColumn = async function(params, body, auth) {
         throw 'Cannot update this column';
     }
     var nv = body.newValue;
+    if(nv == '') {
+        nv = null;
+    }
     // allow to change value in one column based on the value in another
     
     // add support for array of columns (for setting up the location, reference, trait, method abbrev)
@@ -649,7 +658,7 @@ const updateColumn = async function(params, body, auth) {
     }
     var clauses = [];
     for(var i = 0; i < vc.length; i++) {
-        clauses.push(`${db.escapeId(vc[i])}${ov[i] ? '=' : ' IS ' }${db.escape(ov[i])}`)
+        clauses.push(`${db.escapeId(vc[i])}${ov[i] != null ? '=' : ' IS ' }${db.escape(ov[i])}`)
     }
     var cw = clauses.join(' AND ');
     
@@ -694,7 +703,7 @@ const updateColumn = async function(params, body, auth) {
     console.dir(nv);
     console.dir(cw);
     */
-    var results = await db.query({table: 'import', sql:`UPDATE ${joind} SET ?? = ?, changed = 1 WHERE ${cw} AND dataset_id = ? AND ${aw}`, values: [column, nv, ds ] });
+    var results = await db.query({table: 'import', sql:`UPDATE ${joind} SET ?? = ?, valid_review = 0, valid = 0, changed = 1 WHERE ${cw} AND dataset_id = ? AND ${aw}`, values: [column, nv, ds ] });
     
     // run the validation as a new job and return a job id
     //validate(ds, aw); 
@@ -721,6 +730,9 @@ deleteColumn = async function(params, auth) {
         throw 'Cannot delete by this column';
     }
     var v = params.value;
+    if (v == 'empty') {
+        v = '';
+    }
     var results = await db.query({table: 'import', sql:`DELETE import FROM ${joind} WHERE dataset_id = ? AND ??=? AND ${aw}`, values: [ds, column, v] });
     return {
         affected: results.affectedRows
@@ -814,8 +826,7 @@ const validate = async function(params) {
     + ` import.reference_id = COALESCE(refa.id, refd.id, reff.id),  `
     + ` location_id = COALESCE(location.id, loccoord.id), location_habitat_global_id = habitat_global.id, `
     + ` location_country_id = COALESCE(country3.id,country2.id), `
-    + ` import.taxonomy_id = CASE WHEN taxonomy.id IS NOT NULL AND taxonomy_name.taxonomy_id IS NOT NULL AND taxonomy.id <> taxonomy_name.taxonomy_id THEN NULL `
-    + ` ELSE COALESCE(taxonomy.id, taxonomy_name.taxonomy_id) END, `
+    + ` import.taxonomy_id = COALESCE(taxonomy.id, taxonomy_name.taxonomy_id), `
     + ` require_numeric_value = CASE WHEN data_type.name <> 'Character' THEN 1 ELSE 0 END `
     + ` WHERE changed = 1 AND dataset_id = ? AND ${aw}`, values: [ds] });
 

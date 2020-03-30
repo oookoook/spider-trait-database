@@ -96,7 +96,7 @@ export default {
         root: true
       });
       if (data) {
-        if (data.count) {
+        if (data.count != null) {
           context.commit('total', {
             value: data.count
           });
@@ -224,7 +224,11 @@ export default {
     deleteColumn: async function (context, payload) {
       var p = {};
       p.endpoint = `import`;
-      p.params = `${payload.dataset}/column/${payload.column}/${encodeURIComponent(payload.value)}`;
+      var v = payload.value;
+      if(v == '') {
+        v = 'empty';
+      }
+      p.params = `${payload.dataset}/column/${payload.column}/${encodeURIComponent(v)}`;
       p.auth = true;
       var data = await context.dispatch('delete', p, {
         root: true
@@ -253,6 +257,8 @@ export default {
         if(payload.filter.entity) {
           // asses validity of the values
           data.items.forEach(i => {
+            // deleting the other props - saving space when the store serializes the large collections
+            Object.keys(i).forEach(e=> { if(e != payload.filter.column) { delete(i[e])}});
             var v = context.getters.isEntityValid(payload.filter.column, i, payload.filter.editor ? 'create' : false);
             //console.dir(v);
             i.valid = { 
@@ -301,9 +307,16 @@ export default {
     },
     createMultiple: async function(context, payload) {
       // freeing up the memory
+      
+      var err = [];
+      var prog = 0;
+      const gj = (progress, completed, aborted, errors) => {
+        return { id: null, title: 'Creating entities...', state: { progress, total: payload.entity.values.length, completed, aborted, errors: errors.slice() }};
+      }
+
       context.commit('distinctList', {value: []});
       context.commit('distinctTotal', {value: 0});
-      var j = { id: null, title: 'Creating entities...', state: { progress: 0, total: payload.entity.values.length, completed: false, aborted: false, errors: [] }};
+      await context.dispatch('createJob', { job: gj(prog, false, false, err) }, { root: true });
       for(var i = 0; i < payload.entity.values.length; i++) {
         var e = payload.entity.values[i];
         //console.dir(payload);
@@ -311,7 +324,6 @@ export default {
         p.endpoint = `${payload.endpoint}`;
         p.auth = true;
         p.body = e;
-        await context.dispatch('createJob', { job: j }, { root: true });
         var data = await context.dispatch('post', p, { root: true });
         
         if(data && data.id && data.entity) {
@@ -322,19 +334,23 @@ export default {
           pc.newValue = payload.entity.match.displayValue(o);
           pc.oldValues = payload.entity.oldValues[i];
           await context.dispatch(`editColumn`, pc);
-          j.state.progress++;
+          prog+=1;
         } else if(data && data.error == 'validation') {
-          j.state.errors.push(`${JSON.stringify(e)}: ${data.validation}`);
+          prog+=1;
+          err.push(`Error: ${data.validation} for ${JSON.stringify(e)}`);
         }
         else {
-          j.state.errors.push(`${JSON.stringify(e)}: Server error`);
+          prog+=1;
+          err.push(`Server error for ${JSON.stringify(e)}`);
         }
-        if(j.state.progress % 10 == 0) {
-          await context.dispatch('updateJob', { job: j}, { root: true });
+        if(prog % 10 == 0) {
+          await context.dispatch('updateJob', { job: gj(prog, false, false, err)}, { root: true });
+          await context.dispatch('refreshJob', {}, { root: true });
+          err = [];
         }
       }
-      j.state.completed = true;
-      await context.dispatch('updateJob', { job: j}, { root: true });
+      await context.dispatch('updateJob', { job: gj(prog, true, false, err)}, { root: true });
+      await context.dispatch('refreshJob', {}, { root: true });
     },
 
     validate: async function(context, payload) {
@@ -356,6 +372,6 @@ export default {
         }
         return true;
       }  
-    }
+    },
   },
 }

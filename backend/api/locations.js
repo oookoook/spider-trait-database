@@ -60,6 +60,7 @@ const get = async function(params) {
 
 // validate location - check if abbrev is unique
 const validate = async function(location) {
+    //console.log(location.abbrev);
     if(!location.abbrev || location.abbrev.length == 0) {
         return 'Location abbrev. cannot be empty';
     }
@@ -98,6 +99,7 @@ const prepareForSql = async function(location) {
 
         location.abbrev = db.unique(a.join('-').replace(/[\W ]/,'').substring(0, 25));
     }
+    //console.log(location.abbrev);
     location.habitat_global_id = (location.habitatGlobal) ? location.habitatGlobal.id : null;
     location.country_id = (location.country) ? location.country.id : null;
     if(location.coords) {

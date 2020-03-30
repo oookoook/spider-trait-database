@@ -54,7 +54,7 @@ export default {
   watch: {
     filter: {
       handler() {
-        //console.log('filter changed, updating list provider...');
+        console.log('filter changed, updating list provider...');
         this.update();
       },
       deep:true
@@ -63,7 +63,9 @@ export default {
   methods: {
     // debounce solves repeated filter updates when processing a new data filter from route in the data explorer
     update: debounce(500, function(params) {
+      //console.dir(params);
       if(!params) {
+        //console.log('no params provided');
         params = {};
         params.count = true;
         params.search = null;
@@ -91,7 +93,7 @@ export default {
         params.filter = {};
         params.filter[this.entity] = this.id;
       }
-
+      //console.dir(params);
       this.loading = true;
       this.$store.dispatch(`${this.list}/${this.listAction}`,params).then(() => {this.loading = false; });
     }),

@@ -9,7 +9,7 @@
     >
     
     <template v-slot:header.actions="{}">
-      <action-button tooltip small v-if="editor" icon="mdi-playlist-plus" text="Create all entites" :loading="loadingBtn == -1" @click="loadingBtn = -1; createBatch()"/>
+      <action-button tooltip small v-if="editor" icon="mdi-playlist-plus" text="Create all entites" @click="createBatch()"/>
     </template>
     
     <!--
@@ -21,9 +21,9 @@
     -->
     
     
-    <template v-slot:item="{item, headers }">
+    <template v-slot:item="{item, headers, index }">
         <tr>
-            <td v-for="(h,index) in headers" :key="h.value">
+            <td v-for="h in headers" :key="h.value">
               <!-- <v-simple-checkbox v-if="h.value=='data-table-select'"  :value="isSelected && item.valid.selectable" :disabled="!item.valid.selectable" /> -->
               <span v-if="h.value == 'actions'">
                 <action-button tooltip small v-if="editor && !item.valid.invalid && !item.valid.created" icon="mdi-plus" text="Create entity" 
@@ -70,6 +70,7 @@ export default {
   watch: {
     job(val, oldVal) {
       if(oldVal && !val) {
+        this.loadingBtn = null;
         this.update();
       }
     }
@@ -91,7 +92,8 @@ export default {
   created () {
   },
   mounted () {
-    this.update();
+    //this.needsCount = true;
+    //this.update();
   }
 }
 </script>

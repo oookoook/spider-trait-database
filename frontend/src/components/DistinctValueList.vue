@@ -101,6 +101,8 @@ export default {
   created () {
   },
   mounted () {
+    //this.needsCount = true;
+    //this.update();
   }
 }
 </script>

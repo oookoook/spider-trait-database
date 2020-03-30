@@ -25,6 +25,7 @@
         <v-divider vertical class="mx-3" />
         <v-spacer />
         <v-divider vertical class="mx-3" />
+        <action-button text="Open error log" icon="mdi-clipboard-alert-outline" toolbar @click="log.dialog = true;" />
         <action-button text="Refresh the table" icon="mdi-refresh" toolbar @click="refreshDS(); getData();" />
         <action-button text="Revalidate the whole dataset" icon="mdi-check-all" toolbar @click="validate" />
         <action-button v-if="!editor && isValid" color="success" text="Send for review" icon="mdi-send" toolbar @click="review" />
@@ -86,15 +87,19 @@
         <v-bottom-sheet v-model="distinct.dialog" scrollable>
             <distinct-dialog v-if="selectedCell" :editor="editor" :dataset="id" :prop-name="selectedCell.prop" @cancel="distinct.dialog = false" @create="createEntity" @rule="ruleDistinct" @column="columnDistinct"/>
         </v-bottom-sheet>
-        <v-bottom-sheet v-model="log.dialog">
+        <v-bottom-sheet scrollable v-model="log.dialog">
           <v-card>
               <v-card-title>Error Log</v-card-title>
-            <v-card-text>
-            <v-data-table v-if="errors" :items="errors" headers="[{value: 'id', text: 'ID'},{value: 'Message', text: 'text'}]">
+            <v-card-text style="height: 400px">
+            <v-data-table :items="errorsLocal" :headers="[{value: 'id', text: 'ID'},{value: 'text', text: 'Message'}]">
+              <template v-slot:no-data>
+                No errors in the log
+              </template>
             </v-data-table>
             </v-card-text>
             <v-card-actions>
-              <action-button text="Close" @click="log.dialog = false" icon="mdi-close" />
+              <action-button text="Clear log" @click="errorsLocal = []; " icon="mdi-playlist-remove" />
+              <action-button text="Close" @click="log.dialog=false; errorsLocal = []; " icon="mdi-close" />
             </v-card-actions>
           </v-card> 
         </v-bottom-sheet>
@@ -170,7 +175,8 @@ export default {
         selectedCell: null,
         distinct: {
           dialog: false
-        }
+        },
+        errorsLocal: []
   }
   },
   computed: {
@@ -250,13 +256,24 @@ export default {
           this.refreshDS();
           this.getData();
         }
-      } else {
+      } else if(val && val.id) {
+        // this is an external job
+        // internal jobs are refreshed automatically
         this.$timer.start('refreshJob');
       }
     },
     validityFilter(val) {
       this.getData();
     },
+    errors(val) {
+      if(val && Array.isArray(val) && val.length > 0) {
+        //console.dir(val);
+        //console.dir(this.errorsLocal);
+        this.log.dialog = true;
+        val.forEach(e => this.errorsLocal.unshift(e));
+        this.$store.dispatch('clearErrors');
+      }
+    }
     /*
     editMode() {
       if(this.selectedCell) {
@@ -283,6 +300,7 @@ export default {
     },
     validate() {
       //this.jobCompletedAction = () => { this.getData(); this.refreshDS(); };
+      this.loading = true;
       this.$store.dispatch(`editor/validate`,{ id: this.id, all: true });
     },
     refreshDS() {
@@ -293,7 +311,7 @@ export default {
     },
     uploadFile(f) {
       //console.dir(f);
-      this.jobCompletedAction = this.getData;
+      this.jobCompletedAction = () => { this.getData(); this.refreshDS(); };
       this.upload = false;
       this.$store.dispatch(`editor/upload`,{ dataset: this.id, file: f });
     },
@@ -337,7 +355,7 @@ export default {
       this.confirm.title = 'Delete rows';
       var prop = this.$store.getters[`editor/propsDict`][this.selectedCell.prop];
       var value = prop.displayValue(this.selectedCell.item);
-      this.confirm.text = `All rows with the value ${value} in the column ${prop.text} will be deleted.`;
+      this.confirm.text = `All rows with the value "${value == null ? '[empty]' : value}" in the column ${prop.text} will be deleted.`;
       this.confirm.message.show = false;
       this.confirm.action = () => {
         this.loading = true;
@@ -388,12 +406,14 @@ export default {
     */
     editCell() {
       this.edit.action = (e) => {
+        this.loading = true;
         this.$store.dispatch('editor/editRow', { dataset: this.id, id: this.selectedCell.id, changes: e}).then(() => { this.loading = false; this.edit.dialog=false; this.refreshDS(); this.getData(); });
       };
       this.edit.dialog = true;
     },
     editColumn() {
       this.edit.action = (e) => {
+        this.loading = true;
         e.dataset = this.id;
         e.id = this.selectedCell.id;
         this.$store.dispatch('editor/editColumn', e).then(() => { this.loading = false; this.edit.dialog=false; });
@@ -431,7 +451,7 @@ export default {
           this.confirm.dialog = false;
           this.loading = true;
           this.jobCompletedAction = () => { 
-            this.showLog(); 
+            //this.showLog(); 
             this.jobCompletedAction = () => { this.refreshDS(); this.getData(); };
             this.$store.dispatch(`editor/validate`, {id: this.dataset.id});
           }
@@ -444,11 +464,13 @@ export default {
       this.confirm.dialog = true;  
       }
     },
+    /*
     showLog() {
       if(this.errors && this.errors.length > 0) {
         this.log.dialog = true;
       }
     },
+    */
     columnDistinct(evt) {
       this.replaceDistinct('column', evt);
     },
@@ -504,8 +526,12 @@ export default {
 
   },
   mounted () {
-    if(this.job) {
+    if(this.job && this.job.id) {
       this.$timer.start('refreshJob');
+    } else if(this.job && !this.job.id) {
+      // abandoned local job
+      this.$store.dispatch('resetJob');
+      this.refreshJob();
     }
   },
   timers: {
