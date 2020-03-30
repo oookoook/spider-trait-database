@@ -84,11 +84,11 @@ if(!settings.oidc.disable) {
     handleCallback: async function (req, res, next) {
       // replace this with a new version (appSession instead of identity) once a new relase is made
       const client = req.openid.client;
-      req.identity = req.identity || {};
+      req.appSession = req.appSession || {};
       try {
         var t = await client.userinfo(req.openidTokens);
         //console.dir(t);
-        req.identity.claims = t;
+        req.appSession.claims = t;
         next();
       } catch(e) {
         next(e);
