@@ -69,12 +69,11 @@ if(!settings.oidc.disable) {
     issuerBaseURL: settings.oidc.issuer,
     baseURL: settings.oidc.url,
     clientID: settings.oidc.client,
-    appSessionSecret: settings.oidc.session.secret,
-    /* will be required in a new version
+    //appSessionSecret: settings.oidc.session.secret,
+    /* will be required in a new version */
     appSession: {
       secret: settings.oidc.session.secret
     },
-    */
     clientSecret: settings.oidc.secret,
     routes: false,
     authorizationParams: {
