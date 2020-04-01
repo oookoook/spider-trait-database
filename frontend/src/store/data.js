@@ -5,7 +5,7 @@ const getParams = function(filter) {
   if(!f) {
     f= {};
   }
-    var filters = ['family', 'genus', 'species', 'trait-category', 'trait', 'country', 'habitat', 'dataset', 'authors','reference','row-link'];
+    var filters = ['family', 'genus', 'species', 'trait-category', 'trait', 'method', 'location', 'country', 'habitat', 'dataset', 'authors','reference','row-link'];
     return filters.map(i => `${i}/${f[i] ? encodeURIComponent(f[i]) : '*'}`).join('/');
     // `family/:family/genus/:genus/species/:species/trait-category/:traitcat/trait/:trait/country/:country/habitat/:habitat/dataset/:dataset/authors/:authors/reference/:reference/row-link/:rowl`
 

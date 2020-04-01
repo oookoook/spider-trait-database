@@ -196,7 +196,7 @@ const getObject = function(r) {
 const list = async function(params, limits, auth) {
     var id = parseInt(params.id);
     var aw = getAuthWhere(auth);
-    var res = await db.prepareListResponse(limits, 'import', aw, [], joind);
+    var res = await db.prepareListResponse(limits, 'import', `dataset_id = ? AND ${aw}`, [id], joind);
         
     var results = await db.query({table: 'import', sql:`SELECT import.* `
     + `FROM ${joind} WHERE dataset_id = ? AND ${aw}`, values: [id], nestTables: false, limits, hasWhere: true });
@@ -387,9 +387,9 @@ const importRow = async function(conn, ds, r, state, cache) {
 
     // convert timestamps (start, end)
     if(row['event_date']) {
-        var { s, e } = gfc('event_date',conv.parseEvent);
-        row['event_date_start'] = s;
-        row['event_date_end'] = e;
+        var { start, end } = gfc('event_date',conv.parseEvent);
+        row['event_date_start'] = start;
+        row['event_date_end'] = end;
     }
 
     // convert lat, lon
@@ -542,7 +542,7 @@ const getPropsFromObject = function(o) {
     Object.keys(o).forEach(k => {
         //console.log('Prop key: ');
         //console.dir(k);
-        if(typeof o[k] === 'object') {
+        if(o[k] != null && typeof o[k] === 'object') {
             var childAttrs = getPropsFromObject(o[k]);
             Object.keys(childAttrs).forEach(ca => {
                 output[`${k}.${ca}`] = childAttrs[ca];
@@ -604,9 +604,9 @@ const updateRow = async function(params, body, auth) {
     
     // convert timestamps (start, end)
     if(newAttrs['event_date']) {
-        var { s, e } = conv.parseEvent(newAttrs['event_date']);
-        newAttrs['event_date_start'] = s;
-        newAttrs['event_date_end'] = e;
+        var { start, end } = conv.parseEvent(newAttrs['event_date']);
+        newAttrs['event_date_start'] = start;
+        newAttrs['event_date_end'] = end;
     }
 
     // the dataset id is not really needed - the row IDs are autoincremented
@@ -693,8 +693,8 @@ const updateColumn = async function(params, body, auth) {
 
     // convert timestamps (start, end)
     if(column == 'event_date') {
-        var { s, e } = conv.parseEvent(nv);
-        await db.query({table: 'import', sql:`UPDATE ${joind} SET event_date_start = ?, event_date_end = ? WHERE ${cw} AND dataset_id = ? AND ${aw}`, values: [s, e, ds ] });
+        var { start, end } = conv.parseEvent(nv);
+        await db.query({table: 'import', sql:`UPDATE ${joind} SET event_date_start = ?, event_date_end = ? WHERE ${cw} AND dataset_id = ? AND ${aw}`, values: [start, end, ds ] });
     }
 
     /*
@@ -722,7 +722,7 @@ const updateColumn = async function(params, body, auth) {
     };
 }
 
-deleteColumn = async function(params, auth) {
+const deleteColumn = async function(params, auth) {
     var ds = parseInt(params.id);
     var aw = getAuthWhere(auth);
     var column = getColumnName(params.column);
@@ -789,7 +789,7 @@ const getColumn = async function(params, limits, auth) {
     var colSql = colEsc.join(',');
 
 
-    var res = await db.prepareListResponse(limits, 'import', aw, [], joind, colEsc);
+    var res = await db.prepareListResponse(limits, 'import', `dataset_id = ? AND ${aw}`, [ds], joind, colEsc);
         
     var results = await db.query({table: 'import', sql:`SELECT DISTINCT ${colSql} `
     + `FROM ${joind} WHERE dataset_id = ? AND ${aw}`, values: [ds], nestTables: false, limits, hasWhere: true });

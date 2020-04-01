@@ -15,7 +15,7 @@
           :selectedProp.sync="selectedProp"
           :invalid="isPropValid(item, h.value) !== true"
           @select="(e) => selectCell(e, item)">
-            <span>{{ getPropFormattedValue(item, h.value) }}</span>
+            <span>{{ getPropFormattedValue(item, h.value, shorten) }}</span>
           </selectable-cell>
         </tr> 
     </template>
@@ -37,6 +37,9 @@ export default {
   components: {
     SelectableCell
   },
+  props: {
+    shorten: Boolean
+  },
   data () {
     return {
       selectedId: null,
@@ -47,6 +50,9 @@ export default {
 
   },
   watch: {
+    shorten() {
+      this.update();
+    }
   },
   methods: {
     selectCell(e, item) {

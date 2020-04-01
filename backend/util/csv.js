@@ -17,7 +17,7 @@ const get = async function(tmpDir, filename, dstream, connection) {
     
     await new Promise((resolve, reject) => {
 
-    var cstream = fcsv.format({headers: true })
+    var cstream = fcsv.format({headers: true, rowDelimiter:'\r\n' })
         .on('error', err => reject(err))
         
     

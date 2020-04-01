@@ -38,6 +38,10 @@ export default {
       headers: [
         { text: 'Id', value: 'id' },
         { text: 'WSC LSID', value: 'taxonomy.wsc.lsId' },
+        { text: 'Family', value: 'taxonomy.family' },
+        { text: 'Genus', value: 'taxonomy.genus' },
+        { text: 'Species', value: 'taxonomy.species' },
+        { text: 'Subspecies', value: 'taxonomy.subspecies' },
         { text: 'Original name', value: 'originalName' },
         { text: 'Trait ID', value: 'trait.abbrev' },
         { text: 'Trait value', value: 'value' },

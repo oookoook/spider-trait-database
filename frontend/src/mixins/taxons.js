@@ -27,6 +27,7 @@ export default {
             if(item.species) return 'species';
             if(item.genus) return 'genus';
             if(item.family) return 'family';
+            return 'species';
           }
     }
 }

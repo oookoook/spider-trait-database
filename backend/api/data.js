@@ -17,8 +17,8 @@ var join = `data `
 + `LEFT JOIN reference ON data.reference_id = reference.id`;
 
 const getCondition = function(params) {
-    var p = ['family','genus', 'species', 'traitcat', 'trait', 'country', 'habitat', 'dataset', 'authors', 'reference', 'rowl'];
-    var f = ['taxonomy.family', 'taxonomy.genus', 'taxonomy.species', 'trait.trait_category_id', 'data.trait_id', 'country.id', 
+    var p = ['family','genus', 'species', 'traitcat', 'trait', 'method', 'location','country', 'habitat', 'dataset', 'authors', 'reference', 'rowl'];
+    var f = ['taxonomy.family', 'taxonomy.genus', 'taxonomy.species', 'trait.trait_category_id', 'data.trait_id', 'method.id', 'location.id', 'country.id', 
     'habitat_global.id', 'dataset.id', 'dataset.authors', 'data.reference_id', 'data.row_link']
 
     var cl = ['1=1'];
@@ -60,13 +60,10 @@ const list = async function(params, limits) {
                         id: r.taxonomy.wsc_id,
                         lsId: r.taxonomy.wsc_lsid,
                     },
-                    /*
-                    family: taxonomy.family, 
-                    genus: taxonomy.genus, 
-                    species: taxonomy.species, 
-                    subspecies: taxonomy.subspecies,
-                    */
-                    originalName: r.data.original_name,
+                    family: r.taxonomy.family, 
+                    genus: r.taxonomy.genus, 
+                    species: r.taxonomy.species, 
+                    subspecies: r.taxonomy.subspecies,
                     id: r.taxonomy.id
                 },
                 trait: {
@@ -142,12 +139,17 @@ const synonyms = {
     'trait.category.id':'trait_category.id',
     'trait.category.name':'trait_category.name',
     'lifeStage.name':'life_stage.name',
-    'taxon': 'original_name',
+    'taxon': 'taxonomy.wsc_lsid',
     'location': 'location.abbrev',
     'method': 'method.abbrev',
     'reference': 'reference.abbrev',
     'trait': 'trait.abbrev',
-    'dataset': 'dataset.name'
+    'dataset': 'dataset.name',
+    'taxonomy.wsc.lsId': 'taxonomy.wsc_lsid',
+    'sampleSize': 'sample_size',
+    'eventDate.text': 'event_date_text',
+    'eventDate.start': 'event_date_start',
+    'eventDate.end': 'event_date_end',
 }
 
 module.exports = function(dbClient) {

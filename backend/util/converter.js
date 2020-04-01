@@ -94,6 +94,19 @@ const parseNumber = function(val) {
         return num;
     }
 }
+
+//https://www.geeksforgeeks.org/how-to-get-the-number-of-days-in-a-specified-month-using-javascript/
+const getDaysInMonth = function(val) {
+    var a = val.split('-');
+    if(a.length != 2) {
+        // this is not a valid date - should not happen
+        throw('invalid mont identifier');
+    }
+    // the months in the constructor are indexed from 0, in the string from 0
+    var d = new Date(parseInt(a[0]), parseInt(a[0]), 0);
+    return d.getDate();
+}
+
 /*
 The date-time or interval associated to the trait. Examples: 
 1963-03-08T14:07-0600 (8 Mar 1963 at 2:07pm in the time zone six hours earlier than UTC). 
@@ -107,7 +120,71 @@ The date-time or interval associated to the trait. Examples:
 */
 const parseEvent = function(val) {
     // TODO implement the event parsing
-    return { start: new Date(Date.parse(val)), end: null };
+    var start = null;
+    var end = null;
+    
+    if(!val) {
+        return {start, end};
+    }
+
+    var a  = val.split('/');
+
+    if(!a[1]) {
+        a.push(a[0]);
+    }
+
+    // only year is set
+    if(a[0].length == 4) {
+        a[0]+='-01-01';
+    }
+    // year and month is set
+    if(a[0].length == 7) {
+        a[0]+='-01';
+    }
+
+    // ISO-like format without seconds and miliseconds
+    if(a[0].length == 21 && a[0][17] == '-') {
+        a[0]=a[0].substr(0,17) + `:00.000` + a[0].substr(17);
+    }
+
+    // only year is set
+    if(a[1].length == 4) {
+        a[1]+='-12-31';
+    }
+
+    // ISO-like format without seconds and miliseconds
+    if(a[1].length == 21 && a[1][17] == '-') {
+        a[1]=a[1].substr(0,17) + `:00.000` + a[1].substr(17);
+    }
+
+    // year and month is set
+    if(a[1].length == 7) {
+        try {
+            a[1]+=`-${getDaysInMonth(a[1])}T23:59:59.999`;
+        } catch(e) {
+            a[1] = null;
+        }
+    }
+
+    if(a[1].length == 2) {
+        a[1]=a[0].substr(0,8) + a[1];
+    }
+
+    if(a[1].length == 10) {
+        a[1]=a[1] + 'T23:59:59.999Z';
+    }
+
+
+    var startnumval = Date.parse(a[0]);
+    var endnumval = Date.parse(a[1]);
+    if(!isNaN(startnumval)) {
+        start = new Date(startnumval);
+    }
+    if(!isNaN(endnumval)) {
+        end = new Date(endnumval);
+    }
+
+    return { start, end };
 }
 
 module.exports = {

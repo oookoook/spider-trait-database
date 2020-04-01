@@ -16,7 +16,7 @@
       show-expand
     >
     <template v-slot:item.taxon="{ item }">
-        <entity-link-cell :abbrev="item.originalName" :text="item.taxonomy.wsc.lsId" tooltip="View in the World Spider Catalog (opens in a new tab)" external :link="`https://wsc.nmbe.ch/species/${item.taxonomy.wsc_id}`" />
+        <entity-link-cell :abbrev="getTaxon(item.taxonomy)" :text="item.taxonomy.wsc.lsId" tooltip="View in the World Spider Catalog (opens in a new tab)" external :link="getWscLink(item.taxonomy)" />
     </template>
 
     <template v-slot:item.trait="{item}">
@@ -74,6 +74,7 @@
 import EntityLinkCell from '../components/EntityLinkCell'
 import ListItem from '../components/ListItem'
 import DataTable from '../mixins/data-table'
+import Taxons from '../mixins/taxons'
 
 export default {
   name: 'DataPreviewTable',
@@ -81,14 +82,14 @@ export default {
         EntityLinkCell,
         ListItem
   },
-  mixins: [DataTable],
+  mixins: [DataTable, Taxons],
   props: {
-    hideTitle: Boolean
   },
   data () {
     return {
       headers: [
         { text: 'Taxon', value: 'taxon' },
+        { text: 'Original name', value: 'originalName' },
         { text: 'Trait Name', value: 'trait' },
         { text: 'Trait Value', value: 'value' },
         { text: 'Observation', value: 'data-table-expand' },

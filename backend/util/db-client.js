@@ -49,7 +49,7 @@ const addLimits = function (values, limits, table, hasWhere, aggregate, customWh
     if(customWhereClause){
         whereClause = ` ${searchStart} ${customWhereClause}`;
     } else {
-        ` ${searchStart} 1=1`;
+        whereClause = ` ${searchStart} 1=1`;
     }
     if(limits.search) {
         //whereClause = ` ${searchStart} ${mysql.escapeId(table+'.'+limits.search.field)} ${op} '${mysql.escape(limits.search.value)}${wildcard}'`;
@@ -89,6 +89,7 @@ hasWhere
 */
 
 const getQueryParams = function(opt) {
+    //console.dir(opt);
     if(!opt.values) {
         opt.values = [];
     }

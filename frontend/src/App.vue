@@ -61,12 +61,17 @@
           <v-list-item-content><v-list-item-title>Import datasets</v-list-item-title></v-list-item-content>
         </v-list-item>
         <v-list-item to="/approve" v-if="isEditor">
-          <v-list-item-icon><v-icon>mdi-table-edit</v-icon></v-list-item-icon>
+          <v-list-item-icon><v-icon>mdi-stamper</v-icon></v-list-item-icon>
           <v-list-item-content><v-list-item-title>Approve datasets</v-list-item-title></v-list-item-content>
         </v-list-item>
       </v-list>
     </v-menu>
 
+    <v-btn v-if="isAdmin"
+        to="/admin"
+        text
+      ><v-icon left>mdi-cogs</v-icon> Administration 
+    </v-btn>
     <v-menu right bottom offset-y>
       <template v-slot:activator="{ on }">
         <v-btn text v-on="on"><v-icon left>mdi-help</v-icon> Help<v-icon right>mdi-chevron-down</v-icon></v-btn>
@@ -75,6 +80,10 @@
         <v-list-item to="/about">
           <v-list-item-icon><v-icon>mdi-frequently-asked-questions</v-icon></v-list-item-icon>
           <v-list-item-content><v-list-item-title>About project</v-list-item-title></v-list-item-content>
+        </v-list-item>
+        <v-list-item to="/help">
+          <v-list-item-icon><v-icon>lifebuoy</v-icon></v-list-item-icon>
+          <v-list-item-content><v-list-item-title>How to contribute</v-list-item-title></v-list-item-content>
         </v-list-item>
         <v-list-item to="/terms">
           <v-list-item-icon><v-icon>mdi-format-list-numbered</v-icon></v-list-item-icon>

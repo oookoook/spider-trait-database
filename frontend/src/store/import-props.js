@@ -193,7 +193,7 @@ export default [
       text: 'Event Date', 
       displayValue: (i) => i.eventDate.text,
       save: (o, v) => {if(!o.eventDate) o.eventDate={}; o.eventDate.text = v; }, 
-      isValid: (i, e) => true
+      isValid: (i, e) => !i.eventDate.text || (!!i.eventDate.start && !!i.eventDate.end) || 'If date is set, it must be in a valid format' 
     },
     /*
     { 

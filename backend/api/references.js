@@ -48,7 +48,7 @@ const prepareForSql = function(reference) {
     // prepare reference - create the abbrev
     if(!reference.abbrev) {
         reference.abbrev = db.unique((reference.fullCitation || '')//.replace(/[\W ]/,'')
-        .substr(0, Math.min(reference.fullCitation.indexOf(')'), 40)));
+        .substr(0, Math.min(reference.fullCitation.indexOf(')') + 1, 40)));
     }
     reference['full_citation'] = reference.fullCitation;
     delete(reference.fullCitation);

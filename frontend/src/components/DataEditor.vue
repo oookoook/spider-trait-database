@@ -14,6 +14,10 @@
           <action-button  color="error" text="Show invalid rows" icon="mdi-close-outline" toolbar />
         </v-btn-toggle>
         <v-divider vertical class="mx-3" />
+          <v-btn-toggle group dense v-model="shorten">
+          <action-button text="Shorten long values" icon="mdi-arrow-collapse-horizontal" toolbar />
+          </v-btn-toggle>
+        <v-divider vertical class="mx-3" />
           <v-btn-toggle group dense mandatory v-model="editModeRaw">  
             <action-button text="Edit only the selected cell" icon="mdi-table-row" toolbar />
             <action-button text="Edit the selected value in the whole column" icon="mdi-table-column" toolbar />
@@ -39,7 +43,8 @@
         :items="list" 
         :loading="loadingData" 
         :total="total"
-        :options="options" 
+        :options="options"
+        :shorten="shorten === 0" 
         @selectCell="selectCell"
         @update="getData" 
          >
@@ -146,6 +151,7 @@ export default {
     return {
         validityFilter: 0,
         editModeRaw: 0,
+        shorten: true,
         //editMode: 'cell',
         loading: false,
         loadingData: false,

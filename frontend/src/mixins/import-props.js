@@ -16,15 +16,17 @@ export default {
     getPropValue(item, propName) {
      return this.propsDict[propName].displayValue(item);
     },
-    getPropFormattedValue(item, propName) {
+    getPropFormattedValue(item, propName, shorten) {
       //console.log(propName);
       var v = this.getPropValue(item, propName);
       if(v != null && typeof v == 'string') {
        //console.log(`replacing spaces in ${v}`);
         v = v.replace(/\s/g, '\xa0');
-        if(v.length > 35) {
+        
+        if(shorten && v.length > 35) {
           v = v.substring(0, 32) + '...';
         }
+        
       }
       return v;
     },
