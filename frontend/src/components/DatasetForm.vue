@@ -50,7 +50,7 @@
           ></v-text-field>
           <v-text-field
             v-model="dataset.authorsEmail"
-            label="Authors email(s)"
+            label="Author email(s)"
             :counter="255"
             prepend-icon="mdi-at"
             :rules="aemailRules"

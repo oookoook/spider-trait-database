@@ -10,14 +10,14 @@
         :small="menu || small" 
         :color="color"
         v-on="on"
-        :href="download"
+        :href="link"
         :loading="loading"
-        :target="download ? '_blank' : null"
+        :target="link ? '_blank' : null"
         ><v-icon>{{ icon }}</v-icon></v-btn>
       </template>
       <span>{{ text }}</span>
     </v-tooltip>
-    <v-btn v-else text @click="click" :color="color" :loading="loading" :href="download"><v-icon left>{{ icon }}</v-icon> {{ text }}</v-btn>
+    <v-btn v-else text @click="click" :color="color" :loading="loading" :href="link" :target="link ? '_blank' : null"><v-icon left>{{ icon }}</v-icon> {{ text }}</v-btn>
     </span>
 </template>
 
@@ -28,7 +28,7 @@ export default {
   components: {
   },
   props: { icon: { type: String, default: 'mdi-plus-circle' }, text: { type: String, default: 'Add new' }, 
-  color: String, tooltip: Boolean, toolbar: Boolean, menu: Boolean, small: Boolean, download:String, loading: Boolean },
+  color: String, tooltip: Boolean, toolbar: Boolean, menu: Boolean, small: Boolean, link: String, loading: Boolean },
   data () {
     return {
 

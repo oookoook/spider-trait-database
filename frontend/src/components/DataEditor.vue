@@ -4,7 +4,7 @@
       <v-toolbar dense color="accent" class="elevation-0 my-3">
         <action-button text="Dataset detail" icon="mdi-card-text-outline" toolbar @click="dsEdit = true" />
         <action-button color="success" text="Upload data" icon="mdi-upload" toolbar @click="upload = true" />
-        <action-button text="Download as CSV" icon="mdi-download" toolbar :download="downloadLink" />
+        <action-button text="Download as CSV" icon="mdi-download" toolbar :link="downloadLink" />
         <action-button text="Delete all the data" icon="mdi-table-remove" toolbar @click="deleteData"/>
         <action-button text="Delete the dataset" icon="mdi-delete-forever-outline" toolbar @click="deleteDataset" />
         <v-divider vertical class="mx-3" />

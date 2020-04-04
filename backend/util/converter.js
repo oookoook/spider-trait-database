@@ -87,6 +87,7 @@ const parseCoord = function(str) {
 }
 
 const parseNumber = function(val) {
+    val = val.replace('%', '');
     var num = parseFloat(val);
     if(Number.isNaN(num)) {
         return null;
