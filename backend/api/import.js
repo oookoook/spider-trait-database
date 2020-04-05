@@ -804,11 +804,16 @@ const startValidation = async function(params, body, auth) {
     var ds = parseInt(params.id);
     var aw = getAuthWhere(auth);
     //console.dir(body);
-    if(body.all && body.all === true) {
-        await db.query({table: 'import', sql:`UPDATE ${joind} SET changed = 1 WHERE dataset_id = ? AND ${aw}`, values: [ ds ] });
+    
+    const f = async (params) => {
+        if(body.all && body.all === true) {
+            await db.query({table: 'import', sql:`UPDATE ${joind} SET changed = 1, valid_review = 0, valid = 0 WHERE dataset_id = ? AND ${aw}`, values: [ ds ] });
+        }
+        params.state.progress += 1000;
+        await validate(params);
     }
     
-    var jobId = jm.createJob(auth.sub, 16000, validate, { ds, aw });
+    var jobId = jm.createJob(auth.sub, 17000, f, { ds, aw });
     return {
         job: jm.getJob(jobId),    
     };
@@ -852,7 +857,7 @@ const validate = async function(params) {
     + ` (location_precision IS NULL OR location_precision_numeric IS NOT NULL) AND`
     + ` (location_country_code IS NULL OR location_country_id IS NOT NULL) AND`
     + ` (location_habitat_global IS NULL OR location_habitat_global_id IS NOT NULL) AND`
-    //+ ` (event_date IS NULL OR event_date_start IS NOT NULL) AND`
+    + ` (event_date IS NULL OR (event_date_start IS NOT NULL AND event_date_end IS NOT NULL)) AND`
     + ` (require_numeric_value = 0 OR value_numeric = value OR (value = 'true' AND value_numeric = 1) OR (value = 'false' AND value_numeric = 0)) AND`
     + ` dataset_id = ? AND changed = 1 AND ${aw}`, values: [ds] });
 
