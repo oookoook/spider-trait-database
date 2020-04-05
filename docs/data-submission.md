@@ -2,6 +2,8 @@
 
 This document covers data submission process and rules to the Spider Trait Database. It also provides tutorial on data modification capabilities of the online data editing tool.
 
+> If you want to request access and contribute to the database, please [contact the administrators](mailto:spidertraits@group.muni.cz?subject=Spider%20Traits%3A%20Request%20for%20Access&body=Hello%2C%20I%20would%20like%20to%20request%20the%20access%20for%20the%20Spider%20Traits%20Database%20access.%0D%0A%0D%0A---%20Please%20provide%20more%20detail%20about%20your%20request%20(e.g.%20information%20about%20the%20data%20you%20want%20to%20upload)%3A%20---).
+
 ## Data validity
 
 Before the dataset can be comitted to the database, the data must be in a valid format. That basically means that all required attributes must be filled in, all numeric or temporal information must be valid numbers or timestamps  and enumerated values must comply to the list of valid values. The precise definitons of validity requirements can be find below. 

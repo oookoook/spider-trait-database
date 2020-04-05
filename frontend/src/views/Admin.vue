@@ -1,5 +1,6 @@
 <template>
   <v-container>
+    <auth-section admin>
     <h2>Administration</h2>
     <p>This page contains links to services for user and resource management.</p>
     <v-expansion-panels
@@ -77,17 +78,20 @@
     </v-expansion-panel-content>
     </v-expansion-panel>
     </v-expansion-panels>
+    </auth-section>
   </v-container>
 </template>
 
 <script>
 import { mapState, mapGetters } from 'vuex'
 import ActionButton from '../components/ActionButton'
+import AuthSection from '../components/AuthSection'
 
 export default {
   name: 'admin',
   components: {
-    ActionButton
+    ActionButton,
+    AuthSection
   },
   props: [],
   data () {

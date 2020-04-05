@@ -81,9 +81,13 @@
           <v-list-item-icon><v-icon>mdi-frequently-asked-questions</v-icon></v-list-item-icon>
           <v-list-item-content><v-list-item-title>About project</v-list-item-title></v-list-item-content>
         </v-list-item>
-        <v-list-item to="/help">
-          <v-list-item-icon><v-icon>lifebuoy</v-icon></v-list-item-icon>
-          <v-list-item-content><v-list-item-title>How to contribute</v-list-item-title></v-list-item-content>
+        <v-list-item href="https://github.com/oookoook/spider-trait-database/blob/master/docs/data-submission.md" target="_blank">
+          <v-list-item-icon><v-icon>mdi-share</v-icon></v-list-item-icon>
+          <v-list-item-content><v-list-item-title>Data submission</v-list-item-title></v-list-item-content>
+        </v-list-item>
+        <v-list-item v-if="user" href="https://github.com/oookoook/spider-trait-database/blob/master/docs/editor-howto.md" target="_blank">
+          <v-list-item-icon><v-icon>mdi-lifebuoy</v-icon></v-list-item-icon>
+          <v-list-item-content><v-list-item-title>Data editor How To</v-list-item-title></v-list-item-content>
         </v-list-item>
         <v-list-item to="/terms">
           <v-list-item-icon><v-icon>mdi-format-list-numbered</v-icon></v-list-item-icon>
