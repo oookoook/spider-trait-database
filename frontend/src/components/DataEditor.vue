@@ -32,6 +32,7 @@
         <action-button text="Open error log" icon="mdi-clipboard-alert-outline" toolbar @click="log.dialog = true;" />
         <action-button text="Refresh the table" icon="mdi-refresh" toolbar @click="refreshDS(); getData();" />
         <action-button text="Revalidate the whole dataset" icon="mdi-check-all" toolbar @click="validate" />
+        <v-divider vertical class="mx-3" />
         <action-button v-if="!editor && isValid" color="success" text="Send for review" icon="mdi-send" toolbar @click="review" />
         <action-button v-if="!editor && !isValid" color="warning" text="Send for review (dataset invalid)" icon="mdi-send" toolbar @click="review"/>
         <action-button v-if="editor" color="error" text="Reject" icon="mdi-undo" toolbar @click="reject"/>
