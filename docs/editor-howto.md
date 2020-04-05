@@ -14,13 +14,17 @@ The types of edit that can be done using the data editor are:
 
 ## Viewing existing unprocessed datasets
 
-Dataset states, actions
+The entry point to data submission process is a list of submitted datasets. Contributors can view their submitted datasets here or add new ones. The list is located in the top menu under `Contribute` -> `Import datasets`.
+
+![Import datasets](img/import-datasets.gif)
 
 ## Creating a new dataset
 
 Where is the add button
 
 Filling in the form
+
+## Viewing datasets under review (editor only)
 
 ## Data editor toolbar
 
