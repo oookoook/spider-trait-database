@@ -40,7 +40,7 @@ Once the dataset is fully valid, the editor can approve the dataset to the datab
 
 ## Recognized column names and validity constraints
 
-The list of column names with their descriptions and allowed values follows. The column names can be formatted in a three notations: with spaces (e.g. "Original name"), with undersocres ("original_name") or as camelCase ("originalName"). Both Upper case, lower case (or combination) are recognized. You can also combine different types or notation in one file.
+The list of column names with their descriptions and allowed values follows. The column names can be formatted in a three notations: with spaces (e.g. `Original name`), with undersocres (`original_name`) or as camelCase (`originalName`). Both Upper case and lower case (or combination) are recognized. You can also combine different types or notation in one file.
 
 + `wsc_lsid` - Taxonomic identifier (URN) linking the record with World Spider Catalog. Example: `urn:lsid:nmbe.ch:spidersp:033381`
 + `original_name` - **Mandatory**. Full taxon name as assigned by the author in the original source (that is, not changed based on later taxonomical amendations). If no LSID is provided, the original name should be known to the World Spider Catalog at least as a synonym, homonym, or a known combination. Example: `Pimoa rupicola`.
@@ -71,12 +71,10 @@ The list of column names with their descriptions and allowed values follows. The
   + `2007-11-13/15` - some time in the interval between 13 November 2007 and 15 November 2007.
 + `reference_abbrev` - Unique identifier linking to the list of references. This column is used only in special cases as reference abbreviations are generated automatically during the review process.
 + `reference` - **Mandatory** (if no `reference_abbrev` is provided) Reference related to the trait, preferentially in the format used in the world spider catalog. Examples:
-
   + Journal: `Thaler, K. & Plachter, H. (1983). Spinnen aus Höhlen der Fränkischen Alb, Deutschland (Arachnida: Araneae: Erigonidae, Linyphiidae). Senckenbergiana Biologica 63: 249-263.`
   + Book: `Yaginuma, T. (1962). The spider fauna of Japan. Arachnological Society of East Asia Osaka, 74 pp.`
   + Book Chapter: `Pickard-Cambridge, O. (1891). Arachnida. Araneida. In: Biologia Centrali-Americana, Zoology. London 1, 73-88.`
   + Website: `World Spider Catalog (2019). World Spider Catalog. Version 20.5. Natural History Museum Bern, online at http://wsc.nmbe.ch, accessed on {date of access}.`
-
 + `reference_doi` - DOI of the reference.
 + `row_link` - Used for multidimensional data, i.e. use same numbers for rows that contain data from same individuals or populations obtained in the same context.
 + `location_abbrev` - Unique identifier linking to the list of known locations. This column is used only in special cases as reference abbreviations are generated automatically during the review process.
@@ -107,7 +105,8 @@ The types of edit that can be done using the data editor are:
 + Replacing an unrecognized value with a value from an enumeration list (e.g. fixing typos, replacing synonyms)
 + Replacing unparsable value with a valid representation (numbers, timestamps, coordinates)
 + Deleting records that can't be made valid
-+ Creating new entites (references, locations, methods, traits)
++ Creating new entites (references, locations, methods, traits) - editors only
 
 ## Data editor How To
 
+Detailed instructions on how to use the data editor can be found in the [Data Editor HowTo](editor-howto.md).
