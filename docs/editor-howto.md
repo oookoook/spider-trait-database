@@ -42,7 +42,7 @@ Contributors can edit the dataset by clicking the pen icon on the right. They ca
 
 User can add new dataset by clicking the green "plus" button in the top right. Then, a new dataset form appears. Dataset name and uploader name are filled in automatically, but the uploader e-mail must be provided. The other properties are not mandatory. After filling in the information, a new dataset is created.
 
-![Create dataset](img/creating-dataset.gif)
+![Create dataset](img/create-dataset.gif)
 
 ## Viewing datasets under review (editor only)
 
@@ -113,7 +113,7 @@ Buttons in the last group are used for changing the state of the dataset to one 
 
 ## Data editing examples
 
-### Providng a missing required value
+### Providing a missing required value
 
 ### Replacing an unrecognized value with a value from an enumeration list (e.g. fixing typos, replacing synonyms)
 
