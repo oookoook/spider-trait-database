@@ -18,6 +18,26 @@ The entry point to data submission process is a list of submitted datasets. Cont
 
 ![Import datasets](img/import-datasets.gif)
 
+There are several states the dataset can be in:
+
+### New
+
+Contributors can edit the dataset by clicking the pen icon on the right.
+
+![New dataset](img/new-dataset.gif)
+
+### Under review
+
+Contributors cannot edit the dataset as it was submitted for the review.
+
+![Under review](img/reviewed-dataset.png)
+
+### Rejected
+
+Contributors can edit the dataset by clicking the pen icon on the right. They can also view any message editor left them by clicking the arrow down.
+
+![Rejected](img/rejected-dataset.gif)
+
 ## Creating a new dataset
 
 Where is the add button
