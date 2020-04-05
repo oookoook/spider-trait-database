@@ -55,9 +55,9 @@
     <action-button color="primary" text="Administrators" icon="mdi-cogs" link="https://perun.aai.muni.cz/organizations/363/groups/6482/members" />  
      -->
 
-     <action-button color="primary" text="Contributors" icon="mdi-share" link="https://idm.ics.muni.cz/fed/gui/#grp/detail?id=6484&active=1;" />
-    <action-button color="primary" text="Editors" icon="mdi-stamper" link="https://idm.ics.muni.cz/fed/gui/#grp/detail?id=6483&active=1;" />
-    <action-button color="primary" text="Administrators" icon="mdi-cogs" link="https://idm.ics.muni.cz/fed/gui/#grp/detail?id=6482&active=1;" />  
+     <action-button color="primary" text="Contributors" icon="mdi-share" link="https://idm.ics.muni.cz/fed/gui/#grp/detail?id=6484&amp;active=1;" />
+    <action-button color="primary" text="Editors" icon="mdi-stamper" link="https://idm.ics.muni.cz/fed/gui/#grp/detail?id=6483&amp;active=1;" />
+    <action-button color="primary" text="Administrators" icon="mdi-cogs" link="https://idm.ics.muni.cz/fed/gui/#grp/detail?id=6482&amp;active=1;" />  
     </v-row>
 
       </v-expansion-panel-content>
