@@ -71,6 +71,13 @@ export default {
     $route(to, from) {
         this.processRoute();
     },
+    showNew(val, oldVal) {
+      if(val) {
+        this.$router.push('/import/new');
+      } else {
+        this.$router.push('/import');
+      }
+    }
   },
   methods: {
     processRoute() {
@@ -83,11 +90,7 @@ export default {
       }
     },
     showNewDialog(s) {
-      if(s) {
-        this.$router.push('/import/new');
-      } else {
-        this.$router.push('/import');
-      }
+        this.showNew = s;
     },
     prepare(id) {
       this.$router.push(`/prepare/${id}`);
