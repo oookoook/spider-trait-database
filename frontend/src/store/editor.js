@@ -213,7 +213,7 @@ export default {
       });
       if (data) {
         if(data.job) {
-          data.job.title='Updating data...';
+          data.job.title='Validating data...';
           await context.dispatch('createJob', data, {
             root: true
           });

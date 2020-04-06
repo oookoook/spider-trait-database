@@ -54,8 +54,8 @@
     </v-card-text>
     <v-card-actions>
       <action-button text="Cancel" @click="$emit('cancel')" icon="mdi-cancel" />
-      <action-button text="Apply rule" v-if="isRule" color="warning" @click="save" icon="mdi-check" />
-      <action-button text="Save" v-else color="primary" @click="save" icon="mdi-check" />
+      <action-button text="Apply rule" v-if="isRule" :loading="loading" color="warning" @click="save" icon="mdi-check" />
+      <action-button text="Save" v-else :loading="loading" color="primary" @click="save" icon="mdi-check" />
       
     </v-card-actions>
   </v-card>
@@ -76,10 +76,10 @@ export default {
     AutocompleteProvider,
     DataFilter
   },
-  props: { type: String, selection: Object, val: Object, autocompleteItems: Array },
+  props: { type: String, selection: Object, val: Object, autocompleteItems: Array, loading: Boolean },
   data () {
     return {
-      loading: false,
+      //loading: false,
       modifiedProp: null,
       modifiedValue: null,
       originalValue: null,

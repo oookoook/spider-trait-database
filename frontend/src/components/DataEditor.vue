@@ -88,7 +88,7 @@
             </v-card>
         </v-bottom-sheet>
         <v-bottom-sheet v-model="edit.dialog">
-            <edit-dialog :editor="editor" :type="editMode" :selection="selectedCell" @cancel="edit.dialog = false" @save="edit.action" />
+            <edit-dialog :editor="editor"  :loading="loading" :type="editMode" :selection="selectedCell" @cancel="edit.dialog = false" @save="edit.action" />
         </v-bottom-sheet>
         <v-bottom-sheet v-model="distinct.dialog" scrollable>
             <distinct-dialog v-if="selectedCell" :editor="editor" :dataset="id" :prop-name="selectedCell.prop" @cancel="distinct.dialog = false" @create="createEntity" @rule="ruleDistinct" @column="columnDistinct"/>
