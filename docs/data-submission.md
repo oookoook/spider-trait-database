@@ -58,7 +58,7 @@ The list of column names with their descriptions and allowed values follows. The
 + `measure` - Mearue: Categorical variable. Valid values: `Single observation`, `Mean`, `Median`, `Min`, `Max`.
 + `sex` - Sex: Categorical variable. Valid values: `Female`, `Male`, `Both`, `Unknown`.
 + `life_stage` - Life stage: Categorical variable. Valid values: `Egg`, `Spiderling`, `Juvenile`, `Adult`, `All`.
-+ `frequency` - Relative frequency of occurrence. Real number.  
++ `frequency` - Relative frequency of occurrence. Real number. Decimal point (`.`) is used.
 + `sample_size` - Total number of observations per record. Integer.
 + `event_date` - The date-time or interval associated to the trait. The value must be either omitted or comply to one of the supported formats:
   + `1963-03-08T14:07-0600` - 8 Mar 1963 at 2:07pm in the time zone six hours earlier than UTC.
@@ -72,7 +72,7 @@ The list of column names with their descriptions and allowed values follows. The
   + `1906-06/1906-07` - some time during the interval between the beginning of the June 1906 and the end of July 1906.
   + `2007-11-13/15` - some time in the interval between 13 November 2007 and 15 November 2007.
 + `reference_abbrev` - Unique identifier linking to the list of references. This column is used only in special cases as reference abbreviations are generated automatically during the review process.
-+ `reference` - **Mandatory** (if no `reference_abbrev` is provided) Reference related to the trait, preferentially in the format used in the world spider catalog. Examples:
++ `reference` - **Mandatory** (if no `reference_abbrev` is provided). Reference related to the trait, preferentially in the format used in the world spider catalog. Examples:
   + Journal: `Thaler, K. & Plachter, H. (1983). Spinnen aus Höhlen der Fränkischen Alb, Deutschland (Arachnida: Araneae: Erigonidae, Linyphiidae). Senckenbergiana Biologica 63: 249-263.`
   + Book: `Yaginuma, T. (1962). The spider fauna of Japan. Arachnological Society of East Asia Osaka, 74 pp.`
   + Book Chapter: `Pickard-Cambridge, O. (1891). Arachnida. Araneida. In: Biologia Centrali-Americana, Zoology. London 1, 73-88.`
@@ -111,4 +111,4 @@ The types of edit that can be done using the data editor are:
 
 ## Data editor How To
 
-Detailed instructions on how to use the data editor can be found in the [Data Editor HowTo](editor-howto.md).
+Detailed instructions on how to use the data editor can be found in the [Data Editor How To](editor-howto.md).

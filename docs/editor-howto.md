@@ -68,6 +68,8 @@ Buttons in this group affect the whole datasets or all the records.
 + Delete all the data - Deletes all the rows, but keeps the empty dataset. Requires confirmation before deleting.
 + Delete the dataset - Deletes all the data, as well as the dataset information itself. Requires confirmation before deleting.
 
+![Upload](img/upload.gif)
+
 ### Data filters
 
 The data filters help the user to identify the rows that require edits. The number of records in the bottom right corner of the table can help to determine the total count of records of each type.
@@ -111,14 +113,75 @@ Buttons in the last group are used for changing the state of the dataset to one 
 + Reject (editor only) - Rejects the dataset. The dataset is returned to the contributor with an optional message describing the problems and editor's requests.
 + Approve (editor only) - This button is active only if the dataset is fully valid. Otherwise, a red inactive icon is shown. If the button is active, it transfers the dataset to the Spider Trait Database.
 
+![Submit for review](img/submitting.gif)
+
 ## Data editing examples
 
-### Providing a missing required value
+In the following section, typical data editing tasks are described in more detail.
+
+### Editing singe cell
+
+This functionality can be used e.g. for correcting typos or incorrectly parsed text.
+
+![Editing single cell](img/single-cell.gif)
 
 ### Replacing an unrecognized value with a value from an enumeration list (e.g. fixing typos, replacing synonyms)
 
-### Replacing unparsable value with a valid representation (numbers, timestamps, coordinates)
+To replace synonyms in the dataset, it is possible to use the *Edit the selected value in the whole column* action. If the value must comply to an enumeration, the autocomplete function can be used. If large number of values is replaced, this operation can take a while (around 1 minute for 50 000 records).
+
+![Replacing](img/replacing.gif)
+
+### Providing a missing value
+
+In some cases the above apprach can't be used. For example when the target column is empty but it should contain multiple distinct values. In such cases, we can use values in another column to serve as a rule for the replacement: *If column A contains value X, replace value in column B with value Y*. As in the previous case, the operation can take a while for large datasets.
+
+Example:
+
+> If `method_name` column contains `Pitfall traps`, fill the column `method_description` with *A pitfall trap is a trapping pit for small animals, such as insects, amphibians and reptiles. Pitfall traps are mainly used for ecology studies and ecologic pest control. Animals that enter a pitfall trap are unable to escape.*.
+
+![Replacing](img/rule.gif)
+
+### Removing a value from column
+
+Use the *Edit the selected value in the whole column* action and then click the cross in the value input field:
+
+![Deleting value](img/delete-value.gif)
 
 ### Deleting records that can't be made valid
 
+Very similar functions are available for deleting the rows. You can either delete a single record or all the records with the given value in a selected column:
+
+![Deleting records](img/delete-records.gif)
+
 ### Creating new entites (references, locations, methods, traits) - editors only
+
+During the validation process, editors have to create all new entities that appear in the dataset. References, locations, methods, or in rare occasions also new traits. This can be accomplished using the *View distinct values in the selected column* action and showing the list of entities in the following dialog. There is an option to create the new entities in a batch. However, the tool creates only entities that are visible in the table on the screen. To create all the entities in the whole dataset, the table has to be forced to show all the records. As this might result in loading large amounts of data, showing all the entities can take a moment (up to 30 seconds). Creating large amounts of entities (e.g. few hundreths) also requires a few minutes to complete.
+
+For references and locations, the entity abbreviations are created automatically during the creation process. For traits and methods, the abbreviation must be assigned by the editor manually prior creating the entities.
+
+![Creating entities](img/entities.gif)
+
+### Replacing unparsable value with a valid representation (numbers, timestamps, coordinates)
+
+For this action, usually the *Edit the selected value in the whole column* is used.
+
+Here are the rules for parsable data types (see [Data submision documentation](data-submission.md) for full list):
+
++ `value` - Trait value. If the Trait data type is not Character, the value must be a valid number. Decimal point (`.`) is used. Percentage sign (`%`) is allowed.
++ `frequency` - Relative frequency of occurrence. Real number. Decimal point (`.`) is used.
++ `sample_size` - Total number of observations per record. Integer.
++ `event_date` - The date-time or interval associated to the trait. The value must be either omitted or comply to one of the supported formats:
+  + `1963-03-08T14:07-0600` - 8 Mar 1963 at 2:07pm in the time zone six hours earlier than UTC.
+  + `2009-02-20T08:40Z` - 20 February 2009 8:40am UTC.
+  + `2018-08-29T15:19` - 3:19pm local time on 29 August 2018.
+  + `1809-02-12` - some time during 12 February 1809.
+  + `1906-06` - some time in June 1906.
+  + `1971` - some time in the year 1971.
+  + `2007-03-01T13:00:00Z/2008-05-11T15:30:00Z` - some time during the interval between 1 March 2007 1pm UTC and 11 May 2008 3:30pm UTC.
+  + `1900/1909` - some time during the interval between the beginning of the year 1900 and the end of the year 1909.
+  + `1906-06/1906-07` - some time during the interval between the beginning of the June 1906 and the end of July 1906.
+  + `2007-11-13/15` - some time in the interval between 13 November 2007 and 15 November 2007.
++ `location_lat` - The geographic latitude of the geographic center of a Location. Preffered format is  decimal degrees, using the spatial reference system WGS84. Positive values are north of the Equator, negative values are south of it. Legal values lie between -90 and 90, inclusive. Other widely used formats are also parsed correctly. Examples: `45.74`, `-37.22285`.
++ `location_lon` - The geographic longitude of the geographic center of a Location. Preffered format is decimal degrees, using the spatial reference system WGS84. Positive values are east of the Greenwich Meridian, negative values are west of it. Legal values lie between -180 and 180, inclusive. Other widely used formats are also parsed correctly. Examples: `102.478922`, `-0.4767`
++ `location_country_code` - The standard code for the country. Both two-character and three-chartacter codes are recognized. Examples: `CZ`, `IT`, `BR`, `CZE`.
++ `location_habitat_global` - A description of the global habitat based on [IUCN habitats](https://www.iucnredlist.org/resources/habitat-classification-scheme). Examples: `Savanna - Dry`.
