@@ -9,7 +9,7 @@
       :autocomplete-items="autocompleteItems" 
       @autocomplete="autocomplete"
       v-model="search"
-      show-expand/>
+      />
     </v-card-title>
   <v-data-table
       :headers="headers"
@@ -18,6 +18,7 @@
       :server-items-length="total"
       :loading="loading"
       class="elevation-1"
+      show-expand
     >
     
     <template v-slot:item.abbrev="{ item }">
@@ -31,7 +32,7 @@
     </template>
 
     <template v-slot:item.doi="{ item }">
-      <entity-link-cell :text="item.doi" tooltip="View the source paper" external :link="getDOILink(item.doi)" />
+      <entity-link-cell v-if="item.doi" :text="item.doi" tooltip="View the source document" external :link="getDOILink(item.doi)" />
     </template>
 
     <template v-slot:item.actions="{ item }">
@@ -68,6 +69,9 @@ export default {
   },
   methods: {
     getDOILink(doi) {
+      if(!doi) {
+        return null;
+      }
       return doi.replace('doi:', 'https://doi.org/');
     }
   },
