@@ -5,7 +5,7 @@ const resourcesAuth = function (req, res, next) {
     //console.dir(claims);
     //console.dir(req.openid ? req.openid : 'no oidc present');
     //console.dir((req.openid && req.openid.user) ? req.openid.user : 'no openid user');
-    var groups = req.openid.user[claims.name];
+    var groups = req.openid.user && req.openid.user[claims.name] ? req.openid.user[claims.name] : [];
     var sub = req.openid && req.openid.user && req.openid.user.sub ? req.openid.user.sub : null;
     req.resourcesAuth = {
         sub, 
