@@ -6,7 +6,7 @@ This document covers data submission process and rules to the Spider Trait Datab
 
 ## Data validity
 
-Before the dataset can be comitted to the database, the data must be in a valid format. That basically means that all required attributes must be filled in, all numeric or temporal information must be valid numbers or timestamps  and enumerated values must comply to the list of valid values. The precise definitons of validity requirements can be find below. 
+Before the dataset can be comitted to the database, the data must be in a valid format. That basically means that all required attributes must be filled in, all numeric or temporal information must be valid numbers or timestamps  and enumerated values must comply to the list of valid values. The precise definitons of validity requirements can be find below.
 
 ## User roles
 
