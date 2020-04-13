@@ -84,7 +84,7 @@ const getAuthWhere = function(auth) {
     return c;
 }
 
-const checkOwner = function(id, auth) {
+const checkOwner = async function(id, auth) {
     var r = await db.query({table: 'dataset', sql: `SELECT id FROM dataset WHERE ${getAuthWhere(auth)} AND id=?`, values: [id]});
     if(r.length != 1 || r[0].id != id) {
         throw 'UNAUTH: Cannot edit the dataset - not an owner or editor'
@@ -355,7 +355,7 @@ const transferToData = async function(params) {
 const importRow = async function(conn, ds, r, state, cache) {
     var row = {};
     // copy the values and convert to snake case
-    console.dir(r);
+    //console.dir(r);
     Object.keys(r).forEach(k => {
         var c = snakeCase(k).toLowerCase();
         //console.dir(c);
