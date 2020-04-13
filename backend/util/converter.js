@@ -122,7 +122,6 @@ The date-time or interval associated to the trait. Examples:
 2007-11-13/15 (some time in the interval between 13 November 2007 and 15 November 2007).
 */
 const parseEvent = function(val) {
-    // TODO implement the event parsing
     var start = null;
     var end = null;
     

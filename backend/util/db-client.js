@@ -323,6 +323,11 @@ const createEntity = async function (opts) {
 
 const getAuthWhere = function(auth) {
     var aw = "";
+
+    if(auth && auth.isEditor) {
+        return aw;
+    }
+    
     if(auth) {
         // if auth is set, we have to check the sub attribute and add the clause
         aw = `AND sub = ${mysql.escape(auth.sub)}`;

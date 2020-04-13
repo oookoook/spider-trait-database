@@ -20,7 +20,7 @@ const get = async function(params) {
     var results = await db.query({table: 'reference', sql: 'SELECT * '
      + 'FROM reference '
      + 'WHERE id = ?', values: [id] });
-     console.dir(results);
+     //console.dir(results);
      var r = results[0];
      return { item: {
         id: r.id,
@@ -47,8 +47,9 @@ const validate = async function(reference) {
 const prepareForSql = function(reference) {
     // prepare reference - create the abbrev
     if(!reference.abbrev) {
+        var parenthesis = reference.fullCitation.indexOf(')');
         reference.abbrev = db.unique((reference.fullCitation || '')//.replace(/[\W ]/,'')
-        .substr(0, Math.min(reference.fullCitation.indexOf(')') + 1, 40)));
+        .substr(0, Math.min(parenthesis > 0 ? parenthesis + 1 : 40, 40)));
     }
     reference['full_citation'] = reference.fullCitation;
     delete(reference.fullCitation);

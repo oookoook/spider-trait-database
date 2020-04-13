@@ -64,7 +64,7 @@ export default {
         { text: 'State', value: 'state'},
         { text: 'Uploader', value: 'uploader' },
         //{ text: 'Uploader e-mail', value: 'email' },
-        { text: 'Authors', value: 'name' },
+        { text: 'Authors', value: 'authors' },
         { text: 'Notes & Messages', value: 'data-table-expand', sortable: false},
         
         { text: 'Actions', value: 'actions', sortable: false }

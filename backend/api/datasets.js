@@ -27,8 +27,9 @@ const setState = function(r) {
 }
 
 const list = async function(limits, auth, showImport) {
-    var res = await db.prepareListResponse(limits, 'dataset');
     var where = getWhere(auth,showImport);
+    var res = await db.prepareListResponse(limits, 'dataset', where);
+    
     //console.dir(res);
     var results = await db.query({table: 'dataset', sql: `SELECT dataset.id, dataset.name, dataset.authors, dataset.uploader, `
                         +`dataset.date, dataset.message, dataset.notes, dataset.imported `

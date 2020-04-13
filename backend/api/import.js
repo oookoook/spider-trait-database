@@ -84,6 +84,13 @@ const getAuthWhere = function(auth) {
     return c;
 }
 
+const checkOwner = function(id, auth) {
+    var r = await db.query({table: 'dataset', sql: `SELECT id FROM dataset WHERE ${getAuthWhere(auth)} AND id=?`, values: [id]});
+    if(r.length != 1 || r[0].id != id) {
+        throw 'UNAUTH: Cannot edit the dataset - not an owner or editor'
+    }
+}
+
 const getObject = function(r) {
     // convert to camelCase from snake case
     // serialize timestamps
@@ -348,11 +355,11 @@ const transferToData = async function(params) {
 const importRow = async function(conn, ds, r, state, cache) {
     var row = {};
     // copy the values and convert to snake case
-    //console.dir(r);
+    console.dir(r);
     Object.keys(r).forEach(k => {
         var c = snakeCase(k).toLowerCase();
         //console.dir(c);
-        if(columns.includes(c)) {
+        if(columns.includes(c) && r[k].length > 0) {
             row[c] = r[k];
         }
     });
@@ -435,9 +442,16 @@ const uploadFile = async function(params, body, files, auth) {
     }
     var fpath = f.tempFilePath;
     //console.dir(fpath);
-    if(f.mimetype == 'application/vnd.ms-excel' || f.mimetype == 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet') {
+    //console.log(f.mimetype);
+    //console.log(f.name);
+    //console.log(`${f.name.toLowerCase().indexOf('.csv')} ${f.name.length}`)
+    // https://www.drupal.org/project/commerce_shipping_price_matrix/issues/2965997
+    // we check mime type or if file name ends with csv
+    if((f.mimetype == 'application/vnd.ms-excel' || f.mimetype == 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+    && f.name.toLowerCase().indexOf('.csv') + 4 != f.name.length) {
+        //console.log('converting');
         fpath = await csv.convert(fpath);
-    } else if(f.mimetype != 'text/csv') {
+    } else if(f.mimetype != 'text/csv' && f.name.toLowerCase().indexOf('.csv') + 4 != f.name.length) {
         throw 'Unknown file format';
     }
     // first passthrough - just get the number of lines
@@ -450,25 +464,41 @@ const uploadFile = async function(params, body, files, auth) {
 
         var conn = await db.getConnection();
 
+        
+        // https://mariadb.com/kb/en/how-to-quickly-insert-data-into-mariadb/
+        //await conn.query({table: 'import', sql: 'BEGIN'});
+        await conn.query({table: 'import', sql: 'ALTER TABLE import DISABLE KEYS'});
+
         // this promise will resolve when the last row is inserted into the db
         // the data events are fired asynchronously (they are not waiting for processing the previous row) and the queries are queued by the mysql client
         // releaseConnection is also queued and can be basically ignored in the flow 
         await new Promise((resolve, reject) => {
         var valCache = {};
-        fcsv.parseFile(fpath, {headers: true, ignoreEmpty: true})
+        fcsv.parseFile(fpath, {headers: true, ignoreEmpty: true, trim: true, encoding: 'utf8'})
         .on('error', error => { params.state.errors.push[error]; params.state.aborted = true; resolve(); })
         .on('data', async row => {  
             // we are running async code here here, but another data event was already fired - the events are not waiting for each other
+            
+            /* speeding up the querying 
+            if(cnt-total % 1000 == 0 && cnt - total >= 1000) {
+                await conn.query({table: 'import', sql: 'END'});
+                await conn.query({table: 'import', sql: 'BEGIN'});
+            }
+            */
             await importRow(conn, params.ds, row, params.state, valCache);
+            
             cnt-=1;
             if(cnt == 0) {
-                console.log('Last row processed');
+                console.log('Last row processed. Enabling indexes...');
+                await conn.query({table: 'import', sql: 'ALTER TABLE import ENABLE KEYS'});
+                db.releaseConnection(conn); 
+                console.log('Connecton released');
                 resolve();
             }
         })
         // when the last record is added to the db queue, an callback is attached to the connection release
         // when the connection is released, the callback is called
-        .on('end', rowCount => { console.log('csv processing ended - conn released'); db.releaseConnection(conn); /*db.releaseConnection(conn, () => resolve())*/ });
+        .on('end', rowCount => { /* console.log('csv processing ended - conn released'); db.releaseConnection(conn); db.releaseConnection(conn, () => resolve())*/ });
         });
         // now all the records are saved in the db or the import was aborted due to the error
         if(params.state.aborted) {
@@ -492,6 +522,7 @@ const deleteRecords = async function(params, auth) {
     var id = parseInt(params.id);
     //https://www.mysqltutorial.org/mysql-delete-join/
     await db.query({table: 'import', sql: `DELETE import FROM ${joind} WHERE dataset_id=? AND ${getAuthWhere(auth)}`, values: [id] });
+    await db.query({table: 'import', sql: `OPTIMIZE TABLE import;`});
     return {
         id
     }
@@ -632,6 +663,7 @@ const deleteRow = async function(params, auth) {
 
 const updateColumn = async function(params, body, auth) {
     var ds = parseInt(params.id);
+    
     var aw = getAuthWhere(auth);
     var column = getColumnName(params.column);
     if(column == 'dataset_id' || column == 'valid' || column == 'valid_review' || column == 'changed') {

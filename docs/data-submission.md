@@ -71,7 +71,7 @@ The list of column names with their descriptions and allowed values follows. The
   + `1900/1909` - some time during the interval between the beginning of the year 1900 and the end of the year 1909.
   + `1906-06/1906-07` - some time during the interval between the beginning of the June 1906 and the end of July 1906.
   + `2007-11-13/15` - some time in the interval between 13 November 2007 and 15 November 2007.
-+ `reference_abbrev` - Unique identifier linking to the list of references. This column is used only in special cases as reference abbreviations are generated automatically during the review process.
++ `reference_abbrev` - Unique identifier linking to the list of references. This column is used only in special cases as reference abbreviations are generated during the review process (see the [dedicated section in the Data Editor How To](editor-howto.md#creating-new-entites-references-locations-methods-traits---editors-only)).
 + `reference` - **Mandatory** (if no `reference_abbrev` is provided). Reference related to the trait, preferentially in the format used in the world spider catalog. Examples:
   + Journal: `Thaler, K. & Plachter, H. (1983). Spinnen aus Höhlen der Fränkischen Alb, Deutschland (Arachnida: Araneae: Erigonidae, Linyphiidae). Senckenbergiana Biologica 63: 249-263.`
   + Book: `Yaginuma, T. (1962). The spider fauna of Japan. Arachnological Society of East Asia Osaka, 74 pp.`

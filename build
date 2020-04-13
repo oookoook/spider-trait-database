@@ -1,3 +1,4 @@
+#!/bin/sh
 git pull
 cd frontend
 npm install

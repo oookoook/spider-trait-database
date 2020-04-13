@@ -1,3 +1,4 @@
+#!/bin/sh
 git pull
 cd backend
 sudo pm2 restart spidertraits
