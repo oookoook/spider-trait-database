@@ -2,6 +2,12 @@
 
 ## Installation
 
+> **The MariaDB was updated to a newer version, the following tutorial is not valid**
+
+See following links for upgrade process:
+<https://mariadb.com/kb/en/yum/> (adding the repos using the script)
+<https://www.tecmint.com/upgrade-mariadb-5-5-to-10-centos-rhel-debian-ubuntu/> (running the update process)
+
 Follow [instructions](https://linuxize.com/post/install-mariadb-on-centos-7/).
 
 ```shell
@@ -12,7 +18,7 @@ sudo systemctl status mariadb
 sudo mysql_secure_installation
 ```
 
-Mounting (and formatting) the db storage volume:
+## Mounting (and formatting) the db storage volume
 
 Read about the [formatting](https://kwilson.io/blog/format-a-linux-disk-as-ext4-from-the-command-line/) and [automounting](https://codingbee.net/rhcsa/rhcsa-mounting-a-partition).
 
@@ -29,6 +35,17 @@ mkfs.xfs /dev/sdb1
 ```
 
 Edit the `/etc/fstab` file according to the instructions above.
+
+## MariaDB configuration changes
+
+Then, edit the `/etc/my.conf.d/server.cnf` to contain (pool size should be 70% of avilable RAM):
+
+```text
+[mysqld]
+datadir=/mnt/db-storage/db
+innodb_buffer_pool_size = 11G
+key_buffer_size = 10M
+```
 
 ## Schema model
 

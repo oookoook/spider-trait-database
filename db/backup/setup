@@ -1,0 +1,5 @@
+!#/bin/sh
+read -s "Enter user name used for backup:" USER
+read -s -p "Enter password used for backup:" PASS
+export SPIDERTRAITS_BACKUP_USER=$USER
+export SPIDERTRAITS_BACKUP_PASS=$PASS
