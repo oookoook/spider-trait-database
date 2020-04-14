@@ -1,5 +1,5 @@
 #!/bin/sh
-DATESTR = $(date '+%Y%m%d-%H%M%S')
+DATESTR=$(date '+%Y%m%d-%H%M%S')
 LAST=/mnt/db-storage/backup/last
 TRGT=/mnt/db-storage/backup/$DATESTR-incr
 mariabackup --backup --target-dir=$TRGT --incremental-basedir=$LAST --user=$SPIDERTRAITS_BACKUP_USER --password="$SPIDERTRAITS_BACKUP_PASS"

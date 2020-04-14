@@ -1,5 +1,6 @@
 #!/bin/sh
-DATESTR = $(date '+%Y%m%d-%H%M%S')
+
+DATESTR=$(date '+%Y%m%d-%H%M%S')
 LAST=$SPIDERTRAITS_BACKUP_DIR/last
 TRGT=$SPIDERTRAITS_BACKUP_DIR/$DATESTR-full
 
