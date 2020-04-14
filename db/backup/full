@@ -13,7 +13,7 @@ then
 fi
 
 #change the symbolic link to the new backup
-ln -s $TRGT $LAST
+ln -sfn $TRGT $LAST
 
 # deleting the old backups
 # https://www.tecmint.com/delete-all-files-in-directory-except-one-few-file-extensions/
