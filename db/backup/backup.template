@@ -5,14 +5,22 @@ export SPIDERTRAITS_BACKUP_PASS="#PASS#"
 export SPIDERTRAITS_BACKUP_DIR="#BDIR#"
 export SPIDERTRAITS_SCRIPT_DIR="#SDIR#"
 
+
 TODAY=$(date +%d)
 
 # https://www.unix.com/shell-programming-and-scripting/197857-how-get-3rd-week-every-friday.html
+# not working for locales that start week on Monday
 #FULLBACKUPDAY=$(cal | awk 'BEGIN{a=3}NR==3 && NF==1{a=4}NR==(a+2){print $(NF-1);exit}')
 
 # https://www.unix.com/unix-for-dummies-questions-and-answers/206541-solved-cron-job-run-every-3rd-friday-month-only.html
+
+MAGICNUM1=$(( (#WEEK# * 7) - 1 ))
+MAGICNUM2=$(( 6 - #WDAY# ))
+
 MONTH=$(date -d $(date +%m)/01/$(date +%Y) +%m/%d/%Y)
-FULLBACKUPDAY=$(date -d "$MONTH +$(( 20 - ( $(date -d $MONTH +%u) +1)%7))days" +%d)
+FULLBACKUPDAY=$(date -d "$MONTH +$(( $MAGICNUM1 - ( $(date -d $MONTH +%u) +$MAGICNUM2)%7))days" +%d)
+
+echo "Next full backup is scheduled for $FULLBACKUPDAY"
 
 if [ \( "$TODAY" -eq "$FULLBACKUPDAY" \) -o \( "$1" = "full" \) ]
 then
