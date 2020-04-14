@@ -47,6 +47,12 @@ innodb_buffer_pool_size = 11G
 key_buffer_size = 10M
 ```
 
+## Setting up the database backups
+
+There are prepared scripts for backuping the databse in the `db/backup` directory. Run the `setup` script to configure the backups: paths and credentials. The script adds symlink to `etc/cron.daily` to run the backup periodically. The script creates a full backup every third friday (and deletes all the old backups in the directory). On other days, the backup is only incremental.
+
+You can call the backup manually: `backup` or `backup full` (the later command forces the script to make the full backup, removing all the older backups in the directory).
+
 ## Schema model
 
 * The `db-model.mwb` file is created in MySQL Workbench tool and contains the database design.
