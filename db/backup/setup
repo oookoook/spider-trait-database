@@ -22,4 +22,4 @@ sed -i "s|#PASS#|$PASS|g" $SDIR/backup
 
 chmod 755 $SDIR/backup
 
-#ln -s $SDIR/backup /etc/cron.daily/spider-traits-backup 
+ln -s $SDIR/backup /etc/cron.daily/spider-traits-backup 
