@@ -1,0 +1,23 @@
+# HASHED strings are replaced during the setup
+
+export SPIDERTRAITS_BACKUP_USER=#USER#
+export SPIDERTRAITS_BACKUP_PASS=#PASS#
+export $SPIDERTRAITS_BACKUP_DIR=#BDIR#
+export $SPIDERTRAITS_SCRIPT_DIR=#BDIR#
+
+
+TODAY=$(date +%d)
+
+# https://www.unix.com/shell-programming-and-scripting/197857-how-get-3rd-week-every-friday.html
+#THIRDFRIDAY=$(cal | awk 'BEGIN{a=3}NR==3 && NF==1{a=4}NR==(a+2){print $(NF-1);exit}')
+
+# https://www.unix.com/unix-for-dummies-questions-and-answers/206541-solved-cron-job-run-every-3rd-friday-month-only.html
+MONTH=$(date -d $(date +%m)/01/$(date +%Y) +%m/%d/%Y)
+THIRDFRIDAY=$(date -d "$MONTH +$(( 20 - ( $(date -d $MONTH +%u) +1)%7))days" +%d)
+
+if [ "$TODAY" -eq "THIRDFRIDAY" ]
+then
+        $SPIDERTRAITS_SCRIPT_DIR/full
+else 
+        $SPIDERTRAITS_SCRIPT_DIR/incremental
+fi

@@ -1,5 +1,25 @@
-!#/bin/sh
-read -s "Enter user name used for backup:" USER
-read -s -p "Enter password used for backup:" PASS
-export SPIDERTRAITS_BACKUP_USER=$USER
-export SPIDERTRAITS_BACKUP_PASS=$PASS
+#!/bin/sh
+
+echo "Your current working dir is:"
+pwd
+
+printf "Enter the full path to the backup dir: "
+read BDIR
+printf "Enter the full path to the script dir: "
+read SDIR
+printf "Enter user name used for backup: " 
+read USER
+printf "Enter password used for backup: "
+read PASS
+
+cp $SDIR/backup.template $SDIR/backup
+
+# https://zhu45.org/posts/2016/Dec/21/environment-variable-substitution-using-sed/
+sed -i 's|#BDIR#|'$BDIR'|g' $SDIR/backup
+sed -i 's|#SDIR#|'$SDIR'|g' $SDIR/backup
+sed -i 's|#USER#|'$USER'|g' $SDIR/backup
+sed -i "s|#PASS#|$PASS|g" $SDIR/backup
+
+chmod 755 $SDIR/backup
+
+#ln -s $SDIR/backup /etc/cron.daily/spider-traits-backup 

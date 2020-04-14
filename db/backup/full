@@ -1,6 +1,20 @@
-!#/bin/sh
+#!/bin/sh
 DATESTR = $(date '+%Y%m%d-%H%M%S')
-LAST=/mnt/db-storage/backup/last
-TRGT=/mnt/db-storage/backup/$DATESTR-full
+LAST=$SPIDERTRAITS_BACKUP_DIR/last
+TRGT=$SPIDERTRAITS_BACKUP_DIR/$DATESTR-full
+
 mariabackup --backup --target-dir=$TRGT --user=$SPIDERTRAITS_BACKUP_USER --password="$SPIDERTRAITS_BACKUP_PASS"
+
+if [ $? -ne 0 ]
+then
+  echo "Error creating backup."
+  exit 1
+fi
+
+#change the symbolic link to the new backup
 ln -s $TRGT $LAST
+
+# deleting the old backups
+# https://www.tecmint.com/delete-all-files-in-directory-except-one-few-file-extensions/
+# https://linuxize.com/post/remove-directory-linux/
+find . -type d -not \(-name 'last' -or -name '$DATESTR-full' \) '*_cache' -exec rm -rf {} +
