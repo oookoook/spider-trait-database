@@ -12,9 +12,9 @@ read USER
 printf "Enter password used for backup: "
 read PASS
 printf "Enter which day of month should the backup take place (e.g. 3rd Friday of the month)."
-printf "First value expected is the order: value from 1 to 4." 
+printf "First value expected is the order: value from 1 to 4: " 
 read WEEK
-printf "The second value is the day of week (0=Sunday, 1=Monday, ..., 5=Friday, 6=Saturday)"
+printf "The second value is the day of week (0=Sunday, 1=Monday, ..., 5=Friday, 6=Saturday): "
 read WDAY
 
 cp $SDIR/backup.template $SDIR/backup
