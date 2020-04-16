@@ -48,7 +48,7 @@ export default {
         { text: 'Method name', valueField: 'id', textField: ['abbrev','name'], searchField: ['name'] },
       ],
       headers: [
-        { text: 'Method ID', value: 'abbrev' },
+        { text: 'Abbreviation', value: 'abbrev' },
         { text: 'Method Name', value: 'name' },
         { text: 'Reference', value: 'reference'},
         { text: 'Actions', value: 'actions', sortable: false}

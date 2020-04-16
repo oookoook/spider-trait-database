@@ -46,7 +46,7 @@ export default {
         { text: 'Locality', valueField: 'locality' }
       ],
       headers: [
-        { text: 'Location ID', value: 'abbrev' },
+        { text: 'Abbreviation', value: 'abbrev' },
         { text: 'Country code', value: 'country.code' },
         { text: 'Country name', value: 'country.name' },
         { text: 'Locality', value: 'locality' },

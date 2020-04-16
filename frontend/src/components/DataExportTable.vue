@@ -43,7 +43,7 @@ export default {
         { text: 'Species', value: 'taxonomy.species' },
         { text: 'Subspecies', value: 'taxonomy.subspecies' },
         { text: 'Original name', value: 'originalName' },
-        { text: 'Trait ID', value: 'trait.abbrev' },
+        { text: 'Trait', value: 'trait.abbrev' },
         { text: 'Trait value', value: 'value' },
         { text: 'Measure', value: 'measure.name' },
         { text: 'Sex', value: 'sex.name' },

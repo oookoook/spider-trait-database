@@ -56,7 +56,7 @@ export default {
         { text: 'Reference', valueField: 'id', textField: ['abbrev','fullCitation'], searchField: ['fullCitation'] },
       ],
       headers: [
-        { text: 'Reference ID', value: 'abbrev' },
+        { text: 'Abbreviation', value: 'abbrev' },
         { text: 'Full citation', value: 'data-table-expand' },
         { text: 'DOI', value: 'doi' },
         { text: 'Actions', value: 'actions', sortable: false}

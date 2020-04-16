@@ -63,7 +63,7 @@ export default {
         { text: 'Life category', valueField: 'category.id', textField: 'category.name', showAll: true }, 
         { text: 'Trait name', valueField: 'id', textField: ['abbrev','name'], searchField: ['name'] }],
       headers: [
-        { text: 'Trait ID', value: 'abbrev' },
+        { text: 'Abbreviation', value: 'abbrev' },
         { text: 'Life Category', value: 'category.name' },
         { text: 'Trait Name', value: 'name' },
         { text: 'Reference', value: 'reference'},
