@@ -95,8 +95,28 @@ export default [
       entity: 'method', 
       displayValue: (i) => i.method.abbrev,
       save: (o, v) => {if(!o.method) o.method={}; o.method.abbrev = v; }, 
-      isValid: (i, e) => !!i.method.id || (!e && (!!i.method.name || !!i.method.description)) 
-      || (e === 'create' && !!i.method.abbrev) || (!i.method.name && !i.method.description) || 'Method Abbrev. must be set and the method must exist if any of the Method attributes is filled in.',
+      isValid: (i, e) => {
+        if(i.method.id) {
+          return true;
+        }
+        if(!e) {
+          // contributor messages
+          if(i.method.name && i.method.description && !i.method.abbrev) {
+            // new method - only name and description are filled in
+            return true;
+          }
+          if(i.method.abbrev && !i.method.id) {
+            return "Do not fill in the method abbrev if the method does not exist. Either select an existing method or fill in the method name and description. The method abbrev will be assigned by an editor during the review.";
+          }
+        }
+        if(e === 'create' && i.method.abbrev) {
+          return true;
+        }
+        if(!i.method.name && !i.method.description) {
+          return true;
+        }
+        return 'Method Abbrev. must be set and the method must exist if any of the Method attributes are filled in.';
+      },
       autocomplete: { endpoint: 'methods', valueField: 'abbrev', textField: ['abbrev','name'] }
     },
     { 
