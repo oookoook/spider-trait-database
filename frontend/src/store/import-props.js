@@ -113,7 +113,7 @@ export default [
           return true;
         }
         if(i.method.abbrev && i.method.name && !e) {
-          return 'Do not provide Method Name when Method ID is set.'
+          return 'Do not provide Method Name when Method Abbrev. is set.'
         }
         if(!i.method.abbrev && !i.method.name && !!i.method.description) {
           return 'Provide Method Name when Method description is set.'
@@ -135,7 +135,7 @@ export default [
           return true;
         }
         if(i.method.abbrev && i.method.description && !e) {
-          return 'Do not provide Method Description when Method ID is set.'
+          return 'Do not provide Method Description when Method Abbrev. is set.'
         }
         if(!i.method.abbrev && i.method.name && !i.method.description) {
           return 'Provide Method Description when Method Name is set.'
