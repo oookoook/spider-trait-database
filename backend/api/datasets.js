@@ -10,7 +10,7 @@ const getWhere = function(auth, showImport, remove) {
     }
     if(auth.isContributor && showImport) {
         var q = remove ? 'imported < 3 AND ' : '';
-        return `${q}sub = ${db.escape(auth.user)}`;
+        return `${q}sub = ${db.escape(auth.sub)}`;
     }
 }
 
