@@ -1,0 +1,3 @@
+#!/bin/sh
+
+node executor.js $(cat lastrun) > lastrun 2> errors.log
