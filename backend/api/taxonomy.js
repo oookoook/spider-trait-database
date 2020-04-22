@@ -2,16 +2,15 @@ var db = null;
 
 const list = async function(limits) {
     var res = await db.prepareListResponse(limits, 'taxonomy');
-    var results = await db.query({table: 'taxonomy', sql: `SELECT taxonomy.id, taxonomy.wsc_lsid, taxonomy.wsc_id, taxonomy.family, taxonomy.genus, taxonomy.species, taxonomy.subspecies, `
+    var results = await db.query({table: 'taxonomy', sql: `SELECT taxonomy.id, taxonomy.wsc_lsid, taxonomy.valid, taxonomy.valid_id taxonomy.family, taxonomy.genus, taxonomy.species, taxonomy.subspecies, `
      + `taxonomy.author, taxonomy.year `
      + `FROM taxonomy`, nestTables: true, limits});    
      res.items = results.map(r => {    
         return {
                 id: r.taxonomy.id,
-                wsc: {
-                    id: r.taxonomy.wsc_id,
-                    lsid: r.taxonomy.wsc_lsid
-                },
+                lsid: r.taxonomy.wsc_lsid,
+                valid: r.taxonomy.valid == 1,
+                validId: r.taxonomy.valid_id,
                 family: r.taxonomy.family,
                 genus: r.taxonomy.genus,
                 species: r.taxonomy.species,
@@ -31,10 +30,9 @@ const get = async function(params) {
      var r = results[0];
      return { item: {
         id: r.taxonomy.id,
-        wsc: {
-            id: r.taxonomy.wsc_id,
-            lsid: r.taxonomy.wsc_lsid
-        },
+        lsid: r.taxonomy.wsc_lsid,
+        valid: r.taxonomy.valid == 1,
+        validId: r.taxonomy.valid_id,
         family: r.taxonomy.family,
         genus: r.taxonomy.genus,
         species: r.taxonomy.species,

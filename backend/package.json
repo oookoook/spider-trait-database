@@ -10,6 +10,7 @@
   "author": "Adam Kučera",
   "license": "ISC",
   "dependencies": {
+    "axios": "^0.19.2",
     "change-case": "^4.1.1",
     "connect-history-api-fallback": "^1.6.0",
     "cookie-session": "^1.4.0",

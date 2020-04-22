@@ -10,8 +10,8 @@
     <v-tooltip top>
       <template v-slot:activator="{ on }">
         
-        <v-btn v-if="!external" :to="link" icon v-on="on"><v-icon>{{ icon }}</v-icon></v-btn>
-        <v-btn v-else :href="link" target="_blank" icon v-on="on"><v-icon>{{ icon }}</v-icon></v-btn>
+        <v-btn v-if="!external" :to="link" icon v-on="on"><v-icon :color="color">{{ icon }}</v-icon></v-btn>
+        <v-btn v-else :href="link" target="_blank" icon v-on="on"><v-icon :color="color">{{ icon }}</v-icon></v-btn>
       </template>
       <span>{{ tooltip }}</span>
     </v-tooltip>
@@ -24,7 +24,14 @@ export default {
   name: 'EntityLinkCell',
   components: {
   },
-  props: { external: Boolean, link: String, icon: { type: String, default: 'mdi-eye-outline' }, abbrev: String, text: String, tooltip: { type: String, default: 'View detail' } },
+  props: { 
+    external: Boolean, 
+    link: String, 
+    icon: { type: String, default: 'mdi-eye-outline' }, 
+    abbrev: String, text: String, 
+    tooltip: { type: String, default: 'View detail' },
+    color: String 
+  },
   data () {
     return {
 

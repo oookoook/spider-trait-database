@@ -18,7 +18,7 @@ var join = `data `
 
 const getCondition = function(params) {
     var p = ['family','genus', 'species', 'traitcat', 'trait', 'method', 'location','country', 'habitat', 'dataset', 'authors', 'reference', 'rowl'];
-    var f = ['taxonomy.family', 'taxonomy.genus', 'taxonomy.species', 'trait.trait_category_id', 'data.trait_id', 'method.id', 'location.id', 'country.id', 
+    var f = ['taxonomy.family', 'taxonomy.genus', 'data.taxonomy_id', 'trait.trait_category_id', 'data.trait_id', 'method.id', 'location.id', 'country.id', 
     'habitat_global.id', 'dataset.id', 'dataset.authors', 'data.reference_id', 'data.row_link']
 
     var cl = ['1=1'];
@@ -35,7 +35,7 @@ const getCondition = function(params) {
 const list = async function(params, limits) {
     var cond = getCondition(params);
     var res = await db.prepareListResponse(limits, 'data', cond.clause, cond.values, join);
-    var results = await db.query({ table: 'data', sql: `SELECT data.*, taxonomy.wsc_id, taxonomy.wsc_lsid, taxonomy.family, taxonomy.genus, taxonomy.species, taxonomy.subspecies, `
+    var results = await db.query({ table: 'data', sql: `SELECT data.*, taxonomy.wsc_lsid, taxonomy.family, taxonomy.genus, taxonomy.species, taxonomy.subspecies, `
      + `trait.id, trait.abbrev, trait.name, trait_category.id, trait_category.name, `
      + `measure.id, measure.name, sex.id, sex.name, life_stage.id, life_stage.name, method.id, method.abbrev, method.name, `
      + `event_date_text, event_date_start, event_date_end, `
@@ -56,10 +56,7 @@ const list = async function(params, limits) {
                     end: r.data.event_date_end ? r.data.event_date_end.toJSON() : null
                 },
                 taxonomy: {
-                    wsc: {
-                        id: r.taxonomy.wsc_id,
-                        lsId: r.taxonomy.wsc_lsid,
-                    },
+                    lsid: r.taxonomy.wsc_lsid,
                     family: r.taxonomy.family, 
                     genus: r.taxonomy.genus, 
                     species: r.taxonomy.species, 
@@ -145,7 +142,7 @@ const synonyms = {
     'reference': 'reference.abbrev',
     'trait': 'trait.abbrev',
     'dataset': 'dataset.name',
-    'taxonomy.wsc.lsId': 'taxonomy.wsc_lsid',
+    'taxonomy.wsc.lsid': 'taxonomy.wsc_lsid',
     'sampleSize': 'sample_size',
     'eventDate.text': 'event_date_text',
     'eventDate.start': 'event_date_start',

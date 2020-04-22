@@ -13,10 +13,14 @@ export default {
     },
     methods: {
         getWscLink(item) {
-            return `https://wsc.nmbe.ch/${this.getCategory(item)}/${item.wsc.id}`;
+            return `https://wsc.nmbe.ch/lsid/${item.lsid}`;
         },
         getTaxon(item) {
-            var t = [ item.genus, item.species];
+            var t = [ item.genus ]
+            if(item.species) {
+              t.push(item.species);
+            }
+  
             if(item.subspecies) {
               t.push(item.subspecies);
             }

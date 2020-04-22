@@ -46,5 +46,8 @@ module.exports = {
         user: null,
         pass: null
     },
+    wsc: {
+        key: 'TODO'
+    },
     baseUrl: 'https://spidertraits.sci.muni.cz'
 }

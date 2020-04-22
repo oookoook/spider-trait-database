@@ -20,9 +20,13 @@
     >
     
     <template v-slot:item.taxon="{ item }">
-      <entity-link-cell :abbrev="getTaxon(item)" :text="item.wsc.lsid" tooltip="View the taxon detail" :link="`/taxonomy/${item.id}`" />
+      <entity-link-cell :abbrev="getTaxon(item)" :text="item.lsid" tooltip="View the taxon detail" :link="`/taxonomy/${item.id}`" />
     </template>
     
+    <template v-slot:item.valid="{ item }">
+      <entity-link-cell v-if="item.valid" tooltip="View the valid taxon" :link="`/taxonomy/${item.validId}`" icon="mdi-content-duplicate" color="warning"/>
+      <info-icon v-else color="success" icon="mdi-check" text="This a valid taxon" />
+    </template>
 
     <template v-slot:item.actions="{ item }">
     <entity-link-cell icon="mdi-spider" tooltip="View in the World Spider Catalog (opens in a new tab)" external :link="getWscLink(item)" />
@@ -36,11 +40,13 @@
 <script>
 
 import ListTable from '../mixins/list-table'
+import InfoIcon from './InfoIcon'
 import Taxons from '../mixins/taxons'
 
 export default {
   name: 'TaxonomyTable',
   mixins: [ ListTable, Taxons ],
+  components: [InfoIcon],
   data () {
     return {
       searchFields: [
@@ -52,6 +58,7 @@ export default {
       ],
       headers: [
         { text: 'Taxon', value: 'taxon', sortable: false },
+        { text: 'Valid', value: 'valid' },
         { text: 'Genus', value: 'genus' },
         { text: 'Species', value: 'species' },
         { text: 'Subspecies', value: 'subspecies' },

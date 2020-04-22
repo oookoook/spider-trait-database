@@ -31,5 +31,8 @@ module.exports = {
     mail: {
         disabled: true
     },
+    wsc: {
+        key: 'TODO'
+    },
     baseUrl: 'http://localhost:8080'
 }

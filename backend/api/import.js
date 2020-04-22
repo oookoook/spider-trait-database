@@ -60,7 +60,7 @@ const joinv = 'import LEFT JOIN trait ON import.trait_abbrev = trait.abbrev '
             + 'LEFT JOIN data_type ON import.trait_data_type = data_type.name OR trait.data_type_id = data_type.id '
             + 'LEFT JOIN trait_category ON import.trait_category = trait_category.name '
             + 'LEFT JOIN taxonomy ON import.wsc_lsid IS NOT NULL AND import.wsc_lsid = taxonomy.wsc_lsid '
-            + 'LEFT JOIN taxonomy_name ON import.original_name IS NOT NULL AND import.original_name = taxonomy_name.name '
+            + 'LEFT JOIN taxonomy taxonomy_names ON import.original_name IS NOT NULL AND import.original_name = taxonomy_names.full_name '
             + 'LEFT JOIN sex ON import.sex = sex.name '
             + 'LEFT JOIN life_stage ON import.life_stage = life_stage.name '
             + 'LEFT JOIN measure ON import.measure = measure.name '
@@ -391,6 +391,10 @@ const importRow = async function(conn, ds, r, state, cache) {
    row['sample_size_numeric'] =conv.parseNumber(row['sample_size']);
    row['location_altitude_numeric'] =conv.parseNumber(row['location_altitude']);
    row['location_precision_numeric'] =conv.parseNumber(row['location_precision']);
+
+
+   // TODO test this
+   row['wsc_lsid'] = row['wsc_lsid'].replace(/\[|\]/g,'');
 
     // convert timestamps (start, end)
     if(row['event_date']) {
@@ -863,7 +867,7 @@ const validate = async function(params) {
     + ` import.reference_id = COALESCE(refa.id, refd.id, reff.id),  `
     + ` location_id = COALESCE(location.id, loccoord.id), location_habitat_global_id = habitat_global.id, `
     + ` location_country_id = COALESCE(country3.id,country2.id), `
-    + ` import.taxonomy_id = COALESCE(taxonomy.id, taxonomy_name.taxonomy_id), `
+    + ` import.taxonomy_id = COALESCE(taxonomy.valid_id, taxonomy.id, taxonomy_names.valid_id, taxonomy_names.id), `
     + ` require_numeric_value = CASE WHEN data_type.name <> 'Character' THEN 1 ELSE 0 END `
     + ` WHERE changed = 1 AND dataset_id = ? AND ${aw}`, values: [ds] });
 

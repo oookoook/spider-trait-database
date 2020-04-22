@@ -2,13 +2,15 @@
   <v-card :loading="loading">
       <v-card-title v-if="item">{{ getTaxon(item) }}</v-card-title>
       <v-card-subtitle v-if="item">{{ item.family }}</v-card-subtitle>
-      <!--
-      <v-card-text v-if="item">
-      {{ item.description }}
+      
+      <v-card-text v-if="!item.valid">
+        <v-alert v-if="confirm.warning" type="warning">
+          This is not a valid taxon. Below, you can find a link to the valid taxon.
+        </v-alert>
       </v-card-text>
-      -->
-        <v-list  v-if="item" three-line>
-          <list-item title="LSID" :text="item.wsc.lsid" icon="mdi-identifier" link-icon="mdi-spider" link-tooltip="View in the World Spider Catalog (opens in a new tab)" :link="getWscLink(item)" external/>
+      <v-list  v-if="item" three-line>
+          <list-item v-if="!item.valid" title="Invalid taxon" text="Follow the link to the right to visit the valid taxon page." icon="mdi-content-duplicate" link-icon="mdi-arrow-right-outline" link-tooltip="Go to the valid taxon page" :link="`/taxonomy/${item.validId}`" />
+          <list-item title="LSID" :text="item.lsid" icon="mdi-identifier" link-icon="mdi-spider" link-tooltip="View in the World Spider Catalog (opens in a new tab)" :link="getWscLink(item)" external/>
           <!--
           <list-item title="Family" :text="item.family" icon="mdi-spider-web" />
           <list-item title="Genus" :text="item.genus" icon="mdi-spider-thread" />
@@ -28,6 +30,7 @@
 <script>
 
 import ListItem from '../components/ListItem'
+import ActionButton from '../components/ActionButton'
 import Taxons from '../mixins/taxons'
 
 export default {
@@ -49,14 +52,6 @@ export default {
 
   },
   methods: {
-    getTaxon(item) {
-      var t = [ item.genus, item.species];
-      if(item.subspecies) {
-        t.push(item.subspecies);
-      }
-      //console.dir(t);
-      return t.join(' ');
-    }
   },
   created () {
 
