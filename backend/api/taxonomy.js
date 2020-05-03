@@ -2,7 +2,8 @@ var db = null;
 
 const list = async function(limits) {
     var res = await db.prepareListResponse(limits, 'taxonomy');
-    var results = await db.query({table: 'taxonomy', sql: `SELECT taxonomy.id, taxonomy.wsc_lsid, taxonomy.valid, taxonomy.valid_id taxonomy.family, taxonomy.genus, taxonomy.species, taxonomy.subspecies, `
+    var results = await db.query({table: 'taxonomy', sql: `SELECT taxonomy.id, taxonomy.wsc_lsid, taxonomy.valid, `
+     + `taxonomy.valid_id, taxonomy.family, taxonomy.genus, taxonomy.species, taxonomy.subspecies, `
      + `taxonomy.author, taxonomy.year `
      + `FROM taxonomy`, nestTables: true, limits});    
      res.items = results.map(r => {    
@@ -55,9 +56,9 @@ Data manipulating methods should not be called from the API - Taxonomy will be s
 
 */
 const synonyms = {
-    'wsc.id': 'taxonomy.wsc_id',
     'wsc.lsid': 'taxonomy.wsc_lsid',
-    'taxonomy.originalName': 'taxonomy_name.name'
+    'fullName': 'taxonomy.full_name',
+    'taxonomy.fullName': 'taxonomy.full_name'
 }
 
 module.exports = function(dbClient) {

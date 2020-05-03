@@ -1,5 +1,6 @@
 import EntityLinkCell from '../components/EntityLinkCell'
 import ListFilter from '../components/ListFilter'
+import { mapGetters } from 'vuex'
 
 export default {
     components: {
@@ -13,6 +14,9 @@ export default {
             needsCount: true,
             options: {},
         }
+    },
+    computed: {
+      ...mapGetters(['isEditor'])
     },
     watch: {
         options: {

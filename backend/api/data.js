@@ -11,7 +11,6 @@ var join = `data `
 + `LEFT JOIN life_stage ON data.life_stage_id = life_stage.id `
 + `LEFT JOIN method ON data.method_id = method.id `
 + `LEFT JOIN location ON data.location_id = location.id `
-+ `LEFT JOIN habitat_global ON location.habitat_global_id = habitat_global.id `
 + `LEFT JOIN country ON location.country_id = country.id `
 + `LEFT JOIN dataset ON data.dataset_id = dataset.id `
 + `LEFT JOIN reference ON data.reference_id = reference.id`;
@@ -38,8 +37,8 @@ const list = async function(params, limits) {
     var results = await db.query({ table: 'data', sql: `SELECT data.*, taxonomy.wsc_lsid, taxonomy.family, taxonomy.genus, taxonomy.species, taxonomy.subspecies, `
      + `trait.id, trait.abbrev, trait.name, trait_category.id, trait_category.name, `
      + `measure.id, measure.name, sex.id, sex.name, life_stage.id, life_stage.name, method.id, method.abbrev, method.name, `
-     + `event_date_text, event_date_start, event_date_end, `
-     + `location.id, location.abbrev, location.locality, habitat_global.id, habitat_global.name, country.id, country.alpha3_code, country.name, `
+     //+ `event_date_text, event_date_start, event_date_end, note, `
+     + `location.id, location.abbrev, location.locality, country.id, country.alpha3_code, country.name, `
      + `dataset.id, dataset.name, dataset.authors, reference.id, reference.abbrev `
      + `FROM ${join} WHERE ${cond.clause}`
      , values: cond.values, nestTables: true, limits, hasWhere: true});    
@@ -81,14 +80,14 @@ const list = async function(params, limits) {
                         id: r.country.id,
                         name: r.country.name,
                         code: r.country.alpha3_code
-                    },
-                    habitatGlobal: r.habitat_global,
+                    }
                 },
                 dataset: r.dataset,
                 reference: {
                     id: r.reference.id,
                     abbrev: r.reference.abbrev,
                 },
+                note: r.data.note,
                 rowLink: r.data.row_link
             }
         });
@@ -104,10 +103,10 @@ const csv =  async function(params, limits, tmpDir) {
      + `taxonomy.family, taxonomy.genus, taxonomy.species, taxonomy.subspecies, `
      + `trait.abbrev as trait, trait.name as traitFullName, trait_category.name as traitCategory, data.value, data.value_numeric, `
      + `measure.name as measure, sex.name as sex, life_stage.name as lifeStage, data.frequency, data.sample_size as sampleSize, method.abbrev as method, method.name as methodFullName, `
-     + `event_date_text as eventDateText, event_date_start as eventDateStart, event_date_end as eventDateEnd, `
-     + `location.abbrev as location, location.lat as decimalLatitude, location.lon as decimalLongitude, location.precision as coordinatePrecision, location.altitude, location.locality as verbatimLocality, `
-     + `country.alpha3_code as countryCode, country.name as countryName, habitat_global.name as habitatGlobal, habitat_global.number as habitatGlobalNumber,`
-     + `location.habitat as habitatVerbatim, location.microhabitat as microhabitatVerbatim, location.stratum as stratumVerbatim, location.note as notePosition, `
+     + `event_date_text as dateText, event_date_start as dateStart, event_date_end as dateEnd, note `
+     + `location.abbrev as location, location.lat as decimalLatitude, location.lon as decimalLongitude, location.altitude, location.locality as verbatimLocality, `
+     + `country.alpha3_code as countryCode, country.name as countryName, `
+     + `location.habitat as habitatVerbatim, location.microhabitat as microhabitatVerbatim, `
      + `dataset.name as datasetName, reference.abbrev as reference, reference.full_citation as referenceFull, reference.doi as referenceDOI, data.row_link as rowLinks `
      + `FROM ${join} WHERE ${cond.clause}`
      , values: cond.values, nestTables: false, limits, hasWhere: true});

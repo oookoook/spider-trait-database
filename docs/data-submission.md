@@ -42,7 +42,7 @@ Once the dataset is fully valid, the editor can approve the dataset to the datab
 
 ## Recognized column names and validity constraints
 
-The list of column names with their descriptions and allowed values follows. The column names can be formatted in a three notations: with spaces (e.g. `Original name`), with undersocres (`original_name`) or as camelCase (`originalName`). Both Upper case and lower case (or combination) are recognized. You can also combine different types or notation in one file.
+The list of column names with their descriptions and allowed values follows. The column names can be formatted in a three notations: with spaces (e.g. `Original name`), with undersocres (`original_name`) or as camelCase (`originalName`). Both Upper case and lower case (or combination) are recognized. You can also combine different types or notation in one file. Some columns have multiple names recognized (e.g. `longitude`, `latitude`, `date`). In such cases, all the allowed names are listed below, separated by `/`.
 
 + `wsc_lsid` - Taxonomic identifier (URN) linking the record with World Spider Catalog. Example: `urn:lsid:nmbe.ch:spidersp:033381`
 + `original_name` - **Mandatory**. Full taxon name as assigned by the author in the original source (that is, not changed based on later taxonomical amendations). If no LSID is provided, the original name should be known to the World Spider Catalog at least as a synonym, homonym, or a known combination. Example: `Pimoa rupicola`.
@@ -60,7 +60,7 @@ The list of column names with their descriptions and allowed values follows. The
 + `life_stage` - Life stage: Categorical variable. Valid values: `Egg`, `Spiderling`, `Juvenile`, `Adult`, `All`.
 + `frequency` - Relative frequency of occurrence. Real number. Decimal point (`.`) is used.
 + `sample_size` - Total number of observations per record. Integer.
-+ `event_date` - The date-time or interval associated to the trait. The value must be either omitted or comply to one of the supported formats:
++ `date` / `event_date` - The date-time or interval associated to the trait. The value must be either omitted or comply to one of the supported formats:
   + `1963-03-08T14:07-0600` - 8 Mar 1963 at 2:07pm in the time zone six hours earlier than UTC.
   + `2009-02-20T08:40Z` - 20 February 2009 8:40am UTC.
   + `2018-08-29T15:19` - 3:19pm local time on 29 August 2018.
@@ -73,24 +73,21 @@ The list of column names with their descriptions and allowed values follows. The
   + `2007-11-13/15` - some time in the interval between 13 November 2007 and 15 November 2007.
 + `reference_abbrev` - Unique identifier linking to the list of references. This column is used only in special cases as reference abbreviations are generated during the review process (see the [dedicated section in the Data Editor How To](editor-howto.md#creating-new-entites-references-locations-methods-traits---editors-only)).
 + `reference` - **Mandatory** (if no `reference_abbrev` is provided). Reference related to the trait, preferentially in the format used in the world spider catalog. Examples:
-  + Journal: `Thaler, K. & Plachter, H. (1983). Spinnen aus Höhlen der Fränkischen Alb, Deutschland (Arachnida: Araneae: Erigonidae, Linyphiidae). Senckenbergiana Biologica 63: 249-263.`
-  + Book: `Yaginuma, T. (1962). The spider fauna of Japan. Arachnological Society of East Asia Osaka, 74 pp.`
-  + Book Chapter: `Pickard-Cambridge, O. (1891). Arachnida. Araneida. In: Biologia Centrali-Americana, Zoology. London 1, 73-88.`
-  + Website: `World Spider Catalog (2019). World Spider Catalog. Version 20.5. Natural History Museum Bern, online at http://wsc.nmbe.ch, accessed on {date of access}.`
+  + Journal article: `Elias DO, Hebets EA, Hoy RR & Mason AC. 2005. Seismic signals are crucial for male mating success in a visual specialist jumping spider (Araneae: Salticidae). Animal Behaviour 69(4): 931–938.`
+  + Book: `Preston-Mafham R. 1990. The Book of Spiders and Scorpions. London, Quantum Books.`
+  + Chapter in a Book: `Nentwig W. 1987. The prey of spiders. In Nentwig W (Ed.),  Ecophysiology of Spiders. Berlin, Springer-Verlag, pp. 249–263.`
+  + Internet Document: `Norton R. 2006. How to train a cat to operate a light switch [Video file]. Http://www.youtube.com/watch?v=Vja83KLQXZs, accessed on 13.4.2020 v 11:06`
 + `reference_doi` - DOI of the reference.
 + `row_link` - Used for multidimensional data, i.e. use same numbers for rows that contain data from same individuals or populations obtained in the same context.
 + `location_abbrev` - Unique identifier linking to the list of known locations. This column is used only in special cases as reference abbreviations are generated automatically during the review process.
-+ `location_lat` - The geographic latitude of the geographic center of a Location. Preffered format is  decimal degrees, using the spatial reference system WGS84. Positive values are north of the Equator, negative values are south of it. Legal values lie between -90 and 90, inclusive. Other widely used formats are also parsed correctly. Examples: `45.74`, `-37.22285`.
-+ `location_lon` - The geographic longitude of the geographic center of a Location. Preffered format is decimal degrees, using the spatial reference system WGS84. Positive values are east of the Greenwich Meridian, negative values are west of it. Legal values lie between -180 and 180, inclusive. Other widely used formats are also parsed correctly. Examples: `102.478922`, `-0.4767`.
-+ `location_precision` - A decimal representation of the precision of the coordinates given in the `location_lat` and `location_lon`.
-+ `location_altitude` - Altitude above the sea level in meters. Integer. Examples: `700`, `3462`.
-+ `location_locality` - The original textual description of the place. Examples: `Municipality of Helsinki`, `small hill close to the river`, `Mount Fuji`.
-+ `location_country_code` - The standard code for the country. Both two-character and three-chartacter codes are recognized. Examples: `CZ`, `IT`, `BR`, `CZE`.
-+ `location_habitat_global` - A description of the global habitat based on [IUCN habitats](https://www.iucnredlist.org/resources/habitat-classification-scheme). Examples: `Savanna - Dry`.
-+ `location_habitat` - Verbatim description of the habitat. Examples: `forest`, `grassland`, `cave`, CORINE habitat code.
-+ `location_microhabitat` - Verbatim description of the microhabitat. Examples: `under stones`, `ground`, `canopy`.
-+ `location_stratum` - Verbatim description of the stratum. Examples: `subterranean`, `epigean`, `under water`, `arboreal`, index of verticality.
-+ `location_note` - Any note related to information provided. Examples: Habitat classification according to CORINE, index of verticality based on the COBRA protocol, altitude is not precise.
++ `latitude` / `location_lat`  - The geographic latitude of the geographic center of a Location. Preffered format is  decimal degrees, using the spatial reference system WGS84. Positive values are north of the Equator, negative values are south of it. Legal values lie between -90 and 90, inclusive. Other widely used formats are also parsed correctly. Examples: `45.74`, `-37.22285`, `27° 43′ 31.796″ N`,`27° 43' 31.796" N`, `27°43'31.796"N`, `27 43 31.796 N`, `- 27° 43′ 31.796″`,`- 27° 43' 31.796"`, `-27°43'31.796"`, `+27 43 31.796`, `27° 43.529933333333′ N`, `- 27° 43.529933333333′`, `27.725499°`, `27.725499`, `27.725499 N`,  `+27.725499`, `-27.725499`.
++ `longitude` / `location_lon` - The geographic longitude of the geographic center of a Location. Preffered format is decimal degrees, using the spatial reference system WGS84. Positive values are east of the Greenwich Meridian, negative values are west of it. Legal values lie between -180 and 180, inclusive. Other widely used formats are also parsed correctly. Examples: `102.478922`, `-0.4767`. Form more format examples, see the latitude examples above. For latitude, `E` and `W` are accepted instead of `N` and `S`.
++ `altitude` / `location_altitude` - Altitude above the sea level in meters. Integer. Examples: `700`, `3462`.
++ `locality` / `location_locality` - The original textual description of the place. Examples: `Municipality of Helsinki`, `small hill close to the river`, `Mount Fuji`.
++ `country_code` / `location_country_code` - The standard code for the country. Both two-character and three-chartacter codes are recognized. Examples: `CZE`, `DEU`, `CZ`, `IT`, `BR`.
++ `habitat` / `location_habitat` - Verbatim description of the habitat. Examples: `forest`, `grassland`, `cave`, CORINE habitat code.
++ `microhabitat` / `location_microhabitat` - Verbatim description of the microhabitat. Examples: `under stones`, `ground`, `canopy`.
++ `note` - Any note related to information provided. Examples: Habitat classification according to CORINE, index of verticality based on the COBRA protocol, altitude is not precise.
 
 ### Additional validity requirements
 

@@ -1,6 +1,6 @@
 <template>
   <div>
-    <slot :loading="loading" :item="item" :save="save" v-if="id || create">
+    <slot :loading="loading" :item="item" :entityProps="entityProps" :save="save" :remove="remove" v-if="id || create">
     {{ JSON.stringify(item) }}
     </slot>
   </div>
@@ -31,6 +31,9 @@ export default {
         console.log('Item setter called');
         save(val);
       }
+    },
+    entityProps() {
+      return this.$store.state[this.list].props;
     }
   },
   watch: {
@@ -57,6 +60,15 @@ export default {
           console.log(data);
           this.loading= false; 
           this.$emit(action, data && data.id ? data.id : this.id); 
+        });
+    },
+    remove(val) {
+      this.loading = true;
+        this.$store.dispatch(`${this.list}/delete`, val)
+        .then((data) => { 
+          console.log(data);
+          this.loading= false; 
+          this.$emit('remove', id); 
         });
     }
   },

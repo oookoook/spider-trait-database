@@ -25,12 +25,6 @@
       <entity-link-cell :text="item.abbrev" tooltip="View the reference detail" :link="`/references/${item.id}`" />
     </template>
 
-    <template v-slot:expanded-item="{ headers, item }">
-      <td :colspan="headers.length">
-        {{ item.fullCitation }}
-      </td>
-    </template>
-
     <template v-slot:item.doi="{ item }">
       <entity-link-cell v-if="item.doi" :text="item.doi" tooltip="View the source document" external :link="getDOILink(item.doi)" />
     </template>
@@ -48,7 +42,7 @@
 import ListTable from '../mixins/list-table'
 
 export default {
-  name: 'MethodsTable',
+  name: 'MReferencesTable',
   mixins: [ ListTable ],
   data () {
     return {
@@ -57,8 +51,7 @@ export default {
       ],
       headers: [
         { text: 'Abbreviation', value: 'abbrev' },
-        { text: 'Full citation', value: 'data-table-expand' },
-        { text: 'DOI', value: 'doi' },
+        { text: 'Full citation', value: 'fullCitation' },
         { text: 'Actions', value: 'actions', sortable: false}
       ]
     }

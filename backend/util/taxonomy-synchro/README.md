@@ -26,7 +26,7 @@ node sql-gen './initial-data/WSC_species_val_nd_nn_20200420.csv' './initial-data
 
 Then you can import the data into the database using the prepared SQL script.
 
-Next, prepare the timestamp to set the lastrun to so the automatic updates can request changes since the day the snapshot was created. In Chrome Dev Tools, enter the following code int the console (change the date):
+Next, prepare the timestamp to set the lastrun to so the automatic updates can request changes since the day the snapshot was created. In your browser's Dev Tools (usally opened by `F12` key), enter the following code int the console (change the date):
 
 ```javascript
 new Date('2020-04-20T12:00:00.000Z').valueOf()

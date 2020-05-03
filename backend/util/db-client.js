@@ -147,6 +147,14 @@ const releaseConnection = function (c, callback) {
     c.release();
 }
 
+const endPool = function() {
+    return new Promise(function (resolve, reject) {
+        pool.end(function (err) {
+            resolve();
+        });
+    });
+}
+
 const limits = function (req, res, next) {
     var offset = 0;
     var limit = 10;
@@ -443,6 +451,7 @@ module.exports = {
     squery,
     getConnection,
     releaseConnection,
+    endPool,
     limits,
     prepareListResponse,
     createEntity,

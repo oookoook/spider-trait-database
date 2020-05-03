@@ -33,16 +33,27 @@ const columns = [
   `location_abbrev`,
   `location_lat`,
   `location_lon`,
-  `location_precision`,
+  //`location_precision`,
   `location_altitude`,
   `location_locality`,
   `location_country_code`,
-  `location_habitat_global`,
+  //`location_habitat_global`,
   `location_habitat`,
   `location_microhabitat`,
-  `location_stratum`,
-  `location_note`
+  //`location_stratum`,
+  `note`
 ];
+
+const colSynonyms = {
+    'longitude': 'location_lon',
+    'latitude': 'location_lat',
+    'altitude': 'location_altitude',
+    'date': 'event_date',
+    'locality': 'location_locality',
+    'country_code': 'location_country_code',
+    'habitat': 'location_habitat',
+    'microhabitat': 'location_microhabitat', 
+}
 
 const join = 'import LEFT JOIN trait ON import.trait_id = trait.id '
             + 'LEFT JOIN taxonomy ON import.taxonomy_id = taxonomy.id '
@@ -73,7 +84,7 @@ const joinv = 'import LEFT JOIN trait ON import.trait_abbrev = trait.abbrev '
             + 'LEFT JOIN reference reff ON import.reference = reff.full_citation '
             + 'LEFT JOIN location ON import.location_abbrev = location.abbrev '
             + 'LEFT JOIN location loccoord ON import.location_lat_conv = loccoord.lat AND import.location_lon_conv = loccoord.lon '
-            + 'LEFT JOIN dataset ON import.dataset_id = dataset.id';
+            //+ 'LEFT JOIN dataset ON import.dataset_id = dataset.id';
 
 const getAuthWhere = function(auth) {
     var c = '';
@@ -145,6 +156,7 @@ const getObject = function(r) {
             start: r[`event_date_start`] ? r[`event_date_start`].toJSON() : null,
             end: r[`event_date_end`] ? r[`event_date_end`].toJSON() : null
         },
+        note: r[`note`],
         rowLink: r[`row_link`],
         method: {
             abbrev: r[`method_abbrev`],
@@ -169,10 +181,12 @@ const getObject = function(r) {
                     raw: r[`location_lon`],
                     conv: r[`location_lon_conv`],
                 },
+                /*
                 precision: {
                     raw: r[`location_precision`],
                     numeric: r[`location_precision_numeric`]
                 }
+                */
             },
             altitude: {
                 raw: r[`location_altitude`],
@@ -183,19 +197,22 @@ const getObject = function(r) {
                 raw: r[`location_country_code`],
                 id: r[`location_country_id`]
             },
+            /*
             habitatGlobal: {
                 raw: r[`location_habitat_global`],
                 id: r[`location_habitat_global_id`]
             },
+            */
             habitat: r[`location_habitat`],
             microhabitat: r[`location_microhabitat`],
-            stratum: r[`location_stratum`],
-            note: r[`location_note`],
+            //stratum: r[`location_stratum`],
+            //note: r[`location_note`],
             id: r[`location_id`]
         },
         valid: {
-            review: r[`valid_review`],
-            approve: r[`valid`]
+            review: r[`valid_review`] == 1,
+            approve: r[`valid`] == 1,
+            duplicate: r['duplicate'] == 1
         }
     }
 }
@@ -216,7 +233,7 @@ const exportCsv = async function(params, auth, tmpDir) {
     var id = parseInt(params.id);
     var aw = getAuthWhere(auth);
     var c = await db.getConnection();
-    var dstream = db.squery(c, {table: 'import', sql:`SELECT import.* `
+    var dstream = db.squery(c, {table: 'import', sql:`SELECT ${columns.map(c => 'import.'+c).join(',')} `
     + `FROM ${joind} WHERE dataset_id = ? AND ${aw}`, values: [id], nestTables: false, hasWhere: true });
    
     var r = await csv.get(tmpDir, `spider-traits-import-${id}-${Date.now()}.csv`, dstream, c);
@@ -334,9 +351,9 @@ const transferToData = async function(params) {
     // INSERT INTO data (...) SELECT ... FROM import WHERE dataset_id = ?
     await db.cquery(c, {table: 'data', sql:`INSERT INTO data`
     + ` (taxonomy_id, original_name, trait_id, value, value_numeric, measure_id, sex_id, life_stage_id, frequency, `
-    + ` sample_size, event_date_text, event_date_start, event_date_end, method_id, location_id, reference_id, dataset_id, row_link) `
+    + ` sample_size, event_date_text, event_date_start, event_date_end, method_id, location_id, reference_id, dataset_id, note, row_link) `
     + ` SELECT taxonomy_id, original_name, trait_id, value, value_numeric, measure_id, sex_id, life_stage_id, frequency_numeric, `
-    + ` sample_size_numeric, event_date, event_date_start, event_date_end, method_id, location_id, reference_id, dataset_id, CONVERT(row_link, UNSIGNED) `
+    + ` sample_size_numeric, event_date, event_date_start, event_date_end, method_id, location_id, reference_id, dataset_id, note, CONVERT(row_link, UNSIGNED) `
     + ` FROM ${joind} WHERE dataset_id = ? AND ${aw}`, values: [id] });
     
     state.progress+=1;
@@ -362,6 +379,10 @@ const importRow = async function(conn, ds, r, state, cache) {
         if(columns.includes(c) && r[k].length > 0) {
             row[c] = r[k];
         }
+        if(colSynonyms[c]) {
+            row[colSynonyms[c]] = r[k];
+        }
+
     });
     //console.dir(row);
     // caches the parsed values
@@ -392,8 +413,6 @@ const importRow = async function(conn, ds, r, state, cache) {
    row['location_altitude_numeric'] =conv.parseNumber(row['location_altitude']);
    row['location_precision_numeric'] =conv.parseNumber(row['location_precision']);
 
-
-   // TODO test this
    row['wsc_lsid'] = row['wsc_lsid'].replace(/\[|\]/g,'');
 
     // convert timestamps (start, end)
@@ -410,6 +429,7 @@ const importRow = async function(conn, ds, r, state, cache) {
 
     row['dataset_id'] = ds;
     row['changed'] = 1;
+    row['duplicate'] = 0;
     row['valid_review'] = 0;
     row['valid'] = 0;
 
@@ -509,7 +529,7 @@ const uploadFile = async function(params, body, files, auth) {
             return;
         }
         
-        await validate({ds, aw: getAuthWhere(auth), state: params.state});
+        await validate({ds, auth, state: params.state});
         params.state.progress += 1000;
         params.state.completed = true;
     };
@@ -548,7 +568,7 @@ const getColumnName = function(val) {
     if(val == 'eventDate.text') {
         return `event_date`;
     }
-    if(val == 'location.country') {
+    if(val.indexOf('location.country') > -1) {
         return `location_country_code`;
     }
     if(val.indexOf('.coords')>0) {
@@ -608,6 +628,7 @@ const updateRow = async function(params, body, auth) {
     delete(newAttrs['dataset_id']);
     newAttrs['valid'] = 0;
     newAttrs['valid_review'] = 0;
+    newAttrs['duplicate'] = 0;
     newAttrs.changed = 1;
 
     if(newAttrs['location_lat']) {
@@ -646,7 +667,7 @@ const updateRow = async function(params, body, auth) {
 
     // the dataset id is not really needed - the row IDs are autoincremented
     await db.query({table: 'import', sql:`UPDATE ${joind} SET ? WHERE dataset_id = ? AND import.id=? AND ${aw}`, values: [newAttrs, ds, row] });
-    validate({ds, aw});
+    validate({ds, auth});
     return { 
         row
     }
@@ -717,11 +738,12 @@ const updateColumn = async function(params, body, auth) {
         await db.query({table: 'import', sql:`UPDATE ${joind} SET sample_size_numeric = ? WHERE ${cw} AND dataset_id = ? AND ${aw}`, values: [numVal, ds] });
     }
 
+    
     if(column == 'location_precision') {
         var numVal = conv.parseNumber(nv);
         await db.query({table: 'import', sql:`UPDATE ${joind} SET location_precision_numeric = ? WHERE ${cw} AND dataset_id = ? AND ${aw}`, values: [numVal, ds] });
     }
-
+    
     if(column == 'location_altitude') {
         var numVal = conv.parseNumber(nv);
         await db.query({table: 'import', sql:`UPDATE ${joind} SET location_altitude_numeric = ? WHERE ${cw} AND dataset_id = ? AND ${aw}`, values: [numVal, ds] });
@@ -739,7 +761,7 @@ const updateColumn = async function(params, body, auth) {
     console.dir(nv);
     console.dir(cw);
     */
-    var results = await db.query({table: 'import', sql:`UPDATE ${joind} SET ?? = ?, valid_review = 0, valid = 0, changed = 1 WHERE ${cw} AND dataset_id = ? AND ${aw}`, values: [column, nv, ds ] });
+    var results = await db.query({table: 'import', sql:`UPDATE ${joind} SET ?? = ?, valid_review = 0, valid = 0, duplicate=0, changed = 1 WHERE ${cw} AND dataset_id = ? AND ${aw}`, values: [column, nv, ds ] });
     
     // run the validation as a new job and return a job id
     //validate(ds, aw); 
@@ -751,7 +773,7 @@ const updateColumn = async function(params, body, auth) {
         }
     }
 
-    var jobId = jm.createJob(auth.sub, 16000, validate, { ds, aw });
+    var jobId = jm.createJob(auth.sub, 16000, validate, { ds, auth });
     return {
         job: jm.getJob(jobId),    
         affected: results.affectedRows 
@@ -803,7 +825,7 @@ const getColumn = async function(params, limits, auth) {
             cols.push('location_lat_conv');
             cols.push('location_lon_conv');
             cols.push('location_country_id');
-            cols.push('location_habitat_global_id');
+            //cols.push('location_habitat_global_id');
         }
         if(column == 'trait') {
             cols.push('trait_data_type_id');
@@ -849,14 +871,20 @@ const startValidation = async function(params, body, auth) {
         await validate(params);
     }
     
-    var jobId = jm.createJob(auth.sub, 17000, f, { ds, aw });
+    var jobId = jm.createJob(auth.sub, 17000, f, { ds, auth });
     return {
         job: jm.getJob(jobId),    
     };
 }
 
 const validate = async function(params) {
-    var { ds, aw, state } = params;
+    var { ds, auth, state } = params;
+    try {
+        checkOwner(ds, auth);
+    } catch(e) {
+        state.aborted = true;
+        state.errors.push(e);
+    }
     state = state || { progress: 0 };
     c = await db.getConnection();
     state.progress += 1000;
@@ -865,16 +893,25 @@ const validate = async function(params) {
     + ` sex_id = sex.id, life_stage_id = life_stage.id, measure_id = measure.id, method_id = method.id, trait_id = trait.id, trait_data_type_id = data_type.id, `
     + ` import.trait_category_id = trait_category.id, `
     + ` import.reference_id = COALESCE(refa.id, refd.id, reff.id),  `
-    + ` location_id = COALESCE(location.id, loccoord.id), location_habitat_global_id = habitat_global.id, `
+    + ` location_id = COALESCE(location.id, loccoord.id), `
+    // + `location_habitat_global_id = habitat_global.id, `
     + ` location_country_id = COALESCE(country3.id,country2.id), `
     + ` import.taxonomy_id = COALESCE(taxonomy.valid_id, taxonomy.id, taxonomy_names.valid_id, taxonomy_names.id), `
     + ` require_numeric_value = CASE WHEN data_type.name <> 'Character' THEN 1 ELSE 0 END `
-    + ` WHERE changed = 1 AND dataset_id = ? AND ${aw}`, values: [ds] });
+    + ` WHERE changed = 1 AND dataset_id = ?`, values: [ds] });
 
-    state.progress += 5000;
+    state.progress += 4000;
+
+    // mark the duplicate records
+    await db.cquery(c,{table: 'import', sql:`UPDATE import INNER JOIN data`
+    + ` ON import.original_name = data.original_name AND import.reference_id = data.reference_id AND import.trait_id = data.trait_id` 
+    + ` SET duplicate = 1 WHERE changed = 1 AND import.dataset_id = ?`, values: [ds] });
+
+
+    state.progress += 3000;
 
     // step 3: set the valid attribute to 1 if all the necesssary foreign keys are filled in and other conditions are met
-    await db.cquery(c,{table: 'import', sql:`UPDATE ${joind} SET valid_review = 1 WHERE`
+    await db.cquery(c,{table: 'import', sql:`UPDATE import SET valid_review = 1 WHERE`
     + ` (sex IS NULL OR sex_id IS NOT NULL) AND`
     + ` (life_stage IS NULL OR life_stage_id IS NOT NULL) AND`
     + ` (measure_id IS NOT NULL) AND`
@@ -892,32 +929,38 @@ const validate = async function(params) {
     + ` (location_altitude IS NULL OR location_altitude_numeric IS NOT NULL) AND`
     + ` (location_precision IS NULL OR location_precision_numeric IS NOT NULL) AND`
     + ` (location_country_code IS NULL OR location_country_id IS NOT NULL) AND`
-    + ` (location_habitat_global IS NULL OR location_habitat_global_id IS NOT NULL) AND`
+    // + ` (location_habitat_global IS NULL OR location_habitat_global_id IS NOT NULL) AND`
     + ` (event_date IS NULL OR (event_date_start IS NOT NULL AND event_date_end IS NOT NULL)) AND`
     + ` (require_numeric_value = 0 OR value_numeric = value OR (value = 'true' AND value_numeric = 1) OR (value = 'false' AND value_numeric = 0)) AND`
-    + ` dataset_id = ? AND changed = 1 AND ${aw}`, values: [ds] });
+    + ` duplicate = 0 AND `
+    + ` dataset_id = ? AND changed = 1`, values: [ds] });
 
-    state.progress += 5000;
+    state.progress += 4000;
 
     // step 4: set the valid attribute to 1 if the record is valid for review and also trait_id, method_id, 
 
-    await db.cquery(c,{table: 'import', sql:`UPDATE ${joind} SET valid = 1 WHERE valid_review = 1 AND`
+    await db.cquery(c,{table: 'import', sql:`UPDATE import SET valid = 1 WHERE valid_review = 1 AND`
     + ` (trait_id IS NOT NULL) AND`
     //+ ` (method_id IS NOT NULL) AND`
     + ` (method_id IS NOT NULL OR (method_name IS NULL AND method_description IS NULL)) AND`
     + ` (import.reference_id IS NOT NULL) AND`
     //+ ` (event_date IS NULL OR event_date_start IS NOT NULL) AND`
     /* all location fields are null OR location_id is filled in */
-    + ` ((location_abbrev IS NULL AND location_lat IS NULL AND location_lon IS NULL AND location_precision IS NULL AND location_altitude IS NULL AND `
-    + ` location_locality IS NULL AND location_country_code IS NULL AND location_habitat_global IS NULL AND location_habitat IS NULL AND `
-    + ` location_microhabitat IS NULL AND location_stratum IS NULL AND location_note IS NULL) OR location_id IS NOT NULL) AND`
-    + ` dataset_id = ? AND changed = 1 AND ${aw}`, values: [ds] });
+    + ` ((location_abbrev IS NULL AND location_lat IS NULL AND location_lon IS NULL AND`
+    //+ ` location_precision IS NULL AND`
+    + ` location_altitude IS NULL AND`
+    + ` location_locality IS NULL AND location_country_code IS NULL AND`
+    // + `AND location_habitat_global IS NULL AND location_habitat IS NULL AND `
+    + ` location_microhabitat IS NULL `
+    // + `AND location_stratum IS NULL AND location_note IS NULL `
+    + `) OR location_id IS NOT NULL) AND`
+    + ` dataset_id = ? AND changed = 1`, values: [ds] });
     
     // step 5 reset the changed attribute for all the records (also for the invalid ones)
-    await db.cquery(c,{table: 'import', sql:`UPDATE ${joind} SET changed = 0 WHERE changed = 1 AND`
-    + ` dataset_id = ? AND changed = 1 AND ${aw}`, values: [ds] });
+    await db.cquery(c,{table: 'import', sql:`UPDATE import SET changed = 0 WHERE changed = 1 AND`
+    + ` dataset_id = ? AND changed = 1`, values: [ds] });
 
-    state.progress += 5000;
+    state.progress += 4000;
     state.completed = true;
     
     db.releaseConnection(c);
@@ -932,15 +975,15 @@ var synonyms = {
     'location.abbrev': 'location_abbrev',
     'location.coords.lon': 'location_lon',
     'location.coords.lat': 'location_lat',
-    'location.coords.precision': 'location_precision',
+    //'location.coords.precision': 'location_precision',
     'location.altitude': `location_altitude`,
     'location.locality': `location_locality`,
     'location.country.code': `location_country_code`,
     'location.country': `location_country_code`,
-    'location.habitatGlobal': `location_habitat_global`,
+    //'location.habitatGlobal': `location_habitat_global`,
     'location.habitat': `location_habitat`,
     'location.microhabitat': `location_microhabitat`,
-    'location.stratum': `location_stratum`,
+    //'location.stratum': `location_stratum`,
     'location.note': `location_note`,
     'trait.abbrev': `trait_abbrev`,
     'trait.name': `trait_name`,

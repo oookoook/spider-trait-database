@@ -14,7 +14,7 @@
           :selectedId.sync="selectedId" 
           :selectedProp.sync="selectedProp"
           :invalid="isPropValid(item, h.value) !== true"
-          @select="(e) => selectCell(e, item)">
+          @select="(e) => selectCell(e, item, h.value)">
             <span>{{ getPropFormattedValue(item, h.value, shorten) }}</span>
           </selectable-cell>
         </tr> 
@@ -55,9 +55,12 @@ export default {
     }
   },
   methods: {
-    selectCell(e, item) {
+    selectCell(e, item, prop) {
       //console.dir(e);
       // e = { id: this.cellId, prop: this.cellProp }
+      if(this.isPropReadOnly(prop)){
+        e.readOnly = true;
+      }
       e.item = item;
       this.$emit('selectCell', e);
     }

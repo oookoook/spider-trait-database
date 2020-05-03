@@ -23,9 +23,12 @@
       <entity-link-cell :text="item.abbrev" tooltip="View the location detail" :link="`/locations/${item.id}`" />
     </template>
     
+    <template v-slot:item.coords="{ item }">
+      <entity-link-cell v-if="item.coords" tooltip="View in Google Maps" :link="getGMapsLink(item.coords)" icon="mdi-crosshairs-gps" />
+    </template>
 
     <template v-slot:item.actions="{ item }">
-      <entity-link-cell tooltip="Set as filter in the data explorer" :link="`data/location/${item.id}`" icon="mdi-location" />
+      <entity-link-cell tooltip="Set as filter in the data explorer" :link="`data/location/${item.id}`" icon="mdi-filter" />
     </template>
     </v-data-table>
   </v-card>
@@ -34,10 +37,10 @@
 <script>
 
 import ListTable from '../mixins/list-table'
-
+import Locations from '../mixins/locations'
 export default {
   name: 'LocationsTable',
-  mixins: [ ListTable ],
+  mixins: [ ListTable, Locations ],
   data () {
     return {
       searchFields: [
@@ -49,8 +52,9 @@ export default {
         { text: 'Abbreviation', value: 'abbrev' },
         { text: 'Country code', value: 'country.code' },
         { text: 'Country name', value: 'country.name' },
+        { text: 'Coordinates', value: 'coords' },
         { text: 'Locality', value: 'locality' },
-        { text: 'Global habitat (IUCN)', value: 'habitatGlobal.name' },
+        //{ text: 'Global habitat (IUCN)', value: 'habitatGlobal.name' },
         { text: 'Actions', value: 'actions', sortable: false}
       ]
     }

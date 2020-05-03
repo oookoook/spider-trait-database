@@ -3,6 +3,7 @@
         :loading="loading"
         :items="items"
         v-model="search"
+        :menu-props="menuProps"
         clearable
         :label="label"
         single-line
@@ -10,6 +11,7 @@
         :search-input.sync="autocompleteInput"
         return-object
         @focus="autocomplete"
+        @click:clear="autocomplete"
       >
       <template v-slot:prepend>
         <v-icon :color="iconColor">{{icon}}</v-icon>
@@ -22,7 +24,7 @@ export default {
   name: 'DataFilter',
   components: {
   },
-  props: { loading: Boolean, items: Array, icon: String, label: String, value: [String, Number], preload: Boolean  },
+  props: { loading: Boolean, items: Array, icon: String, label: String, value: [String, Number], preload: Boolean, menuProps: [String, Array, Object]  },
   data () {
     return {
       search: null,
@@ -70,10 +72,18 @@ export default {
       this.changeSearch(val || '');
     },
     items() {
+      console.log('items changed');
       if(this.items && this.items.length && this.waitingForFill) {
         // we have items, value is set, but search is empty - we have to set it
         this.search = this.items.find(i => i.value == this.value);
         // this will trigger the search watcher
+      } else if(this.items.length == 0 && this.waitingForFill) {
+        // value was passed to the filter, but the value does not exist in the data (invalid column value during import)
+        this.waitingForFill = false;
+        // do preload
+        if(this.preload) {
+          this.$emit('autocomplete', { term: '' });
+        }
       }
     },
     autocompleteInput(val) {
@@ -110,12 +120,14 @@ export default {
 
   },
   mounted () {
+    console.log(`${this.label}: DataFilter mounted...`)
     if(this.value) {
       this.changeSearch(this.value);
       return;
     }
+    console.log(`${this.label}: DataFilter pre preload...`)
     if(this.preload && (!this.items || this.items.length == 0)){
-      //console.log(`${this.label}: DataFilter preload...`)
+      console.log(`${this.label}: DataFilter preload...`)
       this.$emit('autocomplete', { term: '' });
     }
   }

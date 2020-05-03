@@ -2,8 +2,8 @@ var db = null;
 
 const list = async function(limits) {
     var res = await db.prepareListResponse(limits, 'location');
-    var results = await db.query({table: 'location', sql: `SELECT location.id, location.abbrev, location.locality, country.id, country.alpha3_code, country.name, habitat_global.id, habitat_global.name `
-     + `FROM location LEFT JOIN country ON location.country_id = country.id LEFT JOIN habitat_global ON location.habitat_global_id = habitat_global.id`, nestTables: true, limits });    
+    var results = await db.query({table: 'location', sql: `SELECT location.id, location.abbrev, location.locality, location.lat, location.lon, country.id, country.alpha3_code, country.name `
+     + `FROM location LEFT JOIN country ON location.country_id = country.id`, nestTables: true, limits });    
      res.items = results.map(r => {    
         return {
                 id: r.location.id,
@@ -14,10 +14,17 @@ const list = async function(limits) {
                     name: r.country.name,
                     code: r.country.alpha3_code
                 },
+                coords: r.location.lat && r.location.lon ? {
+                    lat: r.location.lat,
+                    lon: r.location.lon,
+                    //precision: r.location.precision
+                } : null,
+                /*
                 habitatGlobal: {
                     id: r.habitat_global.id,
                     name: r.habitat_global.name
                 }
+                */
             }
         });
     return res;
@@ -33,11 +40,11 @@ const get = async function(params) {
         id: r.location.id,
         abbrev: r.location.abbrev,
         locality: r.location.locality,
-        coords: {
+        coords: r.location.lat && r.location.lon ? {
             lat: r.location.lat,
             lon: r.location.lon,
-            precision: r.location.precision
-        },
+            //precision: r.location.precision
+        } : null,
         altitude: r.location.altitude,
         habitat: r.location.habitat,
         microhabitat: r.location.microhabitat,

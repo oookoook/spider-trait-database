@@ -1,5 +1,19 @@
 export default [
-    { 
+  { 
+    name: 'valid',
+    readOnly: true,
+    text: 'Valid',
+    //entity: 'taxonomy', 
+    displayValue: (i, e) => {
+      if(i.valid.duplicate) {
+        return 'Duplicate';
+      }
+      return (e && i.valid.approve) || (!e && i.valid.review) ? 'Yes' : 'No';
+    },
+    save: (o, v) => {},
+    isValid: (i, e) => (!i.valid.duplicate && ((e && i.valid.approve) || (!e && i.valid.review))) || 'Record is not valid',
+  },  
+  { 
       name: 'taxonomy.wscLsid',
       text: 'WSC LSID',
       //entity: 'taxonomy', 
@@ -210,7 +224,7 @@ export default [
     },
     { 
       name: 'eventDate.text',
-      text: 'Event Date', 
+      text: 'Date', 
       displayValue: (i) => i.eventDate.text,
       save: (o, v) => {if(!o.eventDate) o.eventDate={}; o.eventDate.text = v; }, 
       isValid: (i, e) => !i.eventDate.text || (!!i.eventDate.start && !!i.eventDate.end) || 'If date is set, it must be in a valid format' 
@@ -287,6 +301,7 @@ export default [
       save: (o, v) => {if(!o.location) o.location={}; if(!o.location.coords) o.location.coords = {}; if(!o.location.coords.lon) o.location.lon = {}; o.location.coords.lon.raw = v; }, 
       isValid: (i, e) => (!i.location.coords.lon.raw && !i.location.coords.lat.raw) || !!i.location.coords.lon.conv || 'Value cannot be converted to a valid longitude.',
     },
+    /*
     { 
       name: 'location.coords.precision',
       text: 'Coordinate precision',
@@ -295,6 +310,7 @@ export default [
       save: (o, v) => {if(!o.location) o.location={}; if(!o.location.coords) o.location.coords = {}; if(!o.location.coords.precision) o.location.coords.precision = {}; o.location.coords.precision.raw = v; }, 
       isValid: (i, e) => !i.location.coords.precision.raw || i.location.coords.precision.numeric != null || 'Value is not a valid number',
     },
+    */
     { 
       name: 'location.altitude',
       text: 'Altitude', 
@@ -320,6 +336,7 @@ export default [
       isValid: (i, e) => !i.location.country.raw || !!i.location.country.id || 'Value does not match any existing code',
       autocomplete: { endpoint: 'locations', valueField: 'country.code', textField: ['country.code', 'country.name'] }
     },
+    /*
     { 
       name: 'location.habitatGlobal',
       text: 'Global habitat', 
@@ -329,6 +346,7 @@ export default [
       isValid: (i, e) => !i.location.habitatGlobal.raw || !!i.location.habitatGlobal.id || 'Value does not match any of the possible values',
       autocomplete: { endpoint: 'locations', valueField: 'habitatGlobal.name' }
     },
+    */
     { 
       name: 'location.habitat',
       text: 'Habitat', 
@@ -345,6 +363,7 @@ export default [
       save: (o, v) => {if(!o.location) o.location={}; o.location.microhabitat = v; },   
       isValid: (i, e) => true,
     },
+    /*
     { 
       name: 'location.stratum',
       text: 'Stratum', 
@@ -353,12 +372,12 @@ export default [
       save: (o, v) => {if(!o.location) o.location={}; o.location.stratum= v; },    
       isValid: (i, e) => true,
     },
+    */
     { 
-      name: 'location.note',
+      name: 'note',
       text: 'Note', 
-      entity: 'location',
-      displayValue: (i) => i.location.note, 
-      save: (o, v) => {if(!o.location) o.location={}; o.location.note = v; },   
+      displayValue: (i) => i.note, 
+      save: (o, v) => { o.note = v; },   
       isValid: (i, e) => true,
     },
     { 

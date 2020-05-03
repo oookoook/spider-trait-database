@@ -22,7 +22,7 @@
         label="Cell value"
         clearable
         class="mr-3"
-        
+        :readonly="isReadOnly"
         prepend-icon="mdi-text"
         persistent-hint
         :rules="[isValid]" 
@@ -111,6 +111,9 @@ export default {
     isValid() {
       //return this.isPropInvalid(selection.item, selection.prop)
       return this.modifiedProp ? this.modifiedProp.isValid(this.selection.item, this.editor) : true;
+    },
+    isReadOnly(){
+      return this.modifiedProp ? this.modifiedProp.readOnly : false;
     },
     isRule() {
       return this.type == 'rule';

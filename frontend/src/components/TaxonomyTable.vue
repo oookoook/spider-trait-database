@@ -24,7 +24,7 @@
     </template>
     
     <template v-slot:item.valid="{ item }">
-      <entity-link-cell v-if="item.valid" tooltip="View the valid taxon" :link="`/taxonomy/${item.validId}`" icon="mdi-content-duplicate" color="warning"/>
+      <entity-link-cell v-if="!item.valid" tooltip="View the valid taxon" :link="`/taxonomy/${item.validId}`" icon="mdi-content-duplicate" color="warning"/>
       <info-icon v-else color="success" icon="mdi-check" text="This a valid taxon" />
     </template>
 
@@ -46,13 +46,13 @@ import Taxons from '../mixins/taxons'
 export default {
   name: 'TaxonomyTable',
   mixins: [ ListTable, Taxons ],
-  components: [InfoIcon],
+  components: { InfoIcon },
   data () {
     return {
       searchFields: [
         { text: 'Family', valueField: 'family' }, 
         { text: 'Genus', valueField: 'genus' },
-        { text: 'Taxon', valueField: 'id', textField: ['genus', 'species', 'subspecies'], searchField: ['species']},
+        { text: 'Taxon', valueField: 'id', textField: ['fullName'], searchField: ['fullName']},
         { text: 'Author', valueField: 'author' },
         { text: 'LSID', valueField: 'id', textField: 'wsc.lsid' }
       ],

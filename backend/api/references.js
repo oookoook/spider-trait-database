@@ -44,12 +44,16 @@ const validate = async function(reference) {
     return (r.length == 0 || (reference.id && r[0].id == reference.id)) ? true : 'Reference abbrev. is already used.';
 }
 
+const getAbbrev = function (val) {
+    val = val || '';
+    var yearPos = val.search(/. \d\d\d\d./);
+    return db.unique((val).substr(0, Math.min(yearPos > 0 ? yearPos + 6 : 50, 50)));
+}
+
 const prepareForSql = function(reference) {
     // prepare reference - create the abbrev
     if(!reference.abbrev) {
-        var parenthesis = reference.fullCitation.indexOf(')');
-        reference.abbrev = db.unique((reference.fullCitation || '')//.replace(/[\W ]/,'')
-        .substr(0, Math.min(parenthesis > 0 ? parenthesis + 1 : 40, 40)));
+        reference.abbrev = getAbbrev(reference.fullCitation);
     }
     reference['full_citation'] = reference.fullCitation;
     delete(reference.fullCitation);

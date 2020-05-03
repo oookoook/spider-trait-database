@@ -32,7 +32,11 @@ const createJob = function(owner, total, func, params) {
 }
 
 const getJob = function(id) {
-    return gjs(id, jobs[id]);
+    var j = jobs[id];
+    if(j && (j.state == 'completed' || j.state == 'aborted')) {
+        removeJob(id);
+    }
+    return gjs(id, j);
     
 }
 

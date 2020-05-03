@@ -22,10 +22,6 @@
     <template v-slot:item.abbrev="{ item }">
       <entity-link-cell :text="item.abbrev" tooltip="View the method detail" :link="`/methods/${item.id}`" />
     </template>
-    
-    <template v-slot:item.reference="{ item }">
-      <entity-link-cell v-if="item.reference.id" :text="item.reference.abbrev" tooltip="View the reference detail" :link="`/references/${item.reference.id}`" />
-    </template>
 
     <template v-slot:item.actions="{ item }">
     <entity-link-cell tooltip="Set as filter in the data explorer" :link="`data/method/${item.id}`" icon="mdi-filter" />
@@ -50,7 +46,7 @@ export default {
       headers: [
         { text: 'Abbreviation', value: 'abbrev' },
         { text: 'Method Name', value: 'name' },
-        { text: 'Reference', value: 'reference'},
+        { text: 'Description', value: 'description'},
         { text: 'Actions', value: 'actions', sortable: false}
       ]
     }

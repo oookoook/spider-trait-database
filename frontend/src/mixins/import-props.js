@@ -14,7 +14,7 @@ export default {
   mounted() {},
   methods: {
     getPropValue(item, propName) {
-     return this.propsDict[propName].displayValue(item);
+     return this.propsDict[propName].displayValue(item, this.editor);
     },
     getPropFormattedValue(item, propName, shorten) {
       //console.log(propName);
@@ -27,12 +27,17 @@ export default {
           v = v.substring(0, 32) + '...';
         }
         
+      } else if(v != null && typeof v == 'boolean') {
+        v = v ? 'Yes' : 'No';
       }
       return v;
     },
     isPropValid(item, propName) {
       //console.log(propName);
       return this.propsDict[propName].isValid(item, this.editor);
+    },
+    isPropReadOnly(propName) {
+      return this.propsDict[propName].readOnly === true;
     },
     getPropForeignMatch(item, propName) {
       // return the ID of foreign key if available

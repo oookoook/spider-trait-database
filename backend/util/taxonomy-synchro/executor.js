@@ -24,6 +24,7 @@ const run = async () => {
         console.log(from);
         console.log(d.toISOString());
         console.error(`${new Date().toISOString()}: ${e}`);
+        return -1;
     }
 
     

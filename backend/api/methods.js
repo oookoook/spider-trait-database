@@ -2,17 +2,14 @@ var db = null;
 
 const list = async function(limits) {
     var res = await db.prepareListResponse(limits, 'method');
-    var results = await db.query({ table: 'method', sql: `SELECT method.id, method.abbrev, method.name, reference.id, reference.abbrev `
-     + `FROM method LEFT JOIN reference ON method.reference_id = reference.id`, nestTables: true, limits });    
+    var results = await db.query({ table: 'method', sql: `SELECT method.id, method.abbrev, method.name `
+     + `FROM method`, nestTables: true, limits });    
      res.items = results.map(r => {    
         return {
                 id: r.method.id,
                 abbrev: r.method.abbrev,
                 name: r.method.name,
-                reference: {
-                    id: r.reference.id,
-                    abbrev: r.reference.abbrev
-                }
+                description: r.method.description
             }
         });
     return res;

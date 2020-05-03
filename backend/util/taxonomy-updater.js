@@ -102,6 +102,9 @@ const py = (v) => v && v.length > 0 ? parseInt(v.substr(v.length-4,4)) : null;
 const ph = (v) => v.substr(v.indexOf('urn'));
 
 const gfn = (r) => {
+    if(!r.genus) {
+        return r.family;
+    }
     var t = [ r.genus ]
     if(r.species) {
         t.push(r.species);
@@ -111,6 +114,10 @@ const gfn = (r) => {
         t.push(r.subspecies);
     }
     
+    if(t.length == 1) {
+        t.push('sp.');
+    }
+
     return t.join(' ');
 }
 
@@ -162,7 +169,8 @@ const update = async function(from) {
         throw 'Invalid start date';
     }
 
-    var lsids = await getIdsFromWsc('genus', d.toISOString().substr(0,10));
+    var lsids = await getIdsFromWsc('family', d.toISOString().substr(0,10));
+    lsids = lsids.concat(await getIdsFromWsc('genus', d.toISOString().substr(0,10)));
     lsids = lsids.concat(await getIdsFromWsc('species', d.toISOString().substr(0,10)));
     //console.dir(lsids);
     var conn = await db.getConnection();
@@ -174,9 +182,10 @@ const update = async function(from) {
         }
     }
 
-    await updateTaxonLinks(conn);
+    //await updateTaxonLinks(conn);
 
     db.releaseConnection(conn);
+    db.endPool();
     console.log('Update completed.');
     return;
 }

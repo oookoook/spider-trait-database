@@ -33,10 +33,6 @@
     <template v-slot:item.abbrev="{ item }">
       <entity-link-cell :text="item.abbrev" tooltip="View the trait detail" :link="`/traits/${item.id}`" />
     </template>
-    
-    <template v-slot:item.reference="{ item }">
-      <entity-link-cell v-if="item.reference" :text="item.reference.abbrev" tooltip="View the reference detail" :link="`/references/${item.reference.id}`" />
-    </template>
 
     <template v-slot:item.actions="{ item }">
     <entity-link-cell tooltip="Set as filter in the data explorer" :link="`data/trait/${item.id}`" icon="mdi-filter" />
@@ -60,13 +56,13 @@ export default {
   data () {
     return {
       searchFields: [
-        { text: 'Life category', valueField: 'category.id', textField: 'category.name', showAll: true }, 
+        { text: 'Category', valueField: 'category.id', textField: 'category.name', showAll: true }, 
         { text: 'Trait name', valueField: 'id', textField: ['abbrev','name'], searchField: ['name'] }],
       headers: [
         { text: 'Abbreviation', value: 'abbrev' },
-        { text: 'Life Category', value: 'category.name' },
+        { text: 'Category', value: 'category.name' },
         { text: 'Trait Name', value: 'name' },
-        { text: 'Reference', value: 'reference'},
+        { text: 'Description', value: 'description'},
         { text: 'Actions', value: 'actions', sortable: false}
       ]
     }

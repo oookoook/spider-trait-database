@@ -58,6 +58,7 @@ You can call the backup manually: `backup` or `backup full` (the later command f
 * The `db-model.mwb` file is created in MySQL Workbench tool and contains the database design.
 * The `create-schema.sql` is a script generated from the model. Can be used to create the database.
 * The `*-enums.sql` scripts are meant to be executed after the schema is created and populate the database with the basic enumerations.
+* Then populate the taxonomy database with the data from the WSC. Refer to the [separate README](../backend/util/taxonomy-synchro/README.md) for instructions.
 
 The creation script creates a default user with credentials `app/app`. Use [a guide](https://linuxize.com/post/how-to-change-mysql-user-password/) to change the password for production environment:
 

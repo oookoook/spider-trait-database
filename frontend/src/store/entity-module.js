@@ -1,3 +1,5 @@
+import props from './entity-props' 
+
 export default (endpoint) => {
     return {
     namespaced: true,
@@ -6,7 +8,8 @@ export default (endpoint) => {
       total: 0,
       entity: null,
       autocomplete: [],
-      search: null
+      search: null,
+      props: props(endpoint)
     },
     mutations: {
       list(state, payload) {

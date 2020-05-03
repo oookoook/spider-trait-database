@@ -3,26 +3,22 @@ var db = null;
 
 
 const list = async function(limits) {
-    const join = 'trait LEFT JOIN trait_category ON trait.trait_category_id = trait_category.id '
-               + 'LEFT JOIN reference ON trait.reference_id = reference.id';
+    const join = 'trait LEFT JOIN trait_category ON trait.trait_category_id = trait_category.id';
     
     var res = await db.prepareListResponse(limits, 'trait', null, null, join);
     
-   var results = await db.query({table: 'trait', sql:`SELECT trait.id, trait.abbrev, trait.name, trait_category.id, trait_category.name, reference.id, reference.abbrev `
+   var results = await db.query({table: 'trait', sql:`SELECT trait.id, trait.abbrev, trait.description, trait.name, trait_category.id, trait_category.name `
    + `FROM ${join}`, nestTables: true, limits });
    res.items = results.map(r => {    
     return {
         id: r.trait.id,
         abbrev: r.trait.abbrev,
         name: r.trait.name,
+        description: r.trait.description,
         category: {
             id: r.trait_category.id,
             name: r.trait_category.name
         },
-        reference: r.reference.id ? {
-            id: r.reference.id,
-            abbrev: r.reference.abbrev
-        } : null
         }
     });   
 
