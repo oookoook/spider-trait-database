@@ -104,7 +104,7 @@ const prepareForSql = async function(location) {
             a.push(location.locality);
         }
 
-        location.abbrev = db.unique(a.join('-').replace(/[\W ]/,'').substring(0, 25));
+        location.abbrev = db.unique(a.join(' ').replace(/[\W ]/,'').substring(0, 25));
     }
     //console.log(location.abbrev);
     location.habitat_global_id = (location.habitatGlobal) ? location.habitatGlobal.id : null;

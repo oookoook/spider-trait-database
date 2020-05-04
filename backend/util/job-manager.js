@@ -10,7 +10,7 @@ const gjs = function(id, j) {
                 aborted: true,
                 progress: 1,
                 total: 1,
-                errors: ['Job not found - server was probably restarted']
+                errors: ['Job not found - job was already deleted or server was restarted']
             }
         }
     }

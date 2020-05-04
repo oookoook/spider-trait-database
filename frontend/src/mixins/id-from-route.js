@@ -6,6 +6,8 @@ export default {
             id: null,
             entityCreate: false,
             entityEdit: false,
+            // TODO enable the edit functionality
+            isEditor: false
         }
     },
     computed: {
@@ -15,7 +17,8 @@ export default {
         editDialog() {
             return this.isEditor && (this.entityCreate || this.entityEdit);
         },
-        ...mapGetters(['isEditor'])
+        // TODO enable the edit functionality
+        //...mapGetters(['isEditor'])
     },
     watch: {
         $route(to, from) {

@@ -2,7 +2,7 @@ var db = null;
 
 const list = async function(limits) {
     var res = await db.prepareListResponse(limits, 'method');
-    var results = await db.query({ table: 'method', sql: `SELECT method.id, method.abbrev, method.name `
+    var results = await db.query({ table: 'method', sql: `SELECT method.id, method.abbrev, method.name, method.description `
      + `FROM method`, nestTables: true, limits });    
      res.items = results.map(r => {    
         return {
