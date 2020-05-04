@@ -70,6 +70,13 @@ const e = (v) => {
     return mysql.escape(v);
 }
 
+const year = (v) => {
+    if(!v) {
+        return null;
+    }
+    return parseInt(v.replace(/\D/g, ''));
+}
+
 const isNDNN = function(row) {
     return row.sp_status != 'VALID';
 }
@@ -84,7 +91,7 @@ const getSQL = (row) => {
     + `, subspecies=${e(row.subspecific_epithet)}`
     + `, full_name=${e(getFullName(row))}`
     + `, author=${e(row.sp_author)}`
-    + `, year=${e(row.sp_author_year)};`
+    + `, year=${e(year(row.sp_author_year))};`
 }
 
 (async () => {
