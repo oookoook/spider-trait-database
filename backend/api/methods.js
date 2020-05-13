@@ -51,16 +51,16 @@ const prepareForSql = function(method) {
     delete(method.reference);
 }
 
-const create = async function(body) {
-    return await db.createEntity({ body, table: 'method', prepareForSql, validate});
+const create = async function(body, auth) {
+    return await db.createEntity({ body, table: 'method', auth, prepareForSql, validate});
 }
 
-const update = async function(params, body) {
-    return await db.updateEntity({params, body, table: 'method', prepareForSql, validate});
+const update = async function(params, body, auth) {
+    return await db.updateEntity({params, body, table: 'method', auth, prepareForSql, validate});
 }
 
 const remove = async function(params) {
-    return await db.deleteEntity({params, table: 'method'});
+    return await db.deleteEntity({params, table: 'method', auth});
 }
 
 const synonyms = {

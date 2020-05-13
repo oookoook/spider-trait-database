@@ -131,16 +131,16 @@ const prepareForSql = async function(location) {
     delete location.coords;
 }
 
-const create = async function(body) {
-    return await db.createEntity({ body, table: 'location', prepareForSql, validate});
+const create = async function(body, auth) {
+    return await db.createEntity({ body, table: 'location', auth, prepareForSql, validate});
 }
 
-const update = async function(params, body) {
-    return await db.updateEntity({params, body, table: 'location', prepareForSql, validate});
+const update = async function(params, body, auth) {
+    return await db.updateEntity({params, body, table: 'location', auth, prepareForSql, validate});
 }
 
-const remove = async function(params) {
-    return await db.deleteEntity({ params, table:'location'});
+const remove = async function(params, auth) {
+    return await db.deleteEntity({ params, table:'location', auth});
 }
 
 const synonyms = {

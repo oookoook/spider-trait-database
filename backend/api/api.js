@@ -18,7 +18,19 @@ const taxonomy = require('./taxonomy')(db);
 const datasets = require('./datasets')(db);
 const data = require('./data')(db);
 const imports = require('./import')(db, mail);
+
+const et = require('./enums');
+const enums = {
+  dataTypes: et('dataTypes', 'data_type', db, ['trait']),
+  lifeStages: et('lifeStages','life_stage', db),
+  measures: et('measures', 'measure', db),
+  sexes: et('sexes', 'sex', db),
+  traitCategories: et('traitCategories', 'trait_category', db, ['trait'])
+}
+
 const jobs = require('./jobs');
+
+
 
 router.use(auth.resourcesAuth);
 
@@ -41,7 +53,7 @@ router.route('/traits')
       traits.list(req.recordLimit).then(r => res.json(r)).catch(e => { err(e); res.sendStatus(400); })
   })
   .post(requiresAuth(), auth.isEditor, function (req, res) {
-    traits.create(req.body).then(r => res.json(r)).catch(e => { err(e); res.sendStatus(400); })
+    traits.create(req.body, req.resourcesAuth).then(r => res.json(r)).catch(e => { err(e); res.sendStatus(400); })
   })
 
 router.route('/traits/:id')
@@ -49,10 +61,10 @@ router.route('/traits/:id')
     traits.get(req.params).then(r => res.json(r)).catch(e => { err(e); res.sendStatus(400); })
   })
   .put(requiresAuth(), auth.isEditor, function (req, res) {
-    traits.update(req.params, req.body).then(r => res.json(r)).catch(e => { err(e); res.sendStatus(400); })
+    traits.update(req.params, req.body, req.resourcesAuth).then(r => res.json(r)).catch(e => { err(e); res.sendStatus(400); })
   })
   .delete(requiresAuth(), auth.isEditor, function (req, res) {
-    traits.remove(req.params).then(r => res.json(r)).catch(e => { err(e); res.sendStatus(400); })
+    traits.remove(req.params, req.resourcesAuth).then(r => res.json(r)).catch(e => { err(e); res.sendStatus(400); })
   })
 
 router.route('/methods')
@@ -60,7 +72,7 @@ router.route('/methods')
     methods.list(req.recordLimit).then(r => res.json(r)).catch(e => { err(e); res.sendStatus(400); })
   })
   .post(requiresAuth(), auth.isEditor, function (req, res) {
-    methods.create(req.body).then(r => res.json(r)).catch(e => { err(e); res.sendStatus(400); })
+    methods.create(req.body, req.resourcesAuth).then(r => res.json(r)).catch(e => { err(e); res.sendStatus(400); })
   })
 
 router.route('/methods/:id')
@@ -68,10 +80,10 @@ router.route('/methods/:id')
     methods.get(req.params).then(r => res.json(r)).catch(e => { err(e); res.sendStatus(400); })
   })
   .put(requiresAuth(), auth.isEditor, function (req, res) {
-    methods.update(req.params, req.body).then(r => res.json(r)).catch(e => { err(e); res.sendStatus(400); })
+    methods.update(req.params, req.body, req.resourcesAuth).then(r => res.json(r)).catch(e => { err(e); res.sendStatus(400); })
   })
   .delete(requiresAuth(), auth.isEditor, function (req, res) {
-    methods.remove(req.params).then(r => res.json(r)).catch(e => { err(e); res.sendStatus(400); })
+    methods.remove(req.params, req.resourcesAuth).then(r => res.json(r)).catch(e => { err(e); res.sendStatus(400); })
   })
 
 router.route('/references')
@@ -79,7 +91,7 @@ router.route('/references')
     references.list(req.recordLimit).then(r => res.json(r)).catch(e => { err(e); res.sendStatus(400); })
   })
   .post(requiresAuth(), auth.isEditor, function (req, res) {
-    references.create(req.body).then(r => res.json(r)).catch(e => { err(e); res.sendStatus(400); })
+    references.create(req.body, req.resourcesAuth).then(r => res.json(r)).catch(e => { err(e); res.sendStatus(400); })
   })
 
 router.route('/references/:id')
@@ -87,10 +99,10 @@ router.route('/references/:id')
     references.get(req.params).then(r => res.json(r)).catch(e => { err(e); res.sendStatus(400); })
   })
   .put(requiresAuth(), auth.isEditor, function (req, res) {
-    references.update(req.params, req.body).then(r => res.json(r)).catch(e => { err(e); res.sendStatus(400); })
+    references.update(req.params, req.body, req.resourcesAuth).then(r => res.json(r)).catch(e => { err(e); res.sendStatus(400); })
   })
   .delete(requiresAuth(), auth.isEditor, function (req, res) {
-    references.remove(req.params).then(r => res.json(r)).catch(e => { err(e); res.sendStatus(400); })
+    references.remove(req.params, req.resourcesAuth).then(r => res.json(r)).catch(e => { err(e); res.sendStatus(400); })
   })
 
 router.route('/locations')
@@ -98,7 +110,7 @@ router.route('/locations')
     locations.list(req.recordLimit).then(r => res.json(r)).catch(e => { err(e); res.sendStatus(400); })
   })
   .post(requiresAuth(), auth.isEditor, function (req, res) {
-    locations.create(req.body).then(r => res.json(r)).catch(e => { err(e); res.sendStatus(400); })
+    locations.create(req.body, req.resourcesAuth).then(r => res.json(r)).catch(e => { err(e); res.sendStatus(400); })
   })
 
 router.route('/locations/:id')
@@ -106,10 +118,10 @@ router.route('/locations/:id')
     locations.get(req.params).then(r => res.json(r)).catch(e => { err(e); res.sendStatus(400); })
   })
   .put(requiresAuth(), auth.isEditor, function (req, res) {
-    locations.update(req.params, req.body).then(r => res.json(r)).catch(e => { err(e); res.sendStatus(400); })
+    locations.update(req.params, req.body, req.resourcesAuth).then(r => res.json(r)).catch(e => { err(e); res.sendStatus(400); })
   })
   .delete(requiresAuth(), auth.isEditor, function (req, res) {
-    locations.remove(req.params).then(r => res.json(r)).catch(e => { err(e); res.sendStatus(400); })
+    locations.remove(req.params, req.resourcesAuth).then(r => res.json(r)).catch(e => { err(e); res.sendStatus(400); })
   })
 
 router.route('/taxonomy')
@@ -245,7 +257,9 @@ router.route('/import/:id/column/:column')
    .delete(requiresAuth(), auth.isContributor, function (req, res) {
     imports.deleteColumn(req.params, req.resourcesAuth).then(r => res.json(r)).catch(e => { err(e); res.sendStatus(400); })
    });
+
    
+
 router.route('/jobs/')
     .get(requiresAuth(), auth.isContributor, function (req, res) {
       // used for getting the list of running jobs
@@ -261,5 +275,25 @@ router.route('/jobs/:id')
       jobs.remove(req.params, req.resourcesAuth).then(r => res.json(r)).catch(e => { err(e); res.sendStatus(400); })
     });
  
+Object.keys(enums).forEach(e => {
+  router.route(`/${e}`)
+  .get(function (req, res) {
+    enums[e].list(req.recordLimit).then(r => res.json(r)).catch(e => { err(e); res.sendStatus(400); })
+  })
+  .post(requiresAuth(), auth.isEditor, function (req, res) {
+    enums[e].create(req.body, req.resourcesAuth).then(r => res.json(r)).catch(e => { err(e); res.sendStatus(400); })
+  })
+
+router.route(`/${e}/:id`)
+  .get(function (req, res) {
+    enums[e].get(req.params).then(r => res.json(r)).catch(e => { err(e); res.sendStatus(400); })
+  })
+  .put(requiresAuth(), auth.isEditor, function (req, res) {
+    enums[e].update(req.params, req.body, req.resourcesAuth).then(r => res.json(r)).catch(e => { err(e); res.sendStatus(400); })
+  })
+  .delete(requiresAuth(), auth.isEditor, function (req, res) {
+    enums[e].remove(req.params, req.resourcesAuth).then(r => res.json(r)).catch(e => { err(e); res.sendStatus(400); })
+  })
+})
 
 module.exports = router;

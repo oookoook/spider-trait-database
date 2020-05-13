@@ -46,7 +46,11 @@ export default {
         query.count = 10;
       } 
       this.loading = true;
-      this.$store.dispatch(`${this.list}/autocomplete`, { query, entity: this.entity, endpoint: this.endpoint }).then(() => {this.loading = false; this.items=this.$store.getters[`${this.list}/autocomplete`](this.entity)}, (err) => { this.$store.dispatch('notify', { error: true, text: `Unable to retrieve autocomplete.`})});
+      if(this.entity) {
+        this.$store.dispatch(`${this.list}/autocomplete`, { query, entity: this.entity, endpoint: this.endpoint }).then(() => {this.loading = false; this.items=this.$store.getters[`${this.list}/autocomplete`](this.entity)}, (err) => { this.$store.dispatch('notify', { error: true, text: `Unable to retrieve autocomplete.`})});
+      } else {
+        this.$store.dispatch(`${this.list}/autocomplete`, { query }).then(() => {this.loading = false; this.items=this.$store.state[this.list].autocomplete}, (err) => { this.$store.dispatch('notify', { error: true, text: `Unable to retrieve autocomplete.`})});
+      }
     },
     autocomplete: debounce(500, function(p) {
 

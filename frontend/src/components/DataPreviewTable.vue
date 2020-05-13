@@ -95,7 +95,7 @@ export default {
         { text: 'Observation', value: 'data-table-expand' },
         { text: 'Method', value: 'method' },
         { text: 'Location', value: 'location' },
-        { text: 'Dataset', value: 'dataset'},
+        //{ text: 'Dataset', value: 'dataset'},
         { text: 'Reference', value: 'reference'},
         { text: 'Related records', value: 'rowLink'}
       ]

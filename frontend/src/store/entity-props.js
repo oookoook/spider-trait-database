@@ -19,19 +19,25 @@ const props = {
             name: 'category',
             label: 'Category',
             isValid: (v) => !!v || 'Category is required',
-            autocomplete: { endpoint: 'traits', valueField: 'category.name' }
+            autocomplete: { endpoint: 'traitCategories', valueField: 'id', textField: 'name', showAll: true }
         },
         {
             name: 'dataType',
-            label: 'data type',
+            label: 'Data type',
             isValid: (v) => !!v || 'Data type is required',
-            autocomplete: { endpoint: 'traits', valueField: 'dataType.name' }
+            autocomplete: { endpoint: 'dataTypes', valueField: 'id', textField: 'name', showAll: true }
         },
         {
             name: 'standard',
             label: 'Unit',
             isValid: (v) => true
-        },       
+        },
+        {
+            name: 'reference',
+            label: 'Reference',
+            isValid: (v) => true,
+            autocomplete: { endpoint: 'references', valueField: 'id', textField: 'fullCitation' }
+        }       
     ]
 }
 

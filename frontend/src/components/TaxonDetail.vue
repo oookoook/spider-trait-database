@@ -3,7 +3,7 @@
       <v-card-title v-if="item">{{ getTaxon(item) }}</v-card-title>
       <v-card-subtitle v-if="item">{{ item.family }}</v-card-subtitle>
       
-      <v-card-text>
+      <v-card-text v-if="item">
         <v-alert v-if="!item.valid" type="warning">
           This is not a valid taxon. Below, you can find a link to the valid taxon.
         </v-alert>
@@ -15,7 +15,7 @@
           This is a taxon record that matches only records that has no specific species attached. 
           To filter all the taxons that belong to this genus, use the filter action on the Genus row in the list below. 
         </v-alert>
-        <span v-else>This is a valid taxon page</span>
+        <span v-else>This is a valid taxon.</span>
 
       </v-card-text>
       <v-list  v-if="item" three-line>

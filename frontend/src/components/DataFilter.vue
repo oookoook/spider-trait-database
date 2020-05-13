@@ -6,9 +6,10 @@
         :menu-props="menuProps"
         clearable
         :label="label"
-        single-line
-        hide-details
+        :single-line="!showDetails"
+        :hide-details="!showDetails"
         :search-input.sync="autocompleteInput"
+        :rules="rules"
         return-object
         @focus="autocomplete"
         @click:clear="autocomplete"
@@ -24,7 +25,8 @@ export default {
   name: 'DataFilter',
   components: {
   },
-  props: { loading: Boolean, items: Array, icon: String, label: String, value: [String, Number], preload: Boolean, menuProps: [String, Array, Object]  },
+  props: { loading: Boolean, items: Array, icon: String, label: String, value: [String, Number], 
+  preload: Boolean, menuProps: [String, Array, Object], showDetails: Boolean, rules: Array  },
   data () {
     return {
       search: null,
@@ -77,7 +79,7 @@ export default {
         // we have items, value is set, but search is empty - we have to set it
         this.search = this.items.find(i => i.value == this.value);
         // this will trigger the search watcher
-      } else if(this.items.length == 0 && this.waitingForFill) {
+      } else if((!this.items || this.items.length == 0) && this.waitingForFill) {
         // value was passed to the filter, but the value does not exist in the data (invalid column value during import)
         this.waitingForFill = false;
         // do preload

@@ -4,7 +4,14 @@
     <v-breadcrumbs :items="[{ text: listTitle, to: `/${list}`, exact: true }, { text: i.item ? i.item.abbrev : `New ${entityTitle}`, to: currentPath }]" />
     <v-slide-x-transition>
     <trait-detail v-if="i.item && !editDialog" :item="i.item" :show-update="isEditor" @edit="entityEdit=true" />
-    <entity-dialog v-if="editDialog" :item="i.item" :entity-props="i.entityProps" @save="i.save" @remove="i.remove" @cancel="entityEdit=false"/>
+    <entity-dialog v-if="editDialog" 
+    :loading="i.loading"
+    :create="entityCreate" 
+    :item="i.item" 
+    :entity-props="i.entityProps" 
+    @save="i.save" 
+    @remove="i.remove" 
+    @cancel="entityEdit=false"/>
     </v-slide-x-transition>
   </entity-provider>
   

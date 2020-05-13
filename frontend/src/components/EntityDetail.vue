@@ -1,0 +1,128 @@
+<template>
+  <v-container>
+    <entity-provider
+      :list="list"
+      :id="id"
+      :create="entityCreate"
+      v-slot="i"
+      @update="entityRefresh"
+      @create="entityRefresh"
+      @remove="entityList(list)"
+    >
+      <v-breadcrumbs
+        :items="[{ text: listTitle, to: `/${list}`, exact: true }, { text: i.item ? i.item.abbrev : `New ${entityTitle}`, to: currentPath }]"
+      />
+      <v-slide-x-transition>
+        <!--
+        <trait-detail
+          v-if="i.item && !editDialog"
+          :item="i.item"
+          :show-update="isEditor"
+          @edit="entityEdit=true"
+        />
+        -->
+        <slot v-if="i.item && !editDialog" :item="i.item" :show-update="isEditor" :onEdit="() => {entityEdit = true}" />
+        <entity-dialog
+          v-if="editDialog"
+          :loading="i.loading"
+          :create="entityCreate"
+          :item="i.item"
+          :entity-props="i.entityProps"
+          @save="i.save"
+          @remove="i.remove"
+          @cancel="entityEdit=false"
+        />
+      </v-slide-x-transition>
+    </entity-provider>
+
+    <list-provider v-if="id" list="data" :entity="entity" :id="id" v-slot="i">
+      <v-card>
+        <v-card-title>Data preview</v-card-title>
+        <data-preview-table
+          :items="i.items"
+          :loading="i.loading"
+          :total="i.total"
+          @update="i.update"
+        />
+      </v-card>
+    </list-provider>
+  </v-container>
+</template>
+
+<script>
+import { mapGetters } from "vuex";
+
+import IdFromRoute from "../mixins/id-from-route";
+import EntityProvider from "../components/EntityProvider";
+import ListProvider from "../components/ListProvider";
+import EntityDialog from "../components/EntityDialog";
+import DataPreviewTable from "../components/DataPreviewTable";
+export default {
+  name: "trait",
+  mixins: [IdFromRoute],
+  components: {
+    EntityProvider,
+    ListProvider,
+    EntityDialog,
+    DataPreviewTable
+  },
+  props: { list: String, entity: String },
+  data() {
+    return {
+      entityCreate: false,
+      entityEdit: false
+    };
+  },
+  computed: {
+    listTitle() {
+      if (!this.list) {
+        return "";
+      }
+      return this.list[0].toUpperCase() + this.list.substr(1);
+    },
+    entityTitle() {
+      if (!this.entity) {
+        return "";
+      }
+      return this.entity[0].toUpperCase() + this.entity.substr(1);
+    },
+    currentPath() {
+      return this.$route.path;
+    },
+    editDialog() {
+      return this.isEditor && (this.entityCreate || this.entityEdit);
+    },
+    ...mapGetters(["isEditor"])
+  },
+  watch: {
+    $route(to, from) {
+      this.processRouteNew();
+    }
+  },
+  methods: {
+    processRouteNew() {
+      var p = this.$route.params.id;
+      if (!p) {
+        return;
+      }
+      if (p === "new") {
+        this.entityCreate = true;
+      }
+    },
+    entityRefresh(id) {
+      if (!this.id && this.entityCreate) {
+        this.$router.push(this.currentPath.replace(/new$/, id));
+      } else {
+        this.$router.go(0);
+      }
+    },
+    entityList(endpoint) {
+      this.$router.push(`/${endpoint}`);
+    }
+  },
+  created() {},
+  mounted() {}
+};
+</script>
+<style scoped>
+</style>

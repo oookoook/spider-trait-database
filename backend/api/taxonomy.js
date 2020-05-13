@@ -57,6 +57,7 @@ Data manipulating methods should not be called from the API - Taxonomy will be s
 */
 const synonyms = {
     'wsc.lsid': 'taxonomy.wsc_lsid',
+    'lsid': 'wsc_lsid',
     'fullName': 'taxonomy.full_name',
     'taxonomy.fullName': 'taxonomy.full_name'
 }

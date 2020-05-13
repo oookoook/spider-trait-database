@@ -45,7 +45,7 @@ export default {
     return {
       searchFields: [
         { text: 'Country', valueField: 'country.id', textField: ['country.code', 'country.name'], searchField: ['country.name']},
-        { text: 'Global habitat (IUCN)', valueField: 'habitatGlobal.id', textField: 'habitatGlobal.name'},
+        //{ text: 'Global habitat (IUCN)', valueField: 'habitatGlobal.id', textField: 'habitatGlobal.name'},
         { text: 'Locality', valueField: 'locality' }
       ],
       headers: [

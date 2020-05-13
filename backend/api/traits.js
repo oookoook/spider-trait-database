@@ -77,20 +77,26 @@ const prepareForSql = function(trait) {
     // prepare trait
     trait.trait_category_id = (trait.category) ? trait.category.id : null;
     trait.data_type_id = (trait.dataType) ? trait.dataType.id : null;
+    
+    if(trait.reference != null) {
+        trait.reference_id = trait.reference.id;
+    }
+
+    delete trait.reference;
     delete trait.category;
     delete trait.dataType;
 }
 
-const create = async function(body) {
-    return await db.createEntity({body, table: 'trait', prepareForSql, validate});
+const create = async function(body, auth) {
+    return await db.createEntity({body, table: 'trait', auth, prepareForSql, validate});
 }
 
-const update = async function(params, body) {
-    return await db.updateEntity({params, body, table: 'trait', prepareForSql, validate});
+const update = async function(params, body, auth) {
+    return await db.updateEntity({params, body, table: 'trait', auth, prepareForSql, validate});
 }
 
-const remove = async function(params) {
-    return await db.deleteEntity({params, table: 'trait'});
+const remove = async function(params, auth) {
+    return await db.deleteEntity({params, table: 'trait', auth});
 }
 
 const synonyms = {
@@ -109,7 +115,6 @@ module.exports = function(dbClient) {
         get,
         create,
         update,
-        remove,
-        synonyms
+        remove
     }
 }

@@ -117,6 +117,11 @@ const routes = [
     component: () => import(/* webpackChunkName: "taxon" */ '../views/Taxon.vue')
   },
   {
+    path: '/taxonomy/lsid/:lsid',
+    name: 'lsid',
+    component: () => import(/* webpackChunkName: "taxon" */ '../views/Taxon.vue')
+  },
+  {
     path: '/locations/:id',
     name: 'location',
     component: () => import(/* webpackChunkName: "location" */ '../views/Location.vue')

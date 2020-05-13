@@ -42,6 +42,7 @@ export default (endpoint) => {
                     context.commit('total', { value: data.count});
                 }
                 context.commit('list', { value: data.items});
+                return data.items;
             }
         },
         get: async function(context, payload) {
@@ -51,7 +52,9 @@ export default (endpoint) => {
             var data = await context.dispatch('get', payload, { root: true });
             if(data) {
                 context.commit('entity', { value: data.item });
+                return data.item;
             }
+            
         },
         autocomplete: async function(context, payload) {
             console.log(`${endpoint}/autocomplete`);
@@ -60,8 +63,8 @@ export default (endpoint) => {
             var data = await context.dispatch('get', payload, { root: true });
             if(data) {
                 context.commit('autocomplete', { value: data.items });
+                return data.items;
             }
-            
         },
         create: async function(context, payload) {
             console.log(`${endpoint}/create`);
