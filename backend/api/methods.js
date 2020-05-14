@@ -59,7 +59,7 @@ const update = async function(params, body, auth) {
     return await db.updateEntity({params, body, table: 'method', auth, prepareForSql, validate});
 }
 
-const remove = async function(params) {
+const remove = async function(params, auth) {
     return await db.deleteEntity({params, table: 'method', auth});
 }
 

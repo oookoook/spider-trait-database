@@ -1,7 +1,8 @@
 <template>
   <v-card>
     <v-card-title>
-      Traits
+      Traits 
+      <action-button tooltip color="primary" v-if="isEditor" to="/traits/new" />
       <v-spacer></v-spacer>
       <list-filter 
       :search-fields="searchFields" 

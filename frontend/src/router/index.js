@@ -72,6 +72,11 @@ const routes = [
     component: () => import(/* webpackChunkName: "prepare" */ '../views/Admin.vue')
   },
   {
+    path: '/enums',
+    name: 'enums',
+    component: () => import(/* webpackChunkName: "prepare" */ '../views/Enums.vue')
+  },
+  {
     path: '/traits',
     name: 'traits',
     component: () => import(/* webpackChunkName: "traits" */ '../views/Traits.vue')

@@ -22,6 +22,7 @@ const columns = [
   `life_stage`,
   `frequency`,
   `sample_size`,
+  `treatment`,
   `event_date`,
   `row_link`,
   `method_abbrev`,
@@ -51,7 +52,9 @@ const colSynonyms = {
     'date': 'event_date',
     'locality': 'location_locality',
     'country_code': 'location_country_code',
+    'country': 'location_country_code',
     'habitat': 'location_habitat',
+    'habitat_local': 'location_habitat',
     'microhabitat': 'location_microhabitat', 
 }
 

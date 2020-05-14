@@ -32,8 +32,8 @@ const list = async function(limits) {
 
 const get = async function(params) {
     var id = params.id;
-    var results = await db.query({table: 'location', sql:'SELECT location.*, habitat_global.*, country.* '
-     + 'FROM location LEFT JOIN country ON location.country_id = country.id LEFT JOIN habitat_global ON location.habitat_global_id = habitat_global.id '
+    var results = await db.query({table: 'location', sql:'SELECT location.*, country.* '
+     + 'FROM location LEFT JOIN country ON location.country_id = country.id '
      + 'WHERE location.id = ?', values: [id], nestTables: true });
      var r = results[0];
      return { item: {
@@ -49,18 +49,20 @@ const get = async function(params) {
         habitat: r.location.habitat,
         microhabitat: r.location.microhabitat,
         stratum: r.location.stratum,
-        notes: r.location.note,
+        //note: r.location.note,
         country: {
             id: r.country.id,
             name: r.country.name,
             code: r.country.alpha3_code
         },
+        /*
         habitatGlobal: {
             id: r.habitat_global.id,
             name: r.habitat_global.name,
             category: r.habitat_global.category,
             number: r.habitat_global.number
         }
+        */
     }
     };
 }
@@ -74,6 +76,13 @@ const validate = async function(location) {
 
     if(!((location.lat == null && location.lon == null) || (location.lat != null && location.lon != null))) {
         return 'Both coordinates must be set.';
+    }
+
+    if(location.lat && Number.isNaN(parseFloat(location.lat))) {
+        return 'Latitude is not a number.';
+    }
+    if(location.lon && Number.isNaN(parseFloat(location.lon))) {
+        return 'Longitude is not a number.';
     }
 
     var r = await db.query({table: 'location', sql: 'SELECT location.id FROM location WHERE abbrev = ?', values: [location.abbrev], nestTables: false});

@@ -74,6 +74,7 @@ module.exports = function (endpoint, tableName, dbClient, referencingTables) {
     const remove = async function (params, auth) {
         return await db.deleteEntity({
             params,
+            table,
             auth,
             refs
         });

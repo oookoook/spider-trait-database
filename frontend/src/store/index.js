@@ -38,6 +38,7 @@ export default new Vuex.Store({
     measures: new EntityModule('measures'),
     sexes: new EntityModule('sexes'),
     traitCategories: new EntityModule('traitCategories'),
+    countries: new EntityModule('countries'),
     imports: new EntityModule('import'),
     editor,
     data,

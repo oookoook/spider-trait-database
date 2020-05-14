@@ -25,7 +25,8 @@ const enums = {
   lifeStages: et('lifeStages','life_stage', db),
   measures: et('measures', 'measure', db),
   sexes: et('sexes', 'sex', db),
-  traitCategories: et('traitCategories', 'trait_category', db, ['trait'])
+  traitCategories: et('traitCategories', 'trait_category', db, ['trait']),
+  countries: require('./countries')(db)
 }
 
 const jobs = require('./jobs');

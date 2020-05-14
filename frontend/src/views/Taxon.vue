@@ -20,10 +20,11 @@ import IdFromRoute from '../mixins/id-from-route'
 import EntityProvider from '../components/EntityProvider'
 import ListProvider from '../components/ListProvider'
 import TaxonDetail from '../components/TaxonDetail'
+import Taxons from '../mixins/taxons'
 import DataPreviewTable from '../components/DataPreviewTable'
 export default {
   name: 'taxon',
-  mixins: [IdFromLsid, IdFromRoute],
+  mixins: [IdFromLsid, IdFromRoute, Taxons],
   components: {
     EntityProvider,
     TaxonDetail,

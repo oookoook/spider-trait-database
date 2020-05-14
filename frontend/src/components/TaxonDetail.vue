@@ -1,7 +1,9 @@
 <template>
   <v-card :loading="loading">
       <v-card-title v-if="item">{{ getTaxon(item) }}</v-card-title>
-      <v-card-subtitle v-if="item">{{ item.family }}</v-card-subtitle>
+      <v-card-subtitle v-if="item">
+        <v-breadcrumbs class="px-0" :items="[{ text: 'Taxonomy', to: `/taxonomy`, exact: true }, { text: getTaxon(item), to: currentPath }]"/>
+      </v-card-subtitle>
       
       <v-card-text v-if="item">
         <v-alert v-if="!item.valid" type="warning">

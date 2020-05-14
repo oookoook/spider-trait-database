@@ -48,6 +48,10 @@
           <v-list-item-icon><v-icon>mdi-chart-bell-curve</v-icon></v-list-item-icon>
           <v-list-item-content><v-list-item-title>Methods</v-list-item-title></v-list-item-content>
         </v-list-item>
+        <v-list-item to="/enums" v-if="isEditor">
+          <v-list-item-icon><v-icon>mdi-chevron-right</v-icon></v-list-item-icon>
+          <v-list-item-content><v-list-item-title>Enumerations</v-list-item-title></v-list-item-content>
+        </v-list-item>
       </v-list>
     </v-menu>      
 

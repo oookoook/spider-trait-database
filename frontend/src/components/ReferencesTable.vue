@@ -2,6 +2,7 @@
   <v-card>
     <v-card-title>
       References
+      <action-button tooltip color="primary" v-if="isEditor" to="/references/new" />
       <v-spacer></v-spacer>
       <list-filter 
       :search-fields="searchFields" 
@@ -18,7 +19,6 @@
       :server-items-length="total"
       :loading="loading"
       class="elevation-1"
-      show-expand
     >
     
     <template v-slot:item.abbrev="{ item }">

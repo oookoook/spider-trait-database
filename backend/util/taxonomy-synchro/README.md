@@ -4,6 +4,8 @@ This script updates the taxonomy database with the newest data from the [https:/
 
 The scripts expect a full database snapshot available in the database (inserted using SQL - instructions below) and then queires the WSC API for changes since the last update.
 
+The script also requires your WSC API key entered in the backend settings file.
+
 To setup automatic updates, run these commands (your pwd must be this directory):
 
 ```sh
@@ -11,7 +13,9 @@ cp lastrun.template lastrun
 
 # If you have newer snapshot than provided in the repo, change the timestamp in the lastrun to match the date of your snapsot
 
-ln -s ./run /etc/cron.weekly/spider-traits-taxonomy-update
+echo "cd `pwd`" | sudo tee -a /etc/cron.weekly/spidertraits-wsc-synchro
+echo "./run" | sudo tee -a /etc/cron.weekly/spidertraits-wsc-synchro
+sudo chmod 744 /etc/cron.weekly/spidertraits-wsc-synchro
 ```
 
 ## Using sql-gen utility

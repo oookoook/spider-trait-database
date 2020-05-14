@@ -1,7 +1,9 @@
 <template>
   <v-card :loading="loading">
-      <v-card-title>{{ item.name }}</v-card-title>
-      <v-card-subtitle>{{ item.abbrev }}</v-card-subtitle>
+      <v-card-title>
+        {{ item.name }}
+      </v-card-title>
+      <v-card-subtitle><v-breadcrumbs class="px-0" :items="breadcrumbs"/></v-card-subtitle>
       <v-card-text>
       {{ item.description }}
       </v-card-text>
@@ -28,7 +30,7 @@ export default {
   components: {
     ListItem
   },
-  props: { item: Object, loading: Boolean, showUpdate: Boolean },
+  props: { item: Object, loading: Boolean, showUpdate: Boolean, breadcrumbs: Array },
   data () {
     return {
 

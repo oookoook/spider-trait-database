@@ -2,6 +2,7 @@
   <v-card>
     <v-card-title>
       Locations
+      <action-button tooltip color="primary" v-if="isEditor" to="/locations/new" />
       <v-spacer></v-spacer>
       <list-filter 
       :search-fields="searchFields" 

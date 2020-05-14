@@ -1,8 +1,8 @@
 <template>
   <v-card>
     <v-card-title>
-      Methods
-      <action-button tooltip color="primary" v-if="isEditor" to="/methods/new" />
+      Countries
+      <action-button tooltip color="primary" v-if="isEditor" @click="$emit('create')" />
       <v-spacer></v-spacer>
       <list-filter 
       :search-fields="searchFields" 
@@ -20,12 +20,8 @@
       class="elevation-1"
     >
     
-    <template v-slot:item.abbrev="{ item }">
-      <entity-link-cell :text="item.abbrev" tooltip="View the method detail" :link="`/methods/${item.id}`" />
-    </template>
-
     <template v-slot:item.actions="{ item }">
-    <entity-link-cell tooltip="Set as filter in the data explorer" :link="`data/method/${item.id}`" icon="mdi-filter" />
+    <action-button tooltip text="Edit" icon="mdi-pencil" color="primary" v-if="isEditor" @click="$emit('edit', item)" />
     </template>
 
     </v-data-table>
@@ -36,18 +32,19 @@
 
 import ListTable from '../mixins/list-table'
 
+
 export default {
-  name: 'MethodsTable',
+  name: 'CountriesTable',
   mixins: [ ListTable ],
   data () {
     return {
       searchFields: [
-        { text: 'Method name', valueField: 'id', textField: ['abbrev','name'], searchField: ['name'] },
+        { text: 'Country name', valueField: 'id', textField: ['code','name'], searchField: ['name'] },
       ],
       headers: [
-        { text: 'Abbreviation', value: 'abbrev' },
-        { text: 'Method Name', value: 'name' },
-        { text: 'Description', value: 'description'},
+        { text: 'Country Name', value: 'name' },
+        { text: 'Code', value: 'code'},
+        { text: 'Code (2 leters)', value: 'codeAlpha2'},
         { text: 'Actions', value: 'actions', sortable: false}
       ]
     }

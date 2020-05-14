@@ -9,9 +9,11 @@
       @create="entityRefresh"
       @remove="entityList(list)"
     >
+      <!--
       <v-breadcrumbs
         :items="[{ text: listTitle, to: `/${list}`, exact: true }, { text: i.item ? i.item.abbrev : `New ${entityTitle}`, to: currentPath }]"
       />
+      -->
       <v-slide-x-transition>
         <!--
         <trait-detail
@@ -21,13 +23,20 @@
           @edit="entityEdit=true"
         />
         -->
-        <slot v-if="i.item && !editDialog" :item="i.item" :show-update="isEditor" :onEdit="() => {entityEdit = true}" />
+        <slot v-if="i.item && !editDialog" 
+        :item="i.item" 
+        :showUpdate="isEditor" 
+        :onEdit="() => {entityEdit = true}"
+        :breadcrumbs="[{ text: listTitle, to: `/${list}`, exact: true }, { text: i.item.abbrev, to: currentPath }]">
+        {{ JSON.stringify(i.item) }}
+        </slot>
         <entity-dialog
           v-if="editDialog"
           :loading="i.loading"
           :create="entityCreate"
           :item="i.item"
           :entity-props="i.entityProps"
+          :breadcrumbs="[{ text: listTitle, to: `/${list}`, exact: true }, { text: i.item ? i.item.abbrev : 'New item', to: currentPath }]"
           @save="i.save"
           @remove="i.remove"
           @cancel="entityEdit=false"
@@ -58,7 +67,7 @@ import ListProvider from "../components/ListProvider";
 import EntityDialog from "../components/EntityDialog";
 import DataPreviewTable from "../components/DataPreviewTable";
 export default {
-  name: "trait",
+  name: "entityDetail",
   mixins: [IdFromRoute],
   components: {
     EntityProvider,
@@ -107,13 +116,19 @@ export default {
       }
       if (p === "new") {
         this.entityCreate = true;
+        this.id = null;
+      } else {
+        this.entityCreate = false;
       }
     },
     entityRefresh(id) {
+      console.log('entity refresh');
       if (!this.id && this.entityCreate) {
         this.$router.push(this.currentPath.replace(/new$/, id));
       } else {
-        this.$router.go(0);
+        this.entityEdit = false;
+        this.id = id;
+        //this.$router.go(0);
       }
     },
     entityList(endpoint) {
@@ -121,7 +136,9 @@ export default {
     }
   },
   created() {},
-  mounted() {}
+  mounted() {
+    this.processRouteNew();  
+  }
 };
 </script>
 <style scoped>

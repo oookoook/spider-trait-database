@@ -49,6 +49,7 @@ const list = async function(params, limits) {
                 value: r.data.value_numeric ? r.data.value_numeric : r.data.value,
                 frequency: r.data.frequency,
                 sampleSize: r.data.sample_size,
+                treatment: r.data.treatment,
                 eventDate: { 
                     text: r.data.event_date_text,
                     start: r.data.event_date_start ? r.data.event_date_start.toJSON() : null,     
@@ -102,7 +103,8 @@ const csv =  async function(params, limits, tmpDir) {
     var dstream = db.squery(c, { table: 'data', sql: `SELECT data.id, taxonomy.wsc_lsid, data.original_name as originalName, `
      + `taxonomy.family, taxonomy.genus, taxonomy.species, taxonomy.subspecies, `
      + `trait.abbrev as trait, trait.name as traitFullName, trait_category.name as traitCategory, data.value, data.value_numeric, `
-     + `measure.name as measure, sex.name as sex, life_stage.name as lifeStage, data.frequency, data.sample_size as sampleSize, method.abbrev as method, method.name as methodFullName, `
+     + `measure.name as measure, sex.name as sex, life_stage.name as lifeStage, data.frequency, data.sample_size as sampleSize, `
+     + `data.treatment as treatment, method.abbrev as method, method.name as methodFullName, `
      + `event_date_text as dateText, event_date_start as dateStart, event_date_end as dateEnd, note `
      + `location.abbrev as location, location.lat as decimalLatitude, location.lon as decimalLongitude, location.altitude, location.locality as verbatimLocality, `
      + `country.alpha3_code as countryCode, country.name as countryName, `

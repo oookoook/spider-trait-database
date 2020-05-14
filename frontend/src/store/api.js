@@ -155,7 +155,12 @@ export default {
             }
             try {
                 var result = await Vue.http.put(url, payload.body, { params: payload.query });
-            return result.body;
+                if(result.body.error) {
+                    if(result.body.error == 'validation') {
+                        context.dispatch('notify', { error: true, text: result.body.validation});
+                    }
+                }
+                return result.body;
             } catch (err) {
                 console.error(err);
                 context.dispatch('notify', { error: true, text: `Unable to update record.`});
@@ -169,7 +174,12 @@ export default {
             }
             try {
                 var result = await Vue.http.delete(url, { params: payload.query });
-            return result.body;
+                if(result.body.error) {
+                    if(result.body.error == 'validation') {
+                        context.dispatch('notify', { error: true, text: result.body.validation});
+                    }
+                }
+                return result.body;
             } catch (err) {
                 console.error(err);
                 context.dispatch('notify', { error: true, text: `Unable to delete record.`});

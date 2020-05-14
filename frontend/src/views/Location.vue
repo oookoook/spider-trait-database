@@ -1,33 +1,22 @@
 <template>
-  <v-container>
-  <entity-provider list="locations" :id="id" v-slot="i">
-    <location-detail :item="i.item" />
-  </entity-provider>
-  
-  <list-provider v-if="id" list="data" entity="location" :id="id" v-slot="i">
-    <v-card>
-      <v-card-title>Data preview</v-card-title>
-      <data-preview-table :items="i.items" :loading="i.loading" :total="i.total" @update="i.update"/>
-    </v-card>
-  </list-provider>
-  
-  </v-container>
+  <entity-detail entity="location" list="locations" v-slot="{item, showUpdate, onEdit, breadcrumbs}">
+    <location-detail
+          :item="item"
+          :show-update="showUpdate"
+          :breadcrumbs="breadcrumbs"
+          @edit="onEdit"
+        />
+  </entity-detail>
 </template>
 
 <script>
-import IdFromRoute from '../mixins/id-from-route' 
-import EntityProvider from '../components/EntityProvider'
-import ListProvider from '../components/ListProvider'
+import EntityDetail from '../components/EntityDetail'
 import LocationDetail from '../components/LocationDetail'
-import DataPreviewTable from '../components/DataPreviewTable'
 export default {
   name: 'method',
-  mixins: [IdFromRoute],
   components: {
-    EntityProvider,
-    LocationDetail,
-    ListProvider,
-    DataPreviewTable
+    EntityDetail,
+    LocationDetail
   },
   props: [],
   data () {

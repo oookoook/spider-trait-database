@@ -68,7 +68,7 @@ const update = async function(params, body, auth) {
 }
 
 const remove = async function(params, auth) {
-    return await db.deleteEntity({params, table: 'reference', auth});
+    return await db.deleteEntity({params, table: 'reference', auth, refs: ['data', 'import', 'trait', 'method']});
 }
 
 const synonyms = {

@@ -1,7 +1,7 @@
 <template>
   <v-card>
-    <v-card-title>Edit</v-card-title>
-    <v-card-subtitle>{{ item ? `Editing item ${item.id}` : `New item` }}</v-card-subtitle>
+    <v-card-title>Edit entity</v-card-title>
+    <v-card-subtitle v-if="breadcrumbs"><v-breadcrumbs class="px-0" :items="breadcrumbs"/></v-card-subtitle>
     <v-card-text>
       <v-form v-model="fv" ref="form">
       <v-row v-if="it">
@@ -12,6 +12,7 @@
         clearable
         class="mr-3"
         persistent-hint
+        :hint="prop.hint"
         :rules="[prop.isValid]" 
       ></v-text-field>
       <autocomplete-provider v-else
@@ -38,7 +39,9 @@
       </v-form>
     </v-card-text>
     <v-card-actions>
+      
       <action-button text="Cancel" @click="$emit('cancel')" icon="mdi-cancel" />
+      <action-button text="Delete" v-if="item && item.id" color="warning" @click="remove" icon="mdi-delete-forever-outline" />
       <action-button text="Save" :loading="loading" color="primary" @click="save" icon="mdi-check" />
       
     </v-card-actions>
@@ -58,7 +61,7 @@ export default {
     AutocompleteProvider,
     DataFilter
   },
-  props: { item: Object, create: Boolean, loading: Boolean, entityProps: Array },
+  props: { item: Object, create: Boolean, loading: Boolean, entityProps: Array, breadcrumbs: Array },
   data () {
     return {
       it: null,
@@ -76,6 +79,9 @@ export default {
     save() {
       this.$emit('save', this.it);
     },
+    remove() {
+      this.$emit('remove', this.it);
+    },
     fillItem() {
       this.it = Object.assign({}, this.item || {});
       this.entityProps.forEach(e => {
@@ -85,12 +91,15 @@ export default {
       if(e.autocomplete) {
         this.it[e.name] = {};
         this.it[e.name][e.autocomplete.valueField] = null;
+      } else if(e.parent) {
+        if(!this.it[e.parent]) {
+          this.it[e.parent]  = {};
+        };
+        this.it[e.parent][e.name] = null;
       } else {
         this.it[e.name] = null;
       }
     })
-    
-    console.dir(this.it);
     }
   },
   created () {

@@ -1,7 +1,7 @@
 <template>
   <v-card :loading="loading">
       <v-card-title v-if="item">{{ item.locality }}</v-card-title>
-      <v-card-subtitle v-if="item">{{ item.abbrev }}</v-card-subtitle>
+      <v-card-subtitle><v-breadcrumbs class="px-0" :items="breadcrumbs"/></v-card-subtitle>
         <v-list  v-if="item" three-line>
           
           <!-- <list-item v-if="item.habitatGlobal && item.habitatGlobal.id" title="Global habitat (IUCN)" :text="`${item.habitatGlobal.category}: ${item.habitatGlobal.name}`" icon="mdi-map" external link-icon="book-open-page-variant" link-tooltip="View the IUCN clasification scheme" link="https://www.iucnredlist.org/resources/habitat-classification-scheme"/> -->
@@ -18,6 +18,7 @@
       </v-card-text>
         <v-card-actions  v-if="item">
           <v-btn text :to="`/data/location/${item.id}`"><v-icon left>mdi-filter</v-icon>Set as filter in the data explorer</v-btn>
+          <v-btn v-if="showUpdate" text color="warning" @click="$emit('edit')"><v-icon left>mdi-pencil-outline</v-icon>Edit</v-btn>
         </v-card-actions>
       <!--  -->
   </v-card>
@@ -34,7 +35,7 @@ export default {
   components: {
     ListItem
   },
-  props: { item: Object, loading: Boolean },
+  props: { item: Object, loading: Boolean, showUpdate: Boolean, breadcrumbs: Array  },
   data () {
     return {
 

@@ -347,15 +347,17 @@ const deleteEntity = async function (opts) {
     var {params, table, auth, refs} = opts;
     var id = parseInt(params.id);
 
-    if(!keys) {
-        keys = ['import', 'data'];
+    if(!refs) {
+        refs = ['import', 'data'];
     }
 
-    var conn = getConnection();
+    var conn = await getConnection();
     var canDelete = true;
     var err = '';
     for(var i = 0; i < refs.length; i++) {
-        var cntres = await cquery(conn, {table: refs[i], sql: `SELECT COUNT(id) as cnt FROM ?? WHERE ?? = ?`, values: [ refs[i], `$${table}_id`, id]});
+        var reftbl = typeof refs[i] === 'string' ? refs[i] : refs[i].table;
+        var reffld = typeof refs[i] === 'string' ? `${table}_id` : refs[i].field;
+        var cntres = await cquery(conn, {table: reftbl, sql: `SELECT COUNT(id) as cnt FROM ?? WHERE ?? = ?`, values: [ reftbl, reffld, id]});
         var cnt = parseInt(cntres[0].cnt);
         if (cnt > 0) {
             err += `The entity is referenced in the table ${refs[i]} ${cnt} times.`
@@ -366,7 +368,7 @@ const deleteEntity = async function (opts) {
     if(!canDelete) {
         releaseConnection(conn);
         return { 
-            error: 'referenced',
+            error: 'validation',
             validation: err
         }
     }
@@ -396,6 +398,7 @@ const updateEntity = async function (opts) {
     }
     if (typeof validate == 'function') {
         var vr = await validate(obj);
+        //console.dir(vr);
         if (vr !== true) {
             return { 
                 error: 'validation',

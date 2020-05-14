@@ -2,6 +2,8 @@ const express = require('express')
 const fs = require('fs')
 const https = require('https')
 const http = require('http')
+const compression = require('compression')
+
 const settings = require('./settings')
 const history = require('connect-history-api-fallback');
 const { auth, requiresAuth } = require('express-openid-connect');
@@ -13,6 +15,8 @@ const api = require('./api/api');
 const cauth = require('./util/auth');
 
 const app = express();
+
+app.use(compression())
 
 // userd for testing. Other CORS requests should be blocked
 app.use(cors({
