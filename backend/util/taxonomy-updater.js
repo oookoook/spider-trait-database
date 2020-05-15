@@ -130,7 +130,8 @@ const updateTaxon = async function(conn, t) {
         species: p(t.taxon.species),
         subspecies: p(t.taxon.subspecies),
         author: pa(pb(t.taxon.author)),
-        year: py(pb(t.taxon.author))
+        year: py(pb(t.taxon.author)),
+        valid: 1
     }
 
     if(t.validTaxon) {
@@ -174,6 +175,7 @@ const update = async function(from) {
     lsids = lsids.concat(await getIdsFromWsc('species', d.toISOString().substr(0,10)));
     //console.dir(lsids);
     var conn = await db.getConnection();
+    try {
     for(var i = 0; i < lsids.length; i++) {
         console.log(`Updating ${lsids[i]}`);
         var t = await getTaxonFromWsc(lsids[i]); 
@@ -181,7 +183,9 @@ const update = async function(from) {
             await updateTaxon(conn, t);
         }
     }
-
+    } catch (e) {
+        console.error(e);
+    }
     //await updateTaxonLinks(conn);
 
     db.releaseConnection(conn);
