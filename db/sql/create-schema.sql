@@ -15,48 +15,34 @@ CREATE SCHEMA IF NOT EXISTS `spider_traits_db` DEFAULT CHARACTER SET utf8 COLLAT
 USE `spider_traits_db` ;
 
 -- -----------------------------------------------------
--- Table `spider_traits_db`.`reference`
--- -----------------------------------------------------
-DROP TABLE IF EXISTS `spider_traits_db`.`reference` ;
-
-CREATE TABLE IF NOT EXISTS `spider_traits_db`.`reference` (
-  `id` INT NOT NULL AUTO_INCREMENT,
-  `doi` VARCHAR(255) NULL,
-  `full_citation` VARCHAR(1024) NOT NULL,
-  `abbrev` VARCHAR(255) NOT NULL,
-  PRIMARY KEY (`id`),
-  UNIQUE INDEX `abbrev_UNIQUE` (`abbrev` ASC),
-  INDEX `full_citation_idx` (`full_citation` ASC),
-  INDEX `doi_idx` (`doi` ASC),
-  INDEX `all_idx` (`abbrev` ASC, `full_citation` ASC, `doi` ASC))
-ENGINE = InnoDB;
-
-
--- -----------------------------------------------------
 -- Table `spider_traits_db`.`taxonomy`
 -- -----------------------------------------------------
 DROP TABLE IF EXISTS `spider_traits_db`.`taxonomy` ;
 
 CREATE TABLE IF NOT EXISTS `spider_traits_db`.`taxonomy` (
   `id` INT NOT NULL AUTO_INCREMENT,
-  `wsc_lsid` VARCHAR(45) NOT NULL,
-  `wsc_id` INT NOT NULL,
+  `wsc_lsid` VARCHAR(45) NULL,
   `family` VARCHAR(255) NULL,
   `genus` VARCHAR(255) NULL,
   `species` VARCHAR(255) NULL,
   `subspecies` VARCHAR(255) NULL,
   `author` VARCHAR(255) NULL,
   `year` INT NULL,
-  `reference_id` INT NULL,
+  `valid` TINYINT(1) NOT NULL,
+  `valid_wsc_lsid` VARCHAR(45) NULL,
+  `valid_id` INT NULL,
+  `full_name` VARCHAR(255) NULL,
   PRIMARY KEY (`id`),
-  INDEX `taxonomy_reference_fk_idx` (`reference_id` ASC),
   INDEX `family_idx` (`family` ASC),
   INDEX `genus_idx` (`genus` ASC),
   INDEX `taxon_idx` (`genus` ASC, `species` ASC, `subspecies` ASC),
   INDEX `wsclsid_idx` (`wsc_lsid` ASC),
-  CONSTRAINT `taxonomy_reference_fk`
-    FOREIGN KEY (`reference_id`)
-    REFERENCES `spider_traits_db`.`reference` (`id`)
+  INDEX `valid_idx` (`valid` ASC),
+  INDEX `full_name_idx` (`full_name` ASC),
+  INDEX `taxonomy_valid_id_idx` (`valid_id` ASC),
+  CONSTRAINT `taxonomy_valid_id`
+    FOREIGN KEY (`valid_id`)
+    REFERENCES `spider_traits_db`.`taxonomy` (`id`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = InnoDB;
@@ -85,6 +71,24 @@ CREATE TABLE IF NOT EXISTS `spider_traits_db`.`data_type` (
   `name` VARCHAR(45) NULL,
   PRIMARY KEY (`id`),
   INDEX `name_idx` (`name` ASC))
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `spider_traits_db`.`reference`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `spider_traits_db`.`reference` ;
+
+CREATE TABLE IF NOT EXISTS `spider_traits_db`.`reference` (
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `doi` VARCHAR(255) NULL,
+  `full_citation` VARCHAR(1024) NOT NULL,
+  `abbrev` VARCHAR(255) NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE INDEX `abbrev_UNIQUE` (`abbrev` ASC),
+  INDEX `full_citation_idx` (`full_citation` ASC),
+  INDEX `doi_idx` (`doi` ASC),
+  INDEX `all_idx` (`abbrev` ASC, `full_citation` ASC, `doi` ASC))
 ENGINE = InnoDB;
 
 
@@ -243,6 +247,7 @@ CREATE TABLE IF NOT EXISTS `spider_traits_db`.`location` (
   INDEX `location_country_fk_idx` (`country_id` ASC),
   UNIQUE INDEX `abbrev_UNIQUE` (`abbrev` ASC),
   INDEX `locality_idx` (`locality` ASC),
+  INDEX `coords_idx` (`lat` ASC, `lon` ASC),
   CONSTRAINT `location_habitat_global_fk`
     FOREIGN KEY (`habitat_global_id`)
     REFERENCES `spider_traits_db`.`habitat_global` (`id`)
@@ -298,9 +303,11 @@ CREATE TABLE IF NOT EXISTS `spider_traits_db`.`data` (
   `life_stage_id` INT NULL COMMENT 'Categorical variable. One of: egg, spiderling, juvenile, adult, all\n',
   `frequency` DECIMAL(9,4) NULL COMMENT 'Real number. Relative frequency of occurrence. \n',
   `sample_size` INT NULL COMMENT 'Integer. Total number of observation per record.\n',
+  `treatment` VARCHAR(255) NULL,
   `event_date_text` VARCHAR(255) NULL COMMENT 'The date-time or interval associated to the trait. Examples: 1963-03-08T14:07-0600 (8 Mar 1963 at 2:07pm in the time zone six hours earlier than UTC). 2009-02-20T08:40Z (20 February 2009 8:40am UTC). 2018-08-29T15:19 (3:19pm local time on 29 August 2018). 1809-02-12 (some time during 12 February 1809). 1906-06 (some time in June 1906). 1971 (some time in the year 1971). 2007-03-01T13:00:00Z/2008-05-11T15:30:00Z (some time during the interval between 1 March 2007 1pm UTC and 11 May 2008 3:30pm UTC). 1900/1909 (some time during the interval between the beginning of the year 1900 and the end of the year 1909). 2007-11-13/15 (some time in the interval between 13 November 2007 and 15 November 2007).\n',
   `event_date_start` DATETIME NULL COMMENT 'The date-time or interval associated to the trait. Examples: 1963-03-08T14:07-0600 (8 Mar 1963 at 2:07pm in the time zone six hours earlier than UTC). 2009-02-20T08:40Z (20 February 2009 8:40am UTC). 2018-08-29T15:19 (3:19pm local time on 29 August 2018). 1809-02-12 (some time during 12 February 1809). 1906-06 (some time in June 1906). 1971 (some time in the year 1971). 2007-03-01T13:00:00Z/2008-05-11T15:30:00Z (some time during the interval between 1 March 2007 1pm UTC and 11 May 2008 3:30pm UTC). 1900/1909 (some time during the interval between the beginning of the year 1900 and the end of the year 1909). 2007-11-13/15 (some time in the interval between 13 November 2007 and 15 November 2007).\n',
   `event_date_end` DATETIME NULL COMMENT 'The date-time or interval associated to the trait. Examples: 1963-03-08T14:07-0600 (8 Mar 1963 at 2:07pm in the time zone six hours earlier than UTC). 2009-02-20T08:40Z (20 February 2009 8:40am UTC). 2018-08-29T15:19 (3:19pm local time on 29 August 2018). 1809-02-12 (some time during 12 February 1809). 1906-06 (some time in June 1906). 1971 (some time in the year 1971). 2007-03-01T13:00:00Z/2008-05-11T15:30:00Z (some time during the interval between 1 March 2007 1pm UTC and 11 May 2008 3:30pm UTC). 1900/1909 (some time during the interval between the beginning of the year 1900 and the end of the year 1909). 2007-11-13/15 (some time in the interval between 13 November 2007 and 15 November 2007).\n',
+  `note` TEXT NULL,
   `row_link` INT NULL COMMENT 'for multidimensional data, i.e. use same numbers for rows that contain data from same individuals or populations obtained in the same context\n',
   `method_id` INT NOT NULL COMMENT 'unique identifier linking to Methods table\n',
   `location_id` INT NULL COMMENT 'unique identifier linking to Location table\n',
@@ -411,7 +418,9 @@ CREATE TABLE IF NOT EXISTS `spider_traits_db`.`import` (
   `life_stage` VARCHAR(45) NULL,
   `frequency` VARCHAR(45) NULL,
   `sample_size` VARCHAR(45) NULL,
+  `treatment` VARCHAR(255) NULL,
   `event_date` VARCHAR(45) NULL,
+  `note` TEXT NULL,
   `row_link` VARCHAR(45) NULL,
   `method_abbrev` VARCHAR(45) NULL,
   `method_name` VARCHAR(255) NULL,
@@ -456,6 +465,7 @@ CREATE TABLE IF NOT EXISTS `spider_traits_db`.`import` (
   `changed` TINYINT(1) NOT NULL,
   `valid` TINYINT(1) NOT NULL,
   `valid_review` TINYINT(1) NOT NULL,
+  `duplicate` TINYINT(1) NOT NULL,
   PRIMARY KEY (`id`),
   INDEX `import_dataset_fk_idx` (`dataset_id` ASC),
   INDEX `import_sex_fk_idx` (`sex_id` ASC),
