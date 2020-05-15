@@ -154,6 +154,7 @@ const getObject = function(r) {
             raw: r[`sample_size`],
             numeric: r[`sample_size_numeric`]
         },
+        treatment: r[`treatment`],
         eventDate: {
             text: r[`event_date`],
             start: r[`event_date_start`] ? r[`event_date_start`].toJSON() : null,

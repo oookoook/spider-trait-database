@@ -223,6 +223,13 @@ export default [
       isValid: (i, e) => !i.sampleSize.raw || i.sampleSize.numeric != null || 'Value is not a valid number',
     },
     { 
+      name: 'treatment',
+      text: 'Treatment', 
+      displayValue: (i) => i.treatment, 
+      save: (o, v) => { o.treatment = v; },   
+      isValid: (i, e) => true,
+    },
+    { 
       name: 'eventDate.text',
       text: 'Date', 
       displayValue: (i) => i.eventDate.text,
