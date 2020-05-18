@@ -13,7 +13,7 @@
 import EntityDetail from '../components/EntityDetail'
 import LocationDetail from '../components/LocationDetail'
 export default {
-  name: 'method',
+  name: 'location',
   components: {
     EntityDetail,
     LocationDetail

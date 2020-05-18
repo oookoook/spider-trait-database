@@ -119,17 +119,17 @@ const prepareForSql = async function(location) {
     location.habitat_global_id = (location.habitatGlobal) ? location.habitatGlobal.id : null;
     location.country_id = (location.country) ? location.country.id : null;
     if(location.coords) {
-        if(typeof location.coords.lat == 'object') {
+        if(typeof(location.coords.lat) === 'object') {
             location.lat = location.coords.lat.conv;
         } else {
             location.lat = location.coords.lat;
         }
-        if(typeof location.coords.lon == 'object') {
+        if(typeof(location.coords.lon) === 'object') {
             location.lon = location.coords.lon.conv;
         } else {
             location.lon = location.coords.lon;
         }
-        if(typeof location.coords.precision == 'object') {
+        if(typeof(location.coords.precision) === 'object') {
             location.precision = location.coords.precision.numeric;
         } else {
             location.precision = location.coords.precision;

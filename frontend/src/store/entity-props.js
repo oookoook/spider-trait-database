@@ -104,14 +104,14 @@ const props = {
       isValid: (v) => !!v || 'Abbreviation is required'
     },
     {
-      name: 'coords.lat',
+      name: 'lat',
       parent: 'coords',
       label: 'Latitude',
       hint: 'Enter the value in the decimal format (e.g. 49.12345)',
       isValid: (v) => !v || !Number.isNaN(parseFloat(v)) || 'Value cannot be converted to a valid latitude.',
     },
     {
-      name: 'coords.lon',
+      name: 'lon',
       parent: 'coords',
       label: 'Longitude',
       hint: 'Enter the value in the decimal format (e.g. 16.12345)',
