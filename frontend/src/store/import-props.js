@@ -1,17 +1,38 @@
 export default [
   { 
-    name: 'valid',
+    name: 'valid.review',
     readOnly: true,
     text: 'Valid',
-    //entity: 'taxonomy', 
-    displayValue: (i, e) => {
-      if(i.valid.duplicate) {
-        return 'Duplicate';
-      }
-      return (e && i.valid.approve) || (!e && i.valid.review) ? 'Yes' : 'No';
+    show: (e) => e === false,
+    displayValue: (i) => {
+      return i.valid.review;
     },
+    getIcon: (i) => i.valid.review ? 'mdi-check-outline' : 'mdi-close-outline',
     save: (o, v) => {},
-    isValid: (i, e) => (!i.valid.duplicate && ((e && i.valid.approve) || (!e && i.valid.review))) || 'Record is not valid',
+    isValid: (i, e) => i.valid.review || 'Record is not valid',
+  },
+  { 
+    name: 'valid.approve',
+    readOnly: true,
+    show: (e) => e === true,
+    text: 'Valid',
+    displayValue: (i) => {
+      return i.valid.approve;
+    },
+    getIcon: (i) => i.valid.approve ? 'mdi-check-outline' : 'mdi-close-outline',
+    save: (o, v) => {},
+    isValid: (i, e) => i.valid.approve || 'Record is not valid',
+  },
+  { 
+    name: 'valid.duplicate',
+    readOnly: true,
+    text: 'Duplicate',
+    displayValue: (i) => {
+      return i.valid.duplicate;
+    },
+    getIcon: (i) => i.valid.duplicate ? 'mdi-exclamation-thick' : 'mdi-check-outline',
+    save: (o, v) => {},
+    isValid: (i, e) => !i.valid.duplicate || 'Record is not valid',
   },  
   { 
       name: 'taxonomy.wscLsid',
@@ -29,7 +50,7 @@ export default [
       displayValue: (i) => i.taxonomy.originalName,
       save: (o, v) => {if(!o.taxonomy) o.taxonomy={}; o.taxonomy.originalName = v; }, 
       isValid: (i, e) => !!i.taxonomy.id || 'Taxon must be assigned to the record',
-      autocomplete: { endpoint: 'taxonomy', valueField: 'taxonomy.originalName' }
+      autocomplete: { endpoint: 'taxonomy', valueField: 'fullName' }
     },
     { 
       name: 'trait.abbrev',

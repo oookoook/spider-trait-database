@@ -54,10 +54,11 @@ const get = async function(params, auth, showImport) {
      
      r.valid = {};
      if(showImport) {
+
         var validR = await db.query({table: 'import', sql: `SELECT COUNT(import.valid) as invalid FROM `
         + `import LEFT JOIN dataset ON import.dataset_id = dataset.id WHERE dataset.id = ? AND ${where} AND valid=0`, values: [id]});
         r.valid.approve = validR[0].invalid == 0;
-        var validRR = await db.query({table: 'import', sql: `SELECT COUNT(import.valid) as invalid FROM `
+        var validRR = await db.query({table: 'import', sql: `SELECT COUNT(import.valid_review) as invalid FROM `
         + `import LEFT JOIN dataset ON import.dataset_id = dataset.id WHERE dataset.id = ? AND ${where} AND valid_review=0`, values: [id]});
         r.valid.review = validRR[0].invalid == 0;
     }

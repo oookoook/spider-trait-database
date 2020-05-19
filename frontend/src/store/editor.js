@@ -33,13 +33,14 @@ export default {
     },
     autocomplete: (state) => (entity) => state.autocomplete[entity],
     entityProps: (state) => state.entityProps,
+    writableProps: (state) => state.entityProps.filter(e => !e.readOnly),
     propsDict: (state) => {
       var d = {};
       state.entityProps.forEach(p => d[p.name] = p);
       return d;
     },
-    headers: (state) => {
-      return state.entityProps.map(p => {
+    headers: (state) => (editor) => {
+      return state.entityProps.filter(e => e.show == null || e.show(editor)).map(p => {
         var o = p.table || {};
         o.text = p.text.replace(' ','\xa0');
         o.value = p.name;
@@ -225,7 +226,7 @@ export default {
       var p = {};
       p.endpoint = `import`;
       var v = payload.value;
-      if(v == '') {
+      if(v === '') {
         v = 'empty';
       }
       p.params = `${payload.dataset}/column/${payload.column}/${encodeURIComponent(v)}`;

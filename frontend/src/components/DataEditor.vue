@@ -362,11 +362,12 @@ export default {
       this.confirm.title = 'Delete rows';
       var prop = this.$store.getters[`editor/propsDict`][this.selectedCell.prop];
       var value = prop.displayValue(this.selectedCell.item);
+      var column = this.selectedCell.prop;
       this.confirm.text = `All rows with the value "${value == null ? '[empty]' : value}" in the column ${prop.text} will be deleted.`;
       this.confirm.message.show = false;
       this.confirm.action = () => {
         this.loading = true;
-        this.$store.dispatch('editor/deleteColumn', { dataset: this.id, column: this.selectedCell.prop, value }).then(() => { this.loading = false; this.confirm.dialog = false; this.refreshDS(); this.getData(); });
+        this.$store.dispatch('editor/deleteColumn', { dataset: this.id, column, value }).then(() => { this.loading = false; this.confirm.dialog = false; this.refreshDS(); this.getData(); });
       }
       this.confirm.dialog = true;
     },
@@ -412,6 +413,10 @@ export default {
     },
     */
     editCell() {
+      if(this.selectedCell.readOnly) {
+        this.$store.dispatch('notify', {text: 'This is an read-only value.', error: true});
+        return;
+      }
       this.edit.action = (e) => {
         this.loading = true;
         this.$store.dispatch('editor/editRow', { dataset: this.id, id: this.selectedCell.id, changes: e}).then(() => { this.loading = false; this.edit.dialog=false; this.refreshDS(); this.getData(); });
@@ -419,6 +424,10 @@ export default {
       this.edit.dialog = true;
     },
     editColumn() {
+      if(this.editMode == 'column' && this.selectedCell.readOnly) {
+        this.$store.dispatch('notify', {text: 'This is an read-only value.', error: true});
+        return;
+      }
       this.edit.action = (e) => {
         this.loading = true;
         e.dataset = this.id;

@@ -6,8 +6,17 @@
       <v-form v-model="fv" ref="form">
       <v-row v-if="it">
       <v-col :cols="12" :md="4" v-for="prop in entityProps" :key="prop.name">
-      <v-text-field v-if="!prop.autocomplete"
+      <v-text-field v-if="!prop.autocomplete && !prop.parent"
         v-model="it[prop.name]"
+        :label="prop.label"
+        clearable
+        class="mr-3"
+        persistent-hint
+        :hint="prop.hint"
+        :rules="[prop.isValid]" 
+      ></v-text-field>
+      <v-text-field v-else-if="!prop.autocomplete"
+        v-model="it[prop.parent][prop.name]"
         :label="prop.label"
         clearable
         class="mr-3"
@@ -72,6 +81,7 @@ export default {
   },
   watch: {
     item(val) {
+      console.dir(val);
       this.fillItem();
     }
   },
@@ -83,7 +93,9 @@ export default {
       this.$emit('remove', this.it);
     },
     fillItem() {
+      console.dir(this.item);
       this.it = Object.assign({}, this.item || {});
+      console.dir(this.it);
       this.entityProps.forEach(e => {
       if(this.it[e.name]) {
         return;
@@ -92,6 +104,9 @@ export default {
         this.it[e.name] = {};
         this.it[e.name][e.autocomplete.valueField] = null;
       } else if(e.parent) {
+        if(this.it[e.parent][e.name]) {
+          return;
+        }
         if(!this.it[e.parent]) {
           this.it[e.parent]  = {};
         };
@@ -99,10 +114,12 @@ export default {
       } else {
         this.it[e.name] = null;
       }
-    })
+    });
+    console.dir(this.it);
     }
   },
   created () {
+    console.dir(this.item);
     this.fillItem();
   },
   mounted () {

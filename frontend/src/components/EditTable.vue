@@ -15,7 +15,8 @@
           :selectedProp.sync="selectedProp"
           :invalid="isPropValid(item, h.value) !== true"
           @select="(e) => selectCell(e, item, h.value)">
-            <span>{{ getPropFormattedValue(item, h.value, shorten) }}</span>
+            <v-icon v-if="isPropIcon(h.value)">{{ getIcon(item, h.value) }}</v-icon>
+            <span v-else>{{ getPropFormattedValue(item, h.value, shorten) }}</span>
           </selectable-cell>
         </tr> 
     </template>

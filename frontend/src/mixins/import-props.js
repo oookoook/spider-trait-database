@@ -8,13 +8,16 @@ export default {
     }
   },
   computed: {
-    ...mapGetters('editor', ['entityProps', 'propsDict', 'headers'])
+    headers() {
+      return this.$store.getters[`editor/headers`](this.editor);
+    },
+    ...mapGetters('editor', ['entityProps', 'propsDict', 'writableProps'])
   },
   watch: {},
   mounted() {},
   methods: {
     getPropValue(item, propName) {
-     return this.propsDict[propName].displayValue(item, this.editor);
+     return this.propsDict[propName].displayValue(item);
     },
     getPropFormattedValue(item, propName, shorten) {
       //console.log(propName);
@@ -35,6 +38,12 @@ export default {
     isPropValid(item, propName) {
       //console.log(propName);
       return this.propsDict[propName].isValid(item, this.editor);
+    },
+    isPropIcon(propName) {
+      return this.propsDict[propName].getIcon != null;
+    },
+    getIcon(item, propName) {
+      return this.propsDict[propName].getIcon(item);
     },
     isPropReadOnly(propName) {
       return this.propsDict[propName].readOnly === true;

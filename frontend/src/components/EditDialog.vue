@@ -8,7 +8,7 @@
       <v-col :cols="12" :md="4">
       <v-select
           v-model="modifiedProp"
-          :items="entityProps"
+          :items="writableProps"
           label="Modified cell"
           return-object
           class="mr-3"
@@ -76,7 +76,7 @@ export default {
     AutocompleteProvider,
     DataFilter
   },
-  props: { type: String, selection: Object, val: Object, autocompleteItems: Array, loading: Boolean },
+  props: { type: String, selection: Object, val: Object, autocompleteItems: Array, loading: Boolean, isEditor: Boolean },
   data () {
     return {
       //loading: false,
@@ -105,7 +105,7 @@ export default {
       switch(this.type) {
         case 'cell': return `Where record ID is ${this.selection.id}`;
         case 'column': return `Where the current value is "${this.originalValue != null ? this.originalValue : '[empty]'}"`;
-        case 'rule': return this.valueProp ? `Where value of the ${this.valueProp.name} column is "${this.originalValue != null ? this.originalValue : '[empty]'}"` : '...';
+        case 'rule': return this.valueProp ? `Where value of the ${this.getPropName(this.valueProp.name)} column is "${this.originalValue != null ? this.originalValue : '[empty]'}"` : '...';
       }
     },
     isValid() {

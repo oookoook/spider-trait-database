@@ -45,6 +45,12 @@ const columns = [
   `note`
 ];
 
+const validityColumns = [
+    'valid_review',
+    'valid_approve',
+    'duplicate',
+]
+
 const colSynonyms = {
     'longitude': 'location_lon',
     'latitude': 'location_lat',
@@ -560,6 +566,9 @@ const getColumnName = function(val) {
     if(!val) {
         return null;
     }
+    if(val == 'valid.duplicate') {
+        return 'duplicate';
+    }
     if(val == 'taxonomy.wscLsid') {
         return `wsc_lsid`;
     }
@@ -788,7 +797,7 @@ const deleteColumn = async function(params, auth) {
     var ds = parseInt(params.id);
     var aw = getAuthWhere(auth);
     var column = getColumnName(params.column);
-    if(!columns.includes(column)) {
+    if(!columns.includes(column) && !validityColumns.includes(column)) {
         throw 'Cannot delete by this column';
     }
     var v = params.value;
@@ -1005,7 +1014,8 @@ var synonyms = {
     'reference.abbrev': 'reference_abbrev',
     'reference.doi': `reference_doi`,
     'valid.review': 'valid_review',
-    'valid.approve': 'valid'
+    'valid.approve': 'valid',
+    'valid.duplicate': 'duplicate'
 }
 
 module.exports = function(dbClient, mailClient) {
