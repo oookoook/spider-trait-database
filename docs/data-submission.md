@@ -30,7 +30,7 @@ The first steps when uploading a new data to the database is to create a new dat
 
 Then the dataset is created and contributor is able to upload the data to the newly created dataset.
 
-Contributors can upload the data from the Excel or CSV (comma separated) file. See below for the requirements on the data format. The records from the sheet are imported to the temporary cache for data waiting for approval. At the moment, the data are visible only for the contributor who uploads the data.
+Contributors can upload the data from the Excel or CSV (comma separated) file. In case of the CSV format, the file must be UTF-8 encoded. See below for the requirements on the data format. The records from the sheet are imported to the temporary cache for data waiting for approval. At the moment, the data are visible only for the contributor who uploads the data.
 
 Then, they can view the data in the editing tool in the web application. The editing interface notifies the users about invalid records and properties in the dataset. Contributors can edit the data to make them as complying to the database requirements as possible.
 
@@ -95,6 +95,12 @@ The list of column names with their descriptions and allowed values follows. The
 + Contributor should provide either only the `method_abbrev` if the method exist or both the `method_name` and `method_description` if there is no such method defined in the Spider Trait Database catalog.  The `method_abbrev` will be proposed later by the editor.
 + If any of the columns starting with `location_` is filled in, a new location must be created by the editor. The `location_abbrev` will be generated and assigned to the correct records by the application.
 + For every new reference, a new record in the references list must be created by the editor. The `reference_abbrev` will be generated and assigned to the correct records by the application.
+
+### CSV file format and encoding
+
+In case of CSV upload, the file does not contain any information about its encoding. For this reason, the file must be encoded as UTF-8. Otherwise, characters from national alphabets (accents) won't be correctly processed. The values are expected to be separated by commas.
+
+The CSV files can be converted to the UTF-8 using Notepad application on Windows by opening the file (check if the characters are shown correctly, if not, this approach can't be used). Then select *Save As* from the *File* menu and choose *UTF-8* encoding from the list on the left to the *Save* button.
 
 ## Data editor capabilites
 
