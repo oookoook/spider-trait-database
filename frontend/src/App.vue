@@ -112,10 +112,17 @@
         text
       ><v-icon left>mdi-account-arrow-right-outline</v-icon>  Log in 
       </v-btn>
-      <v-btn v-else
-        text
+      <template v-else>
+      <v-btn
+        text readonly
       ><v-icon left>mdi-account</v-icon>  {{user.name}} 
       </v-btn>
+      <v-btn 
+        text
+        :href="logoutUrl"
+      ><v-icon>mdi-logout</v-icon>
+      </v-btn>
+      </template>
       </v-toolbar-items>
     </v-app-bar>
     <v-snackbar absolute

@@ -6,7 +6,7 @@ export default {
         }
     },
     computed: {
-        ...mapGetters(['loginUrl', 'user', 'lastRoute', 'isEditor', 'isAdmin'])
+        ...mapGetters(['loginUrl', 'logoutUrl', 'user', 'lastRoute', 'isEditor', 'isAdmin'])
     },
     watch: {
         $route(to, from) {
@@ -22,8 +22,15 @@ export default {
                 // redirect to the correct route from the url
                 // fill in the user info
                 this.$store.dispatch('getUserInfo').then(
-                    () => this.$store.dispatch('notify', { error: false, text: `You were successully loged in as ${this.user.name}`}), 
+                    () => this.$store.dispatch('notify', { error: false, text: `You were successully logged in as ${this.user.name}`}), 
                     () => this.$store.dispatch('notify', { error: true, text: `Unable to log you in.`}));
+                // should be stored in the local storage (vuex persistence)
+                var returnRoute = this.lastRoute ? this.lastRoute : '/';
+                this.$router.replace(returnRoute);
+            } else if(this.$route.path == '/logout') {
+                this.$store.dispatch('logout').then(
+                    () => this.$store.dispatch('notify', { error: false, text: `You were successully loged out`}), 
+                    () => this.$store.dispatch('notify', { error: true, text: `Unable to log you out.`}));
                 // should be stored in the local storage (vuex persistence)
                 var returnRoute = this.lastRoute ? this.lastRoute : '/';
                 this.$router.replace(returnRoute);

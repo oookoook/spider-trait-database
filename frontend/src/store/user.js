@@ -25,6 +25,9 @@ export default {
         loginUrl(state) {
           return `${process.env.VUE_APP_BACKEND}user/login`;
         },
+        logoutUrl(state) {
+          return `${process.env.VUE_APP_BACKEND}user/logout`;
+        },
         lastRoute(state) {
           return state.lastRoute;
         },
@@ -49,6 +52,10 @@ export default {
           throw err;
         }
       },
+      async logout(context, payload) {
+        context.commit('user', { value: null });
+        //context.commit('lastAction', { value: Date.now().valueOf() });
+      }
     },
     modules: {
     }

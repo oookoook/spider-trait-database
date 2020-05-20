@@ -46,7 +46,7 @@ const setClaims = function(c) {
     claims = c;
 }
 
-const mockupAuth = function(returnPath) {
+const mockupAuth = function(returnPath, returnPathLogout) {
     return function (req, res, next) {    
     req.openid = { user: {
         sub: 'DEBUG',
@@ -55,6 +55,9 @@ const mockupAuth = function(returnPath) {
     res.openid = {
         login: (opts) => {
         res.redirect(returnPath);
+        },
+        logout: (opts) => {
+            res.redirect(returnPathLogout);
         }
     };
     req.openid.user[claims.name] = [claims.administration, claims.dataEntry, claims.dataValidation].join(',');

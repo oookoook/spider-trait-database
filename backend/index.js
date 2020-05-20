@@ -102,11 +102,13 @@ if(!settings.oidc.disable) {
   
 } else {
   // everything is authorized
-  app.use(cauth.mockupAuth('http://localhost:8080/login'));
+  app.use(cauth.mockupAuth('http://localhost:8080/login', 'http://localhost:8080/logout'));
 }
 // route used to show the SSO login screen
 // 
 app.get('/user/login', (req, res) => res.openid.login({ returnTo: `/login` }));
+
+app.get('/user/logout', (req, res) => res.openid.logout({ returnTo: `/logout` }));
 
 
 
