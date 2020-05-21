@@ -54,8 +54,8 @@
             <list-item title="Life stage" :text="item.lifeStage.name" icon="mdi-egg" />
             <list-item title="Frequency" :text="item.frequency" icon="mdi-ab-testing" />
             <list-item title="Sample size" :text="item.sampleSize" icon="mdi-numeric" />
-            <list-item title="Treatment" :text="item.sampleSize" icon="mdi-hand-right" />
-            <list-item v-if="item.eventDate && item.eventDate.text" title="Event date" :text="item.eventDate.text" icon="mdi-calendar" />
+            <list-item title="Treatment" :text="item.treatment" icon="mdi-hand-right" />
+            <list-item title="Event date" :text="item.eventDate && item.eventDate.text ? item.eventDate.text : null" icon="mdi-calendar" />
             <list-item v-if="item.eventDate && item.eventDate.start" title="Event start" :text="new Date(item.eventDate.start).toISOString()" icon="mdi-calendar-arrow-right" />
             <list-item v-if="item.eventDate && item.eventDate.end" title="Event end" :text="new Date(item.eventDate.end).toISOString()" icon="mdi-calendar-arrow-left" />
         </v-list>

@@ -23,6 +23,7 @@
             <action-button text="Edit the selected value in the whole column" icon="mdi-table-column" toolbar />
             <action-button text="Use this value as rule for value change" icon="mdi-table-search" toolbar />
             <action-button text="View distinct values in the selected column" icon="mdi-format-list-numbered" toolbar />
+            <action-button text="View duplicates" icon="mdi-content-duplicate" toolbar />
             <action-button text="Delete selected row" icon="mdi-table-row-remove" toolbar />
             <action-button text="Delete all rows containing selected value" icon="mdi-table-column-remove" toolbar />
           </v-btn-toggle>
@@ -93,6 +94,9 @@
         <v-bottom-sheet v-model="distinct.dialog" scrollable>
             <distinct-dialog v-if="selectedCell" :editor="editor" :dataset="id" :prop-name="selectedCell.prop" @cancel="distinct.dialog = false" @create="createEntity" @rule="ruleDistinct" @column="columnDistinct"/>
         </v-bottom-sheet>
+        <v-bottom-sheet v-model="duplicate.dialog" scrollable>
+            <duplicate-dialog v-if="selectedCell" :item="selectedCell.item" :loading="loading" @remove="deleteDuplicate" />
+        </v-bottom-sheet>
         <v-bottom-sheet scrollable v-model="log.dialog">
           <v-card>
               <v-card-title>Error Log</v-card-title>
@@ -130,6 +134,7 @@ import InfoIcon from './InfoIcon'
 import EditTable from './EditTable'
 import EditDialog from './EditDialog'
 import DistinctDialog from './DistinctDialog'
+import DuplicateDialog from './DuplicateDialog'
 import DatasetForm from './DatasetForm'
 import UploadForm from './UploadForm'
 import ListProvider from './ListProvider'
@@ -145,7 +150,8 @@ export default {
     DistinctDialog,
     DatasetForm,
     UploadForm,
-    ListProvider
+    ListProvider,
+    DuplicateDialog
   },
   props: {isEditor: Boolean, id: Number},
   data () {
@@ -183,6 +189,9 @@ export default {
         distinct: {
           dialog: false
         },
+        duplicate: {
+          dialog: false
+        },
         errorsLocal: []
   }
   },
@@ -197,9 +206,11 @@ export default {
       get() {
         return this.$store.state.imports.entity;
       },
-      set(val, oldVal) {
+      set(val) {
+        console.dir(val);
+        console.dir(this.dataset);
         // name did not changed - remove it form the object so no new unique id is added
-        if(val.name == oldVal.name) {
+        if(val.name == this.dataset.name) {
           delete(val.name);
         }
         this.$store.dispatch(`datasets/update`, val)
@@ -222,8 +233,9 @@ export default {
         case 1: return 'column';
         case 2: return 'rule';
         case 3: return 'distinct';
-        case 4: return 'delete';
-        case 5: return 'deleteMultiple';
+        case 4: return 'duplicate';
+        case 5: return 'delete';
+        case 6: return 'deleteMultiple';
       }
       },
       set(val) {
@@ -232,8 +244,9 @@ export default {
         case 'column': this.editModeRaw = 1; break;
         case 'rule': this.editModeRaw = 2; break;
         case 'distinct': this.editModeRaw = 3; break;
-        case 'delete': this.editModeRaw = 4; break;
-        case 'deleteMultiple': this.editModeRaw = 5; break;
+        case 'duplicate': this.editModeRaw = 4; break;
+        case 'delete': this.editModeRaw = 5; break;
+        case 'deleteMultiple': this.editModeRaw = 6; break;
       }
       }
     },
@@ -301,6 +314,7 @@ export default {
         case 'column': 
         case 'rule': this.editColumn(); break;
         case 'distinct': this.showDistinct(); break;
+        case 'duplicate': this.showDuplicate(); break;
         case 'delete': this.deleteRow(); break;
         case 'deleteMultiple': this.deleteColumn(); break;
       }
@@ -347,6 +361,10 @@ export default {
         this.$store.dispatch('datasets/delete', { id: this.id}).then(() => { this.loading = false; this.$router.push(this.editor ? '/approve' : '/import') });
       }
       this.confirm.dialog = true;
+    },
+    deleteDuplicate() {
+      this.duplicate.dialog = false;
+      this.deleteRow();
     },
     deleteRow() {
       this.confirm.title = 'Delete row';
@@ -439,6 +457,9 @@ export default {
     },
     showDistinct() {
       this.distinct.dialog = true;
+    },
+    showDuplicate() {
+      this.duplicate.dialog = true;
     },
     createEntity(evt) {
       if(evt.entity.value) {
