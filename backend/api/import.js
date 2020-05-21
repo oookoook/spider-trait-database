@@ -423,8 +423,10 @@ const importRow = async function(conn, ds, r, state, cache) {
    row['location_altitude_numeric'] =conv.parseNumber(row['location_altitude']);
    row['location_precision_numeric'] =conv.parseNumber(row['location_precision']);
 
-   row['wsc_lsid'] = row['wsc_lsid'].replace(/\[|\]/g,'');
-
+   if(row['wsc_lsid']) {
+    row['wsc_lsid'] = row['wsc_lsid'].replace(/\[|\]/g,'');
+   }
+   
     // convert timestamps (start, end)
     if(row['event_date']) {
         var { start, end } = gfc('event_date',conv.parseEvent);
@@ -704,7 +706,7 @@ const updateColumn = async function(params, body, auth) {
     
     var aw = getAuthWhere(auth);
     var column = getColumnName(params.column);
-    if(column == 'dataset_id' || column == 'valid' || column == 'valid_review' || column == 'changed') {
+    if(column == 'dataset_id' || column == 'valid' || column == 'valid_review' || column == 'changed' || column == 'duplicate') {
         throw 'Cannot update this column';
     }
     var nv = body.newValue;
