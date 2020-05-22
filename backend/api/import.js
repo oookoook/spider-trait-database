@@ -386,11 +386,18 @@ const importRow = async function(conn, ds, r, state, cache) {
     Object.keys(r).forEach(k => {
         var c = snakeCase(k).toLowerCase();
         //console.dir(c);
-        if(columns.includes(c) && r[k].length > 0) {
-            row[c] = r[k];
+
+        var val = r[k];
+        if(!val || val.trim().length == 0) {
+            // skips the column
+            return;
+        }
+
+        if(columns.includes(c)) {
+            row[c] = val;
         }
         if(colSynonyms[c]) {
-            row[colSynonyms[c]] = r[k];
+            row[colSynonyms[c]] = val;
         }
 
     });
@@ -426,7 +433,7 @@ const importRow = async function(conn, ds, r, state, cache) {
    if(row['wsc_lsid']) {
     row['wsc_lsid'] = row['wsc_lsid'].replace(/\[|\]/g,'');
    }
-   
+
     // convert timestamps (start, end)
     if(row['event_date']) {
         var { start, end } = gfc('event_date',conv.parseEvent);
