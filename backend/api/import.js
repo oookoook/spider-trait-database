@@ -926,7 +926,12 @@ const validate = async function(params) {
 
     // mark the duplicate records
     await db.cquery(c,{table: 'import', sql:`UPDATE import INNER JOIN data`
-    + ` ON import.original_name = data.original_name AND import.reference_id = data.reference_id AND import.trait_id = data.trait_id` 
+    + ` ON import.original_name = data.original_name`
+    + ` AND import.reference_id = data.reference_id`
+    + ` AND import.trait_id = data.trait_id`
+    + ` AND import.value = data.value`
+    + ` AND import.sex_id = data.sex_id`
+    + ` AND import.life_stage_id = data.life_stage_id`
     + ` SET duplicate = 1 WHERE changed = 1 AND import.dataset_id = ?`, values: [ds] });
 
 
