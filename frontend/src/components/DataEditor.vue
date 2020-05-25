@@ -95,7 +95,7 @@
             <distinct-dialog v-if="selectedCell" :editor="editor" :dataset="id" :prop-name="selectedCell.prop" @cancel="distinct.dialog = false" @create="createEntity" @rule="ruleDistinct" @column="columnDistinct"/>
         </v-bottom-sheet>
         <v-bottom-sheet v-model="duplicate.dialog" scrollable>
-            <duplicate-dialog v-if="selectedCell" :item="selectedCell.item" :loading="loading" @remove="deleteDuplicate" />
+            <duplicate-dialog v-if="selectedCell" :item="selectedCell.item" :loading="loading" @cancel="duplicate.dialog = false" @remove="deleteDuplicate" />
         </v-bottom-sheet>
         <v-bottom-sheet scrollable v-model="log.dialog">
           <v-card>
