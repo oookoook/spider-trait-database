@@ -21,7 +21,7 @@
 
       <v-menu right bottom offset-y>
       <template v-slot:activator="{ on }">
-        <v-btn text v-on="on"><v-icon left>mdi-format-list-bulleted-square</v-icon>Browse<v-icon right>mdi-chevron-down</v-icon></v-btn>
+        <v-btn text v-on="on"><v-icon left>mdi-format-list-bulleted-square</v-icon>Lists<v-icon right>mdi-chevron-down</v-icon></v-btn>
       </template>
       <v-list>
         <v-list-item to="/datasets">
