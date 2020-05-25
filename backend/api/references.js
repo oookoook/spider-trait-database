@@ -40,14 +40,14 @@ const validate = async function(reference) {
         return 'Reference full citation cannot be empty';
     }
 
-    var r = await db.query({table: 'reference', sql: 'SELECT reference.id FROM reference WHERE abbrev = ?', values: [reference.abbrev], nestTables: false});
+    var r = await db.query({table: 'reference', sql: 'SELECT id FROM reference WHERE abbrev = ?', values: [reference.abbrev], nestTables: false});
     return (r.length == 0 || (reference.id && r[0].id == reference.id)) ? true : 'Reference abbrev. is already used.';
 }
 
 const getAbbrev = function (val) {
     val = val || '';
     var yearPos = val.search(/. \d\d\d\d./);
-    return db.unique((val).substr(0, Math.min(yearPos > 0 ? yearPos + 6 : 50, 50)));
+    return db.unique(val.substr(0, Math.min(yearPos > 0 ? yearPos + 6 : 40, 40)));
 }
 
 const prepareForSql = function(reference) {
