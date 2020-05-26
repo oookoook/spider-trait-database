@@ -11,7 +11,7 @@ SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='TRADITIONAL,ALLOW_INVALID_DATES';
 -- -----------------------------------------------------
 -- Schema spider_traits_db
 -- -----------------------------------------------------
-CREATE SCHEMA IF NOT EXISTS `spider_traits_db` DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci ;
+CREATE SCHEMA IF NOT EXISTS `spider_traits_db` DEFAULT CHARACTER SET utf8 ;
 USE `spider_traits_db` ;
 
 -- -----------------------------------------------------
@@ -86,9 +86,9 @@ CREATE TABLE IF NOT EXISTS `spider_traits_db`.`reference` (
   `abbrev` VARCHAR(255) NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE INDEX `abbrev_UNIQUE` (`abbrev` ASC),
-  INDEX `full_citation_idx` (`full_citation` ASC),
+  INDEX `full_citation_idx` (`full_citation`(100) ASC),
   INDEX `doi_idx` (`doi` ASC),
-  INDEX `all_idx` (`abbrev` ASC, `full_citation` ASC, `doi` ASC))
+  INDEX `all_idx` (`abbrev` ASC, `full_citation`(100) ASC, `doi` ASC))
 ENGINE = InnoDB;
 
 
@@ -280,7 +280,7 @@ CREATE TABLE IF NOT EXISTS `spider_traits_db`.`dataset` (
   `message` VARCHAR(4096) NULL,
   PRIMARY KEY (`id`),
   UNIQUE INDEX `name_UNIQUE` (`name` ASC),
-  INDEX `authors_idx` (`authors` ASC),
+  INDEX `authors_idx` (`authors`(100) ASC),
   INDEX `imported_idx` (`imported` ASC),
   INDEX `sub_idx` (`sub` ASC))
 ENGINE = InnoDB;
@@ -426,7 +426,7 @@ CREATE TABLE IF NOT EXISTS `spider_traits_db`.`import` (
   `method_name` VARCHAR(255) NULL,
   `method_description` TEXT NULL,
   `reference` VARCHAR(1024) NULL,
-  `reference_abbrev` VARCHAR(45) NULL,
+  `reference_abbrev` VARCHAR(255) NULL,
   `reference_doi` VARCHAR(255) NULL,
   `location_abbrev` VARCHAR(45) NULL,
   `location_lat` VARCHAR(45) NULL,
@@ -493,7 +493,7 @@ CREATE TABLE IF NOT EXISTS `spider_traits_db`.`import` (
   INDEX `import_method_abbrev_idx` (`method_abbrev` ASC),
   INDEX `import_method_name_idx` (`method_name` ASC),
   INDEX `import_refrence_abbrev_idx` (`reference_abbrev` ASC),
-  INDEX `import_reference_idx` (`reference` ASC),
+  INDEX `import_reference_idx` (`reference`(100) ASC),
   INDEX `import_reference_doi_idx` (`reference_doi` ASC),
   INDEX `import_location_abbrev_idx` (`location_abbrev` ASC),
   INDEX `import_location_lat_idx` (`location_lat` ASC),

@@ -47,7 +47,7 @@ const validate = async function(reference) {
 const getAbbrev = function (val) {
     val = val || '';
     var yearPos = val.search(/. \d\d\d\d./);
-    return db.unique(val.substr(0, Math.min(yearPos > 0 ? yearPos + 6 : 35, 35)));
+    return db.unique(val.substr(0, Math.min(yearPos > 0 ? yearPos + 6 : 50, 50)));
 }
 
 const prepareForSql = function(reference) {
