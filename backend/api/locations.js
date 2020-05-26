@@ -134,6 +134,12 @@ const prepareForSql = async function(location) {
         } else {
             location.precision = location.coords.precision;
         }
+
+        if(typeof(location.altitude) === 'object') {
+            location.altitude = location.altitude.numeric;
+        } else {
+            location.altitude = location.altitude;
+        }
     }
     delete location.habitatGlobal;
     delete location.country;
