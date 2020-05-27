@@ -27,7 +27,14 @@ const createJob = function(owner, total, func, params) {
     var state = { total, progress: 0, errors: [], completed: false, aborted: false }
     // passes the state to the function
     params.state = state;
-    jobs[jobId] = { owner, state, promise: func(params), start: new Date().valueOf() };
+    jobs[jobId] = { owner, state, promise: (async () => { 
+        try { 
+            await func(params); 
+        } catch(e) { 
+            state.aborted = true; 
+            state.errors.push(e) 
+        } 
+    })(), start: new Date().valueOf() };
     return jobId;
 }
 
