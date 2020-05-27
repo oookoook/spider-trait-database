@@ -62,16 +62,16 @@ const authenticate = function(context, payload) {
     var authRequired = payload.auth;
     var user = context.getters.user;
     var lastAction = context.getters.lastAction;
-    context.commit('lastAction', {value: Date.now()});
     if(authRequired) {
-        //return Promise.resolve(true);
         /*
         console.log(lastAction);
         console.log(sessionTimeout);
         console.log(lastAction + sessionTimeout);
         console.log(Date.now());
-        */
+        console.log((lastAction + sessionTimeout) > Date.now());
+        */ 
         if(user && (lastAction + sessionTimeout) > Date.now()) {
+            context.commit('lastAction', {value: Date.now()});
             return Promise.resolve(true);
         } else {
             // log off the user in the frontend
