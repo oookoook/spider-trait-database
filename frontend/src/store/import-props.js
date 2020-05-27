@@ -309,7 +309,9 @@ export default [
       save: (o, v) => {if(!o.location) o.location={}; o.location.abbrev = v; },
       // the valid function checks if all the props of the location are null  
       isValid: (i, e) => !!i.location.id || !e || e==='create' || 
-      Object.keys(i.location).reduce((total, k) => total && (i.location[k] == null || (i.location[k] != null && i.location[k].raw == null)), true) 
+      Object.keys(i.location).reduce((total, k) => total && (i.location[k] == null 
+      || (i.location[k] != null && k == 'coords' && i.location.coords.lat.raw == null && i.location.coords.lon.raw == null)
+      || (i.location[k] != null && k != 'coords' && i.location[k].raw == null)),  true) 
       || 'Location Abbrev. must be set',
       autocomplete: { endpoint: 'locations', valueField: 'abbrev', textField: ['abbrev', 'locality' ] }
     },

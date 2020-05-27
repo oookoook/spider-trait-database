@@ -136,7 +136,7 @@ DROP TABLE IF EXISTS `spider_traits_db`.`measure` ;
 
 CREATE TABLE IF NOT EXISTS `spider_traits_db`.`measure` (
   `id` INT NOT NULL AUTO_INCREMENT,
-  `name` VARCHAR(45) NOT NULL COMMENT 'valid categories: single observation; mean; median; min; max\n',
+  `name` VARCHAR(45) NOT NULL COMMENT 'valid categories: single observation; mean; median; min; max',
   PRIMARY KEY (`id`),
   INDEX `name_idx` (`name` ASC))
 ENGINE = InnoDB;
@@ -149,7 +149,7 @@ DROP TABLE IF EXISTS `spider_traits_db`.`sex` ;
 
 CREATE TABLE IF NOT EXISTS `spider_traits_db`.`sex` (
   `id` INT NOT NULL AUTO_INCREMENT,
-  `name` VARCHAR(45) NOT NULL COMMENT 'Categorical variable; female, male; both; unknown\n',
+  `name` VARCHAR(45) NOT NULL COMMENT 'Categorical variable; female, male; both; unknown',
   PRIMARY KEY (`id`),
   INDEX `name_idx` (`name` ASC))
 ENGINE = InnoDB;
@@ -162,7 +162,7 @@ DROP TABLE IF EXISTS `spider_traits_db`.`life_stage` ;
 
 CREATE TABLE IF NOT EXISTS `spider_traits_db`.`life_stage` (
   `id` INT NOT NULL AUTO_INCREMENT,
-  `name` VARCHAR(45) NOT NULL COMMENT 'Categorical variable. One of: egg, spiderling, juvenile, adult, all\n',
+  `name` VARCHAR(45) NOT NULL COMMENT 'Categorical variable. One of: egg, spiderling, juvenile, adult, all',
   PRIMARY KEY (`id`),
   INDEX `name_idx` (`name` ASC))
 ENGINE = InnoDB;
@@ -232,15 +232,15 @@ CREATE TABLE IF NOT EXISTS `spider_traits_db`.`location` (
   `id` INT NOT NULL AUTO_INCREMENT,
   `abbrev` VARCHAR(45) NOT NULL,
   `lat` DECIMAL(11,8) NULL COMMENT 'The geographic latitude (in decimal degrees, using the spatial reference system WGS84) of the geographic center of a Location. Positive values are north of the Equator, negative values are south of it. Legal values lie between -90 and 90, inclusive (e.g. 45.74, -37.22285; etc.)',
-  `lon` DECIMAL(11,8) NULL COMMENT 'The geographic longitude (in decimal degrees, using the spatial reference system WGS84) of the geographic center of a Location. Positive values are east of the Greenwich Meridian, negative values are west of it. Legal values lie between -180 and 180, inclusive. (e.g. 102.478922; -0.4767; etc.)\n',
+  `lon` DECIMAL(11,8) NULL COMMENT 'The geographic longitude (in decimal degrees, using the spatial reference system WGS84) of the geographic center of a Location. Positive values are east of the Greenwich Meridian, negative values are west of it. Legal values lie between -180 and 180, inclusive. (e.g. 102.478922; -0.4767; etc.)',
   `precision` DECIMAL(11,8) NULL COMMENT 'A decimal representation of the precision of the coordinates given in the decimalLatitude and decimalLongitude.',
   `altitude` INT NULL COMMENT 'Altitude above the sea level in meters. (e.g. 700, 3462, etc.)',
   `locality` VARCHAR(255) NULL COMMENT 'The original textual description of the place. (e.g. Municipality of Helsinki; small hill close to the river; Mount Fuji)',
   `country_id` INT NULL COMMENT 'The standard code for the country. (e.g. CZ, IT, BR, etc.)',
   `habitat_global_id` INT NULL COMMENT 'A description of the global habitat based on IUCN habitats – https://www.iucnredlist.org/resources/habitat-classification-scheme (e.g. Savanna - Dry; Forest, etc.)',
-  `habitat` TEXT NULL COMMENT 'Verbatim description of the habitat (e.g. forest, grassland, cave, CORINE habitat code, etc.)\n',
-  `microhabitat` TEXT NULL COMMENT 'Verbatim description of the microhabitat (e.g. under stones, ground, canopy, etc.)\n',
-  `stratum` TEXT NULL COMMENT 'Verbatim description of the stratum. (ex. subterranean, epigean, under water, arboreal, index of verticality, etc.)\n',
+  `habitat` TEXT NULL COMMENT 'Verbatim description of the habitat (e.g. forest, grassland, cave, CORINE habitat code, etc.)',
+  `microhabitat` TEXT NULL COMMENT 'Verbatim description of the microhabitat (e.g. under stones, ground, canopy, etc.)',
+  `stratum` TEXT NULL COMMENT 'Verbatim description of the stratum. (ex. subterranean, epigean, under water, arboreal, index of verticality, etc.)',
   `note` TEXT NULL,
   PRIMARY KEY (`id`),
   INDEX `habitat_global_fk_idx` (`habitat_global_id` ASC),
@@ -293,24 +293,24 @@ DROP TABLE IF EXISTS `spider_traits_db`.`data` ;
 
 CREATE TABLE IF NOT EXISTS `spider_traits_db`.`data` (
   `id` INT NOT NULL AUTO_INCREMENT,
-  `taxonomy_id` INT NOT NULL COMMENT 'Taxonomic identifier linking with World Spider Catalog\n',
+  `taxonomy_id` INT NOT NULL COMMENT 'Taxonomic identifier linking with World Spider Catalog',
   `original_name` VARCHAR(255) NOT NULL COMMENT 'Full taxon name as assigned by the author in the original source (that is, not changed based on later taxonomical amendations). (ex. Pimoa rupicola)',
-  `trait_id` INT NOT NULL COMMENT 'unique identifier linking to trait table\n',
-  `value` VARCHAR(45) NULL COMMENT 'trait value\n',
+  `trait_id` INT NOT NULL COMMENT 'unique identifier linking to trait table',
+  `value` VARCHAR(45) NULL COMMENT 'trait value',
   `value_numeric` DECIMAL(15,4) NULL,
-  `measure_id` INT NOT NULL COMMENT 'valid categories: single observation; mean; median; min; max\n',
-  `sex_id` INT NULL COMMENT 'Categorical variable; female, male; both; unknown\n',
-  `life_stage_id` INT NULL COMMENT 'Categorical variable. One of: egg, spiderling, juvenile, adult, all\n',
-  `frequency` DECIMAL(9,4) NULL COMMENT 'Real number. Relative frequency of occurrence. \n',
-  `sample_size` INT NULL COMMENT 'Integer. Total number of observation per record.\n',
+  `measure_id` INT NOT NULL COMMENT 'valid categories: single observation; mean; median; min; max',
+  `sex_id` INT NULL COMMENT 'Categorical variable; female, male; both; unknown',
+  `life_stage_id` INT NULL COMMENT 'Categorical variable. One of: egg, spiderling, juvenile, adult, all',
+  `frequency` DECIMAL(9,4) NULL COMMENT 'Real number. Relative frequency of occurrence. ',
+  `sample_size` INT NULL COMMENT 'Integer. Total number of observation per record.',
   `treatment` VARCHAR(255) NULL,
-  `event_date_text` VARCHAR(255) NULL COMMENT 'The date-time or interval associated to the trait. Examples: 1963-03-08T14:07-0600 (8 Mar 1963 at 2:07pm in the time zone six hours earlier than UTC). 2009-02-20T08:40Z (20 February 2009 8:40am UTC). 2018-08-29T15:19 (3:19pm local time on 29 August 2018). 1809-02-12 (some time during 12 February 1809). 1906-06 (some time in June 1906). 1971 (some time in the year 1971). 2007-03-01T13:00:00Z/2008-05-11T15:30:00Z (some time during the interval between 1 March 2007 1pm UTC and 11 May 2008 3:30pm UTC). 1900/1909 (some time during the interval between the beginning of the year 1900 and the end of the year 1909). 2007-11-13/15 (some time in the interval between 13 November 2007 and 15 November 2007).\n',
-  `event_date_start` DATETIME NULL COMMENT 'The date-time or interval associated to the trait. Examples: 1963-03-08T14:07-0600 (8 Mar 1963 at 2:07pm in the time zone six hours earlier than UTC). 2009-02-20T08:40Z (20 February 2009 8:40am UTC). 2018-08-29T15:19 (3:19pm local time on 29 August 2018). 1809-02-12 (some time during 12 February 1809). 1906-06 (some time in June 1906). 1971 (some time in the year 1971). 2007-03-01T13:00:00Z/2008-05-11T15:30:00Z (some time during the interval between 1 March 2007 1pm UTC and 11 May 2008 3:30pm UTC). 1900/1909 (some time during the interval between the beginning of the year 1900 and the end of the year 1909). 2007-11-13/15 (some time in the interval between 13 November 2007 and 15 November 2007).\n',
-  `event_date_end` DATETIME NULL COMMENT 'The date-time or interval associated to the trait. Examples: 1963-03-08T14:07-0600 (8 Mar 1963 at 2:07pm in the time zone six hours earlier than UTC). 2009-02-20T08:40Z (20 February 2009 8:40am UTC). 2018-08-29T15:19 (3:19pm local time on 29 August 2018). 1809-02-12 (some time during 12 February 1809). 1906-06 (some time in June 1906). 1971 (some time in the year 1971). 2007-03-01T13:00:00Z/2008-05-11T15:30:00Z (some time during the interval between 1 March 2007 1pm UTC and 11 May 2008 3:30pm UTC). 1900/1909 (some time during the interval between the beginning of the year 1900 and the end of the year 1909). 2007-11-13/15 (some time in the interval between 13 November 2007 and 15 November 2007).\n',
+  `event_date_text` VARCHAR(255) NULL COMMENT 'The date-time or interval associated to the trait. Examples: 1963-03-08T14:07-0600 (8 Mar 1963 at 2:07pm in the time zone six hours earlier than UTC). 2009-02-20T08:40Z (20 February 2009 8:40am UTC). 2018-08-29T15:19 (3:19pm local time on 29 August 2018). 1809-02-12 (some time during 12 February 1809). 1906-06 (some time in June 1906). 1971 (some time in the year 1971). 2007-03-01T13:00:00Z/2008-05-11T15:30:00Z (some time during the interval between 1 March 2007 1pm UTC and 11 May 2008 3:30pm UTC). 1900/1909 (some time during the interval between the beginning of the year 1900 and the end of the year 1909). 2007-11-13/15 (some time in the interval between 13 November 2007 and 15 November 2007).',
+  `event_date_start` DATETIME NULL COMMENT 'The date-time or interval associated to the trait. Examples: 1963-03-08T14:07-0600 (8 Mar 1963 at 2:07pm in the time zone six hours earlier than UTC). 2009-02-20T08:40Z (20 February 2009 8:40am UTC). 2018-08-29T15:19 (3:19pm local time on 29 August 2018). 1809-02-12 (some time during 12 February 1809). 1906-06 (some time in June 1906). 1971 (some time in the year 1971). 2007-03-01T13:00:00Z/2008-05-11T15:30:00Z (some time during the interval between 1 March 2007 1pm UTC and 11 May 2008 3:30pm UTC). 1900/1909 (some time during the interval between the beginning of the year 1900 and the end of the year 1909). 2007-11-13/15 (some time in the interval between 13 November 2007 and 15 November 2007).',
+  `event_date_end` DATETIME NULL COMMENT 'The date-time or interval associated to the trait. Examples: 1963-03-08T14:07-0600 (8 Mar 1963 at 2:07pm in the time zone six hours earlier than UTC). 2009-02-20T08:40Z (20 February 2009 8:40am UTC). 2018-08-29T15:19 (3:19pm local time on 29 August 2018). 1809-02-12 (some time during 12 February 1809). 1906-06 (some time in June 1906). 1971 (some time in the year 1971). 2007-03-01T13:00:00Z/2008-05-11T15:30:00Z (some time during the interval between 1 March 2007 1pm UTC and 11 May 2008 3:30pm UTC). 1900/1909 (some time during the interval between the beginning of the year 1900 and the end of the year 1909). 2007-11-13/15 (some time in the interval between 13 November 2007 and 15 November 2007).',
   `note` TEXT NULL,
-  `row_link` INT NULL COMMENT 'for multidimensional data, i.e. use same numbers for rows that contain data from same individuals or populations obtained in the same context\n',
-  `method_id` INT NOT NULL COMMENT 'unique identifier linking to Methods table\n',
-  `location_id` INT NULL COMMENT 'unique identifier linking to Location table\n',
+  `row_link` INT NULL COMMENT 'for multidimensional data, i.e. use same numbers for rows that contain data from same individuals or populations obtained in the same context',
+  `method_id` INT NULL COMMENT 'unique identifier linking to Methods table',
+  `location_id` INT NULL COMMENT 'unique identifier linking to Location table',
   `dataset_id` INT NOT NULL,
   `reference_id` INT NOT NULL,
   PRIMARY KEY (`id`),
