@@ -1,5 +1,34 @@
 const props = {
-  traits: [{
+  datasets: [
+    {
+      name: 'name',
+      label: 'Name',
+      isValid: (v) => !!v || 'Name is required'
+    },
+    {
+      name: 'uploader',
+      label: 'Uploader',
+      isValid: (v) => !!v || 'Uploader is required'
+    },
+    {
+      name: 'email',
+      label: 'Uploader\'s e-mail',
+      isValid: (v) => !!v || 'Email is required'
+    },
+    {
+      name: 'authors',
+      label: 'Author(s)',
+      isValid: (v) => true
+    },
+    {
+      name: 'authorsEmail',
+      label: 'Author\'s e-mail',
+      isValid: (v) => true
+    },
+
+],
+  traits: [
+    {
       name: 'abbrev',
       label: 'Abbreviation',
       hint: 'Abbreviation must be unique.',

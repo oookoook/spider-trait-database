@@ -6,7 +6,7 @@ const getWhere = function(auth, showImport, remove) {
     }
 
     if(auth.isEditor && showImport) {
-        return 'imported < 3';
+        return '1=1';
     }
     if(auth.isContributor && showImport) {
         var q = remove ? 'imported < 3 AND ' : '';
@@ -32,7 +32,7 @@ const list = async function(limits, auth, showImport) {
     
     //console.dir(res);
     var results = await db.query({table: 'dataset', sql: `SELECT dataset.id, dataset.name, dataset.authors, dataset.uploader, `
-                        +`dataset.date, dataset.message, dataset.notes, dataset.imported `
+                        +`dataset.email, dataset.date, dataset.message, dataset.notes, dataset.imported `
                         + `FROM dataset WHERE ${where}`, limits, hasWhere: true });    
      
      res.items = results;
@@ -116,7 +116,7 @@ const remove = async function(params, auth) {
 
 module.exports = function(dbClient) {
     db = dbClient;
-    db.addSynonyms('datasets', 'dataset', {state: `imported`});
+    db.addSynonyms('datasets', 'dataset', {state: `imported` });
     return {
         list,
         get,

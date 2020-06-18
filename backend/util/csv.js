@@ -49,6 +49,23 @@ const get = async function(tmpDir, filename, dstream, connection) {
     return p;
 }
 
+const excel = async function(tmpDir, filename, records) {
+    var header = [];
+    if(records.length == 0) {
+       header = "NO DATA";
+    } else {
+        console.log(Object.keys(records[0]));
+        header = Object.keys(records[0]);
+    }
+
+    var p = path.resolve(tmpDir, filename);
+    var wb = XLSX.utils.book_new();
+    var ws = XLSX.utils.json_to_sheet(records, header);
+      XLSX.utils.book_append_sheet(wb, ws, 'Dataset');
+      XLSX.writeFile(wb, p);
+      return p;
+}
+
 // https://github.com/SheetJS/sheetjs/issues/718
 const convert = async function(f) {
   var wb = XLSX.readFile(f, {cellText:false, cellDates:true});
@@ -77,5 +94,6 @@ const convert = async function(f) {
 module.exports = {
     get,
     convert,
+    excel,
     rows
 }

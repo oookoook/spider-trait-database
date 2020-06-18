@@ -25,7 +25,7 @@
     </template>
     
     <template v-slot:item.coords="{ item }">
-      <entity-link-cell v-if="item.coords" tooltip="View in Google Maps" :link="getGMapsLink(item.coords)" icon="mdi-crosshairs-gps" />
+      <entity-link-cell v-if="item.coords" tooltip="View in Google Maps" :link="getGMapsLink(item.coords)" icon="mdi-crosshairs-gps" external />
     </template>
 
     <template v-slot:item.actions="{ item }">

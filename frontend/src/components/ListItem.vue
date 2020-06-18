@@ -5,8 +5,8 @@
     </v-list-item-icon>
 
     <v-list-item-content>
-      <v-list-item-subtitle>{{title}}</v-list-item-subtitle>
-      <v-list-item-title><span v-if="text">{{text}}</span><slot v-else></slot></v-list-item-title>
+      <v-list-item-title>{{title}}</v-list-item-title>
+      <v-list-item-subtitle><span v-if="text">{{text}}</span><slot v-else></slot></v-list-item-subtitle>
     </v-list-item-content>
 
     <v-list-item-action v-if="link">
@@ -36,7 +36,7 @@ export default {
   link: String, 
   external: Boolean, 
   linkIcon: {type: String, default: 'mdi-eye-outline'}, 
-  linkTooltip: {type: String, default: 'Open detail' } 
+  linkTooltip: {type: String, default: 'Open detail' }, 
   },
   data() {
     return {};

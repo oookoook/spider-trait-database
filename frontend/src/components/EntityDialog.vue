@@ -50,10 +50,19 @@
     <v-card-actions>
       
       <action-button text="Cancel" @click="$emit('cancel')" icon="mdi-cancel" />
-      <action-button text="Delete" v-if="item && item.id" color="warning" @click="remove" icon="mdi-delete-forever-outline" />
+      <action-button text="Delete" v-if="item && item.id" color="warning" @click="confirm = true" icon="mdi-delete-forever-outline" />
       <action-button text="Save" :loading="loading" color="primary" @click="save" icon="mdi-check" />
       
     </v-card-actions>
+    <v-dialog width="500" v-model="confirm">
+      <v-card>
+        <v-card-title><v-icon left color="warning">mdi-alert</v-icon>Delete Confirmation</v-card-title>
+      <v-card-text>{{ confirmationText }}</v-card-text>
+      <v-card-actions><action-button text="Cancel" @click="confirm = false" icon="mdi-cancel" />
+      <action-button text="Delete" v-if="item && item.id" color="error" @click="remove" icon="mdi-delete-forever-outline" />
+      </v-card-actions>
+      </v-card>
+    </v-dialog>
   </v-card>
 </template>
 
@@ -70,11 +79,13 @@ export default {
     AutocompleteProvider,
     DataFilter
   },
-  props: { item: Object, create: Boolean, loading: Boolean, entityProps: Array, breadcrumbs: Array },
+  props: { item: Object, create: Boolean, loading: Boolean, entityProps: Array, breadcrumbs: Array, 
+  confirmationText: { type: String, default: 'Are you sure you want to delete the entity? This can\'t be undone.'}},
   data () {
     return {
       it: null,
-      fv: null
+      fv: null,
+      confirm: false
     }
   },
   computed: {

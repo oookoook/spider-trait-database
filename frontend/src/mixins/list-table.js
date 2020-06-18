@@ -28,6 +28,7 @@ export default {
               console.dir(this.options);
               if(this.internalOptsChange == 0) {
                 console.log('opts changed updating');
+                //this.needsCount = true;
                 this.update();
               } else {
                 this.internalOptsChange -= 1;

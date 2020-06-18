@@ -66,7 +66,7 @@
         </v-list-item>
         <v-list-item to="/approve" v-if="isEditor">
           <v-list-item-icon><v-icon>mdi-stamper</v-icon></v-list-item-icon>
-          <v-list-item-content><v-list-item-title>Approve datasets</v-list-item-title></v-list-item-content>
+          <v-list-item-content><v-list-item-title>Approve and manage datasets</v-list-item-title></v-list-item-content>
         </v-list-item>
       </v-list>
     </v-menu>

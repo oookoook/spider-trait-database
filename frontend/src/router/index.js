@@ -42,7 +42,7 @@ const routes = [
     component: () => import(/* webpackChunkName: "data" */ '../views/Data.vue')
   },
   {
-    path: '/data/family/:family/genus/:genus/species/:species/trait-category/:traitcategory/trait/:trait/method/:method/location/:location/country/:country/habitat/:habitat/dataset/:dataset/authors/:authors/reference/:reference/row-link/:rowlink',
+    path: '/data/family/:family/genus/:genus/species/:species/original-name/:origname/trait-category/:traitcategory/trait/:trait/method/:method/location/:location/country/:country/dataset/:dataset/authors/:authors/reference/:reference/row-link/:rowlink',
     name: 'dataFullFilter',
     component: () => import(/* webpackChunkName: "data" */ '../views/Data.vue')
   },
@@ -65,6 +65,11 @@ const routes = [
     path: '/prepare/:id',
     name: 'prepare',
     component: () => import(/* webpackChunkName: "prepare" */ '../views/Prepare.vue')
+  },
+  {
+    path: '/prepare/transfer/:id',
+    name: 'importTransfer',
+    component: () => import(/* webpackChunkName: "import" */ '../views/Prepare.vue')
   },
   {
     path: '/admin',

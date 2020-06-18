@@ -1,30 +1,23 @@
 <template>
-  <v-container>
-  <entity-provider list="datasets" :id="id" v-slot="i">
-    <dataset-detail :item="i.item" />
-  </entity-provider>
-  
-  <list-provider v-if="id" list="data" v-slot="i" entity="dataset" :id="id" >
-    <data-preview-table :items="i.items" :loading="i.loading" :total="i.total" @update="i.update"/>
-  </list-provider>
-  
-  </v-container>
+  <entity-detail entity="dataset" list="datasets" breadcrumb-prop="name" v-slot="{item, showUpdate, onEdit, breadcrumbs}"
+  delete-confirmation-text="Are you sure you want to delete the dataset? All the data from this dataset will be removed from the database. This can't be undone.">
+    <dataset-detail 
+      :item="item"
+      :show-update="showUpdate"
+      :breadcrumbs="breadcrumbs"
+      @edit="onEdit"
+    />
+  </entity-detail>
 </template>
 
 <script>
-import IdFromRoute from '../mixins/id-from-route' 
-import EntityProvider from '../components/EntityProvider'
-import ListProvider from '../components/ListProvider'
+import EntityDetail from '../components/EntityDetail'
 import DatasetDetail from '../components/DatasetDetail'
-import DataPreviewTable from '../components/DataPreviewTable'
 export default {
   name: 'dataset',
-  mixins: [IdFromRoute],
   components: {
-    EntityProvider,
+    EntityDetail,
     DatasetDetail,
-    ListProvider,
-    DataPreviewTable
   },
   props: [],
   data () {

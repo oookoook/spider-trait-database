@@ -53,6 +53,38 @@ export default [
       autocomplete: { endpoint: 'taxonomy', valueField: 'fullName' }
     },
     { 
+      name: 'taxonomy.fullName',
+      text: 'Assigned name',
+      //entity: 'taxonomy', 
+      displayValue: (i) => {
+        if(i.taxonomy.fullName) {
+          return i.taxonomy.fullName;
+        }
+        if(!i.taxonomy.wscLsid && !i.taxonomy.originalName) {
+          return 'No taxonomy information available';
+        }
+        
+        if (!!i.taxonomy.wscLsid && !!i.taxonomy.originalName && !i.taxonomy.id) {
+          return 'LSID and Orginal name do not refer to the same WSC taxon.';
+        }
+        return 'Unknow error';
+      },
+      readOnly: true,
+      isValid: (i, e) => {
+        if(i.taxonomy.fullName) {
+          return true;
+        }
+        if(!i.taxonomy.wscLsid && !i.taxonomy.originalName) {
+          return 'No taxonomy information available';
+        }
+        
+        if (!!i.taxonomy.wscLsid && !!i.taxonomy.originalName && !i.taxonomy.id) {
+          return 'LSID and Orginal name do not refer to the same WSC taxon.';
+        }
+        return 'Unknow error';
+      },
+    },
+    { 
       name: 'trait.abbrev',
       text: 'Trait Abbrev.',
       entity: 'trait', 
@@ -282,7 +314,7 @@ export default [
       displayValue: (i) => i.reference.fullCitation,
       save: (o, v) => {if(!o.reference) o.reference={}; o.reference.fullCitation = v; },  
       isValid: (i, e) => !!i.reference.id || !!i.reference.fullCitation || 'Reference must be set',
-      
+      similar: { endpoint: 'references', valueField: 'fullCitation', textField: 'fullCitation' }
     },
     { 
       name: 'reference.abbrev',

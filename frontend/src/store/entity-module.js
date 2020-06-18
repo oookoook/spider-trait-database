@@ -38,7 +38,7 @@ export default (endpoint) => {
             payload.currCount = context.state.total;                
             var data = await context.dispatch('list', payload, { root: true });
             if(data) {    
-                if(data.count) {
+                if(data.count !== null) {
                     context.commit('total', { value: data.count});
                 }
                 context.commit('list', { value: data.items});

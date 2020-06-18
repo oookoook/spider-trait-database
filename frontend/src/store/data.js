@@ -5,7 +5,7 @@ const getParams = function(filter) {
   if(!f) {
     f= {};
   }
-    var filters = ['family', 'genus', 'species', 'trait-category', 'trait', 'method', 'location', 'country', 'habitat', 'dataset', 'authors','reference','row-link'];
+    var filters = ['family', 'genus', 'species', 'original-name', 'trait-category', 'trait', 'method', 'location', 'country', 'dataset', 'authors','reference','row-link'];
     return filters.map(i => `${i}/${f[i] ? encodeURIComponent(f[i]) : '*'}`).join('/');
     // `family/:family/genus/:genus/species/:species/trait-category/:traitcat/trait/:trait/country/:country/habitat/:habitat/dataset/:dataset/authors/:authors/reference/:reference/row-link/:rowl`
 
@@ -34,9 +34,12 @@ export default {
       }
     },
     getters: {
-        exportLink(state, getters, rootState, rootGetters) {
-            return `${rootGetters.baseUrl}data/export/${state.link}`;
+        exportLinkCSV(state, getters, rootState, rootGetters) {
+            return `${rootGetters.baseUrl}data/export/csv/${state.link}`;
         },
+        exportLinkExcel(state, getters, rootState, rootGetters) {
+          return `${rootGetters.baseUrl}data/export/excel/${state.link}`;
+      },
         shareLink(state, getters, rootState, rootGetters) {
           var port = window.location.port ? `:${window.location.port}` : '';
           return `${window.location.protocol}//${window.location.hostname}${port}/data/${state.link}`;
@@ -59,7 +62,7 @@ export default {
             //console.log(payload.params);
             var data = await context.dispatch('list', payload, { root: true });
             if(data){    
-              if(data.count) {
+              if(data.count !== null) {
                     context.commit('total', { value: data.count});
                 }
               context.commit('list', { value: data.items});

@@ -29,7 +29,7 @@
     :loading="i.loading" 
     :total="i.total" 
     @update="i.update"
-    @delete="showRemove" >
+    @remove="showRemove" >
       <action-button color="primary" @click="showNewDialog(true)"></action-button>
     </imports-table>
   </list-provider>

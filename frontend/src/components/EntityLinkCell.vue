@@ -6,10 +6,8 @@
         <span style="text-decoration-line: underline; text-decoration-style: dotted" v-on="on">{{ abbrev }}</span>
       </template>
       <span>{{ text }}</span>
-    </v-tooltip>
-    <v-tooltip top>
+    </v-tooltip><v-tooltip top>
       <template v-slot:activator="{ on }">
-        
         <v-btn v-if="!external" :to="link" icon v-on="on"><v-icon :color="color">{{ icon }}</v-icon></v-btn>
         <v-btn v-else :href="link" target="_blank" icon v-on="on"><v-icon :color="color">{{ icon }}</v-icon></v-btn>
       </template>

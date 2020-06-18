@@ -27,7 +27,7 @@
         :item="i.item" 
         :showUpdate="isEditor" 
         :onEdit="() => {entityEdit = true}"
-        :breadcrumbs="[{ text: listTitle, to: `/${list}`, exact: true }, { text: i.item.abbrev, to: currentPath }]">
+        :breadcrumbs="[{ text: listTitle, to: `/${list}`, exact: true }, { text: i.item[breadcrumbProp], to: currentPath }]">
         {{ JSON.stringify(i.item) }}
         </slot>
         <entity-dialog
@@ -36,7 +36,8 @@
           :create="entityCreate"
           :item="i.item"
           :entity-props="i.entityProps"
-          :breadcrumbs="[{ text: listTitle, to: `/${list}`, exact: true }, { text: i.item ? i.item.abbrev : 'New item', to: currentPath }]"
+          :breadcrumbs="[{ text: listTitle, to: `/${list}`, exact: true }, { text: i.item ? i.item[breadcrumbProp] : 'New item', to: currentPath }]"
+          :confirmation-text="deleteConfirmationText"
           @save="i.save"
           @remove="i.remove"
           @cancel="entityEdit=false"
@@ -46,7 +47,7 @@
 
     <list-provider v-if="id" list="data" :entity="entity" :id="id" v-slot="i">
       <v-card>
-        <v-card-title>Data preview</v-card-title>
+        <v-card-title>Data preview ({{i.items.length}} records)</v-card-title>
         <data-preview-table
           :items="i.items"
           :loading="i.loading"
@@ -75,7 +76,7 @@ export default {
     EntityDialog,
     DataPreviewTable
   },
-  props: { list: String, entity: String },
+  props: { list: String, entity: String, breadcrumbProp: { type: String, default: 'abbrev'}, deleteConfirmationText: String },
   data() {
     return {
       entityCreate: false,

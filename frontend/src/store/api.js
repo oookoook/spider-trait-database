@@ -30,6 +30,7 @@ const getListParams = function(payload) {
     var searchField = payload.searchField;
     var searchValue = payload.search;
     var searchLike = payload.searchLike ? true : false;
+    var searchFromStart = payload.searchFromStart ? true : false;
     var count = payload.count;
     var sortField = (payload.options.sortBy && payload.options.sortBy[0]) ? payload.options.sortBy[0] : null;
     var sortDirection = (payload.options.sortDesc && payload.options.sortDesc[0]) ? 'desc' : 'asc';
@@ -46,6 +47,7 @@ const getListParams = function(payload) {
         params.searchField = searchField;
         params.searchValue = searchValue;
         params.searchLike = searchLike;
+        params.searchFromStart = searchFromStart;
     }
     if(count) {
         params.count = true;

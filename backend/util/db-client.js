@@ -35,10 +35,12 @@ const addLimits = function (values, limits, table, hasWhere, aggregate, customWh
         return ';';
     }
     var op = '=';
-    var wildcard = '';
+    var wildcardS = '';
+    var wildcardE = '';
     if (limits.search && limits.search.like) {
         op = 'LIKE';
-        wildcard = '%'
+        wildcardS = limits.search.fromStart ? '%' : '';
+        wildcardE = '%';
     }
     var searchStart = 'WHERE';
     if (hasWhere) {
@@ -59,7 +61,7 @@ const addLimits = function (values, limits, table, hasWhere, aggregate, customWh
         
         //console.log(`${table} ${limits.search.field} ${getSynonym(table, limits.search.field)}`);
         values.push(getSynonym(table, limits.search.field));
-        values.push(`${wildcard}${limits.search.value}${wildcard}`);
+        values.push(`${wildcardS}${limits.search.value}${wildcardE}`);
     }
 
     //console.log(`${whereClause} ${orderClause} LIMIT ${limits.offset},${limits.limit};`);
@@ -181,7 +183,8 @@ const limits = function (req, res, next) {
         req.recordLimit.search = {
             field: req.query.searchField,
             value: v,
-            like: req.query.searchLike && req.query.searchLike == 'true'
+            like: req.query.searchLike && req.query.searchLike == 'true',
+            fromStart: req.query.searchFromStart && req.query.searchFromStart == 'true'
         };
     }
 
@@ -219,7 +222,7 @@ const prepareListResponse = async function (limits, table, customWhereClause, cu
     return res;
 }
 
-const getAutocomplete = async function(endpoint, valueField, textField, search, count, searchByValue) {
+const getAutocomplete = async function(endpoint, valueField, textField, search, count, searchByValue, searchFromStart) {
     
     var qt = getSynonym(endpoint); 
     var vf = getSynonym(endpoint, valueField);
@@ -237,6 +240,8 @@ const getAutocomplete = async function(endpoint, valueField, textField, search, 
     var st = '%';
     if(searchByValue && search) {
         st = search;
+    } else if(search && searchFromStart) {
+        st = `${search}%`;
     } else if(search) {
         st = `%${search}%`;
     }

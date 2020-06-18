@@ -48,6 +48,26 @@
         preload>
       </data-filter>
       </autocomplete-provider>
+      <autocomplete-provider v-if="modifiedProp && modifiedProp.similar"
+        list="editor" 
+        :endpoint="modifiedProp.similar.endpoint"
+        :entity="modifiedProp.name" 
+        :valueField="modifiedProp.similar.valueField" 
+        :textField="modifiedProp.similar.textField" 
+        :showAll="modifiedProp.similar.showAll" 
+        v-slot="i">
+      <!-- <action-button tooltip icon="mdi-arrow-left-bold-outline" text="Fill in value" @click="fillInSimilar" /> -->
+      <data-filter
+        v-model="similarValue"  
+        :items="i.items" 
+        :loading="i.loading"
+        label="Similar values lookup" 
+        icon="mdi-arrow-left-bold-outline"
+        @autocomplete="i.autocomplete"
+        @init="i.init"
+        preload>
+      </data-filter>
+      </autocomplete-provider>
       </v-col> 
       </v-row>
       </v-form>
@@ -87,7 +107,8 @@ export default {
       acitems: null,
       foreignMatchValue: null,
       autocompleteInput: null,
-      fv: null
+      fv: null,
+      similarValue: null
     }
   },
   computed: {
@@ -130,7 +151,15 @@ export default {
         this.modifiedValue = val;
       }
       this.$refs.form.validate();
-    }
+    },
+    similarValue(val, oldVal) {
+      if(val) {
+        //console.log('Value in autocomplete selected');
+        //console.dir(val);
+        this.modifiedValue = val;
+      }
+      this.$refs.form.validate();
+    },
     /*
     type(val) {
 
@@ -174,7 +203,7 @@ export default {
         }
       }
       this.$emit('save', e);
-    }
+    },
   },
   created () {
 

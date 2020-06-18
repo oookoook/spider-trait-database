@@ -17,7 +17,7 @@ export default {
   name: 'ListProvider',
   components: {
   },
-  props: { list: String, entity: String, textField: [String,Array], valueField: String, showAll: Boolean, endpoint: String },
+  props: { list: String, entity: String, textField: [String,Array], valueField: String, showAll: Boolean, endpoint: String, searchFromStart: Boolean },
   data () {
     return {
       loading: false,
@@ -44,6 +44,9 @@ export default {
       }
       if(!this.showAll) {
         query.count = 10;
+      }
+      if(this.searchFromStart) {
+        query.searchFromStart = true;
       } 
       this.loading = true;
       if(this.entity) {

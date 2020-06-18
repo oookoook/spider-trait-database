@@ -16,9 +16,9 @@ var join = `data `
 + `LEFT JOIN reference ON data.reference_id = reference.id`;
 
 const getCondition = function(params) {
-    var p = ['family','genus', 'species', 'traitcat', 'trait', 'method', 'location','country', 'habitat', 'dataset', 'authors', 'reference', 'rowl'];
-    var f = ['taxonomy.family', 'taxonomy.genus', 'data.taxonomy_id', 'trait.trait_category_id', 'data.trait_id', 'method.id', 'location.id', 'country.id', 
-    'habitat_global.id', 'dataset.id', 'dataset.authors', 'data.reference_id', 'data.row_link']
+    var p = ['family','genus', 'species', 'origname', 'traitcat', 'trait', 'method', 'location','country', 'dataset', 'authors', 'reference', 'rowl'];
+    var f = ['taxonomy.family', 'taxonomy.genus', 'data.taxonomy_id', 'data.original_name', 'trait.trait_category_id', 'data.trait_id', 'method.id', 'location.id', 'country.id', 
+    'dataset.id', 'dataset.authors', 'data.reference_id', 'data.row_link']
 
     var cl = ['1=1'];
     var val = [];
@@ -33,6 +33,7 @@ const getCondition = function(params) {
 
 const list = async function(params, limits) {
     var cond = getCondition(params);
+    //console.dir(cond);
     var res = await db.prepareListResponse(limits, 'data', cond.clause, cond.values, join);
     var results = await db.query({ table: 'data', sql: `SELECT data.*, taxonomy.wsc_lsid, taxonomy.family, taxonomy.genus, taxonomy.species, taxonomy.subspecies, `
      + `trait.id, trait.abbrev, trait.name, trait_category.id, trait_category.name, `
@@ -105,7 +106,7 @@ const csv =  async function(params, limits, tmpDir) {
      + `trait.abbrev as trait, trait.name as traitFullName, trait_category.name as traitCategory, data.value, data.value_numeric, `
      + `measure.name as measure, sex.name as sex, life_stage.name as lifeStage, data.frequency, data.sample_size as sampleSize, `
      + `data.treatment as treatment, method.abbrev as method, method.name as methodFullName, `
-     + `event_date_text as dateText, event_date_start as dateStart, event_date_end as dateEnd, note `
+     + `event_date_text as dateText, event_date_start as dateStart, event_date_end as dateEnd, data.note, `
      + `location.abbrev as location, location.lat as decimalLatitude, location.lon as decimalLongitude, location.altitude, location.locality as verbatimLocality, `
      + `country.alpha3_code as countryCode, country.name as countryName, `
      + `location.habitat as habitatVerbatim, location.microhabitat as microhabitatVerbatim, `
@@ -115,6 +116,29 @@ const csv =  async function(params, limits, tmpDir) {
     
     var f = await csvu.get(tmpDir, `spider-traits-${Date.now()}.csv`, dstream, c);
     db.releaseConnection(c);
+    return f;
+}
+
+const excel =  async function(params, limits, tmpDir) {
+    var cond = getCondition(params);
+    var res = await db.prepareListResponse(limits, 'data', cond.clause, cond.values, join);
+    limits.limit = res.count;
+    
+    var records = await db.query({ table: 'data', sql: `SELECT data.id, taxonomy.wsc_lsid, data.original_name as originalName, `
+     + `taxonomy.family, taxonomy.genus, taxonomy.species, taxonomy.subspecies, `
+     + `trait.abbrev as trait, trait.name as traitFullName, trait_category.name as traitCategory, data.value, data.value_numeric, `
+     + `measure.name as measure, sex.name as sex, life_stage.name as lifeStage, data.frequency, data.sample_size as sampleSize, `
+     + `data.treatment as treatment, method.abbrev as method, method.name as methodFullName, `
+     + `event_date_text as dateText, event_date_start as dateStart, event_date_end as dateEnd, data.note, `
+     + `location.abbrev as location, location.lat as decimalLatitude, location.lon as decimalLongitude, location.altitude, location.locality as verbatimLocality, `
+     + `country.alpha3_code as countryCode, country.name as countryName, `
+     + `location.habitat as habitatVerbatim, location.microhabitat as microhabitatVerbatim, `
+     + `dataset.name as datasetName, reference.abbrev as reference, reference.full_citation as referenceFull, reference.doi as referenceDOI, data.row_link as rowLinks `
+     + `FROM ${join} WHERE ${cond.clause}`
+     , values: cond.values, nestTables: false, limits, hasWhere: true});
+    
+    var f = await csvu.excel(tmpDir, `spider-traits-${Date.now()}.xlsx`, records);
+    
     return f;
 }
 
@@ -141,6 +165,7 @@ const synonyms = {
     'location': 'location.abbrev',
     'method': 'method.abbrev',
     'reference': 'reference.abbrev',
+    'reference.fullCitation':  'reference.full_citation',
     'trait': 'trait.abbrev',
     'dataset': 'dataset.name',
     'taxonomy.wsc.lsid': 'taxonomy.wsc_lsid',
@@ -155,6 +180,7 @@ module.exports = function(dbClient) {
     db.addSynonyms('data','data', synonyms);
     return {
         list,
-        csv
+        csv,
+        excel
     }
 }

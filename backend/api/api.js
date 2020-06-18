@@ -41,12 +41,13 @@ var uploadOpts = { useTempFiles: true, tempFileDir : settings.files.tmpDir, limi
 
 const err = (e) => {
   console.error(`${new Date().toISOString()}: ${e}`);
+  console.error(e);
 }
 
 router.route('/autocomplete/:endpoint')
   .get(function(req, res) {
     db.getAutocomplete(req.params.endpoint, req.query.valueField, req.query.textField, 
-      req.query.search, req.query.count ? parseInt(req.query.count) : null, req.query.searchByValue == 'true').then(r => res.json({ items: r })).catch(e => { err(e); res.sendStatus(400); })
+      req.query.search, req.query.count ? parseInt(req.query.count) : null, req.query.searchByValue == 'true', req.query.searchFromStart == 'true').then(r => res.json({ items: r })).catch(e => { err(e); res.sendStatus(400); })
   })
 
 router.route('/traits')
@@ -167,14 +168,19 @@ router.route('/datasets/:id')
     datasets.remove(req.params, req.resourcesAuth).then(r => res.json(r)).catch(e => { err(e); res.sendStatus(400); })
   })
 
-router.route('/data/family/:family/genus/:genus/species/:species/trait-category/:traitcat/trait/:trait/method/:method/location/:location/country/:country/habitat/:habitat/dataset/:dataset/authors/:authors/reference/:reference/row-link/:rowl')
+router.route('/data/family/:family/genus/:genus/species/:species/original-name/:origname/trait-category/:traitcat/trait/:trait/method/:method/location/:location/country/:country/dataset/:dataset/authors/:authors/reference/:reference/row-link/:rowl')
   .get(function (req, res) {
     data.list(req.params, req.recordLimit).then(r => res.json(r)).catch(e => { err(e); res.sendStatus(400); })
   });
 
-router.route('/data/export/family/:family/genus/:genus/species/:species/trait-category/:traitcat/trait/method/:method/:trait/:location/country/:country/habitat/:habitat/dataset/:dataset/authors/:authors/reference/:reference/row-link/:rowl')
+router.route('/data/export/csv/family/:family/genus/:genus/species/:species/original-name/:origname/trait-category/:traitcat/trait/:trait/method/:method/location/:location/country/:country/dataset/:dataset/authors/:authors/reference/:reference/row-link/:rowl')
   .get(function (req, res) {
     data.csv(req.params, req.recordLimit, settings.files.tmpDir).then(r => res.download(r)).catch(e => { err(e); res.sendStatus(400); })
+  });
+
+  router.route('/data/export/excel/family/:family/genus/:genus/species/:species/original-name/:origname/trait-category/:traitcat/trait/:trait/method/:method/location/:location/country/:country/dataset/:dataset/authors/:authors/reference/:reference/row-link/:rowl')
+  .get(function (req, res) {
+    data.excel(req.params, req.recordLimit, settings.files.tmpDir).then(r => res.download(r)).catch(e => { err(e); res.sendStatus(400); })
   });
 
 router.route('/import/')

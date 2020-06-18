@@ -1,7 +1,7 @@
 <template>
   <v-card :loading="loading">
-    <v-card-title>Data editor</v-card-title>
       <v-toolbar dense color="accent" class="elevation-0 my-3">
+        <v-card-title>Data editor</v-card-title>
         <action-button text="Dataset detail" icon="mdi-card-text-outline" toolbar @click="dsEdit = true" />
         <action-button color="success" text="Upload data" icon="mdi-upload" toolbar @click="upload = true" />
         <action-button text="Download as CSV" icon="mdi-download" toolbar :link="downloadLink" />
@@ -265,6 +265,11 @@ export default {
       if(val) {
         this.refreshDS();
         this.getData();
+        console.log('id changed');
+        if(this.$route.path.indexOf('transfer') > -1 && this.$route.params.id) {
+          console.log('transfer requested');
+          this.transferBack(); 
+        }
       }
     },
     job(val, oldVal) {
@@ -293,7 +298,7 @@ export default {
         val.forEach(e => this.errorsLocal.unshift(e));
         this.$store.dispatch('clearErrors');
       }
-    }
+    },
     /*
     editMode() {
       if(this.selectedCell) {
@@ -557,6 +562,10 @@ export default {
     },
     refreshJob() {
       this.$store.dispatch(`refreshJob`);  
+    },
+    transferBack() {
+      this.$store.dispatch('editor/changeState', { id: this.id, message: null, state: 'reviewed'}).then(() => { this.loading = false;});
+      this.jobCompletedAction = () => { this.$router.push(`/prepare/${this.id}`); this.refreshDS(); this.getData();  };
     }
   },
   created () {
@@ -570,6 +579,7 @@ export default {
       this.$store.dispatch('resetJob');
       this.refreshJob();
     }
+
   },
   timers: {
     refreshJob: { time: 3000, repeat: true }

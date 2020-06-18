@@ -26,9 +26,12 @@
     <!-- Export button -->
     <v-tooltip top>
       <template v-slot:activator="{ on }">
-      <span v-on="on"><v-btn text :disabled="exportDisabled" :href="exportLink"><v-icon>mdi-download</v-icon>Export</v-btn></span>
+      <span v-on="on">
+        <v-btn text :disabled="exportDisabled" :href="exportLinkCSV" download><v-icon>mdi-download</v-icon>Export CSV</v-btn>
+        <v-btn text :disabled="exportDisabled" :href="exportLinkExcel" download><v-icon>mdi-file-excel-box</v-icon>Export Excel</v-btn>
+        </span>
       </template>
-      <span v-if="!exportDisabled">Download the filtered data as CSV (all pages)</span>
+      <span v-if="!exportDisabled">Download the filtered data (all pages)</span>
       <span v-else>Please set up a filter before exporting</span>
     </v-tooltip>
     </v-card-title>
@@ -40,9 +43,10 @@
         list="data" 
         :endpoint="f.endpoint"
         :entity="f.entity" 
-        :valueField="f.valueField" 
-        :textField="f.textField" 
-        :showAll="f.showAll" 
+        :value-field="f.valueField" 
+        :text-field="f.textField" 
+        :show-all="f.showAll"
+        :search-from-start="f.searchFromStart" 
         v-slot="i">
       <data-filter
         v-model="f.search"  
@@ -113,18 +117,19 @@ export default {
     return {
       tab: null,
       filters: [
-        { entity: 'family', endpoint: 'taxonomy', label:'Family', icon: 'mdi-spider-web', valueField: 'taxonomy.family', search: null },
-        { entity: 'genus', endpoint: 'taxonomy', label:'Genus', icon: 'mdi-spider-thread', valueField: 'taxonomy.genus', search: null },
-        { entity: 'species', endpoint: 'taxonomy', label:'Species', icon: 'mdi-spider', valueField: 'taxonomy.id', textField: ['taxonomy.genus', 'taxonomy.species', 'taxonomy.subspecies'], search: null },
+        { entity: 'family', endpoint: 'taxonomy', label:'Family', icon: 'mdi-spider-web', valueField: 'taxonomy.family', searchFromStart: true, search: null },
+        { entity: 'genus', endpoint: 'taxonomy', label:'Genus', icon: 'mdi-spider-thread', valueField: 'taxonomy.genus', searchFromStart: true, search: null },
+        { entity: 'species', endpoint: 'taxonomy', label:'Species', icon: 'mdi-spider', valueField: 'taxonomy.id', textField: ['taxonomy.genus', 'taxonomy.species', 'taxonomy.subspecies'], searchFromStart: true, search: null },
+        { entity: 'original-name', endpoint: 'data', label:'Original name', icon: 'format-quote-close', valueField: 'originalName', searchFromStart: true, search: null },
         { entity: 'trait-category', endpoint: 'traits', label:'Trait category', icon: 'mdi-file-tree', valueField: 'trait.category.id', textField: 'trait.category.name', search: null, showAll: true },
         { entity: 'trait', endpoint: 'traits', label:'Trait', icon: 'mdi-comment-question-outline', valueField: 'trait.id', textField: ['trait.abbrev', 'trait.name'], search: null },
         { entity: 'method', endpoint: 'methods', label:'Method', icon: 'mdi-chart-bell-curve', valueField: 'method.id', textField: ['method.abbrev', 'method.name'], search: null },
         { entity: 'location', endpoint: 'locations', label:'Location', icon: 'mdi-map-marker', valueField: 'location.id', textField: ['location.abbrev'], search: null },
         { entity: 'country', endpoint: 'locations', label:'Country', icon: 'mdi-flag-outline', valueField: 'location.country.id', textField: ['location.country.code', 'location.country.name'], search: null },
-        { entity: 'habitat', endpoint: 'locations', label:'Global habitat', icon: 'mdi-map', valueField: 'location.habitatGlobal.id', textField: 'location.habitatGlobal.name', search: null },
+        //{ entity: 'habitat', endpoint: 'locations', label:'Global habitat', icon: 'mdi-map', valueField: 'location.habitatGlobal.id', textField: 'location.habitatGlobal.name', search: null },
         { entity: 'dataset', endpoint: 'datasets', label:'Dataset', icon: 'mdi-table', valueField: 'dataset.id', textField: 'dataset.name', search: null },
         //{ entity: 'authors', endpoint: 'datasets', label:'Authors', icon: 'mdi-account-multiple', valueField: 'dataset.authors', search: null },
-        { entity: 'reference', endpoint: 'references', label:'References', icon: 'mdi-bookmark-outline', valueField: 'reference.id', textField:'reference.abbrev', search: null },
+        { entity: 'reference', endpoint: 'references', label:'References', icon: 'mdi-bookmark-outline', valueField: 'reference.id', textField:'reference.fullCitation', search: null },
         { entity: 'row-link', endpoint: 'data', label:'Row links', icon: 'mdi-link', valueField: 'rowLink', search: null },
       ],
       shareMenu: false,
@@ -145,7 +150,7 @@ export default {
       this.filters.forEach((f,i) => { l[f.entity] = i });
       return l;
     },
-    ...mapGetters('data', ['exportLink', 'shareLink','routeLink'])
+    ...mapGetters('data', ['exportLinkCSV', 'exportLinkExcel', 'shareLink','routeLink'])
   },
   watch: {
     routeLink() {

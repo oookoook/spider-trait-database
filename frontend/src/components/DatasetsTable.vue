@@ -20,15 +20,15 @@
     >
     
     <template v-slot:item.name="{ item }">
-      <entity-link-cell :text="item.name" tooltip="View the dataset detail" :link="`/dataset/${item.id}`" />
+      <entity-link-cell :text="item.name" tooltip="View the dataset detail" :link="`/datasets/${item.id}`" />
     </template>
     
   <template v-slot:item.uploader="{ item }">
-      <entity-link-cell :text="item.uploader" tooltip="Send an email to the uploader" icon="mdi-email-outline" :link="`mailto:${item.email}`" />
+      <entity-link-cell :text="item.uploader" tooltip="Send an email to the uploader" icon="mdi-email-outline" :link="`mailto:${item.email}`" external />
     </template>
 
     <template v-slot:item.uploaded="{ item }">
-      {{ new Date(item.uploaded) }}
+      {{ new Date(item.date).toISOString().substr(0,10) }}
     </template>
 
     <!--
@@ -60,8 +60,8 @@ export default {
       ],
       headers: [
         { text: 'Dataset Name', value: 'name' },
-        { text: 'Authors', value: 'authors' },
-        { text: 'Uploader', value: 'uploader'},
+        { text: 'Authors', value: 'authors', width: 300 },
+        { text: 'Uploader', value: 'uploader', width: 300 },
         { text: 'Uploaded', value: 'uploaded'},
         //{ text: 'Approved', value: 'approved'},
         { text: 'Actions', value: 'actions', sortable: false }

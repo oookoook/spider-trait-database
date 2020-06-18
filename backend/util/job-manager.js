@@ -31,8 +31,10 @@ const createJob = function(owner, total, func, params) {
         try { 
             await func(params); 
         } catch(e) { 
+            console.error(e);
             state.aborted = true; 
-            state.errors.push(e) 
+            
+            state.errors.push(typeof e == 'string' ? e : JSON.stringify(e)); 
         } 
     })(), start: new Date().valueOf() };
     return jobId;

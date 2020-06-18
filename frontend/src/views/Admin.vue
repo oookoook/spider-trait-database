@@ -70,11 +70,22 @@
       <a href="https://dashboard.cloud.muni.cz/" target="_blank">https://dashboard.cloud.muni.cz/</a>.</p>
       <p>If you are able to see this page, you should be also able to log in there. The access is automatically granted to all members of the Admin group.</p>
     </v-expansion-panel-content>
+    </v-expansion-panel>
+    <v-expansion-panel>
+    <v-expansion-panel-header><h3><v-icon color="primary" left>mdi-server</v-icon> Database backups</h3></v-expansion-panel-header>
+    <v-expansion-panel-content>
+    <p>The database backups are perfomed using the Bacula tool and stored at the tape storage at the ICS MU. More information and guides (in Czech) are available at 
+      <a href="https://it.muni.cz/sluzby/zalohovani-bacula" target="_blank">https://it.muni.cz/sluzby/zalohovani-bacula</a>.</p>
+      <p>The selected backup policy creates full database backup on the second firday of the month, in all the other days an incremental backup is made (predefined policy no. 2). The backups are retained for one year on the tape storage.</p>
+      <p>The database backup information and scripts are located in the <a href="https://github.com/oookoook/spider-trait-database/tree/master/db#setting-up-the-database-backups" target="_blank">GitHub source code repository</a>.</p>
+      <p>Refer to the <a href="https://mariadb.com/kb/en/incremental-backup-and-restore-with-mariabackup/" target="_blank">MariaDB documentation</a> for instructions on backup restore procedure.</p>
+    </v-expansion-panel-content>
     </v-expansion-panel>  
     <v-expansion-panel>
     <v-expansion-panel-header><h3><v-icon color="primary" left>mdi-code-tags</v-icon> Source code</h3></v-expansion-panel-header>
     <v-expansion-panel-content>
     <p>The source code of the app is available at <a href="https://github.com/oookoook/spider-trait-database" target="_blank">https://github.com/oookoook/spider-trait-database</a>.</p>
+    <p>For editing the content of the home page, you have to have a GitHub account. Then contact the <a href="mailto:adam@nastojte.cz">repository owner</a> to add you the rights to edit the source code. The content of the home page can be edited in the <a href="https://github.com/oookoook/spider-trait-database/blob/master/frontend/src/views/Home.vue" target="_blank"> Home.vue</a> file. After making changes to the the source code, the new version must be deployed.</p>
     </v-expansion-panel-content>
     </v-expansion-panel>
     </v-expansion-panels>

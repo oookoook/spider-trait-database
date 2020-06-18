@@ -65,6 +65,18 @@ export default {
         this.update();
       },
       deep:true
+    },
+    id() {
+      console.log('id changed, updating list provider...');
+      this.update();
+    },
+    entity() {
+      console.log('entity changed, updating list provider...');
+      this.update();
+    },
+    list() {
+      console.log('list changed, updating list provider...');
+      this.update();
     }
   },
   methods: {

@@ -5,6 +5,8 @@
       :options.sync="options"
       :server-items-length="total"
       :loading="loading"
+      sort-by="date"
+      :sort-desc="true"
       show-expand     
     >
 
@@ -34,7 +36,8 @@
 
     <template v-slot:item.actions="{ item }">
       <entity-link-cell v-if="canEdit(item.state)" tooltip="Edit or delete the dataset" :link="`/prepare/${item.id}`" icon="mdi-pencil" />
-      <action-button v-if="canDelete(item.state)" icon="mdi-delete-forever-outline" text="Permanently delete" @click="$emit('remove', item)"/>
+      <action-button tooltip v-if="canDelete(item.state)" icon="mdi-delete-forever-outline" text="Permanently delete" @click="$emit('remove', item)"/>
+      <entity-link-cell v-if="canDelete(item.state)" tooltip="Transfer data back to import editor" :link="`/prepare/transfer/${item.id}`" icon="mdi-table-edit" />
       <entity-link-cell v-if="item.state == 'approved'" tooltip="Set as filter in the data explorer" :link="`data/dataset/${item.id}`" icon="mdi-filter" />
     </template>
 

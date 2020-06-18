@@ -64,17 +64,20 @@ const colSynonyms = {
     'microhabitat': 'location_microhabitat', 
 }
 
-const join = 'import LEFT JOIN trait ON import.trait_id = trait.id '
-            + 'LEFT JOIN taxonomy ON import.taxonomy_id = taxonomy.id '
-            + 'LEFT JOIN sex ON import.sex_id = sex.id '
-            + 'LEFT JOIN life_stage ON import.life_stage_id = life_stage.id '
-            + 'LEFT JOIN measure ON import.measure_id = measure.id '
-            + 'LEFT JOIN method ON import.method_id = method.id '       
-            + 'LEFT JOIN reference ON import.reference_id = reference.id '
-            + 'LEFT JOIN location ON import.location_id = location.id '
-            + 'LEFT JOIN dataset ON import.dataset_id';
+const joinf = 'data LEFT JOIN trait ON data.trait_id = trait.id '
+            + 'LEFT JOIN taxonomy ON data.taxonomy_id = taxonomy.id '
+            + 'LEFT JOIN sex ON data.sex_id = sex.id '
+            + 'LEFT JOIN life_stage ON data.life_stage_id = life_stage.id '
+            + 'LEFT JOIN measure ON data.measure_id = measure.id '
+            + 'LEFT JOIN method ON data.method_id = method.id '       
+            + 'LEFT JOIN reference ON data.reference_id = reference.id '
+            + 'LEFT JOIN location ON data.location_id = location.id '
+            + 'LEFT JOIN dataset ON data.dataset_id = dataset.id';
 
 const joind = 'import LEFT JOIN dataset ON import.dataset_id = dataset.id';
+
+const joindt = 'import LEFT JOIN dataset ON import.dataset_id = dataset.id '
+             + 'LEFT JOIN taxonomy ON import.taxonomy_id = taxonomy.id ';
 
 const joinv = 'import LEFT JOIN trait ON import.trait_abbrev = trait.abbrev '
             + 'LEFT JOIN data_type ON import.trait_data_type = data_type.name OR trait.data_type_id = data_type.id '
@@ -119,7 +122,8 @@ const getObject = function(r) {
         taxonomy: {
             wscLsid: r[`wsc_lsid`],
             originalName: r[`original_name`],
-            id: r[`taxonomy_id`]
+            id: r[`taxonomy_id`],
+            fullName: r[`full_name`]
         },
         trait: {
             abbrev: r[`trait_abbrev`],
@@ -232,8 +236,8 @@ const list = async function(params, limits, auth) {
     var aw = getAuthWhere(auth);
     var res = await db.prepareListResponse(limits, 'import', `dataset_id = ? AND ${aw}`, [id], joind);
         
-    var results = await db.query({table: 'import', sql:`SELECT import.* `
-    + `FROM ${joind} WHERE dataset_id = ? AND ${aw}`, values: [id], nestTables: false, limits, hasWhere: true });
+    var results = await db.query({table: 'import', sql:`SELECT import.*, taxonomy.full_name `
+    + `FROM ${joindt} WHERE dataset_id = ? AND ${aw}`, values: [id], nestTables: false, limits, hasWhere: true });
    
     res.items = results.map(r => getObject(r)); 
     return res;
@@ -257,6 +261,22 @@ const getUploaderEmail = async function(id) {
     return record[0].email;
 }
 
+const getDatasetState = async function(id) {
+    var currStateR = await db.query({table: 'dataset', sql: `SELECT imported FROM dataset WHERE id = ?`, values: [id]});
+    if(currStateR.length == 0) {
+        throw 'Dataset does not exist'
+    }
+    var currState;
+    switch(currStateR[0].imported) {
+        case 0: currState = 'created'; break;
+        case 1: currState = 'reviewed'; break;
+        case 2: currState = 'rejected'; break;
+        case 3: currState = 'approved'; break;
+        default: currState = 'created';
+    }
+    return { currState, currStateNum: currStateR[0].imported};
+}
+
 const changeState = async function(params, body, auth) {
     var id = parseInt(params.id);
     
@@ -276,6 +296,8 @@ const changeState = async function(params, body, auth) {
         throw 'cannot change the state to this value';
     }
 
+    var { currState, currStateNum } = await getDatasetState(id);
+
     if(state == 'approved') {
         // check if the dataset is valid    
         var valid = false;
@@ -290,11 +312,14 @@ const changeState = async function(params, body, auth) {
     }
 
     // send notification email
+    // only if dataset is not already approved
+    if(currStateNum < 3) {
     switch(state) {
         case 'created': mail.send({subject: 'Dataset added', text: 'A new dataset was created by a contributor.'}); break; // this will never happen
         case 'rejected': mail.send({ to: await getUploaderEmail(id), subject: 'Dataset rejected', text: 'Your dataset was rejected by an editor. You can find more details at {BASEURL}/import'}); break;
         case 'reviewed': mail.send({subject: 'Dataset review requested', text: 'A new dataset was sbmitted for a review by a contributor. You can find more details at {BASEURL}/approve'}); break;
         case 'approved': mail.send({ to: await getUploaderEmail(id), subject: 'Dataset approved', text: `Your dataset was approved by an editor. You can view the dataset detil at {BASEURL}/dataset/${id}`}); break; 
+    }
     }
 
     var imp;
@@ -305,24 +330,29 @@ const changeState = async function(params, body, auth) {
         case 'approved': imp = 3; break; 
     }
 
+    //console.log(currStateNum);
     //console.log(imp);
 
-    if(imp < 3) {
+    // dataset is not yet approved and should not be approved now
+    if(currStateNum < 3 && imp < 3) {
         await db.query({table: 'dataset', sql: `UPDATE dataset SET imported = ?, message = ? WHERE id = ? AND ${getAuthWhere(auth)}`, values: [imp, msg, id] });
         //console.log('Returning...');
         return {
             id
         };
+    } else if(currStateNum == 2 && imp == 3) {
+        // dataset is approved now
+        var jobId = jm.createJob(auth.sub, 6, transferToData, { id, aw });
+        return {
+            job: jm.getJob(jobId)
+        };
+    } else if(currStateNum == 3 && imp == 2) {
+        // transferring data from validated dataset back to import
+        var jobId = jm.createJob(auth.sub, 30000, transferFromData, { id, auth });
+        return {
+            job: jm.getJob(jobId)
+        };
     }
-    //console.log('Transfering data...');
-    // Transfering the data
-    // USE job manager
-
-
-    var jobId = jm.createJob(auth.sub, 6, transferToData, { id, aw });
-    return {
-        job: jm.getJob(jobId)
-    };
 }
 
 const transferToData = async function(params) {
@@ -376,6 +406,38 @@ const transferToData = async function(params) {
     state.progress+=1;
     db.releaseConnection(c);
     
+    state.completed = true;
+}
+
+const transferFromData = async function(params) {
+    var { id, auth, state } = params;
+
+    if(!auth.isEditor) {
+        throw 'Unauthorized for this action';
+    }
+
+    c = await db.getConnection();
+    
+    state.progress+=1000;
+    // copy data to import
+    await db.cquery(c, {table: 'import', sql:`INSERT INTO import (`
+    + `wsc_lsid, original_name, trait_abbrev, value, value_numeric, measure, sex, life_stage, frequency, frequency_numeric, sample_size, sample_size_numeric, `
+    + `event_date, event_date_start, event_date_end, method_abbrev, location_abbrev, reference_abbrev, dataset_id, note, row_link, changed, valid, valid_review, duplicate`
+    + `) SELECT `
+    + `taxonomy.wsc_lsid, data.original_name, trait.abbrev, value, value_numeric, measure.name, sex.name, life_stage.name, frequency, frequency, sample_size, `
+    + `sample_size, event_date_text, event_date_start, event_date_end, method.abbrev, location.abbrev, reference.abbrev, dataset.id, data.note, data.row_link, 1, 0, 0, 0 `
+    + `FROM ${joinf} WHERE data.dataset_id = ?`, values: [id] });
+
+    state.progress+=10000;
+    // change dataset state
+    await db.cquery(c, {table: 'dataset', sql: `UPDATE dataset SET imported = 2, message = 'Transferred back from approved data' WHERE id = ?`, values: [id] });
+    state.progress+=1000;
+    // delete from data
+    await db.cquery(c, {table: 'data', sql: `DELETE FROM data WHERE dataset_id = ?`, values: [id] });
+    state.progress+=2000;
+    db.releaseConnection(c);
+    // validation = 16000 progress
+    await validate({ds: id, auth, state: params.state});
     state.completed = true;
 }
 
@@ -918,7 +980,9 @@ const validate = async function(params) {
     + ` location_id = COALESCE(location.id, loccoord.id), `
     // + `location_habitat_global_id = habitat_global.id, `
     + ` location_country_id = COALESCE(country3.id,country2.id), `
-    + ` import.taxonomy_id = COALESCE(taxonomy.valid_id, taxonomy.id, taxonomy_names.valid_id, taxonomy_names.id), `
+    + ` import.taxonomy_id = CASE WHEN taxonomy.id IS NOT NULL AND taxonomy_names.id IS NOT NULL `
+    + `   AND COALESCE(taxonomy.valid_id, taxonomy.id) <> COALESCE(taxonomy_names.valid_id, taxonomy_names.id) `
+    + `    THEN NULL ELSE COALESCE(taxonomy.valid_id, taxonomy.id, taxonomy_names.valid_id, taxonomy_names.id) END, `
     + ` require_numeric_value = CASE WHEN data_type.name <> 'Character' THEN 1 ELSE 0 END `
     + ` WHERE changed = 1 AND dataset_id = ?`, values: [ds] });
 
@@ -946,7 +1010,7 @@ const validate = async function(params) {
     + ` (trait_id IS NOT NULL OR (trait_name IS NOT NULL AND trait_description IS NOT NULL AND trait_data_type_id IS NOT NULL AND trait_category_id IS NOT NULL)) AND`
     // method is not required
     + ` (method_id IS NOT NULL OR (method_name IS NULL AND method_description IS NULL) OR (method_name IS NOT NULL AND method_description IS NOT NULL)) AND`
-    + ` (reference IS NOT NULL) AND`
+    + ` (reference_id IS NOT NULL OR reference IS NOT NULL) AND`
     + ` (original_name IS NOT NULL AND taxonomy_id IS NOT NULL) AND`
     + ` (sample_size IS NULL OR sample_size_numeric IS NOT NULL) AND`
     + ` (frequency IS NULL OR frequency_numeric IS NOT NULL) AND`
