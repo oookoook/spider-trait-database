@@ -983,7 +983,7 @@ const validate = async function(params) {
     + ` import.taxonomy_id = CASE WHEN taxonomy.id IS NOT NULL AND taxonomy_names.id IS NOT NULL `
     + `   AND COALESCE(taxonomy.valid_id, taxonomy.id) <> COALESCE(taxonomy_names.valid_id, taxonomy_names.id) `
     + `    THEN NULL ELSE COALESCE(taxonomy.valid_id, taxonomy.id, taxonomy_names.valid_id, taxonomy_names.id) END, `
-    + ` require_numeric_value = CASE WHEN data_type.name <> 'Character' THEN 1 ELSE 0 END `
+    + ` require_numeric_value = CASE WHEN data_type.name <> 'Character' AND data_type.name <> 'Categorical' THEN 1 ELSE 0 END `
     + ` WHERE changed = 1 AND dataset_id = ?`, values: [ds] });
 
     state.progress += 4000;

@@ -15,6 +15,7 @@ export default {
     namespaced: true,
     state: {
       list: [],
+      stats: [],
       total: 0,
       link: getParams(),
       autocomplete: {},
@@ -22,6 +23,9 @@ export default {
     mutations: {
       list(state, payload) {
         state.list = payload.value;
+      },
+      stats(state, payload) {
+        state.stats = payload.value;
       },
       total(state, payload) {
         state.total = payload.value;
@@ -67,6 +71,15 @@ export default {
                 }
               context.commit('list', { value: data.items});
             }
+        },
+
+        stats: async function(context, payload) {
+          payload.endpoint = endpoint + '/stats';
+          payload.params = `${payload.type}/${getParams(payload.filter)}`;
+          var data = await context.dispatch('get', payload, { root: true });
+          if(data){    
+            context.commit('stats', { value: data});
+          }
         },
         autocomplete: async function(context, payload) {
           //console.log(`data/autocomplete ${payload.entity}`);

@@ -1,7 +1,6 @@
 import Vue from 'vue';
 
 const baseUrl = `${process.env.VUE_APP_BACKEND}backend/` //Vue.config.devtools ? 'http://localhost:3000/backend/' : '/backend/';
-const sessionTimeout = parseInt(process.env.VUE_APP_SESSION_TIMEOUT);
 
 const getUrl = function(payload) {
     return `${baseUrl}${payload.endpoint}${payload.params ? '/' + payload.params : ''}`;
@@ -60,10 +59,10 @@ const getListParams = function(payload) {
     return params;
 }
 
+
 const authenticate = function(context, payload) {
     var authRequired = payload.auth;
-    var user = context.getters.user;
-    var lastAction = context.getters.lastAction;
+    
     if(authRequired) {
         /*
         console.log(lastAction);
@@ -72,14 +71,10 @@ const authenticate = function(context, payload) {
         console.log(Date.now());
         console.log((lastAction + sessionTimeout) > Date.now());
         */ 
-        if(user && (lastAction + sessionTimeout) > Date.now()) {
+        if(context.dispatch('verifySession', { required: true })) {
             context.commit('lastAction', {value: Date.now()});
             return Promise.resolve(true);
         } else {
-            // log off the user in the frontend
-            context.commit('user', {value: null});
-            context.dispatch('notify', { error: true, text: 'Please log in to perform this action.'});
-            console.error('Unauthenticated user');
             return Promise.resolve(false);
         }
     } else {

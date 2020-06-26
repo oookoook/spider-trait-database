@@ -60,7 +60,7 @@
       </autocomplete-provider>
       </v-col>
     </v-row>
-    <list-provider list="data" :filter="filter" v-slot="i">
+    
     <v-tabs
       v-model="tab"
       grow
@@ -73,8 +73,9 @@
     </v-tab>
     <!-- Raw -->
     <v-tab href="#raw"><info-icon icon="mdi-table-large" text="Raw data view"/></v-tab>
-
+    <v-tab href="#chart"><info-icon icon="mdi-chart-bar" text="Trait values chart (a single trait must be filtered)"/></v-tab>
     <v-tabs-items v-model="tab">
+      <list-provider list="data" :filter="filter" v-slot="i">
       <v-tab-item value="preview">
         <data-preview-table :items="i.items" :loading="i.loading" :total="i.total" :options="i.options" @update="i.update" />
       </v-tab-item>
@@ -83,9 +84,16 @@
         <data-export-table :items="i.items" :loading="i.loading" :total="i.total" :options="i.options" @update="i.update" />
         </v-responsive>
       </v-tab-item>
+      </list-provider>
+      <v-tab-item value="chart">
+        <v-alert type="warning" v-if="!allowChart">Please select a trait in the data filter to enable chart.</v-alert>
+        <v-card :loading="chartLoading" v-else>
+          <v-card-title>Trait value histogram</v-card-title>
+          <data-chart :filter="filter" :trait="chartTrait" :loading.sync="chartLoading" />
+        </v-card>
+      </v-tab-item>
     </v-tabs-items>
     </v-tabs>
-    </list-provider>
     </v-card-text>
   </v-card>
 </template>
@@ -98,6 +106,7 @@ import InfoIcon from '../components/InfoIcon'
 import ListProvider from '../components/ListProvider'
 import DataExportTable from '../components/DataExportTable'
 import DataPreviewTable from '../components/DataPreviewTable'
+import DataChart from '../components/DataChart'
 import DataFilter from '../components/DataFilter'
 
 
@@ -110,6 +119,7 @@ export default {
     DataExportTable,
     DataPreviewTable,
     DataFilter,
+    DataChart,
     InfoIcon
   },
   props: [],
@@ -134,6 +144,7 @@ export default {
       ],
       shareMenu: false,
       internalRouteChange: false,
+      chartLoading: false
     }
   },
   computed: {
@@ -149,6 +160,12 @@ export default {
       var l = {};
       this.filters.forEach((f,i) => { l[f.entity] = i });
       return l;
+    },
+    allowChart() {
+      return this.filters[this.filtersLookup.trait].search != null;
+    },
+    chartTrait() {
+      return parseInt(this.filters[this.filtersLookup.trait].search);
     },
     ...mapGetters('data', ['exportLinkCSV', 'exportLinkExcel', 'shareLink','routeLink'])
   },

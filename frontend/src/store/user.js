@@ -1,5 +1,7 @@
 import Vue from 'vue';
 
+const sessionTimeout = parseInt(process.env.VUE_APP_SESSION_TIMEOUT);
+
 
 export default {
     state: {
@@ -55,7 +57,25 @@ export default {
       async logout(context, payload) {
         context.commit('user', { value: null });
         //context.commit('lastAction', { value: Date.now().valueOf() });
-      }
+      },
+
+      verifySession(context, payload) {
+        var lastAction = context.getters.lastAction;
+        var user = context.getters.user;
+        if(user && (lastAction + sessionTimeout) > Date.now()) {
+            return true;
+        } else if (user) {
+            // log off the user in the frontend
+            context.commit('user', {value: null});
+            context.dispatch('notify', { error: true, text: 'You were logged out.'});
+            console.error('Unauthenticated user - timeout');
+            return false;
+        } else if(payload.required) {
+            context.dispatch('notify', { error: true, text: 'Please log in to perform this action.'});
+            console.error('Unauthenticated user');
+            return false;
+        }
+    }
     },
     modules: {
     }

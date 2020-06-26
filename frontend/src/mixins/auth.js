@@ -37,6 +37,7 @@ export default {
             } else {
                 // stores the current route to the store and to the local storage
                 this.$store.commit('lastRoute', {value: this.$route.path });
+                this.$store.dispatch('verifySession', {});
             }
         }
     }

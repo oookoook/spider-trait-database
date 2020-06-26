@@ -15,15 +15,20 @@ var join = `data `
 + `LEFT JOIN dataset ON data.dataset_id = dataset.id `
 + `LEFT JOIN reference ON data.reference_id = reference.id`;
 
+const statsTypes = ['group-by', 'distinct'];
+
+const paramList = ['family','genus', 'species', 'origname', 'traitcat', 'trait', 'method', 'location','country', 'dataset', 'authors', 'reference', 'rowl'];
+const columnList = ['taxonomy.family', 'taxonomy.genus', 'data.taxonomy_id', 'data.original_name', 'trait.trait_category_id', 'data.trait_id', 'method.id', 'location.id', 'country.id', 
+'dataset.id', 'dataset.authors', 'data.reference_id', 'data.row_link'];
+
 const getCondition = function(params) {
-    var p = ['family','genus', 'species', 'origname', 'traitcat', 'trait', 'method', 'location','country', 'dataset', 'authors', 'reference', 'rowl'];
-    var f = ['taxonomy.family', 'taxonomy.genus', 'data.taxonomy_id', 'data.original_name', 'trait.trait_category_id', 'data.trait_id', 'method.id', 'location.id', 'country.id', 
-    'dataset.id', 'dataset.authors', 'data.reference_id', 'data.row_link']
+    var p = paramList;
+    var f = columnList;
 
     var cl = ['1=1'];
     var val = [];
     p.forEach((item, index) => {
-        if(params[item] != '*') {
+        if(params[item] != '*' && !statsTypes.includes(params[item])) {
             cl.push(`${f[index]} = ?`); 
             val.push(f[index].indexOf('_id') > 0 || f[index].indexOf('_link') > 0 ? parseInt(params[item]) : decodeURIComponent(params[item]));
         }
@@ -142,6 +147,111 @@ const excel =  async function(params, limits, tmpDir) {
     return f;
 }
 
+const getMinMaxValue = async function(cond) {
+    var r = await db.query({ table: 'data', sql: `SELECT MIN(value_numeric) as min, MAX(value_numeric) as max `
+     + `FROM ${join} WHERE ${cond.clause}`
+     , values: cond.values, nestTables: false, hasWhere: true});
+     return r.length ? { min: r[0].min, max: r[0].max } : null;
+}
+
+const stats =  async function(params, query) {
+    var cond = getCondition(params);
+    var select = null;
+    var hasDistinct = false;
+    var distinctColumn = null;
+    var hasGroup = false;
+    var groupByColumn = null;
+    var group = '';
+    var hasData  =  false;
+    var min, max, binSize;
+    // valid values: 'count','hist-real', hist-int, 'hist-percent, hist-category
+    var statsType = params.type;
+    // there might be columns marked as group-by or distinct
+    if(statsType == 'count') {
+    paramList.forEach((e, i) => {
+        if(statsList.includes(params[e])) {
+            if(params[e] == 'group-by') {
+                hasGroup = true;
+                groupByColumn = columnList[i];
+            }
+            if(params[e] == 'distinct') {
+                hasDistinct = true;
+                distinctColumn = columnList[i];
+            }
+        }
+    });
+    }
+
+    switch(statsType) {
+        //https://stackoverflow.com/questions/1764881/getting-data-for-histogram-plot
+        case 'count': 
+            break;
+        case 'hist-percent':
+            // get 10 buckets from 0 to 1
+            groupByColumn = 'FLOOR(value_numeric * 10) as bin';
+            break;
+        case 'hist-real':
+            // count the bucket size  
+            var mm = await getMinMaxValue(cond);
+            if(mm) {
+                hasData = true;
+                min = mm.min;
+                max = mm.max;
+                var diff = max - min;
+                binSize = diff / 10;
+            } else {
+                min = 0;
+                max = 1;
+                binSize = 1;
+            }
+            hasGroup = true;
+            groupByColumn = `${min}+FLOOR((value_numeric-${min})/${binSize})*${binSize} as bin`;  
+            break;
+        case 'hist-int':
+            // c ount the bucket size  
+            var mm = await getMinMaxValue(cond);
+            if (mm) {
+                min = mm.min;
+                max = mm.max;
+                var diff = max - min;
+                binSize = Math.round(diff / 10);
+            } else {
+                min = 0;
+                max = 1;
+                binSize = 1;    
+            }
+            hasGroup = true;
+            groupByColumn = `${min}+FLOOR((value_numeric-${min})/${binSize})*${binSize} as bin`;
+            break;
+        case 'hist-category':
+            hasGroup = true;
+            hasDistinct = false;
+            groupByColumn = 'value as bin';
+            break;
+    }
+
+    if(hasDistinct) {
+        select = `COUNT(DISTINCT(${distinctColumn})) as count`;
+    } else {
+        select =  'COUNT(*) as count';
+    }
+    if(hasGroup) {
+        select = groupByColumn + ', '+ select;
+        group = `GROUP BY 1 ORDER BY 1`;
+    }
+    var sql = `SELECT ${select} FROM ${join} WHERE ${cond.clause} ${group}`;
+    //console.log(sql);
+    var records = await db.query({ table: 'data', sql, values: cond.values, nestTables: false, hasWhere: true});
+    
+    var data = { items: records }
+    if(min && max && binSize) {
+        data.min = min;
+        data.max = max;
+        data.binSize = binSize;
+    }
+    return data;
+}
+
 const synonyms = {
     /*
     'trait.id': 'trait.id',
@@ -181,6 +291,7 @@ module.exports = function(dbClient) {
     return {
         list,
         csv,
-        excel
+        excel,
+        stats
     }
 }
