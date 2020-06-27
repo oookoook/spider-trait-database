@@ -197,8 +197,12 @@ const stats =  async function(params, query) {
                 hasData = true;
                 min = mm.min;
                 max = mm.max;
-                var diff = max - min;
-                binSize = diff / 10;
+                if(min != max) {
+                  var diff = max - min;
+                  binSize = diff / 10;  
+                } else {
+                    binSize = 1;
+                }
             } else {
                 min = 0;
                 max = 1;
@@ -213,8 +217,14 @@ const stats =  async function(params, query) {
             if (mm) {
                 min = mm.min;
                 max = mm.max;
+                if(min != max) {
+                    var diff = max - min;
+                    binSize = Math.round(diff / 10);  
+                } else {
+                    binSize = 1;
+                }
                 var diff = max - min;
-                binSize = Math.round(diff / 10);
+                
             } else {
                 min = 0;
                 max = 1;

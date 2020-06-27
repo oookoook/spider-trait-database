@@ -1,7 +1,7 @@
 <template>
   <v-card :loading="loading">
       <v-toolbar dense color="accent" class="elevation-0 my-3">
-        <v-card-title>Data editor</v-card-title>
+        <!--<v-card-title>Data editor</v-card-title>-->
         <action-button text="Dataset detail" icon="mdi-card-text-outline" toolbar @click="dsEdit = true" />
         <action-button color="success" text="Upload data" icon="mdi-upload" toolbar @click="upload = true" />
         <action-button text="Download as CSV" icon="mdi-download" toolbar :link="downloadLink" />

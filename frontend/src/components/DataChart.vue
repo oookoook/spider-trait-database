@@ -104,17 +104,19 @@ export default {
           } else {
             var start = r.min;
             var end = r.min;
+            var isLast = false;
             do {
               start = end;
-              end = start + r.binSize;
-              bins.push(`[${start.toFixed(3)},${(end).toFixed(3)})`);
+              end = Math.min(start + r.binSize, r.max);
+              isLast = Math.abs(end - r.max) < 0.00001;
+              bins.push(`[${start.toFixed(3)},${(end).toFixed(3)}${isLast ? ']' : ')'}`);
               var bin = r.items.find(e => {
                 //console.log(`bin ${e.bin} start ${start}`);
                 return Math.abs(e.bin - start) < 0.00001
               });
               console.log(`Selected bin: ${bin}`);
               binsData.push(bin ? bin.count : 0);
-            } while(Math.abs(end - r.max) > 0.00001);
+            } while(!isLast);
           }
           break;    
       }
