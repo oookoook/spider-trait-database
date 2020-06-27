@@ -11,10 +11,17 @@
     <v-expansion-panel-header><h3><v-icon color="primary" left>mdi-account-multiple</v-icon> User management</h3></v-expansion-panel-header>
     <v-expansion-panel-content>
       <h4>Creating a new user</h4>
-        <p>If the new user has no affiliation with Masaryk University (i.e. tehy don't have the UČO), a new Guest account has to be created. If the user has an affiliation
-          with MUNI, you can skip this step.
-          You can create a new user in the <a href="https://inet.muni.cz/app/iam/guest" target="_blank">INET</a> system. Save the password that the system shows to you and send it to the account owner. The new user
-        will be assigned an unique idetifier (UČO) that will be used for assigning user privileges.</p>
+        
+        <p>If a new user has no affiliation with Masaryk University (i.e., he/she does not have a UCO number), a new Guest account 
+        has to be created. The administrator can create a new user in the <a href="https://inet.muni.cz/app/iam/guest" target="_blank">INET</a> system. The password that the system generates should 
+        be saved and sent to the account owner. The new user will be assigned a unique identifier (UCO) that will be used for assigning 
+        user privileges.</p>
+        
+        <p>Every new user has to be assigned to one of the following user groups: contributor, editor, or administrator. 
+        It is sufficient to add the user to only one group.</p>
+
+      <p>The current user management takes place in the Perun identity management system. The following links lead to a page where users 
+        can be added or removed from user groups using their unique identifier (UCO).</p>
         <v-row class="pb-3"><action-button color="primary" text="Create user account(s)" icon="mdi-account-plus-outline" link="https://inet.muni.cz/app/iam/guest" /></v-row>
       <h4>Assigning user privileges</h4>
         <p>Every user ho should be able to contribute data or approve them has to be assigned to one of the following user groups. Users in the higher-privilege groups
@@ -86,6 +93,13 @@
     <v-expansion-panel-content>
     <p>The source code of the app is available at <a href="https://github.com/oookoook/spider-trait-database" target="_blank">https://github.com/oookoook/spider-trait-database</a>.</p>
     <p>For editing the content of the home page, you have to have a GitHub account. Then contact the <a href="mailto:adam@nastojte.cz">repository owner</a> to add you the rights to edit the source code. The content of the home page can be edited in the <a href="https://github.com/oookoook/spider-trait-database/blob/master/frontend/src/views/Home.vue" target="_blank"> Home.vue</a> file. After making changes to the the source code, the new version must be deployed.</p>
+    <p>To deploy a new version of the app, perform the following steps:</p>
+    <ul>
+      <li>Get the private SSH key from the <a href="https://gitlab.ics.muni.cz/spider-trait-database-admin">private project repository</a>. Contact any of the repository admins to get access.</li>
+      <li>Connect to the production server using SSH and the downloaded SSH key, e.g. <code>ssh -i ~/spider-trait-database.pem centos@spidertraits.sci.muni.cz</code>.</li>
+      <li>Run the following command in the terminal: <code>cd /opt/spidertraits/spider-trait-database/ &amp;&amp; ./build</code></li>
+      <li>After the deployment ends, you can close the SSH connection.</li>
+    </ul>
     </v-expansion-panel-content>
     </v-expansion-panel>
     </v-expansion-panels>

@@ -10,7 +10,7 @@
         <v-list three-line>
           <list-item title="Category" :text="item.category.name" icon="mdi-file-tree" />
           <list-item title="Data type" :text="item.dataType.name" icon="mdi-numeric" />
-          <list-item title="Unit" :text="item.standard" icon="mdi-file-question-outline" />
+          <list-item :title="standardTitle" :text="item.standard" icon="mdi-file-question-outline" />
           <list-item v-if="item.reference" title="Reference" :text="item.reference.fullCitation" icon="mdi-bookmark-multiple-outline" :link="`/references/${item.reference.id}`" />  
         </v-list>
         <v-card-actions>
@@ -37,7 +37,20 @@ export default {
     }
   },
   computed: {
-
+    standardTitle() {
+      if(!this.item) {
+        return null;
+      }
+      switch(this.item.dataType.name.toLowerCase()){
+        case 'categorical':
+          return 'List of valid values separated by semicolon';
+          break;
+        case 'character':
+          return 'Standard';
+        default: 
+          return 'Unit';
+      }
+    }
   },
   watch: {
 

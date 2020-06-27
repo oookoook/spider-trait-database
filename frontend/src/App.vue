@@ -85,9 +85,13 @@
           <v-list-item-icon><v-icon>mdi-frequently-asked-questions</v-icon></v-list-item-icon>
           <v-list-item-content><v-list-item-title>About project</v-list-item-title></v-list-item-content>
         </v-list-item>
-        <v-list-item href="https://github.com/oookoook/spider-trait-database/blob/master/docs/data-submission.md" target="_blank">
+        <v-list-item href="https://github.com/oookoook/spider-trait-database/blob/master/docs/contribute.md" target="_blank">
           <v-list-item-icon><v-icon>mdi-share</v-icon></v-list-item-icon>
-          <v-list-item-content><v-list-item-title>Data submission</v-list-item-title></v-list-item-content>
+          <v-list-item-content><v-list-item-title>Data contribution</v-list-item-title></v-list-item-content>
+        </v-list-item>
+        <v-list-item v-if="isEditor" href="https://github.com/oookoook/spider-trait-database/blob/master/docs/approve.md" target="_blank">
+          <v-list-item-icon><v-icon>mdi-stamper</v-icon></v-list-item-icon>
+          <v-list-item-content><v-list-item-title>Data approval</v-list-item-title></v-list-item-content>
         </v-list-item>
         <v-list-item v-if="user" href="https://github.com/oookoook/spider-trait-database/blob/master/docs/editor-howto.md" target="_blank">
           <v-list-item-icon><v-icon>mdi-lifebuoy</v-icon></v-list-item-icon>
