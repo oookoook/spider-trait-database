@@ -31,15 +31,15 @@ const get = async function(params) {
 // validate method - check if abbrev is unique
 const validate = async function(country) {
     if(!country.name || country.name.length == 0) {
-        return 'Country name cannot be empty';
+        return 'Country name cannot be empty.';
     }
 
     if(!country.alpha3_code || country.alpha3_code.length == 0) {
-        return 'Country code (3 letters) cannot be empty';
+        return 'Country code (3 letters) cannot be empty.';
     }
 
     if(!country.alpha2_code || country.alpha2_code.length == 0) {
-        return 'Country code (2 letters) cannot be empty';
+        return 'Country code (2 letters) cannot be empty.';
     }
     return true;
 }

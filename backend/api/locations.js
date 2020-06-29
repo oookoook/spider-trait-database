@@ -71,7 +71,7 @@ const get = async function(params) {
 const validate = async function(location) {
     //console.log(location.abbrev);
     if(!location.abbrev || location.abbrev.length == 0) {
-        return 'Location abbrev. cannot be empty';
+        return 'Location abbrev. cannot be empty.';
     }
 
     if(!((location.lat == null && location.lon == null) || (location.lat != null && location.lon != null))) {

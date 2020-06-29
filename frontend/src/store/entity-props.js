@@ -13,7 +13,7 @@ const props = {
     {
       name: 'email',
       label: 'Uploader\'s e-mail',
-      isValid: (v) => !!v || 'Email is required'
+      isValid: (v) => !!v || 'E-mail is required'
     },
     {
       name: 'authors',

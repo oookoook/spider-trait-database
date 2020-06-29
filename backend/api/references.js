@@ -33,11 +33,11 @@ const get = async function(params) {
 // validate reference - check if abbrev is unique
 const validate = async function(reference) {
     if(!reference.abbrev || reference.abbrev.length == 0) {
-        return 'Reference abbrev. cannot be empty';
+        return 'Reference abbrev. cannot be empty.';
     }
 
     if(!reference.full_citation || reference.full_citation.length == 0) {
-        return 'Reference full citation cannot be empty';
+        return 'Reference full citation cannot be empty.';
     }
 
     var r = await db.query({table: 'reference', sql: 'SELECT id FROM reference WHERE abbrev = ?', values: [reference.abbrev], nestTables: false});

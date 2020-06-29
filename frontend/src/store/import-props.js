@@ -65,7 +65,7 @@ export default [
         }
         
         if (!!i.taxonomy.wscLsid && !!i.taxonomy.originalName && !i.taxonomy.id) {
-          return 'LSID and Orginal name do not refer to the same WSC taxon.';
+          return 'LSID and Orginal name do not refer to the same WSC taxon';
         }
         return 'Unknow error';
       },
@@ -79,7 +79,7 @@ export default [
         }
         
         if (!!i.taxonomy.wscLsid && !!i.taxonomy.originalName && !i.taxonomy.id) {
-          return 'LSID and Orginal name do not refer to the same WSC taxon.';
+          return 'LSID and Orginal name do not refer to the same WSC taxon';
         }
         return 'Unknow error';
       },
@@ -90,7 +90,7 @@ export default [
       entity: 'trait', 
       displayValue: (i) => i.trait.abbrev,
       save: (o, v) => {if(!o.trait) o.trait={}; o.trait.abbrev = v; }, 
-      isValid: (i, e) => !!i.trait.id || (!e && !!i.trait.name && !!i.trait.description && !!i.trait.dataType) || (e === 'create' && !!i.trait.abbrev) || 'Trait Abbrev. must be set and the trait must exist.',
+      isValid: (i, e) => !!i.trait.id || (!e && !!i.trait.name && !!i.trait.description && !!i.trait.dataType) || (e === 'create' && !!i.trait.abbrev) || 'Trait Abbrev. must be set and the trait must exist',
       autocomplete: { endpoint: 'traits', valueField: 'abbrev', textField: ['abbrev', 'name'] }
     },
     { 
@@ -107,10 +107,10 @@ export default [
           return true;
         }
         if(i.trait.abbrev && i.trait.name && !e) {
-          return 'Do not provide Trait Name when Trait ID is set.'
+          return 'Do not provide Trait Name when Trait ID is set'
         }
         if(!i.trait.abbrev && !i.trait.name) {
-          return 'Provide Trait Name when Trait ID is not set.'
+          return 'Provide Trait Name when Trait ID is not set'
         }
         return true;
       }
@@ -130,10 +130,10 @@ export default [
           return true;
         }
         if(i.trait.abbrev && i.trait.description && !e) {
-          return 'Do not provide Trait Description when Trait ID is set.'
+          return 'Do not provide Trait Description when Trait ID is set'
         }
         if(!i.trait.abbrev && !i.trait.description) {
-          return 'Provide Trait Description when Trait ID is not set.'
+          return 'Provide Trait Description when Trait ID is not set'
         }
         return true;
       }
@@ -182,7 +182,7 @@ export default [
         if(!i.method.name && !i.method.description) {
           return true;
         }
-        return 'Method Abbrev. must be set and the method must exist if any of the Method attributes are filled in.';
+        return 'Method Abbrev. must be set and the method must exist if any of the Method attributes are filled in';
       },
       autocomplete: { endpoint: 'methods', valueField: 'abbrev', textField: ['abbrev','name'] }
     },
@@ -200,10 +200,10 @@ export default [
           return true;
         }
         if(i.method.abbrev && i.method.name && !e) {
-          return 'Do not provide Method Name when Method Abbrev. is set.'
+          return 'Do not provide Method Name when Method Abbrev. is set'
         }
         if(!i.method.abbrev && !i.method.name && !!i.method.description) {
-          return 'Provide Method Name when Method description is set.'
+          return 'Provide Method Name when Method description is set'
         }
         return true;
       }
@@ -222,10 +222,10 @@ export default [
           return true;
         }
         if(i.method.abbrev && i.method.description && !e) {
-          return 'Do not provide Method Description when Method Abbrev. is set.'
+          return 'Do not provide Method Description when Method Abbrev. is set'
         }
         if(!i.method.abbrev && i.method.name && !i.method.description) {
-          return 'Provide Method Description when Method Name is set.'
+          return 'Provide Method Description when Method Name is set'
         }
         return true;
       }
@@ -322,7 +322,7 @@ export default [
       entity: 'reference', 
       displayValue: (i) => i.reference.abbrev, 
       save: (o, v) => {if(!o.reference) o.reference={}; o.reference.abbrev = v; },  
-      isValid: (i, e) => !!i.reference.id || (!e && !!i.reference.fullCitation) || e==='create' || 'Reference Abbrev. must be set and the reference must exist.',
+      isValid: (i, e) => !!i.reference.id || (!e && !!i.reference.fullCitation) || e==='create' || 'Reference Abbrev. must be set and the reference must exist',
       autocomplete: { endpoint: 'references', valueField: 'abbrev', textField: ['abbrev', 'fullCitation'] }
     },
     { 
@@ -353,7 +353,7 @@ export default [
       entity: 'location', 
       displayValue: (i) => i.location.coords.lat.raw,
       save: (o, v) => {if(!o.location) o.location={}; if(!o.location.coords) o.location.coords = {}; if(!o.location.coords.lat) o.location.coords.lat = {}; o.location.coords.lat.raw = v; }, 
-      isValid: (i, e) => (!i.location.coords.lat.raw && !i.location.coords.lon.raw) || !!i.location.coords.lat.conv || 'Value cannot be converted to a valid latitude.',
+      isValid: (i, e) => (!i.location.coords.lat.raw && !i.location.coords.lon.raw) || !!i.location.coords.lat.conv || 'Value cannot be converted to a valid latitude',
     },
     { 
       name: 'location.coords.lon',
@@ -361,7 +361,7 @@ export default [
       entity: 'location', 
       displayValue: (i) => i.location.coords.lon.raw,
       save: (o, v) => {if(!o.location) o.location={}; if(!o.location.coords) o.location.coords = {}; if(!o.location.coords.lon) o.location.lon = {}; o.location.coords.lon.raw = v; }, 
-      isValid: (i, e) => (!i.location.coords.lon.raw && !i.location.coords.lat.raw) || !!i.location.coords.lon.conv || 'Value cannot be converted to a valid longitude.',
+      isValid: (i, e) => (!i.location.coords.lon.raw && !i.location.coords.lat.raw) || !!i.location.coords.lon.conv || 'Value cannot be converted to a valid longitude',
     },
     /*
     { 
@@ -395,7 +395,7 @@ export default [
       entity: 'location',
       displayValue: (i) => i.location.country.raw,
       save: (o, v) => {if(!o.location) o.location={}; if(!o.location.country) o.location.country = {}; o.location.country.raw = v; }, 
-      isValid: (i, e) => !i.location.country.raw || !!i.location.country.id || 'Value does not match any existing code',
+      isValid: (i, e) => !i.location.country.raw || !!i.location.country.id || 'Value does not match any existing country code',
       autocomplete: { endpoint: 'locations', valueField: 'country.code', textField: ['country.code', 'country.name'] }
     },
     /*

@@ -58,15 +58,15 @@ const get = async function(params) {
 // validate trait - check if abbrev is unique
 const validate = async function(trait) {
     if(!trait.abbrev || trait.abbrev.length == 0) {
-        return 'Trait abbrev. cannot be empty';
+        return 'Trait abbrev. cannot be empty.';
     }
 
     if(trait.data_type_id == null) {
-        return 'Trait data type cannot be empty';
+        return 'Trait data type cannot be empty.';
     }
 
     if(trait.trait_category_id == null) {
-        return 'Trait category cannot be empty';
+        return 'Trait category cannot be empty.';
     }
 
     var r = await db.query({table: 'trait', sql: 'SELECT trait.id FROM trait WHERE abbrev = ?', values: [trait.abbrev], nestTables: false});

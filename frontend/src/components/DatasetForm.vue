@@ -86,11 +86,11 @@ export default {
       valid: false,
       nameRules: [
         v => !!v || 'Dataset Name is required',
-        v => !v || v.length <= 240 || 'Name must be less than 240 characters'
+        v => !v || v.length <= 240 || 'Name must be shorter than 240 characters'
       ],
       uploaderRules: [
         v => !!v || 'Uploader Name is required',
-        v => !v || v.length <= 255 || 'Name must be less than 255 characters'
+        v => !v || v.length <= 255 || 'Uploader name must be shorter than 255 characters'
       ],
       emailRules: [
         v => !!v || 'Uploader E-mail is required',

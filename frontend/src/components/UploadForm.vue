@@ -34,7 +34,7 @@ export default {
       valid: false,
       file: null,
       uploadRules: [ value => !!value || 'You must provide a file to upload', 
-        value => !value || value.size < (100 * 1024 * 1024) || 'File size be less than 100 MB!' ],    
+        value => !value || value.size < (100 * 1024 * 1024) || 'File size be less than 100 MB' ],    
     }
   },
   computed: {
