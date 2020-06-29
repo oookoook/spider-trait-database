@@ -90,6 +90,9 @@ const parseNumber = function(val) {
     if(val) {
         val = val.replace('%', '');
     }
+    if(isNaN(val)) {
+        return null;
+    }
     var num = parseFloat(val);
     if(Number.isNaN(num)) {
         return null;
