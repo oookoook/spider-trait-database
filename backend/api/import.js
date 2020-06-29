@@ -520,7 +520,7 @@ const importRow = async function(conn, ds, r, state, cache) {
         await db.cquery(conn, {table: 'import', sql: 'INSERT INTO import SET ?', values: [row]});
     } catch (err) {
         console.log(err);
-        state.errors.push(err);
+        state.errors.push(`Row skipped: ${JSON.stringify(row)}, error: ${err}`);
         return false;
     }
     state.progress += 1;
