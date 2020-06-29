@@ -18,6 +18,7 @@ INSERT INTO `data_type` (`name`) VALUES ('Real number (0-1)');
 INSERT INTO `data_type` (`name`) VALUES ('Percentage');
 INSERT INTO `data_type` (`name`) VALUES ('Binary');
 INSERT INTO `data_type` (`name`) VALUES ('Character');
+INSERT INTO `data_type` (`name`) VALUES ('Categorical');
 
 INSERT INTO `trait` (`abbrev`, `trait_category_id`, `name`, `description`, `data_type_id`, `standard`) VALUES ('brsi', (SELECT id FROM `trait_category` WHERE `name` = 'Anatomy'), 'Brain size', 'Volume of CNS', (SELECT id FROM `data_type`  WHERE UPPER(`name`) = UPPER('real number')), 'mm3');
 INSERT INTO `trait` (`abbrev`, `trait_category_id`, `name`, `description`, `data_type_id`, `standard`) VALUES ('cuti', (SELECT id FROM `trait_category` WHERE `name` = 'Anatomy'), 'Cuticle thickness', 'Thickness of the cuticle', (SELECT id FROM `data_type`  WHERE UPPER(`name`) = UPPER('real number')), 'mm');
