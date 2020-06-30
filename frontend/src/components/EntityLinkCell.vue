@@ -1,5 +1,5 @@
 <template>
-  <span>
+  <span style="white-space:nowrap;">
     <span v-if="!abbrev">{{text}}</span>
     <v-tooltip top v-else>
       <template v-slot:activator="{ on }">

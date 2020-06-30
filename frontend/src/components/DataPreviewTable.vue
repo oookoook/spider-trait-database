@@ -24,7 +24,7 @@
     </template>
 
     <template v-slot:item.method="{item}">
-        <entity-link-cell :abbrev="item.method.abbrev" :text="item.method.name" tooltip="View the method detail" :link="`/methods/${item.method.id}`" />
+        <entity-link-cell v-if="item.method.abbrev" :abbrev="item.method.abbrev" :text="item.method.name" tooltip="View the method detail" :link="`/methods/${item.method.id}`" />
     </template>
 
     <template v-slot:item.location="{item}">
@@ -36,7 +36,7 @@
     </template>
 
     <template v-slot:item.reference="{ item }">
-      <entity-link-cell v-if="item.reference" :text="item.reference.abbrev" tooltip="View the reference detail" :link="`/references/${item.reference.id}`" />
+      <entity-link-cell v-if="item.reference" :abbrev="item.reference.abbrev.substr(0,20)" :text="item.reference.abbrev" tooltip="View the reference detail" :link="`/references/${item.reference.id}`" />
     </template>
 
     <template v-slot:item.rowLink="{ item }">
