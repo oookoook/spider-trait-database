@@ -61,11 +61,11 @@ export default [
           return i.taxonomy.fullName;
         }
         if(!i.taxonomy.wscLsid && !i.taxonomy.originalName) {
-          return 'No taxonomy information available';
+          return 'No taxonomic information available';
         }
         
         if (!!i.taxonomy.wscLsid && !!i.taxonomy.originalName && !i.taxonomy.id) {
-          return 'LSID and Orginal name do not refer to the same WSC taxon';
+          return 'LSID and Original name do not refer to the same WSC taxon';
         }
         return 'Unknow error';
       },
@@ -75,11 +75,11 @@ export default [
           return true;
         }
         if(!i.taxonomy.wscLsid && !i.taxonomy.originalName) {
-          return 'No taxonomy information available';
+          return 'No taxonomic information available';
         }
         
         if (!!i.taxonomy.wscLsid && !!i.taxonomy.originalName && !i.taxonomy.id) {
-          return 'LSID and Orginal name do not refer to the same WSC taxon';
+          return 'LSID and Original name do not refer to the same WSC taxon';
         }
         return 'Unknow error';
       },
@@ -287,7 +287,7 @@ export default [
       text: 'Date', 
       displayValue: (i) => i.eventDate.text,
       save: (o, v) => {if(!o.eventDate) o.eventDate={}; o.eventDate.text = v; }, 
-      isValid: (i, e) => !i.eventDate.text || (!!i.eventDate.start && !!i.eventDate.end) || 'If date is set, it must be in a valid format' 
+      isValid: (i, e) => !i.eventDate.text || (!!i.eventDate.start && !!i.eventDate.end) || 'If date is provided, it must be in a valid format' 
     },
     /*
     { 

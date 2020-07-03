@@ -288,6 +288,9 @@ export default {
       }
     },
     validityFilter(val) {
+      if(this.options) {
+        this.options.page = 1;
+      }
       this.getData();
     },
     errors(val) {
@@ -423,7 +426,7 @@ export default {
         this.confirm.warning = 'Attention! Your dataset is not valid for a review. If possible, fix all the marked problems before submitting.'
       }
       this.confirm.message.show = true;
-      this.confirm.message.placeholder = "Enter a message for the editor if you want to tell them someting about your data (e.g. reason why the data re not valid).";
+      this.confirm.message.placeholder = "Enter a message for the editor if you want to tell them someting about your data (e.g. reason why the data are not valid).";
       this.confirm.action = () => {
         this.loading = true;
         this.$store.dispatch('editor/changeState', { id: this.id, message: this.confirm.message.text, state: 'reviewed'}).then(() => { this.loading = false; this.confirm.warning = null; this.$router.push('/import') });
@@ -437,7 +440,7 @@ export default {
     */
     editCell() {
       if(this.selectedCell.readOnly) {
-        this.$store.dispatch('notify', {text: 'This is an read-only value.', error: true});
+        this.$store.dispatch('notify', {text: 'This is a read-only value.', error: true});
         return;
       }
       this.edit.action = (e) => {
@@ -448,7 +451,7 @@ export default {
     },
     editColumn() {
       if(this.editMode == 'column' && this.selectedCell.readOnly) {
-        this.$store.dispatch('notify', {text: 'This is an read-only value.', error: true});
+        this.$store.dispatch('notify', {text: 'This is a read-only value.', error: true});
         return;
       }
       this.edit.action = (e) => {

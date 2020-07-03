@@ -29,6 +29,7 @@
       :server-items-length="total"
       :loading="loading"
       class="elevation-1"
+      sort-by="category.name"
     >
     
     <template v-slot:item.abbrev="{ item }">

@@ -14,7 +14,7 @@
         :items="[{ text: listTitle, to: `/${list}`, exact: true }, { text: i.item ? i.item.abbrev : `New ${entityTitle}`, to: currentPath }]"
       />
       -->
-      <v-slide-x-transition>
+      <v-slide-x-transition mode="out-in">
         <!--
         <trait-detail
           v-if="i.item && !editDialog"
@@ -40,7 +40,7 @@
           :confirmation-text="deleteConfirmationText"
           @save="i.save"
           @remove="i.remove"
-          @cancel="entityEdit=false"
+          @cancel="hideEdit"
         />
       </v-slide-x-transition>
     </entity-provider>
@@ -107,6 +107,12 @@ export default {
   watch: {
     $route(to, from) {
       this.processRouteNew();
+    },
+    entityCreate(val, oldVal) {
+      console.log('entityCreate watcher executed');
+      if(oldVal && !val) {
+        this.$router.push(`/${this.list}`);
+      }
     }
   },
   methods: {
@@ -134,6 +140,10 @@ export default {
     },
     entityList(endpoint) {
       this.$router.push(`/${endpoint}`);
+    },
+    hideEdit() {
+      this.entityEdit=false;
+      this.entityCreate=false;
     }
   },
   created() {},

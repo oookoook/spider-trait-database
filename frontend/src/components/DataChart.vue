@@ -16,6 +16,10 @@ export default {
         maintainAspectRatio: false,
         scales: {
             yAxes: [{
+                scaleLabel: {
+                  display: true,
+                  labelString: 'Frequency'
+                },
                 ticks: {
                     beginAtZero: true,
                     stepSize: 1

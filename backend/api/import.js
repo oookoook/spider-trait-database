@@ -317,8 +317,8 @@ const changeState = async function(params, body, auth) {
     switch(state) {
         case 'created': mail.send({subject: 'Dataset added', text: 'A new dataset was created by a contributor.'}); break; // this will never happen
         case 'rejected': mail.send({ to: await getUploaderEmail(id), subject: 'Dataset rejected', text: 'Your dataset was rejected by an editor. You can find more details at {BASEURL}/import'}); break;
-        case 'reviewed': mail.send({subject: 'Dataset review requested', text: 'A new dataset was sbmitted for a review by a contributor. You can find more details at {BASEURL}/approve'}); break;
-        case 'approved': mail.send({ to: await getUploaderEmail(id), subject: 'Dataset approved', text: `Your dataset was approved by an editor. You can view the dataset detil at {BASEURL}/dataset/${id}`}); break; 
+        case 'reviewed': mail.send({subject: 'Dataset review requested', text: 'A new dataset was submitted for a review by a contributor. You can find more details at {BASEURL}/approve'}); break;
+        case 'approved': mail.send({ to: await getUploaderEmail(id), subject: 'Dataset approved', text: `Your dataset was approved by an editor. You can view the dataset detail at {BASEURL}/datasets/${id}`}); break; 
     }
     }
 
@@ -980,7 +980,7 @@ const validate = async function(params) {
     + ` location_id = COALESCE(location.id, loccoord.id), `
     // + `location_habitat_global_id = habitat_global.id, `
     + ` location_country_id = COALESCE(country3.id,country2.id), `
-    + ` import.taxonomy_id = CASE WHEN taxonomy.id IS NOT NULL AND taxonomy_names.id IS NOT NULL `
+    + ` import.taxonomy_id = CASE WHEN taxonomy_names.id IS NULL THEN NULL WHEN taxonomy.id IS NOT NULL AND taxonomy_names.id IS NOT NULL `
     + `   AND COALESCE(taxonomy.valid_id, taxonomy.id) <> COALESCE(taxonomy_names.valid_id, taxonomy_names.id) `
     + `    THEN NULL ELSE COALESCE(taxonomy.valid_id, taxonomy.id, taxonomy_names.valid_id, taxonomy_names.id) END, `
     + ` require_numeric_value = CASE WHEN data_type.name <> 'Character' AND data_type.name <> 'Categorical' THEN 1 ELSE 0 END `

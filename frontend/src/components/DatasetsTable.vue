@@ -24,7 +24,8 @@
     </template>
     
   <template v-slot:item.uploader="{ item }">
-      <entity-link-cell :text="item.uploader" tooltip="Send an email to the uploader" icon="mdi-email-outline" :link="`mailto:${item.email}`" external />
+      <entity-link-cell v-if="isEditor" :text="item.uploader" tooltip="Send an email to the uploader" icon="mdi-email-outline" :link="`mailto:${item.email}`" external />
+      <span v-else>{{ item.uploader }}</span>
     </template>
 
     <template v-slot:item.uploaded="{ item }">

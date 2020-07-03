@@ -88,7 +88,7 @@
       <v-tab-item value="chart">
         <v-alert type="warning" v-if="!allowChart">Please select a trait in the data filter to enable chart.</v-alert>
         <v-card :loading="chartLoading" v-else>
-          <v-card-title>Trait value histogram</v-card-title>
+          <!-- <v-card-title>Trait value histogram</v-card-title> -->
           <data-chart :filter="filter" :trait="chartTrait" :loading.sync="chartLoading" />
         </v-card>
       </v-tab-item>
@@ -208,7 +208,7 @@ export default {
       link.setSelectionRange(0, 99999); /*For mobile devices*/
       /* Copy the text inside the text field */
       document.execCommand("copy");
-      this.$store.dispatch('notify', { text: 'The link was copied to the clipboard' });
+      this.$store.dispatch('notify', { text: 'The link has been copied to the clipboard' });
     },
     processRoute() {
       console.log('Processing route');

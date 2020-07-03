@@ -97,7 +97,7 @@ export default {
         v => /.+@.+/.test(v) || 'Uploader E-mail must be valid'
       ],
       authorsRules: [
-        v => !v || v.length <= 4096 || 'Authors must be less than 4096 characters'
+        v => !v || v.length <= 4096 || 'Author name(s) must be less than 4096 characters'
       ],
       aemailRules: [
         v => !v || v.length <= 255 || 'Author email(s) must be less than 255 characters'

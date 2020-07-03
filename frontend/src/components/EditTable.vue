@@ -5,6 +5,7 @@
       :options.sync="options"
       :server-items-length="total"
       :loading="loading"
+      :footer-props="footerProps"
     >
 
     <template v-slot:item="{item, headers}">
@@ -43,6 +44,7 @@ export default {
   },
   data () {
     return {
+      footerProps: { 'items-per-page-options': [ 10, 15, 50, 100, -1 ] },
       selectedId: null,
       selectedProp: null
     }

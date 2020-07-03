@@ -92,7 +92,7 @@ export default {
   },
   watch: {
     item(val) {
-      console.dir(val);
+      //console.dir(val);
       this.fillItem();
     }
   },
@@ -104,9 +104,9 @@ export default {
       this.$emit('remove', this.it);
     },
     fillItem() {
-      console.dir(this.item);
+      //console.dir(this.item);
       this.it = Object.assign({}, this.item || {});
-      console.dir(this.it);
+     //console.dir(this.it);
       this.entityProps.forEach(e => {
       if(this.it[e.name]) {
         return;
@@ -126,11 +126,11 @@ export default {
         this.it[e.name] = null;
       }
     });
-    console.dir(this.it);
+    //console.dir(this.it);
     }
   },
   created () {
-    console.dir(this.item);
+    //console.dir(this.item);
     this.fillItem();
   },
   mounted () {
