@@ -115,7 +115,7 @@ export default {
         this.it[e.name] = {};
         this.it[e.name][e.autocomplete.valueField] = null;
       } else if(e.parent) {
-        if(this.it[e.parent][e.name]) {
+        if(this.it[e.parent] && this.it[e.parent][e.name]) {
           return;
         }
         if(!this.it[e.parent]) {
@@ -126,7 +126,7 @@ export default {
         this.it[e.name] = null;
       }
     });
-    //console.dir(this.it);
+    console.dir(this.it);
     }
   },
   created () {
