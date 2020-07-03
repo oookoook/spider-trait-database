@@ -1,9 +1,10 @@
 var db = null;
 
 const list = async function(limits) {
-    var res = await db.prepareListResponse(limits, 'location');
+    var join = 'location LEFT JOIN country ON location.country_id = country.id';
+    var res = await db.prepareListResponse(limits, 'location', null, null, join);
     var results = await db.query({table: 'location', sql: `SELECT location.id, location.abbrev, location.locality, location.lat, location.lon, country.id, country.alpha3_code, country.name `
-     + `FROM location LEFT JOIN country ON location.country_id = country.id`, nestTables: true, limits });    
+     + `FROM ${join}`, nestTables: true, limits });    
      res.items = results.map(r => {    
         return {
                 id: r.location.id,
