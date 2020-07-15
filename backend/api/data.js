@@ -169,7 +169,6 @@ const stats =  async function(params, query) {
     // there might be columns marked as group-by or distinct
     if(statsType == 'count') {
     paramList.forEach((e, i) => {
-        if(statsList.includes(params[e])) {
             if(params[e] == 'group-by') {
                 hasGroup = true;
                 groupByColumn = columnList[i];
@@ -178,7 +177,6 @@ const stats =  async function(params, query) {
                 hasDistinct = true;
                 distinctColumn = columnList[i];
             }
-        }
     });
     }
 

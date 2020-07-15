@@ -317,7 +317,7 @@ const changeState = async function(params, body, auth) {
     switch(state) {
         case 'created': mail.send({subject: 'Dataset added', text: 'A new dataset was created by a contributor.'}); break; // this will never happen
         case 'rejected': mail.send({ to: await getUploaderEmail(id), subject: 'Dataset rejected', text: 'Your dataset was rejected by an editor. You can find more details at {BASEURL}/import'}); break;
-        case 'reviewed': mail.send({subject: 'Dataset review requested', text: 'A new dataset was submitted for a review by a contributor. You can find more details at {BASEURL}/approve'}); break;
+        case 'reviewed': mail.send({subject: 'Dataset review requested', text: 'A new dataset was submitted for review by a contributor. You can find more details at {BASEURL}/approve'}); break;
         case 'approved': mail.send({ to: await getUploaderEmail(id), subject: 'Dataset approved', text: `Your dataset was approved by an editor. You can view the dataset detail at {BASEURL}/datasets/${id}`}); break; 
     }
     }

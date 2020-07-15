@@ -85,7 +85,7 @@
           <v-list-item-icon><v-icon>mdi-frequently-asked-questions</v-icon></v-list-item-icon>
           <v-list-item-content><v-list-item-title>About project</v-list-item-title></v-list-item-content>
         </v-list-item>
-        <v-list-item href="https://github.com/oookoook/spider-trait-database/blob/master/docs/contribute.md" target="_blank">
+        <v-list-item to="/contribute">
           <v-list-item-icon><v-icon>mdi-share</v-icon></v-list-item-icon>
           <v-list-item-content><v-list-item-title>Data contribution</v-list-item-title></v-list-item-content>
         </v-list-item>
@@ -96,10 +96,6 @@
         <v-list-item v-if="user" href="https://github.com/oookoook/spider-trait-database/blob/master/docs/editor-howto.md" target="_blank">
           <v-list-item-icon><v-icon>mdi-lifebuoy</v-icon></v-list-item-icon>
           <v-list-item-content><v-list-item-title>Data editor How To</v-list-item-title></v-list-item-content>
-        </v-list-item>
-        <v-list-item to="/terms">
-          <v-list-item-icon><v-icon>mdi-format-list-numbered</v-icon></v-list-item-icon>
-          <v-list-item-content><v-list-item-title>Terms of service</v-list-item-title></v-list-item-content>
         </v-list-item>
         <v-list-item to="/policy">
           <v-list-item-icon><v-icon>mdi-shield-check-outline</v-icon></v-list-item-icon>
@@ -129,7 +125,7 @@
       </template>
       </v-toolbar-items>
     </v-app-bar>
-    <v-snackbar absolute
+    <v-snackbar app
       v-model="notification.active"
       :timeout="5000"
       :color="notification.color"
@@ -143,9 +139,29 @@
       </v-btn>
     </v-snackbar>
 
-    <v-content>
+    <v-main>
       <router-view></router-view>
-    </v-content>
+    </v-main>
+    <v-footer dark color="primary" class="mt-16">
+      <v-row class="mx-5 my-4 text-body-2">
+        <v-col cols="4" class="d-inline-flex align-start flex-row">
+          <a target="_blank" href="https://muni.cz/en">
+          <v-img contain :src="require('./assets/muni-white.png')" height="47" max-width="164" width="164" class="mr-5"/>
+          </a>
+          <a target="_blank" href="https://muni.cz/en">
+          <v-img contain :src="require('./assets/muni-lg-text-eng-white.png')" height="47" max-width="183" width="183" class="ml-5"/>
+          </a>
+        </v-col>
+        <v-col cols="4">
+          The core team (in alphabetical order): Klaus Birkhofer, Pedro Cardoso,<br />
+          Ludmila Cernecka, Marie Herberstein, Lizzy Lowe, Stefano Mammola,<br />
+          Stano Pekar, Caroline Sayuri, and Jonas Wolff.
+        </v-col>
+        <v-col cols="4" class="d-flex align-end flex-column">
+          <span class="mt-auto">© 2020 Masaryk University</span>
+        </v-col>
+      </v-row>
+    </v-footer>
   </v-app>
 </template>
 

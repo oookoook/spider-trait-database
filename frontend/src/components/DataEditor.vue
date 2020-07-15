@@ -420,10 +420,10 @@ export default {
       this.confirm.dialog = true;
     },
     review() {
-      this.confirm.title = 'Submit dataset for a review';
-      this.confirm.text = 'The dataset will be submitted for a review to the editors.';
+      this.confirm.title = 'Submit dataset for review';
+      this.confirm.text = 'The dataset will be submitted for review to the editors.';
       if(!this.dataset.valid.review) {
-        this.confirm.warning = 'Attention! Your dataset is not valid for a review. If possible, fix all the marked problems before submitting.'
+        this.confirm.warning = 'Attention! Your dataset is not valid for review. If possible, fix all the marked problems before submitting.'
       }
       this.confirm.message.show = true;
       this.confirm.message.placeholder = "Enter a message for the editor if you want to tell them someting about your data (e.g. reason why the data are not valid).";

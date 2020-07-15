@@ -16,6 +16,7 @@ export default {
     state: {
       list: [],
       stats: [],
+      homeStats: {},
       total: 0,
       link: getParams(),
       autocomplete: {},
@@ -35,6 +36,9 @@ export default {
       },
       autocomplete(state, payload) {
         state.autocomplete[payload.entity] = payload.value;
+      },
+      homeStats(state, payload) {
+        state.homeStats = payload.value;
       }
     },
     getters: {
@@ -52,7 +56,7 @@ export default {
           return state.link;
         },
         autocomplete: (state) => (entity) => state.autocomplete[entity],
-
+        homeStats: (state) => (entity) => state.homeStats[entity] || '...'
 
     },
     actions: {
@@ -89,6 +93,25 @@ export default {
           if(data) {
             context.commit('autocomplete', { value: data.items, entity: payload.entity });
           }
+        },
+
+        homeStats: async function(context, payload) {
+          
+          var data = await Promise.all(payload.entities.map(e => {
+            var f = {};
+            f[e] = 'distinct';
+            var p = {endpoint: endpoint + '/stats', params: `count/${getParams(f)}` };
+
+            return context.dispatch('get', p, { root: true });
+          }));
+          var hs = {};
+          payload.entities.forEach((e,i) => {
+            //console.dir(data[i]);
+            hs[e] = data[i] ? data[i].items[0].count : 0;
+          })
+
+          context.commit('homeStats', { value: hs});
         }
+          
     },
   }
