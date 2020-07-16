@@ -16,17 +16,17 @@
       </ul>
       </v-col>
       <v-col cols="4">
-        <v-img contain class="rounded-pill elevation-15" :src="require('../assets/spider2.jpg')" />
+        <v-img contain eager class="rounded-pill elevation-15" :src="require('../assets/spider2.jpg')" />
       </v-col>
     </v-row>
 
     <v-row justify="space-between"  align="center" class="my-16">
       <v-col cols="4">
-        <v-img contain class="rounded-pill elevation-15" :src="require('../assets/spider3.jpg')" />
+        <v-img contain eager class="rounded-pill elevation-15" :src="require('../assets/spider3.jpg')" />
       </v-col>
       <v-col cols="6" class="about-text text-xl-h5 text-subtitle-1">
       <ul>
-        <li class="mb-5">The database is linked with the World Spider Catalog and has comprehensive search options and export capability. The entered trait records have been standardized, 
+        <li class="mb-5">The database is linked with the <a href="" target="_blank">World Spider Catalog</a> and has comprehensive search options and export capability. The entered trait records have been standardized, 
         quality checked by authors, and approved by the editor. </li>
         <li>The database is supported, hosted, developed, and maintained at the Department of Botany and Zoology of Masaryk University in collaboration with the University IT centre. 
         The project is headed by Stano Pekár. The current editor is Ľudmila Černecká.</li>
@@ -41,7 +41,7 @@
       </ul>
       </v-col>
       <v-col cols="4">
-        <v-img contain class="rounded-pill elevation-15" :src="require('../assets/spider4.jpg')" />
+        <v-img contain eager class="rounded-pill elevation-15" :src="require('../assets/spider4.jpg')" />
       </v-col>
     </v-row>
     <hr class="primary mx-auto my-16" style="height:3px; border:none;width:80%" />
