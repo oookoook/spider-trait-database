@@ -26,7 +26,7 @@
       </v-col>
       <v-col cols="6" class="about-text text-xl-h5 text-subtitle-1">
       <ul>
-        <li class="mb-5">The database is linked with the <a href="" target="_blank">World Spider Catalog</a> and has comprehensive search options and export capability. The entered trait records have been standardized, 
+        <li class="mb-5">The database is linked with the <a href="https://wsc.nmbe.ch/" target="_blank">World Spider Catalog</a> and has comprehensive search options and export capability. The entered trait records have been standardized, 
         quality checked by authors, and approved by the editor. </li>
         <li>The database is supported, hosted, developed, and maintained at the Department of Botany and Zoology of Masaryk University in collaboration with the University IT centre. 
         The project is headed by Stano Pekár. The current editor is Ľudmila Černecká.</li>
