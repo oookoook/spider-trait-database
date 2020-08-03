@@ -6,7 +6,13 @@ export default {
         }
     },
     computed: {
-        ...mapGetters(['loginUrl', 'logoutUrl', 'user', 'lastRoute', 'isEditor', 'isAdmin'])
+        role() {
+            if(this.isAdmin) return 'Administrator';
+            if(this.isEditor) return 'Editor';
+            if(this.isContributor) return 'Contributor';
+            return 'Reader';
+        },
+        ...mapGetters(['loginUrl', 'logoutUrl', 'user', 'lastRoute', 'isContributor', 'isEditor', 'isAdmin'])
     },
     watch: {
         $route(to, from) {
@@ -22,7 +28,7 @@ export default {
                 // redirect to the correct route from the url
                 // fill in the user info
                 this.$store.dispatch('getUserInfo').then(
-                    () => this.$store.dispatch('notify', { error: false, text: `You were successfully logged in as ${this.user.name}.`}), 
+                    () => this.$store.dispatch('notify', { error: false, text: `You were successfully logged in as ${this.user.name}. Your role is ${role}.`}), 
                     () => this.$store.dispatch('notify', { error: true, text: `Unable to log you in.`}));
                 // should be stored in the local storage (vuex persistence)
                 var returnRoute = this.lastRoute ? this.lastRoute : '/';

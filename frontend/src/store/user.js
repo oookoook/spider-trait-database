@@ -41,6 +41,9 @@ export default {
         },
         isAdmin(state) {
           return state.user && state.user.isAdmin;
+        },
+        isContributor(state) {
+          return state.user && state.user.isContributor;
         }
     },
     actions: {

@@ -1,6 +1,27 @@
 <template>
   <v-card>
     <v-card-title><v-icon left>mdi-magnify</v-icon>Data explorer<v-spacer />
+    <v-dialog width="700" v-model="tips">
+      <template v-slot:activator="{ on }">
+        <action-button text="Help" icon="mdi-help" v-on="on" />
+      </template>
+      <v-card>
+        <v-card-title>Search tips</v-card-title>
+        <v-card-text>
+          <ul>
+            <li>To find records for all genera and species of a certain family type its name into the <span class="font-weight-bold">Family</span> window.</li>
+            <li>To find records for all species of a certain genus type its name into the <span class="font-weight-bold">Genus</span> window.</li>
+            <li>To find records for a single species type its name into the <span class="font-weight-bold">Species</span> window.</li>
+            <li>Look up abbreviations of traits under <router-link to="/traits">Lists &ndash; Traits</router-link>.</li>
+            <li>To find records for all traits from a certain trait category type its name into the <span class="font-weight-bold">Trait Category</span> window.</li>
+            <li>Look up abbreviations of methods under <router-link to="/methods">Lists &ndash; Methods</router-link>.</li>
+          </ul>
+        </v-card-text>
+        <v-card-actions>
+          <action-button text="Close" icon="mdi-cancel" @click="tips = false" />
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
     <action-button text="Reset filters" icon="mdi-eraser" @click="reset" />
     <!-- Share link button -->
     <v-menu v-model="shareMenu" :close-on-content-click="false" :nudge-width="600">
@@ -126,10 +147,11 @@ export default {
   data () {
     return {
       tab: null,
+      tips: false,
       filters: [
         { entity: 'family', endpoint: 'taxonomy', label:'Family', icon: 'mdi-spider-web', valueField: 'taxonomy.family', searchFromStart: true, search: null },
         { entity: 'genus', endpoint: 'taxonomy', label:'Genus', icon: 'mdi-spider-thread', valueField: 'taxonomy.genus', searchFromStart: true, search: null },
-        { entity: 'species', endpoint: 'taxonomy', label:'Species', icon: 'mdi-spider', valueField: 'taxonomy.id', textField: ['taxonomy.genus', 'taxonomy.species', 'taxonomy.subspecies'], searchFromStart: true, search: null },
+        { entity: 'species', endpoint: 'taxonomy', label:'Genus & Species', icon: 'mdi-spider', valueField: 'taxonomy.id', textField: ['taxonomy.genus', 'taxonomy.species', 'taxonomy.subspecies'], searchFromStart: true, search: null },
         { entity: 'original-name', endpoint: 'data', label:'Original name', icon: 'format-quote-close', valueField: 'originalName', searchFromStart: true, search: null },
         { entity: 'trait-category', endpoint: 'traits', label:'Trait category', icon: 'mdi-file-tree', valueField: 'trait.category.id', textField: 'trait.category.name', search: null, showAll: true },
         { entity: 'trait', endpoint: 'traits', label:'Trait', icon: 'mdi-comment-question-outline', valueField: 'trait.id', textField: ['trait.abbrev', 'trait.name'], search: null },

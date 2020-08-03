@@ -6,7 +6,7 @@
       dark
     >
       <v-toolbar-title>
-        <router-link style="color:white;text-decoration:none" to="/"><v-icon left>mdi-spider</v-icon>World Spider Trait Database</router-link>
+        <router-link style="color:white;text-decoration:none" to="/"><v-icon left>mdi-spider</v-icon>World Spider Trait database</router-link>
         <!--<v-icon left>mdi-spider</v-icon>Spider Trait Database-->
         </v-toolbar-title>
 
@@ -55,7 +55,7 @@
       </v-list>
     </v-menu>      
 
-    <v-menu right bottom offset-y v-if="user">
+    <v-menu right bottom offset-y v-if="isContributor">
       <template v-slot:activator="{ on }">
         <v-btn text v-on="on"><v-icon left>mdi-share</v-icon> Contribute<v-icon right>mdi-chevron-down</v-icon></v-btn>
       </template>
@@ -68,8 +68,25 @@
           <v-list-item-icon><v-icon>mdi-stamper</v-icon></v-list-item-icon>
           <v-list-item-content><v-list-item-title>Approve and manage datasets</v-list-item-title></v-list-item-content>
         </v-list-item>
+        <v-list-item to="/contribute">
+          <v-list-item-icon><v-icon>mdi-share</v-icon></v-list-item-icon>
+          <v-list-item-content><v-list-item-title>Data contribution help</v-list-item-title></v-list-item-content>
+        </v-list-item>
+        <v-list-item v-if="isEditor" href="https://github.com/oookoook/spider-trait-database/blob/master/docs/approve.md" target="_blank">
+          <v-list-item-icon><v-icon>mdi-stamper</v-icon></v-list-item-icon>
+          <v-list-item-content><v-list-item-title>Data approval help</v-list-item-title></v-list-item-content>
+        </v-list-item>
+        <v-list-item v-if="user" href="https://github.com/oookoook/spider-trait-database/blob/master/docs/editor-howto.md" target="_blank">
+          <v-list-item-icon><v-icon>mdi-lifebuoy</v-icon></v-list-item-icon>
+          <v-list-item-content><v-list-item-title>Data editor How To</v-list-item-title></v-list-item-content>
+        </v-list-item>
       </v-list>
-    </v-menu>
+    </v-menu>    
+    <v-btn v-else
+        to="/contribute"
+        text
+      ><v-icon left>mdi-share</v-icon> Contribute 
+    </v-btn>
 
     <v-btn v-if="isAdmin"
         to="/admin"
@@ -78,24 +95,16 @@
     </v-btn>
     <v-menu right bottom offset-y>
       <template v-slot:activator="{ on }">
-        <v-btn text v-on="on"><v-icon left>mdi-help</v-icon> Help<v-icon right>mdi-chevron-down</v-icon></v-btn>
+        <v-btn text v-on="on"><v-icon left>mdi-help</v-icon> More<v-icon right>mdi-chevron-down</v-icon></v-btn>
       </template>
       <v-list>
         <v-list-item to="/about">
           <v-list-item-icon><v-icon>mdi-frequently-asked-questions</v-icon></v-list-item-icon>
-          <v-list-item-content><v-list-item-title>About project</v-list-item-title></v-list-item-content>
+          <v-list-item-content><v-list-item-title>About</v-list-item-title></v-list-item-content>
         </v-list-item>
-        <v-list-item to="/contribute">
-          <v-list-item-icon><v-icon>mdi-share</v-icon></v-list-item-icon>
-          <v-list-item-content><v-list-item-title>Data contribution</v-list-item-title></v-list-item-content>
-        </v-list-item>
-        <v-list-item v-if="isEditor" href="https://github.com/oookoook/spider-trait-database/blob/master/docs/approve.md" target="_blank">
-          <v-list-item-icon><v-icon>mdi-stamper</v-icon></v-list-item-icon>
-          <v-list-item-content><v-list-item-title>Data approval</v-list-item-title></v-list-item-content>
-        </v-list-item>
-        <v-list-item v-if="user" href="https://github.com/oookoook/spider-trait-database/blob/master/docs/editor-howto.md" target="_blank">
-          <v-list-item-icon><v-icon>mdi-lifebuoy</v-icon></v-list-item-icon>
-          <v-list-item-content><v-list-item-title>Data editor How To</v-list-item-title></v-list-item-content>
+        <v-list-item to="/publications">
+          <v-list-item-icon><v-icon>mdi-bookmark-multiple-outline</v-icon></v-list-item-icon>
+          <v-list-item-content><v-list-item-title>Publications</v-list-item-title></v-list-item-content>
         </v-list-item>
         <v-list-item to="/policy">
           <v-list-item-icon><v-icon>mdi-shield-check-outline</v-icon></v-list-item-icon>
@@ -152,13 +161,27 @@
           <v-img contain :src="require('./assets/muni-lg-text-eng-white.png')" height="47" max-width="183" width="183" class="ml-5"/>
           </a>
         </v-col>
-        <v-col cols="4">
+        <v-col cols="4" class="d-flex align-center flex-crow">
+          <!--
           The core team (in alphabetical order): Klaus Birkhofer, Pedro Cardoso,<br />
           Ludmila Cernecka, Marie Herberstein, Lizzy Lowe, Stefano Mammola,<br />
           Stano Pekar, Caroline Sayuri, and Jonas Wolff.
+          -->
+          <div class="subtitle-2">
+          Pekár et al. 2020. The world spider trait database. Masaryk University, Brno
+          <!-- , doi: -->
+          </div>
         </v-col>
         <v-col cols="4" class="d-flex align-end flex-column">
-          <span class="mt-auto">© 2020 Masaryk University</span>
+          <v-row class="mt-auto mx-1">
+          <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" title="Creative Commons Attribution 4.0 International (CC BY 4.0)">
+          <v-img class="mr-2" width="30" height="30" :src="require('./assets/cc.svg')" alt="CC" />
+          </a>
+          <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" title="Creative Commons Attribution 4.0 International (CC BY 4.0)">
+          <v-img width="30" height="30" :src="require('./assets/by.svg')" alt="BY" />
+          </a>
+          </v-row>
+          <span class="mt-auto mx-1">© 2020</span>
         </v-col>
       </v-row>
     </v-footer>

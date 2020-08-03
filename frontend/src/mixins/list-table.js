@@ -12,6 +12,7 @@ export default {
     props: { items: Array, total: { type: Number, default: 0 }, loading: Boolean, autocompleteLoading: Boolean, autocompleteItems: Array },
     data() {
         return {
+            footerProps: { 'items-per-page-options': [ 10, 15, 50, 100, -1 ] },
             search: null,
             internalOptsChange: false,
             needsCount: true,

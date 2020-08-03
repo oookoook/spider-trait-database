@@ -25,7 +25,7 @@
           <v-col :key="`card${index}`" align-self="center" class="pl-0">
           <v-card width="120" class="rounded-lg"
           >
-            <v-card-text class="text-center text-subtitle-1 black--text font-weight-black my-0 py-3">
+            <v-card-text class="text-center text-subtitle-1 black--text font-weight-black my-0 py-3" :style="statsStyle">
             {{ item.value}}
             </v-card-text>
             <v-card-title class="primary white--text text-subtitle-2 my-0 py-2"><div class="flex-grow-1 text-center">{{ item.name }}</div></v-card-title>  
@@ -40,27 +40,27 @@
     <hr class="primary mx-auto mb-16" style="height:3px; border:none;width:75%" />
     <v-container>
       <v-row justify="space-around">
-        <v-card rounded class="rounded-xl" width="380">
+        <v-card rounded class="rounded-xl mb-5" width="380">
           <v-img class="mx-auto my-5" width="159" :src="require('../assets/database.png')" />
           <v-card-text>
-          <v-card rounded class="rounded-xl primary" height="150"><v-card-text class="white--text text-center text-subtitle-1 flex-column flex-grow-1">
-            First centralised online open-access database of phenotypic traits of spider species
+          <v-card rounded class="rounded-xl primary" height="120"><v-card-text class="white--text text-center text-subtitle-1 flex-column flex-grow-1">
+            First centralised online open-access database of phenotypic traits of spider species at a global scale
             </v-card-text></v-card>
           </v-card-text>
         </v-card>
-        <v-card rounded class="rounded-xl" width="380">
+        <v-card rounded class="rounded-xl mb-5" width="380">
           <v-img class="mx-auto my-5" width="158" contain :src="require('../assets/globe.png')" />
           <v-card-text>
-          <v-card rounded class="rounded-xl primary" height="150"><v-card-text class="white--text text-center text-subtitle-1">
-            Freely accessible, curated, and constantly updated archive at a global scale by assembling published and unpublished data
+          <v-card rounded class="rounded-xl primary" height="120"><v-card-text class="white--text text-center text-subtitle-1">
+            Freely accessible, curated, and constantly updated archive by assembling published and unpublished data
           </v-card-text></v-card>
           </v-card-text>
         </v-card>
-        <v-card rounded class="rounded-xl" width="380">
-          <v-img class="mx-auto my-5" width="187" contain :src="require('../assets/hands.png')" />
+        <v-card rounded class="rounded-xl mb-5" width="380">
+          <v-img class="mx-auto my-5" width="187" contain :src="require('../assets/handsext.png')" />
           <v-card-text>
-          <v-card rounded class="rounded-xl primary" height="150"><v-card-text class="white--text text-center text-subtitle-1">
-            It should offer and foster collaboration opportunities and open up new areas of investigation
+          <v-card rounded class="rounded-xl primary" height="120"><v-card-text class="white--text text-center text-subtitle-1">
+            It should offer and foster collaboration and open up new areas of investigation
           </v-card-text></v-card>
           </v-card-text>  
         </v-card>
@@ -82,6 +82,9 @@ export default {
   components: {},
   data() {
     return {
+      statsStyle: {
+        'border': `solid 2px ${this.$vuetify.theme.themes.light.primary}`
+      }
     }
   },
   computed: {

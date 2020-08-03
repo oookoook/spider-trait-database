@@ -1,6 +1,6 @@
 <template>
   <v-container>
-    <h1 class="text-h2 text-center font-weight-bold pt-16 pb-10">About the project</h1>
+    <h1 class="text-h2 text-center font-weight-bold pt-16 pb-10">About this project</h1>
     <hr class="primary mx-auto" style="height:3px; border:none;width:80%" />
     <v-row justify="space-between" align="center" class="my-16">
       <v-col cols="6" class="about-text text-xl-h5 text-subtitle-1">
@@ -28,7 +28,7 @@
       <ul>
         <li class="mb-5">The database is linked with the <a href="https://wsc.nmbe.ch/" target="_blank">World Spider Catalog</a> and has comprehensive search options and export capability. The entered trait records have been standardized, 
         quality checked by authors, and approved by the editor. </li>
-        <li>The database is supported, hosted, developed, and maintained at the Department of Botany and Zoology of Masaryk University in collaboration with the University IT centre. 
+        <li>This database is supported, hosted, developed, and maintained at the Department of Botany and Zoology of Masaryk University in collaboration with the University IT centre. 
         The project is headed by Stano Pekár. The current editor is Ľudmila Černecká.</li>
       </ul>
       </v-col>
@@ -37,7 +37,7 @@
     <v-row justify="space-between" align="center" class="my-16">
       <v-col cols="6" class="about-text text-xl-h5 text-subtitle-1">
       <ul>
-        <li>The core team is: Klaus Birkhofer, Pedro Cardoso, Ludmila Cernecka, Marie Herberstein, Lizzy Lowe, Stefano Mammola, Stano Pekar, Caroline Sayuri, and Jonas Wolff.</li>
+        <li>The core team (in alphabetical order) is: Klaus Birkhofer, Pedro Cardoso, Ludmila Cernecka, Marie Herberstein, Lizzy Lowe, Stefano Mammola, Stano Pekar, Caroline Sayuri, and Jonas Wolff.</li>
       </ul>
       </v-col>
       <v-col cols="4">
@@ -51,7 +51,7 @@
           The use of this database is limited to <b>research, educational, non-commercial use</b>. 
           Contained data are publicly available under a CC BY license (Creative Commons Attribution). 
           The user is free to download, share and adapt the data, as long as the Database is cited 
-          as the source of the information. This database should be cited as follows: …
+          as the source of the information. This database should be cited as follows: <em>Pekár S., Černecká Ľ., Wolff J., Mamola S., Cardoso P., Lowe E., Sazuri C., Birkhofer K. &amp; Herberstein M. 2020. The world spider trait database. Masaryk University, Brno, URL: https://spidertraits.sci.muni.cz</em>
         </p>
         <v-img class="mx-auto mt-16" contain width="153" height="94" :src="require('../assets/edu.png')" />
         </v-col>
@@ -64,10 +64,10 @@
       
       <v-col cols="6"  class="d-flex flex-column">
         <p class="about-text text-center text-xl-h5 text-subtitle-1">
-          If you detected errors or malfunctions, please, bring them to our attention by sending a message to <a href="spidertraits@group.muni.cz">spidertraits@group.muni.cz</a>.
+          If you detected errors or malfunctions, please, bring them to our attention by sending a message to <!-- <a href="spidertraits@group.muni.cz">spidertraits@group.muni.cz</a>. -->
         </p>
         <v-btn class="mx-auto mt-8" width="300" x-large rounded color="primary" href="mailto:spidertraits@group.muni.cz">E-mail</v-btn>
-        <p class="text-center text-xl-h6 font-weight-regular text-subtitle-2 mt-16">Suggestions for improvement of the database are also welcomed.</p>
+        <p class="about-text text-center text-xl-h5 text-subtitle-1 mt-16">Suggestions for improvement of the database are also welcomed.</p>
       </v-col>
       <v-img contain max-width="50" max-height="50" width="50" height="50" :src="require('../assets/repair.png')" />
     </v-row>

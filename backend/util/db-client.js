@@ -249,7 +249,7 @@ const getAutocomplete = async function(endpoint, valueField, textField, search, 
     values.push(vf);
 
     if(textField && Array.isArray(textField)) {        
-        textSql = 'TRIM(CONCAT(' + textField.map(f =>`COALESCE(??,'')`).join(`,' ',`) + '))';
+        textSql = 'TRIM(CONCAT(' + textField.map(f =>`COALESCE(??,'')`).join(`,' - ',`) + '))';
         var syn = textField.map(f => getSynonym(endpoint,f));
         values = values.concat(syn); // ?? AS TEXT
         values.push(qt); // FROM ??

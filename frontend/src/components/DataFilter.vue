@@ -11,11 +11,19 @@
         :search-input.sync="autocompleteInput"
         :rules="rules"
         return-object
-        @focus="autocomplete"
+        
         @click:clear="autocomplete"
       >
+      <!-- @focus="autocomplete" -->
       <template v-slot:prepend>
         <v-icon :color="iconColor">{{icon}}</v-icon>
+      </template>
+      <template v-slot:no-data>
+        <v-list-item>
+          <v-list-item-title>
+            Enter first letters
+          </v-list-item-title>
+        </v-list-item>
       </template>
       </v-autocomplete>
 </template>

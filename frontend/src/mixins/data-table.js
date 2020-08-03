@@ -3,11 +3,11 @@ export default {
     props: { items: Array, total: { type: Number, default: 0 }, loading: Boolean, options: Object },
     data() {
         return {
+          footerProps: { 'items-per-page-options': [ 10, 15, 50, 100, -1 ] },
           needsCount: true,
           optsExtChange: this.options != null,
           opts: this.options,
           optsIntChange: false,
-          
         }
     },
     watch: {
@@ -15,17 +15,13 @@ export default {
         handler (val, oldVal) {
           //console.log(`${this.$options.name}: optsExtChange: ${this.optsExtChange}`);
           if(!this.optsExtChange) {
-            //console.log(`${this.$options.name}: internal change of options`);
+            console.log(`${this.$options.name}: internal change of options`);
             //console.dir(val);
             //console.dir(oldVal);
             this.update();
           } else {
-            //console.log(`${this.$options.name}: external change of options`);
-            //console.dir(val);
-            //console.dir(oldVal);
             // there are multiple changes when assigning the shared opts
             setTimeout(() => {this.optsExtChange = false;}, 100);
-            
           }
         },
         deep: true,
@@ -48,16 +44,15 @@ export default {
         this.optsIntChange = false;
       }
     },
-    },
-    mounted() {
-        
-    },
+  },
     methods: {
       update() {
         //console.log(`${this.$options.name}:  update called`);
+        /*
         this.optsIntChange = true;
         this.$emit('update', {options: this.opts, count: this.needsCount });
         this.needsCount = false;
+        */
       }
     }
 }

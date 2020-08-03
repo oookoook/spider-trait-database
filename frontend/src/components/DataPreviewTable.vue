@@ -8,6 +8,7 @@
     -->
   <v-data-table
       :headers="headers"
+      :footer-props="footerProps"
       :items="items"
       :options.sync="opts"
       :server-items-length="total"

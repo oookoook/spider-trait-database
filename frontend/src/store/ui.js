@@ -5,15 +5,22 @@ export default {
         text: null,
         color: 'info'
       },
+      publications: ''
     },
     getters: {
       notification(state) {
           return state.notification;
       }, 
+      publications(state) {
+        return state.publications
+      }
     },
     mutations: {
       notification(state, payload) {
         state.notification = payload.value;
+      },
+      publications(state, payload) {
+        state.publications = payload.value;
       }
     },
     actions: {
@@ -27,6 +34,14 @@ export default {
           value: n
         });
       },
+      async getPublications(context, payloar) {
+        try {
+          var md  = await Vue.http.get('https://raw.githubusercontent.com/oookoook/spider-trait-database/master/docs/publications.md');
+          context.commit('publications', { value: md.body });
+        } catch {
+          context.dispatch('notify', {error: true, text: 'Unable to load publications.' });
+        }
+      }
     }
   }
   

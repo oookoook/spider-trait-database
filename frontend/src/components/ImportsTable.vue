@@ -1,6 +1,7 @@
 <template>
   <v-data-table
       :headers="headers"
+      :footer-props="footerProps"
       :items="items"
       :options.sync="options"
       :server-items-length="total"
