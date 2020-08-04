@@ -1091,9 +1091,9 @@ var synonyms = {
     'reference.fullCitation': 'reference',
     'reference.abbrev': 'reference_abbrev',
     'reference.doi': `reference_doi`,
-    'valid.review': 'valid_review',
-    'valid.approve': 'valid',
-    'valid.duplicate': 'duplicate'
+    'valid.review': 'import.valid_review',
+    'valid.approve': 'import.valid',
+    'valid.duplicate': 'import.duplicate'
 }
 
 module.exports = function(dbClient, mailClient) {

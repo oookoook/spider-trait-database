@@ -287,6 +287,7 @@ const synonyms = {
     'trait': 'trait.abbrev',
     'dataset': 'dataset.name',
     'taxonomy.wsc.lsid': 'taxonomy.wsc_lsid',
+    'taxonomy.fullName': 'taxonomy.full_name',
     'sampleSize': 'sample_size',
     'eventDate.text': 'event_date_text',
     'eventDate.start': 'event_date_start',

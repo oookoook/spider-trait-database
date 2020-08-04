@@ -1,6 +1,6 @@
 <template>
   <v-container fluid>
-    <v-img eager :src="require('../assets/spider1.jpg')" max-height="957" contain position="right">
+    <v-img eager :src="require('../assets/spider1.jpg')" height="100vh" max-height="100vh" contain position="right">
     <v-container fill-height>
       <v-row  class="pt-2 mt-2 pt-xl-8 mt-xl-8 pt-xl-8 mt-xl-16 pl-xl-8 ml-xl-16">
         <v-col cols="auto">

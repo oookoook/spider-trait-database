@@ -96,7 +96,7 @@
     <v-tab href="#raw"><info-icon icon="mdi-table-large" text="Raw data view"/></v-tab>
     <v-tab href="#chart"><info-icon icon="mdi-chart-bar" text="Trait values chart (a single trait must be filtered)"/></v-tab>
     <v-tabs-items v-model="tab">
-      <list-provider list="data" :filter="filter" v-slot="i">
+      <list-provider list="data" :filter="filter" v-slot="i" preload>
       <v-tab-item value="preview">
         <data-preview-table :items="i.items" :loading="i.loading" :total="i.total" :options="i.options" @update="i.update" />
       </v-tab-item>
@@ -151,7 +151,7 @@ export default {
       filters: [
         { entity: 'family', endpoint: 'taxonomy', label:'Family', icon: 'mdi-spider-web', valueField: 'taxonomy.family', searchFromStart: true, search: null },
         { entity: 'genus', endpoint: 'taxonomy', label:'Genus', icon: 'mdi-spider-thread', valueField: 'taxonomy.genus', searchFromStart: true, search: null },
-        { entity: 'species', endpoint: 'taxonomy', label:'Genus & Species', icon: 'mdi-spider', valueField: 'taxonomy.id', textField: ['taxonomy.genus', 'taxonomy.species', 'taxonomy.subspecies'], searchFromStart: true, search: null },
+        { entity: 'species', endpoint: 'taxonomy', label:'Genus & Species', icon: 'mdi-spider', valueField: 'taxonomy.id', textField: 'taxonomy.fullName'/*textField: ['taxonomy.genus', 'taxonomy.species', 'taxonomy.subspecies']*/, searchFromStart: true, search: null },
         { entity: 'original-name', endpoint: 'data', label:'Original name', icon: 'format-quote-close', valueField: 'originalName', searchFromStart: true, search: null },
         { entity: 'trait-category', endpoint: 'traits', label:'Trait category', icon: 'mdi-file-tree', valueField: 'trait.category.id', textField: 'trait.category.name', search: null, showAll: true },
         { entity: 'trait', endpoint: 'traits', label:'Trait', icon: 'mdi-comment-question-outline', valueField: 'trait.id', textField: ['trait.abbrev', 'trait.name'], search: null },

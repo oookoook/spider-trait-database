@@ -27,7 +27,8 @@
     <imports-table :items="i.items"
     :editor="editor" 
     :loading="i.loading" 
-    :total="i.total" 
+    :total="i.total"
+    :saved-options="i.savedOptions" 
     @update="i.update"
     @remove="showRemove" >
       <action-button color="primary" @click="showNewDialog(true)"></action-button>

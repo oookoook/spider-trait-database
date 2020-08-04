@@ -5,7 +5,8 @@
     :loading="i.loading" 
     :total="i.total" 
     :autocomplete-items="i.autocompleteItems" 
-    :autocomplete-loading="i.autocompleteLoading" 
+    :autocomplete-loading="i.autocompleteLoading"
+    :saved-options="i.savedOptions"  
     @update="i.update" 
     @autocomplete="i.autocomplete" />
   </list-provider>

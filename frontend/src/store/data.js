@@ -20,6 +20,7 @@ export default {
       total: 0,
       link: getParams(),
       autocomplete: {},
+      savedOptions: null
     },
     mutations: {
       list(state, payload) {
@@ -39,6 +40,9 @@ export default {
       },
       homeStats(state, payload) {
         state.homeStats = payload.value;
+      },
+      savedOptions(state, payload) {
+        // do nothing - this is just for compatibility with entity module
       }
     },
     getters: {

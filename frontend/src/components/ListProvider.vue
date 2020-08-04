@@ -8,7 +8,7 @@
   :autocomplete-items="autocompleteItems" 
   :autocomplete-loading="acloading"
   :search-update="searchUpdate"
-  :options="options">
+  :saved-options="savedOptions">
     {{ JSON.stringify(items) }}
   </slot>
   </div>
@@ -28,13 +28,14 @@ export default {
     totalState: {type: String, default: 'total' },
     autocompleteAction:{ type: String, default: 'autocomplete'},
     autocompleteState:{ type: String, default: 'autocomplete'},
+    savedOptionsState:{ type: String, default: 'savedOptions'},
     preload: Boolean
   },
   data () {
     return {
       loading: false,
       acloading: false,
-      options: null,
+      options: this.savedOptions,
       // debounce solves repeated filter updates when processing a new data filter from route in the data explorer
       // the debounced function is defined in the data so each instance of the list provider has its own function definiton
       // (this is needed when multiple list providers are included within the same component)
@@ -56,6 +57,9 @@ export default {
         //return  ac == null ? [] : ac;
       }
       return this.$store.state[this.list][this.autocompleteState];
+    },
+    savedOptions() {
+      return this.$store.state[this.list][this.savedOptionsState];
     }
   },
   watch: {
@@ -81,14 +85,16 @@ export default {
   },
   methods: {
     updateDirect(params) {
-      //console.dir(params);
+      console.log('Update');
+      console.dir(params);
       if(!params) {
-        //console.log('no params provided');
+        console.log('no params provided');
         params = {};
         params.count = true;
         params.search = null;
         params.searchField = null;
-        params.options = this.options? this.options : {
+        console.dir(this.options);
+        params.options = this.options ? this.options : {
           page: 1,
           itemsPerPage: 10,
           sortBy: [],
@@ -150,6 +156,11 @@ export default {
     if(this.preload) {
       this.update();
     }
+  },
+  beforeDestroy() {
+    //console.log('List provider destroyed');
+    //console.dir(this.options);
+    this.$store.commit(`${this.list}/${this.savedOptionsState}`, { value: this.options });
   }
 }
 </script>

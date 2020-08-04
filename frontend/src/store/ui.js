@@ -1,3 +1,5 @@
+import Vue from 'vue';
+
 export default {
     state: {
       notification: {
@@ -38,7 +40,8 @@ export default {
         try {
           var md  = await Vue.http.get('https://raw.githubusercontent.com/oookoook/spider-trait-database/master/docs/publications.md');
           context.commit('publications', { value: md.body });
-        } catch {
+        } catch (err) {
+          console.error(err);
           context.dispatch('notify', {error: true, text: 'Unable to load publications.' });
         }
       }

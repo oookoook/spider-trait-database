@@ -32,7 +32,7 @@
       class="elevation-1"
       sort-by="category.name"
     >
-    
+  
     <template v-slot:item.abbrev="{ item }">
       <entity-link-cell :text="item.abbrev" tooltip="View the trait detail" :link="`/traits/${item.id}`" />
     </template>
@@ -78,8 +78,6 @@ export default {
   },
   created () {
 
-  },
-  mounted () {
   }
 }
 </script>

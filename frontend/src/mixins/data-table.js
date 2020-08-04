@@ -15,7 +15,7 @@ export default {
         handler (val, oldVal) {
           //console.log(`${this.$options.name}: optsExtChange: ${this.optsExtChange}`);
           if(!this.optsExtChange) {
-            console.log(`${this.$options.name}: internal change of options`);
+            //console.log(`${this.$options.name}: internal change of options`);
             //console.dir(val);
             //console.dir(oldVal);
             this.update();
@@ -48,11 +48,9 @@ export default {
     methods: {
       update() {
         //console.log(`${this.$options.name}:  update called`);
-        /*
         this.optsIntChange = true;
         this.$emit('update', {options: this.opts, count: this.needsCount });
         this.needsCount = false;
-        */
       }
     }
 }

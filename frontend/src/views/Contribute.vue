@@ -22,7 +22,7 @@
         <v-img contain width="515" :src="require('../assets/contact.png')" />
       </v-col>
       <v-col cols="7" class="about-text text-xl-h5 text-subtitle-1">
-      If you are ready to contribute data to the database, please contact the <a href="mailto:spidertraits@group.muni.cz">administrator</a> at spidertraits@group.muni.cz</a>. 
+      If you are ready to contribute data to the database, please contact the <a href="mailto:spidertraits@group.muni.cz">administrator at spidertraits@group.muni.cz</a>. 
       You will receive a username and a password, which will give you access to the submission page.
       </v-col>
     </v-row>

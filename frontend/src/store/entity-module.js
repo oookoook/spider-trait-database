@@ -9,6 +9,7 @@ export default (endpoint) => {
       entity: null,
       autocomplete: [],
       search: null,
+      savedOptions: null,
       props: props(endpoint)
     },
     mutations: {
@@ -26,6 +27,9 @@ export default (endpoint) => {
       },
       search(state, payload) {
           state.search = payload.value;
+      },
+      savedOptions(state, payload) {
+          state.savedOptions = payload.value;
       }
     },
     getters: {

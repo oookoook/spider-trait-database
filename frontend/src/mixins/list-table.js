@@ -9,14 +9,16 @@ export default {
         ListFilter,
         ActionButton
       },
-    props: { items: Array, total: { type: Number, default: 0 }, loading: Boolean, autocompleteLoading: Boolean, autocompleteItems: Array },
+    props: { items: Array, total: { type: Number, default: 0 }, loading: Boolean, autocompleteLoading: Boolean, autocompleteItems: Array, savedOptions: Object },
     data() {
+        console.log('Data assigning');
+        console.dir(this.savedOptions);
         return {
             footerProps: { 'items-per-page-options': [ 10, 15, 50, 100, -1 ] },
             search: null,
             internalOptsChange: false,
             needsCount: true,
-            options: {},
+            options: this.savedOptions,
         }
     },
     computed: {
@@ -24,16 +26,17 @@ export default {
     },
     watch: {
         options: {
-            handler () {
-              console.log('opts changed');
+            handler (val, oldVal) {
+              console.log(`${this.$options.name } opts changed`);
+              console.dir(oldVal);
               console.dir(this.options);
               if(this.internalOptsChange == 0) {
-                console.log('opts changed updating');
+                console.log(`${this.$options.name } opts changed updating`);
                 //this.needsCount = true;
                 this.update();
               } else {
                 this.internalOptsChange -= 1;
-                console.log('opts changed internally');
+                console.log(`${this.$options.name } opts changed internally`);
               }
             },
             deep: true,
@@ -52,9 +55,6 @@ export default {
           this.update();
     
         },
-    },
-    mounted() {
-        
     },
     methods: {
         update() {
@@ -79,5 +79,13 @@ export default {
           autocomplete(p) {
             this.$emit('autocomplete', p);
           }
+    },
+    /*
+    beforeDestroy() {
+      console.log('List table destroyed');
+    },
+    mounted() {
+      console.log('List table mounted');
     }
+    */
 }

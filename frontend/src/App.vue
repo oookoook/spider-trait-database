@@ -161,7 +161,7 @@
           <v-img contain :src="require('./assets/muni-lg-text-eng-white.png')" height="47" max-width="183" width="183" class="ml-5"/>
           </a>
         </v-col>
-        <v-col cols="4" class="d-flex align-center flex-crow">
+        <v-col cols="4" class="d-flex align-center flex-row">
           <!--
           The core team (in alphabetical order): Klaus Birkhofer, Pedro Cardoso,<br />
           Ludmila Cernecka, Marie Herberstein, Lizzy Lowe, Stefano Mammola,<br />
@@ -172,8 +172,8 @@
           <!-- , doi: -->
           </div>
         </v-col>
-        <v-col cols="4" class="d-flex align-end flex-column">
-          <v-row class="mt-auto mx-1">
+        <v-col cols="4" class="d-flex align-end justify-center flex-column">
+          <v-row class="my-auto mx-1 align-center">
           <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" title="Creative Commons Attribution 4.0 International (CC BY 4.0)">
           <v-img class="mr-2" width="30" height="30" :src="require('./assets/cc.svg')" alt="CC" />
           </a>
@@ -181,7 +181,6 @@
           <v-img width="30" height="30" :src="require('./assets/by.svg')" alt="BY" />
           </a>
           </v-row>
-          <span class="mt-auto mx-1">© 2020</span>
         </v-col>
       </v-row>
     </v-footer>

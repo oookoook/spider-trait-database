@@ -69,6 +69,21 @@
     </v-row>
 
       </v-expansion-panel-content>
+    </v-expansion-panel>
+    <v-expansion-panel>
+    <v-expansion-panel-header><h3><v-icon color="primary" left>mdi-bookmark-multiple</v-icon> Publications list</h3></v-expansion-panel-header>
+    <v-expansion-panel-content>
+    <p>The source code of the Publications page is available at <a href="https://github.com/oookoook/spider-trait-database/blob/master/docs/publications.md" target="_blank">GitHub</a>.</p>
+    <p>For editing the content of the home page, you have to have a GitHub account. Then contact the <a href="mailto:adam@nastojte.cz">repository owner</a> to add you the rights to edit the page.</p>
+    <p>The page uses the <a href="https://www.markdownguide.org/basic-syntax/" target="_blank">MarkDown</a> syntax. After commiting the changes, the page is automatically updated in the application.</p>
+    </v-expansion-panel-content>
+    </v-expansion-panel>
+    <v-expansion-panel>
+    <v-expansion-panel-header><h3><v-icon color="primary" left>mdi-google-analytics</v-icon> Visitor statistics</h3></v-expansion-panel-header>
+    <v-expansion-panel-content>
+    <p>Usage statistics for this site (e.g. page visits) available at <a href="https://analytics.google.com/analytics" target="_blank">Google Analytics</a>.</p>
+      <p>The access can be graned by any of the current administrators of the project. An Google account (e.g. GMail or Google Suite account) is required.</p>
+    </v-expansion-panel-content>
     </v-expansion-panel>  
     <v-expansion-panel>
     <v-expansion-panel-header><h3><v-icon color="primary" left>mdi-server</v-icon> Resource management</h3></v-expansion-panel-header>
@@ -95,7 +110,7 @@
     <p>For editing the content of the home page, you have to have a GitHub account. Then contact the <a href="mailto:adam@nastojte.cz">repository owner</a> to add you the rights to edit the source code. The content of the home page can be edited in the <a href="https://github.com/oookoook/spider-trait-database/blob/master/frontend/src/views/Home.vue" target="_blank"> Home.vue</a> file. After making changes to the the source code, the new version must be deployed.</p>
     <p>To deploy a new version of the app, perform the following steps:</p>
     <ul>
-      <li>Get the private SSH key from the <a href="https://gitlab.ics.muni.cz/spider-trait-database-admin">private project repository</a>. Contact any of the repository admins to get access.</li>
+      <li>Get the private SSH key from the <a href="https://github.com/oookoook/spider-trait-database-admin" target="_blank">private project repository</a>. Contact any of the repository admins to get access.</li>
       <li>Connect to the production server using SSH and the downloaded SSH key, e.g. <code>ssh -i ~/spider-trait-database.pem centos@spidertraits.sci.muni.cz</code>.</li>
       <li>Run the following command in the terminal: <code>cd /opt/spidertraits/spider-trait-database/ &amp;&amp; ./build</code></li>
       <li>After the deployment ends, you can close the SSH connection.</li>
