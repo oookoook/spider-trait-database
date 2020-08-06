@@ -110,6 +110,11 @@
           <v-list-item-icon><v-icon>mdi-shield-check-outline</v-icon></v-list-item-icon>
           <v-list-item-content><v-list-item-title>Policy statement</v-list-item-title></v-list-item-content>
         </v-list-item>
+        <v-list-item href="https://github.com/oookoook/spider-trait-database" target="_blank">
+          <v-list-item-icon><v-icon>mdi-github</v-icon></v-list-item-icon>
+          <v-list-item-content><v-list-item-title>Source code</v-list-item-title></v-list-item-content>
+        </v-list-item>
+
       </v-list>
     </v-menu>
       </v-toolbar-items>
@@ -153,15 +158,15 @@
     </v-main>
     <v-footer dark color="primary" class="mt-16">
       <v-row class="mx-5 my-4 text-body-2">
-        <v-col cols="4" class="d-inline-flex align-start flex-row">
+        <v-col cols="12" sm="4" class="d-inline-flex align-start flex-row">
           <a target="_blank" href="https://muni.cz/en">
-          <v-img contain :src="require('./assets/muni-white.png')" height="47" max-width="164" width="164" class="mr-5"/>
+          <v-img contain :src="require('./assets/muni-white.png')" height="47" max-width="164" class="mr-5"/>
           </a>
-          <a target="_blank" href="https://muni.cz/en">
-          <v-img contain :src="require('./assets/muni-lg-text-eng-white.png')" height="47" max-width="183" width="183" class="ml-5"/>
+          <a target="_blank" href="https://muni.cz/en" v-if="showLargeLogo">
+          <v-img contain :src="require('./assets/muni-lg-text-eng-white.png')" height="47" max-width="183" class="ml-5"/>
           </a>
         </v-col>
-        <v-col cols="4" class="d-flex align-center flex-row">
+        <v-col cols="12" sm="4" class="d-flex align-center flex-row">
           <!--
           The core team (in alphabetical order): Klaus Birkhofer, Pedro Cardoso,<br />
           Ludmila Cernecka, Marie Herberstein, Lizzy Lowe, Stefano Mammola,<br />
@@ -172,8 +177,11 @@
           <!-- , doi: -->
           </div>
         </v-col>
-        <v-col cols="4" class="d-flex align-end justify-center flex-column">
-          <v-row class="my-auto mx-1 align-center">
+        <v-col cols="12" sm="4" class="d-flex align-start align-sm-end justify-center flex-column">
+          <v-row class="mx-1 mb-1 align-center subtitle-2">
+            <span>© <a href="https://www.sci.muni.cz/zoolecol/inverteb/?teams=prof-stano-pekar-ph-d" target="_blank" class="white--text">Pekár</a>, <a href="https://nastojte.cz" target="_blank" class="white--text">Kučera</a> 2020</span>
+          </v-row>
+          <v-row class="mx-1 align-center">
           <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" title="Creative Commons Attribution 4.0 International (CC BY 4.0)">
           <v-img class="mr-2" width="30" height="30" :src="require('./assets/cc.svg')" alt="CC" />
           </a>
@@ -181,6 +189,7 @@
           <v-img width="30" height="30" :src="require('./assets/by.svg')" alt="BY" />
           </a>
           </v-row>
+          
         </v-col>
       </v-row>
     </v-footer>
@@ -199,6 +208,15 @@ export default {
   data: () => ({
   }),
   computed: {
+    showLargeLogo() {
+      switch (this.$vuetify.breakpoint.name) {
+          case 'xs': return true; 
+          case 'sm': 
+          case 'md': return false;
+          case 'lg': 
+          case 'xl': return true;
+      }
+    },
     ...mapGetters(['notification'])
   }
 }

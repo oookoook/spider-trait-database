@@ -51,8 +51,10 @@
           The use of this database is limited to <b>research, educational, non-commercial use</b>. 
           Contained data are publicly available under a CC BY license (Creative Commons Attribution). 
           The user is free to download, share and adapt the data, as long as the Database is cited 
-          as the source of the information. This database should be cited as follows: <em>Pekár S., Černecká Ľ., Wolff J., Mamola S., Cardoso P., Lowe E., Sazuri C., Birkhofer K. &amp; Herberstein M. 2020. The world spider trait database. Masaryk University, Brno, URL: https://spidertraits.sci.muni.cz</em>
-        </p>
+          as the source of the information. This database should be cited as follows:</p>
+          <blockquote class="blockquote about-text text-center">
+          Pekár S., Černecká Ľ., Wolff J., Mamola S., Cardoso P., Lowe E., Sayuri C., Birkhofer K. &amp; Herberstein M. 2020. The world spider trait database. Masaryk University, Brno, URL: https://spidertraits.sci.muni.cz</em>
+          </blockquote>
         <v-img class="mx-auto mt-16" contain width="153" height="94" :src="require('../assets/edu.png')" />
         </v-col>
       </v-row>

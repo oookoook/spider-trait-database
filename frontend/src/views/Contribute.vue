@@ -22,7 +22,7 @@
         <v-img contain width="515" :src="require('../assets/contact.png')" />
       </v-col>
       <v-col cols="7" class="about-text text-xl-h5 text-subtitle-1">
-      If you are ready to contribute data to the database, please contact the <a href="mailto:spidertraits@group.muni.cz">administrator at spidertraits@group.muni.cz</a>. 
+      If you are ready to contribute data to the database, please contact the <a href="mailto:spidertraits@group.muni.cz">administrator</a>. 
       You will receive a username and a password, which will give you access to the submission page.
       </v-col>
     </v-row>
@@ -62,7 +62,7 @@ The contributor should also provide either only the <code>method_abbrev</code> i
 <p class="about-text text-xl-h5 text-subtitle-1">When the contributor completes the changes and the dataset is valid, they can send the dataset to the editor for review (by clicking the <em>Send for review</em> button). The contributor can include a message to the editor when submitting the dataset for review in which they can explain any problems they had encountered while editing the dataset.</p>
 <p class="about-text text-xl-h5 text-subtitle-1">Once the dataset is validated by the editor it will be submitted to the database. This means that all the data are transferred from the temporary import cache to the main database and become available for the general public to view and download.</p>
 <p class="about-text text-xl-h5 text-subtitle-1">If the dataset is rejected by the editor, the contributor can edit the dataset again by clicking the pen icon on the right. The contributor can also view any message from the editor by clicking the arrow that points downward.</p>
-<p class="about-text text-xl-h5 text-subtitle-1">Thank you for considering contributing your data to the world spider database and if you have any further questions please contact <a href="mailto:spidertraits@group.muni.cz">spidertraits@group.muni.cz</a>.</p>
+<p class="about-text text-xl-h5 text-subtitle-1">Thank you for considering contributing your data to the world spider database and if you have any further questions please contact us at <a href="mailto:spidertraits@group.muni.cz">spidertraits@group.muni.cz</a>.</p>
   </v-container>
 </template>
 <style scoped>
