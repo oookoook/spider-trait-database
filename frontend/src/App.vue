@@ -179,7 +179,7 @@
         </v-col>
         <v-col cols="12" sm="4" class="d-flex align-start align-sm-end justify-center flex-column">
           <v-row class="mx-1 mb-1 align-center subtitle-2">
-            <span>© <a href="https://www.sci.muni.cz/zoolecol/inverteb/?teams=prof-stano-pekar-ph-d" target="_blank" class="white--text">Pekár</a>, <a href="https://nastojte.cz" target="_blank" class="white--text">Kučera</a> 2020</span>
+            <span><a href="https://www.sci.muni.cz/zoolecol/inverteb/?teams=prof-stano-pekar-ph-d" target="_blank" class="white--text">Pekár</a>, <a href="https://nastojte.cz" target="_blank" class="white--text">Kučera</a> 2020</span>
           </v-row>
           <v-row class="mx-1 align-center">
           <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" title="Creative Commons Attribution 4.0 International (CC BY 4.0)">
