@@ -28,3 +28,18 @@
   </ul>
   </v-container>
 </template>
+<script>
+export default {
+  name: "policy",
+  data() {
+    return {
+    }
+  },
+  computed: {
+  },
+  methods: {
+  }
+};
+</script>
+<style scoped>
+</style>
