@@ -5,26 +5,29 @@
     <v-row class="about-text text-xl-h5 text-subtitle-1 justify-center">
       <v-col cols="8">
       <p class="mt-5">List of publications that used data from WST database:</p>
-      <vue-markdown :source="publications"></vue-markdown>
+      <div v-html="publicationsHtml"></div>
       </v-col>
     </v-row>
   </v-container>
 </template>
 <script>
 import { mapState, mapGetters } from 'vuex'
-import VueMarkdown from 'vue-markdown'
+import MarkdownIt from 'markdown-it'
 
 export default {
   name: 'publications',
   components: {
-    VueMarkdown
   },
   props: [],
   data () {
     return {
+      md: new MarkdownIt()
     }
   },
   computed: {
+    publicationsHtml() {
+      return this.md.render(this.publications);
+    },
     ...mapGetters(['publications'])
   },
   watch: {
