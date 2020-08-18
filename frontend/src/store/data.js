@@ -60,7 +60,7 @@ export default {
           return state.link;
         },
         autocomplete: (state) => (entity) => state.autocomplete[entity],
-        homeStats: (state) => (entity) => state.homeStats[entity] || '...'
+        homeStats: (state) => (entity) => state.homeStats[entity] !== null ? state.homeStats[entity] : '...'
 
     },
     actions: {
