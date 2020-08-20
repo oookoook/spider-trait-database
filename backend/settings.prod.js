@@ -38,8 +38,8 @@ module.exports = {
         }
     },
     mail: {
-        sender: 'spidertraits@group.muni.cz',
-        admins: 'spidertraits@group.muni.cz',
+        sender: 'spidertraits@sci.muni.cz',
+        admins: 'spidertraits@sci.muni.cz',
         host: 'rs.cesnet.cz',
         port: 25,
         secure: false,

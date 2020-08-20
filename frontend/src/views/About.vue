@@ -66,9 +66,9 @@
       
       <v-col cols="6"  class="d-flex flex-column">
         <p class="about-text text-center text-xl-h5 text-subtitle-1">
-          If you detected errors or malfunctions, please, bring them to our attention by sending a message to <!-- <a href="spidertraits@group.muni.cz">spidertraits@group.muni.cz</a>. -->
+          If you detected errors or malfunctions, please, bring them to our attention by sending a message to <!-- <a href="spidertraits@sci.muni.cz">spidertraits@sci.muni.cz</a>. -->
         </p>
-        <v-btn class="mx-auto mt-8" width="300" x-large rounded color="primary" href="mailto:spidertraits@group.muni.cz">E-mail</v-btn>
+        <v-btn class="mx-auto mt-8" width="300" x-large rounded color="primary" href="mailto:spidertraits@sci.muni.cz">E-mail</v-btn>
         <p class="about-text text-center text-xl-h5 text-subtitle-1 mt-16">Suggestions for improvement of the database are also welcomed.</p>
       </v-col>
       <v-img contain max-width="50" max-height="50" width="50" height="50" :src="require('../assets/repair.png')" />

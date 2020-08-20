@@ -57,15 +57,16 @@
     </v-list>
     -->
     <v-row>
-      <!-- links to the new IDM version
+     <!-- links to the new IDM version -->
     <action-button color="primary" text="Contributors" icon="mdi-share" link="https://perun.aai.muni.cz/organizations/363/groups/6484/members" />
     <action-button color="primary" text="Editors" icon="mdi-stamper" link="https://perun.aai.muni.cz/organizations/363/groups/6483/members" />
     <action-button color="primary" text="Administrators" icon="mdi-cogs" link="https://perun.aai.muni.cz/organizations/363/groups/6482/members" />  
-     -->
-
+     
+    <!-- links to the old IDM version
      <action-button color="primary" text="Contributors" icon="mdi-share" link="https://idm.ics.muni.cz/fed/gui/#grp/detail?id=6484&amp;active=1;" />
     <action-button color="primary" text="Editors" icon="mdi-stamper" link="https://idm.ics.muni.cz/fed/gui/#grp/detail?id=6483&amp;active=1;" />
     <action-button color="primary" text="Administrators" icon="mdi-cogs" link="https://idm.ics.muni.cz/fed/gui/#grp/detail?id=6482&amp;active=1;" />  
+    -->
     </v-row>
 
       </v-expansion-panel-content>
