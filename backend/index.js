@@ -26,7 +26,7 @@ app.use(cors({
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: false}));
 
-// this should handle the history mode of Vuex router - redirects reequests to text/html to ./index.html which is server by express.static
+// this should handle the history mode of Vuex router - redirects requests to text/html to ./index.html which is served by express.static
 // rewrites - ignore backend calls
 app.use(history({
     rewrites: [
@@ -50,12 +50,26 @@ app.use(history({
           // just get the same url that was on input
           return context.parsedUrl.href;
         }
+      },
+      // ugly LSID parsing hack
+      // bypassing the dot rule of the history middleware
+      // the lsid contains dot which prevents the path to be handled automatically by the history module
+      {
+        from: /^\/taxonomy\/lsid\/.*$/,
+        to: function(context) {
+          // just get the same url that was on input
+          return 'index.html';
+        }
       }
-    ]
+    ],
+    //verbose: true
   }));
 
 // serving the frontend
-app.use(express.static(settings.frontend.path));
+app.use(express.static(settings.frontend.path, {
+  dotfiles: 'allow',
+  //fallthrough: false
+}));
 
 
 cauth.setClaims(settings.oidc.claims);
