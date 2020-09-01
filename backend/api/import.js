@@ -1022,7 +1022,9 @@ const validate = async function(params) {
     + ` (location_country_code IS NULL OR location_country_id IS NOT NULL) AND`
     // + ` (location_habitat_global IS NULL OR location_habitat_global_id IS NOT NULL) AND`
     + ` (event_date IS NULL OR (event_date_start IS NOT NULL AND event_date_end IS NOT NULL)) AND`
-    + ` (require_numeric_value = 0 OR value_numeric = value OR (value = 'true' AND value_numeric = 1) OR (value = 'false' AND value_numeric = 0)) AND`
+    //+ ` (require_numeric_value = 0 OR value_numeric = value OR (value = 'true' AND value_numeric = 1) OR (value = 'false' AND value_numeric = 0)) AND`
+    + ` (require_numeric_value = 0 OR (value = 'true' AND value_numeric = 1) OR (value = 'false' AND value_numeric = 0) OR ABS(value_numeric - value) <= 0.0001) AND`
+    
     + ` duplicate = 0 AND `
     + ` dataset_id = ? AND changed = 1`, values: [ds] });
 
