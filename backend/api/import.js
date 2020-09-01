@@ -81,7 +81,7 @@ const joindt = 'import LEFT JOIN dataset ON import.dataset_id = dataset.id '
 
 const joinv = 'import LEFT JOIN trait ON import.trait_abbrev = trait.abbrev '
             + 'LEFT JOIN data_type ON import.trait_data_type = data_type.name OR trait.data_type_id = data_type.id '
-            + 'LEFT JOIN trait_category ON import.trait_category = trait_category.name '
+            + 'LEFT JOIN trait_category ON import.trait_category = trait_category.name OR trait.trait_category_id = trait_category.id '
             + 'LEFT JOIN taxonomy ON import.wsc_lsid IS NOT NULL AND import.wsc_lsid = taxonomy.wsc_lsid '
             + 'LEFT JOIN taxonomy taxonomy_names ON import.original_name IS NOT NULL AND import.original_name = taxonomy_names.full_name '
             + 'LEFT JOIN sex ON import.sex = sex.name '

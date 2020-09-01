@@ -66,10 +66,7 @@ app.use(history({
   }));
 
 // serving the frontend
-app.use(express.static(settings.frontend.path, {
-  dotfiles: 'allow',
-  //fallthrough: false
-}));
+app.use(express.static(settings.frontend.path));
 
 
 cauth.setClaims(settings.oidc.claims);
