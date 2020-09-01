@@ -15,8 +15,13 @@ const send = async function (message) {
     try {
         await transporter.sendMail(message);
     } catch(err) {
-        console.log('Unable to send mail message');
-        console.log(err);
+        if((err.responseCode == 450 || err.responseCode == 451) && err.response && err.response.indexOf('Greylisted') > 0) {
+            // wait 15 minutes before re-sending
+            setTimeout(async () => await transporter.sendMail(message), 900000);
+        } else {
+            console.error('Unable to send mail message');
+            console.error(err);
+        }
         return;
     }
 }
