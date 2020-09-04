@@ -44,7 +44,7 @@ export default {
   },
   data () {
     return {
-      footerProps: { 'items-per-page-options': [ 10, 15, 50, 100, -1 ] },
+      footerProps: { 'items-per-page-options': [ 10, 15, 50, 100, 200 ] },
       selectedId: null,
       selectedProp: null
     }

@@ -1,3 +1,4 @@
 lastrun
 *.log
 *.sql
+!combinations.sql

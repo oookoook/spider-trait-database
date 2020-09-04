@@ -2,7 +2,7 @@
   <v-card :loading="loading">
       <v-card-title v-if="item">{{ getTaxon(item) }}</v-card-title>
       <v-card-subtitle v-if="item">
-        <v-breadcrumbs class="px-0" :items="[{ text: 'Taxonomy', to: `/taxonomy`, exact: true }, { text: getTaxon(item), to: currentPath }]"/>
+        <v-breadcrumbs class="px-0" :items="[{ text: 'Taxa', to: `/taxonomy`, exact: true }, { text: getTaxon(item), to: currentPath }]"/>
       </v-card-subtitle>
       
       <v-card-text v-if="item">

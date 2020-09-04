@@ -83,7 +83,9 @@ const joinv = 'import LEFT JOIN trait ON import.trait_abbrev = trait.abbrev '
             + 'LEFT JOIN data_type ON import.trait_data_type = data_type.name OR trait.data_type_id = data_type.id '
             + 'LEFT JOIN trait_category ON import.trait_category = trait_category.name OR trait.trait_category_id = trait_category.id '
             + 'LEFT JOIN taxonomy ON import.wsc_lsid IS NOT NULL AND import.wsc_lsid = taxonomy.wsc_lsid '
-            + 'LEFT JOIN taxonomy taxonomy_names ON import.original_name IS NOT NULL AND import.original_name = taxonomy_names.full_name '
+            + 'LEFT JOIN taxonomy full_names ON import.original_name IS NOT NULL AND import.original_name = full_names.full_name '
+            + 'LEFT JOIN taxonomy_name ON import.original_name IS NOT NULL AND import.original_name = taxonomy_name.name '
+            + 'LEFT JOIN taxonomy synonyms ON taxonomy_name.taxonomy_id = taxonomy.id '
             + 'LEFT JOIN sex ON import.sex = sex.name '
             + 'LEFT JOIN life_stage ON import.life_stage = life_stage.name '
             + 'LEFT JOIN measure ON import.measure = measure.name '
@@ -519,7 +521,7 @@ const importRow = async function(conn, ds, r, state, cache) {
     try { 
         await db.cquery(conn, {table: 'import', sql: 'INSERT INTO import SET ?', values: [row]});
     } catch (err) {
-        console.log(err);
+        console.error(err);
         state.errors.push(`Row skipped: ${JSON.stringify(row)}, error: ${err}`);
         return false;
     }
@@ -908,6 +910,7 @@ const getColumn = async function(params, limits, auth) {
         if(column == 'location') {
             cols.push('location_lat_conv');
             cols.push('location_lon_conv');
+            cols.push('location_altitude_numeric')
             cols.push('location_country_id');
             //cols.push('location_habitat_global_id');
         }
@@ -980,9 +983,9 @@ const validate = async function(params) {
     + ` location_id = COALESCE(location.id, loccoord.id), `
     // + `location_habitat_global_id = habitat_global.id, `
     + ` location_country_id = COALESCE(country3.id,country2.id), `
-    + ` import.taxonomy_id = CASE WHEN taxonomy_names.id IS NULL THEN NULL WHEN taxonomy.id IS NOT NULL AND taxonomy_names.id IS NOT NULL `
-    + `   AND COALESCE(taxonomy.valid_id, taxonomy.id) <> COALESCE(taxonomy_names.valid_id, taxonomy_names.id) `
-    + `    THEN NULL ELSE COALESCE(taxonomy.valid_id, taxonomy.id, taxonomy_names.valid_id, taxonomy_names.id) END, `
+    + ` import.taxonomy_id = CASE WHEN taxonomy.id IS NOT NULL AND (full_names.id IS NOT NULL OR synonyms.id IS NOT NULL)`
+    + `   AND COALESCE(taxonomy.valid_id, taxonomy.id) <> COALESCE(full_names.valid_id, full_names.id, synonyms.valid_id, synonyms.id) `
+    + `    THEN NULL ELSE COALESCE(taxonomy.valid_id, taxonomy.id, full_names.valid_id, full_names.id, synonyms.valid_id, synonyms.id) END, `
     + ` require_numeric_value = CASE WHEN data_type.name <> 'Character' AND data_type.name <> 'Categorical' THEN 1 ELSE 0 END `
     + ` WHERE changed = 1 AND dataset_id = ?`, values: [ds] });
 
@@ -1065,6 +1068,7 @@ const validate = async function(params) {
 var synonyms = {
     'taxonomy.wscLsid': 'wsc_lsid',
     'taxonomy.originalName': `original_name`,
+    'taxonomy.fullName': `taxonomy.full_name`,
     'location.abbrev': 'location_abbrev',
     'location.coords.lon': 'location_lon',
     'location.coords.lat': 'location_lat',

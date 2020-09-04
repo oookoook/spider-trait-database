@@ -20,6 +20,7 @@
       :server-items-length="total"
       :loading="loading"
       class="elevation-1"
+      sort-by="fullCitation"
     >
     
     <template v-slot:item.abbrev="{ item }">

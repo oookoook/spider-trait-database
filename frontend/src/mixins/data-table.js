@@ -3,7 +3,7 @@ export default {
     props: { items: Array, total: { type: Number, default: 0 }, loading: Boolean, options: Object },
     data() {
         return {
-          footerProps: { 'items-per-page-options': [ 10, 15, 50, 100, -1 ] },
+          footerProps: { 'items-per-page-options': [ 10, 15, 50, 100, 200 ] },
           needsCount: true,
           optsExtChange: this.options != null,
           opts: this.options,

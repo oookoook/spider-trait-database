@@ -1,7 +1,7 @@
 <template>
   <v-card>
     <v-card-title>
-      Taxonomy
+      Taxa
       <v-spacer></v-spacer>
       <list-filter 
       :search-fields="searchFields" 

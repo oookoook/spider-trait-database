@@ -22,13 +22,13 @@ const get = async function(tmpDir, filename, dstream, connection) {
         
     
     const fstream = fs.createWriteStream(p, { encoding: 'utf8' });
-    fstream.on('finish', () => { console.log('writing ended'); resolve(path); });
+    fstream.on('finish', () => { /*console.log('writing ended');*/ resolve(path); });
     cstream.pipe(fstream);
 
     dstream
         .on('error', function(err) {
         // Handle error, an 'end' event will be emitted after this as well
-        console.log(err);
+        console.error(err);
         })
         .on('fields', function(fields) {
         // the field packets for the rows to follow
@@ -54,7 +54,7 @@ const excel = async function(tmpDir, filename, records) {
     if(records.length == 0) {
        header = "NO DATA";
     } else {
-        console.log(Object.keys(records[0]));
+        //console.log(Object.keys(records[0]));
         header = Object.keys(records[0]);
     }
 

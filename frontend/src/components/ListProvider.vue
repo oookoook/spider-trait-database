@@ -89,6 +89,12 @@ export default {
       console.dir(params);
       if(!params) {
         console.log('no params provided');
+        /*
+        if(this.items && this.items.length > 0) {
+          console.log('this is not the first load, ignoring the update...');
+          return;
+        }
+        */
         params = {};
         params.count = true;
         params.search = null;
