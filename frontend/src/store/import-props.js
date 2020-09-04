@@ -67,7 +67,10 @@ export default [
         if (!!i.taxonomy.wscLsid && !!i.taxonomy.originalName && !i.taxonomy.id) {
           return 'LSID and Original name do not refer to the same WSC taxon';
         }
-        return 'Unknow error';
+        if(!!i.taxonomy.originalName && !i.taxonomy.wscLsid && !i.taxonomy.id) {
+          return 'Unknown original name';
+        }
+        return 'Unknown error';
       },
       readOnly: true,
       isValid: (i, e) => {
@@ -81,7 +84,10 @@ export default [
         if (!!i.taxonomy.wscLsid && !!i.taxonomy.originalName && !i.taxonomy.id) {
           return 'LSID and Original name do not refer to the same WSC taxon';
         }
-        return 'Unknow error';
+        if(!!i.taxonomy.originalName && !i.taxonomy.wscLsid && !i.taxonomy.id) {
+          return 'Unknown original name';
+        }
+        return 'Unknown error';
       },
     },
     { 

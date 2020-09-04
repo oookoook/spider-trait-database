@@ -85,7 +85,7 @@ const joinv = 'import LEFT JOIN trait ON import.trait_abbrev = trait.abbrev '
             + 'LEFT JOIN taxonomy ON import.wsc_lsid IS NOT NULL AND import.wsc_lsid = taxonomy.wsc_lsid '
             + 'LEFT JOIN taxonomy full_names ON import.original_name IS NOT NULL AND import.original_name = full_names.full_name '
             + 'LEFT JOIN taxonomy_name ON import.original_name IS NOT NULL AND import.original_name = taxonomy_name.name '
-            + 'LEFT JOIN taxonomy synonyms ON taxonomy_name.taxonomy_id = taxonomy.id '
+            + 'LEFT JOIN taxonomy synonyms ON taxonomy_name.taxonomy_id = synonyms.id '
             + 'LEFT JOIN sex ON import.sex = sex.name '
             + 'LEFT JOIN life_stage ON import.life_stage = life_stage.name '
             + 'LEFT JOIN measure ON import.measure = measure.name '
@@ -575,38 +575,47 @@ const uploadFile = async function(params, body, files, auth) {
         // https://mariadb.com/kb/en/how-to-quickly-insert-data-into-mariadb/
         //await conn.query({table: 'import', sql: 'BEGIN'});
         await conn.query({table: 'import', sql: 'ALTER TABLE import DISABLE KEYS'});
-
+        await conn.query({table: 'import', sql: 'BEGIN'});
         // this promise will resolve when the last row is inserted into the db
         // the data events are fired asynchronously (they are not waiting for processing the previous row) and the queries are queued by the mysql client
         // releaseConnection is also queued and can be basically ignored in the flow 
         await new Promise((resolve, reject) => {
         var valCache = {};
-        fcsv.parseFile(fpath, {headers: true, ignoreEmpty: true, trim: true, encoding: 'utf8'})
-        .on('error', error => { params.state.errors.push[error]; params.state.aborted = true; resolve(); })
-        .on('data', async row => {  
+        var parser = fcsv.parseFile(fpath, {headers: true, ignoreEmpty: true, trim: true, encoding: 'utf8'})
+        .on('error', error => { console.error(error); params.state.errors.push[error]; params.state.aborted = true; resolve(); })
+        .on('data', row => {  
+            // NOT true anymore - pausing the parser should do synchronous processing
             // we are running async code here here, but another data event was already fired - the events are not waiting for each other
+            parser.pause();
+
+            (async () => {
+                /* speeding up the querying */ 
+                if(cnt-total % 1000 == 0 && cnt - total >= 1000) {
+                    await conn.query({table: 'import', sql: 'END'});
+                    await conn.query({table: 'import', sql: 'BEGIN'});
+                }
+                await importRow(conn, params.ds, row, params.state, valCache);
+                
+                cnt-=1;
+                parser.resume();
+                if(cnt == 0) {
+                    await conn.query({table: 'import', sql: 'END'});
+                    console.log('Last row processed. Enabling indexes...');
+                    await conn.query({table: 'import', sql: 'ALTER TABLE import ENABLE KEYS'});
+                    db.releaseConnection(conn); 
+                    console.log('Connecton released');
+                    resolve();
+                }
+            })(); 
+
             
-            /* speeding up the querying 
-            if(cnt-total % 1000 == 0 && cnt - total >= 1000) {
-                await conn.query({table: 'import', sql: 'END'});
-                await conn.query({table: 'import', sql: 'BEGIN'});
-            }
-            */
-            await importRow(conn, params.ds, row, params.state, valCache);
-            
-            cnt-=1;
-            if(cnt == 0) {
-                console.log('Last row processed. Enabling indexes...');
-                await conn.query({table: 'import', sql: 'ALTER TABLE import ENABLE KEYS'});
-                db.releaseConnection(conn); 
-                console.log('Connecton released');
-                resolve();
-            }
         })
         // when the last record is added to the db queue, an callback is attached to the connection release
         // when the connection is released, the callback is called
         .on('end', rowCount => { /* console.log('csv processing ended - conn released'); db.releaseConnection(conn); db.releaseConnection(conn, () => resolve())*/ });
         });
+
+        console.log('Upload finished');
         // now all the records are saved in the db or the import was aborted due to the error
         if(params.state.aborted) {
             return;

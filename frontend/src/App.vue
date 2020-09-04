@@ -42,7 +42,7 @@
         </v-list-item>
         <v-list-item to="/taxonomy">
           <v-list-item-icon><v-icon>mdi-file-tree</v-icon></v-list-item-icon>
-          <v-list-item-content><v-list-item-title>Taxonomy</v-list-item-title></v-list-item-content>
+          <v-list-item-content><v-list-item-title>Taxa</v-list-item-title></v-list-item-content>
         </v-list-item>
         <v-list-item to="/methods">
           <v-list-item-icon><v-icon>mdi-chart-bell-curve</v-icon></v-list-item-icon>
