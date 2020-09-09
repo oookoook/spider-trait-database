@@ -11,6 +11,7 @@
           <list-item title="Author(s)" :text="item.authors" icon="mdi-account-edit-outline" />
           <list-item title="Author email(s)" v-if="showUpdate && item.authorsEmail" :text="item.authorsEmail" icon="mdi-email-edit-outline" />
           <list-item title="Uploaded" :text="new Date(item.date).toISOString().substring(0,10)" icon="mdi-calendar" />
+          <list-item title="Record count" :text="item.records" icon="mdi-numeric" />
           <list-item title="State" icon="mdi-checkbox-marked-outline" ><span style="text-transform: capitalize;">{{item.state}}</span></list-item>    
         </v-list>
         <v-card-actions  v-if="item">

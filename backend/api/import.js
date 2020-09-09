@@ -344,7 +344,7 @@ const changeState = async function(params, body, auth) {
         };
     } else if(currStateNum == 2 && imp == 3) {
         // dataset is approved now
-        var jobId = jm.createJob(auth.sub, 6, transferToData, { id, aw });
+        var jobId = jm.createJob(auth.sub, 7, transferToData, { id, aw });
         return {
             job: jm.getJob(jobId)
         };
@@ -406,6 +406,11 @@ const transferToData = async function(params) {
 
     await db.cquery(c, {table: 'dataset', sql: `UPDATE dataset SET imported = 3, message = null WHERE id = ? AND ${aw}`, values: [id] });
     state.progress+=1;
+
+    await db.cquery(c, {table: 'dataset', sql: `UPDATE dataset SET records = (SELECT COUNT(*) FROM data WHERE dataset_id = dataset.id), message = null WHERE id = ? AND ${aw}`, values: [id] });
+    state.progress+=1;
+
+
     db.releaseConnection(c);
     
     state.completed = true;
@@ -1035,7 +1040,7 @@ const validate = async function(params) {
     // + ` (location_habitat_global IS NULL OR location_habitat_global_id IS NOT NULL) AND`
     + ` (event_date IS NULL OR (event_date_start IS NOT NULL AND event_date_end IS NOT NULL)) AND`
     //+ ` (require_numeric_value = 0 OR value_numeric = value OR (value = 'true' AND value_numeric = 1) OR (value = 'false' AND value_numeric = 0)) AND`
-    + ` (require_numeric_value = 0 OR (value = 'true' AND value_numeric = 1) OR (value = 'false' AND value_numeric = 0) OR ABS(value_numeric - value) <= 0.0001) AND`
+    + ` (require_numeric_value = 0 OR (value = 'true' AND value_numeric = 1) OR (value = 'false' AND value_numeric = 0) OR ABS(value_numeric - CAST(value as decimal(15,4))) <= 0.0001) AND`
     
     + ` duplicate = 0 AND `
     + ` dataset_id = ? AND changed = 1`, values: [ds] });

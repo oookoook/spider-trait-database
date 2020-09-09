@@ -62,6 +62,7 @@ export default {
       ],
       headers: [
         { text: 'Dataset Name', value: 'name' },
+        { text: 'Records', value: 'records'},
         { text: 'Authors', value: 'authors', width: 300 },
         { text: 'Uploader', value: 'uploader', width: 300 },
         { text: 'Uploaded', value: 'uploaded'},
