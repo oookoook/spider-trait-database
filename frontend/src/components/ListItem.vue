@@ -6,7 +6,7 @@
 
     <v-list-item-content>
       <v-list-item-title>{{title}}</v-list-item-title>
-      <v-list-item-subtitle><span v-if="text">{{text}}</span><slot v-else></slot></v-list-item-subtitle>
+      <v-list-item-subtitle><span v-if="text != null">{{text}}</span><slot v-else></slot></v-list-item-subtitle>
     </v-list-item-content>
 
     <v-list-item-action v-if="link">

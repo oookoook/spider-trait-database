@@ -344,7 +344,7 @@ const changeState = async function(params, body, auth) {
         };
     } else if(currStateNum == 2 && imp == 3) {
         // dataset is approved now
-        var jobId = jm.createJob(auth.sub, 7, transferToData, { id, aw });
+        var jobId = jm.createJob(auth.sub, 6, transferToData, { id, aw });
         return {
             job: jm.getJob(jobId)
         };
@@ -404,12 +404,8 @@ const transferToData = async function(params) {
     
     state.progress+=1;
 
-    await db.cquery(c, {table: 'dataset', sql: `UPDATE dataset SET imported = 3, message = null WHERE id = ? AND ${aw}`, values: [id] });
+    await db.cquery(c, {table: 'dataset', sql: `UPDATE dataset SET imported = 3, records = (SELECT COUNT(id) FROM data WHERE dataset_id = dataset.id), message = null WHERE id = ? AND ${aw}`, values: [id] });
     state.progress+=1;
-
-    await db.cquery(c, {table: 'dataset', sql: `UPDATE dataset SET records = (SELECT COUNT(*) FROM data WHERE dataset_id = dataset.id), message = null WHERE id = ? AND ${aw}`, values: [id] });
-    state.progress+=1;
-
 
     db.releaseConnection(c);
     
@@ -861,7 +857,8 @@ const updateColumn = async function(params, body, auth) {
     console.dir(nv);
     console.dir(cw);
     */
-    var results = await db.query({table: 'import', sql:`UPDATE ${joind} SET ?? = ?, valid_review = 0, valid = 0, duplicate=0, changed = 1 WHERE ${cw} AND dataset_id = ? AND ${aw}`, values: [column, nv, ds ] });
+   // if using valies array, question marks in cw cause problems and are replaced instead of the proper ones
+    var results = await db.query({table: 'import', sql:`UPDATE ${joind} SET ${db.escapeId(column)} = ${db.escape(nv)}, valid_review = 0, valid = 0, duplicate=0, changed = 1 WHERE ${cw} AND dataset_id = ${db.escape(ds)} AND ${aw}`, values: [] });
     
     // run the validation as a new job and return a job id
     //validate(ds, aw); 
