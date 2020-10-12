@@ -153,13 +153,14 @@ const updateTaxon = async function(conn, t) {
 }
 
 const updateTaxonLinks =async function(conn) {
-    await db.cquery(conn, {table: 'taxonomy', sql: 'UPDATE taxonomy a LEFT JOIN taxonomy b ON a.wsc_lsid = b.valid_wsc_lsid SET b.valid_id = a.id '
-    +'WHERE b.valid_id IS NULL AND b.valid = 0' });
+    await db.cquery(conn, {table: 'taxonomy', sql: `UPDATE taxonomy a LEFT JOIN taxonomy b ON a.wsc_lsid = b.valid_wsc_lsid SET b.valid_id = a.id 
+    WHERE b.valid_id IS NULL AND b.valid = 0` });
 
     // update all the existing records in the data table
     // that are linked to invalid taxonomy records
-    await db.cquery(conn, {table: 'taxonomy', sql: 'UPDATE data INNER JOIN taxonomy ON data.taxonomy_id = taxonomy.id SET data.taxonomy_id = taxonomy.valid_id '
-    +'WHERE taxonomy.valid = 0' });
+    // dont do this - keep the original references
+    //await db.cquery(conn, {table: 'taxonomy', sql: 'UPDATE data INNER JOIN taxonomy ON data.taxonomy_id = taxonomy.id SET data.taxonomy_id = taxonomy.valid_id '
+    //+'WHERE taxonomy.valid = 0' });
 }
 
 const update = async function(from) {
@@ -186,7 +187,7 @@ const update = async function(from) {
     } catch (e) {
         console.error(e);
     }
-    //await updateTaxonLinks(conn);
+    await updateTaxonLinks(conn);
 
     db.releaseConnection(conn);
     db.endPool();

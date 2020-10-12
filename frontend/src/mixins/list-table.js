@@ -30,8 +30,9 @@ export default {
               console.log(`${this.$options.name } opts changed`);
               console.dir(oldVal);
               console.dir(this.options);
+              
               if(this.internalOptsChange == 0) {
-                console.log(`${this.$options.name } opts changed updating`);
+                console.log(`${this.$options.name } opts changed - updating`);
                 //this.needsCount = true;
                 this.update();
               } else {
@@ -44,14 +45,30 @@ export default {
         search(val, oldVal) {
           console.log('SEARCH!');
           // resetting the itemsPerPage so not all the results are loaded
-          this.internalOptsChange = 2;
+          //this.internalOptsChange = 2;
           
-          // two option changes are ignored
-          this.options.itemsPerPage = 10;
-          this.options.page = 1;
+          // two option changes are ignored (they trigger the options watcher)
+          //this.options.itemsPerPage = 10;
+          //this.options.page = 1;
+
+          // options will be set in the ListProvider, we want to ignore this
+          console.log('Preparing for internal change');
+          this.internalOptsChange = 0;
+            if(this.options.itemsPerPage != 10) {
+              console.log('items per page doesnt match');
+              this.internalOptsChange += 1;
+              this.options.itemsPerPage = 10;
+            }
+            if(this.options.page != 1) {
+              console.log('page doesnt match');
+              this.internalOptsChange += 1;
+              this.options.page = 1;
+            }
+            //opts.tableReset = true;
           
+          console.dir(this.internalOptsChange);
           this.needsCount = true;
-          //console.dir(this.options);
+          //console.dir(opts);
           this.update();
     
         },
@@ -63,7 +80,7 @@ export default {
             var search = null;
             var searchField = null;
             var searchLike = true;
-      
+
             if(this.search) {
               search = this.search.search;
               searchField = this.search.searchField;
@@ -71,7 +88,6 @@ export default {
               console.dir(this.search);
               console.log(this.needsCount);
             }
-            
       
             this.$emit('update', {options: this.options, count : this.needsCount, search, searchField, searchLike });
             this.needsCount = false;

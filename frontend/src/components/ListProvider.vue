@@ -39,7 +39,7 @@ export default {
       // debounce solves repeated filter updates when processing a new data filter from route in the data explorer
       // the debounced function is defined in the data so each instance of the list provider has its own function definiton
       // (this is needed when multiple list providers are included within the same component)
-      update: debounce(500, this.updateDirect),
+      update: debounce(500, true, this.updateDirect),
       autocomplete: debounce(500, this.autocompleteDirect),
     }
   },
@@ -107,9 +107,11 @@ export default {
           sortDesc: []
         }
       } else if(params.options) {
+        console.log('assigning options');
+        console.dir(this.options);
         this.options = params.options;
-        /*
         console.dir(params.options);
+        /*
         if(!this.options) {
           this.options = {};
         }
@@ -125,7 +127,8 @@ export default {
       }
       //console.dir(params);
       this.loading = true;
-      this.$store.dispatch(`${this.list}/${this.listAction}`,params).then(() => {this.loading = false; });
+      
+      this.$store.dispatch(`${this.list}/${this.listAction}`,params).then(() => { this.loading = false; });
     },
     autocompleteDirect(p) {
 
@@ -164,7 +167,7 @@ export default {
     }
   },
   beforeDestroy() {
-    //console.log('List provider destroyed');
+    console.log('List provider destroyed');
     //console.dir(this.options);
     this.$store.commit(`${this.list}/${this.savedOptionsState}`, { value: this.options });
   }
