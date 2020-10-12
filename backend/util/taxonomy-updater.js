@@ -158,9 +158,8 @@ const updateTaxonLinks =async function(conn) {
 
     // update all the existing records in the data table
     // that are linked to invalid taxonomy records
-    // dont do this - keep the original references
-    //await db.cquery(conn, {table: 'taxonomy', sql: 'UPDATE data INNER JOIN taxonomy ON data.taxonomy_id = taxonomy.id SET data.taxonomy_id = taxonomy.valid_id '
-    //+'WHERE taxonomy.valid = 0' });
+    await db.cquery(conn, {table: 'taxonomy', sql: 'UPDATE data INNER JOIN taxonomy ON data.taxonomy_id = taxonomy.id SET data.taxonomy_id = taxonomy.valid_id '
+    +'WHERE taxonomy.valid = 0' });
 }
 
 const update = async function(from) {
