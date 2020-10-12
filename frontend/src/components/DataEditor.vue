@@ -210,9 +210,11 @@ export default {
         console.dir(val);
         console.dir(this.dataset);
         // name did not changed - remove it form the object so no new unique id is added
+        /* not needed anymore, unique names are not added
         if(val.name == this.dataset.name) {
           delete(val.name);
         }
+        */
         this.$store.dispatch(`datasets/update`, val)
         .then(() => { 
           this.loading= false;

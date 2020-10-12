@@ -76,7 +76,7 @@ const get = async function(params, auth, showImport) {
 const prepareForCreate = function(dataset, auth) {
     dataset.imported = 0;
     dataset.sub = auth.sub;
-    dataset.name = db.unique(dataset.name);
+    //dataset.name = db.unique(dataset.name);
     dataset.date = new Date();
     dataset['authors_email'] = dataset.authorsEmail;
     delete(dataset.authorsEmail);
@@ -88,20 +88,28 @@ const prepareForUpdate = function(dataset, auth) {
     delete(dataset.sub);
     delete(dataset.valid);
     delete(dataset.date);
-    dataset.name = db.unique(dataset.name);
+    //dataset.name = db.unique(dataset.name);
     dataset['authors_email'] = dataset.authorsEmail;
     delete(dataset.authorsEmail);
     
 }
 
+// validate reference - check if abbrev is unique
+const validate = async function(dataset) {
+    if(!dataset.name || dataset.name.length == 0) {
+        return 'Dataset name cannot be empty.';
+    }
 
+    var r = await db.query({table: 'dataset', sql: 'SELECT id FROM dataset WHERE name = ?', values: [dataset.name], nestTables: false});
+    return (r.length == 0 || (dataset.id && r[0].id == dataset.id)) ? true : 'Dataset name is already used.';
+}
 
 const create = async function(body, auth) {
-    return await db.createEntity({ body, table: 'dataset', auth, prepareForSql: prepareForCreate });
+    return await db.createEntity({ body, table: 'dataset', auth, prepareForSql: prepareForCreate, validate });
 }
 
 const update = async function(params, body, auth) {
-    return await db.updateEntity({params, body, table: 'dataset', auth, prepareForSql: prepareForUpdate });
+    return await db.updateEntity({params, body, table: 'dataset', auth, prepareForSql: prepareForUpdate, validate });
 }
 
 const remove = async function(params, auth) {
