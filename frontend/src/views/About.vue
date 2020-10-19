@@ -12,7 +12,7 @@
         (see <router-link to="/traits">Lists – Traits</router-link> for current bait of traits). The data includes individual measurements, observations, or composite characteristics, 
         but exclude molecular data (such as DNA or protein sequences). 
         Faunistic records are also included if these contain reference to a species traits (e.g. habitat type), 
-        and there is an option for all records to be geo-referenced. For more details, see Lowe et al. (2020).</p>
+        and there is an option for all records to be geo-referenced. For more details, see <a href="http://www.americanarachnology.org/JoA_free/JoA_v48_n2/arac-48-02-103.pdf" target="_blank">Lowe et al. (2020)</a>.</p>
       </div>
       </v-col>
       <v-col cols="4">
