@@ -11,7 +11,7 @@ The Template contains the following 31 variables. Here follow their descriptions
 * `trait_data_type` – Trait data type (character). Eligible values include `integer`, `real number`, `character`.
 * `Trait_unit` – Units in which a trait is measured (character). Example: `mm`.
 * `value` – **Mandatory**. Measured value of a trait (Real number). Dot is used to separate decimals. Percentage sign (`%`) is allowed.
-* `measure` – Type of the measured value (character). Eligible values are: `single observation`, `mean`, `median`, `min`, `max`.
+* `measure` – Type of the measured value (character). Eligible values are: `single observation`, `mean`, `median`, `min`, `max`, `description`.
 * `sex` – Sex (character). Eligible values are: `female`, `male`, `both`, `unknown`.
 * `life_stage` – Ontogenetic stage (character). Eligible values are: `egg`, `larva`, `juvenile`, `adult`, `all`.
 * `frequency` – Relative frequency of occurrence (real number). Dot is used to separate decimals
