@@ -96,7 +96,7 @@
     <v-tab href="#raw"><info-icon icon="mdi-table-large" text="Raw data view"/></v-tab>
     <v-tab href="#chart"><info-icon icon="mdi-chart-bar" text="Trait values chart (a single trait must be filtered)"/></v-tab>
     <v-tabs-items v-model="tab">
-      <list-provider list="data" :filter="filter" v-slot="i" preload>
+      <list-provider list="data" :filter="filter" v-slot="i">
       <v-tab-item value="preview">
         <data-preview-table :items="i.items" :loading="i.loading" :total="i.total" :options="i.options" @update="i.update" />
       </v-tab-item>
@@ -149,6 +149,7 @@ export default {
       tab: null,
       tips: false,
       filters: [
+        { entity: 'order', endpoint: 'taxonomy', label:'Order', icon: 'mdi-bug-outline', valueField: 'taxonomy.order', searchFromStart: true, search: null },
         { entity: 'family', endpoint: 'taxonomy', label:'Family', icon: 'mdi-spider-web', valueField: 'taxonomy.family', searchFromStart: true, search: null },
         { entity: 'genus', endpoint: 'taxonomy', label:'Genus', icon: 'mdi-spider-thread', valueField: 'taxonomy.genus', searchFromStart: true, search: null },
         { entity: 'species', endpoint: 'taxonomy', label:'Genus & Species', icon: 'mdi-spider', valueField: 'taxonomy.id', textField: 'taxonomy.fullName'/*textField: ['taxonomy.genus', 'taxonomy.species', 'taxonomy.subspecies']*/, searchFromStart: true, search: null },
@@ -157,12 +158,11 @@ export default {
         { entity: 'trait', endpoint: 'traits', label:'Trait', icon: 'mdi-comment-question-outline', valueField: 'trait.id', textField: ['trait.abbrev', 'trait.name'], search: null },
         { entity: 'method', endpoint: 'methods', label:'Method', icon: 'mdi-chart-bell-curve', valueField: 'method.id', textField: ['method.abbrev', 'method.name'], search: null },
         { entity: 'location', endpoint: 'locations', label:'Location', icon: 'mdi-map-marker', valueField: 'location.id', textField: ['location.abbrev'], search: null },
-        { entity: 'country', endpoint: 'locations', label:'Country', icon: 'mdi-flag-outline', valueField: 'location.country.id', textField: ['location.country.code', 'location.country.name'], search: null },
-        //{ entity: 'habitat', endpoint: 'locations', label:'Global habitat', icon: 'mdi-map', valueField: 'location.habitatGlobal.id', textField: 'location.habitatGlobal.name', search: null },
+        { entity: 'country', endpoint: 'data', label:'Country', icon: 'mdi-flag-outline', valueField: 'country.id', textField: ['country.code', 'country.name'], search: null },
         { entity: 'dataset', endpoint: 'datasets', label:'Dataset', icon: 'mdi-table', valueField: 'dataset.id', textField: 'dataset.name', search: null },
         //{ entity: 'authors', endpoint: 'datasets', label:'Authors', icon: 'mdi-account-multiple', valueField: 'dataset.authors', search: null },
         { entity: 'reference', endpoint: 'references', label:'References', icon: 'mdi-bookmark-outline', valueField: 'reference.id', textField:'reference.fullCitation', search: null },
-        { entity: 'row-link', endpoint: 'data', label:'Row links', icon: 'mdi-link', valueField: 'rowLink', search: null },
+        //{ entity: 'row-link', endpoint: 'data', label:'Row links', icon: 'mdi-link', valueField: 'rowLink', search: null },
       ],
       shareMenu: false,
       internalRouteChange: false,

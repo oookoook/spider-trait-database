@@ -146,6 +146,8 @@ const props = {
       hint: 'Enter the value in the decimal format (e.g. 16.12345)',
       isValid: (v) => !v || !Number.isNaN(parseFloat(v)) || 'Value cannot be converted to a valid longitude.',
     },
+    // everything below moved to the data record
+    /*
     {
       name: 'altitude',
       label: 'Altitude',
@@ -176,6 +178,7 @@ const props = {
       label: 'Microhabitat',
       isValid: (v) => true
     },
+    */
   ],
   countries: [
     {
@@ -219,6 +222,44 @@ const props = {
     label: 'Name',
     isValid: (v) => !!v || 'Name is required'
   }],
+  taxonomy: [
+    {
+      name: 'order',
+      label: 'Order',
+      isValid: (v) => !!v || 'Order is required',
+      
+    },
+    {
+      name: 'family',
+      label: 'Family',
+      isValid: (v) => !!v || 'Family is required',
+    },
+    {
+      name: 'genus',
+      label: 'Genus',
+      isValid: (v) => true
+    },
+    {
+      name: 'species',
+      label: 'Species',
+      isValid: (v) => true
+    },
+    {
+      name: 'subspecies',
+      label: 'Subspecies',
+      isValid: (v) => true
+    },
+    {
+      name: 'validTaxon',
+      label: 'Valid taxon',
+      isValid: (v) => true,
+      autocomplete: {
+        endpoint: 'taxonomy',
+        valueField: 'id',
+        textField: 'fullName'
+      }
+    }
+  ]
 }
 
 export default (endpoint) => {

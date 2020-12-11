@@ -13,11 +13,10 @@
           <v-text-field
             v-model="dataset.name"
             :rules="nameRules"
-            :counter="240"
+            :counter="255"
             label="Dataset name"
             prepend-icon="mdi-table-search"
             :suffix="dataset.suffix"
-            hint="A uniqe ID will be appended to the entered name."
             required
           ></v-text-field>
             </v-col>

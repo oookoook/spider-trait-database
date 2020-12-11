@@ -27,7 +27,6 @@
     <template v-slot:item.method="{item}">
         <entity-link-cell v-if="item.method.abbrev" :abbrev="item.method.abbrev" :text="item.method.name" tooltip="View the method detail" :link="`/methods/${item.method.id}`" />
     </template>
-
     <template v-slot:item.location="{item}">
         <entity-link-cell v-if="item.location.abbrev" :text="item.location.abbrev" tooltip="View the location detail" :link="`/locations/${item.location.id}`" />
     </template>
@@ -47,7 +46,7 @@
     <template v-slot:expanded-item="{ headers, item }">
       <td :colspan="headers.length">
         <v-container>
-        
+        <v-row justify="start">
         <v-list dense two-line subheader>
             <v-subheader>Observation details</v-subheader>
             <list-item title="Measure" :text="item.measure.name" icon="mdi-chart-bell-curve" />
@@ -60,7 +59,15 @@
             <list-item v-if="item.eventDate && item.eventDate.start" title="Event start" :text="new Date(item.eventDate.start).toISOString()" icon="mdi-calendar-arrow-right" />
             <list-item v-if="item.eventDate && item.eventDate.end" title="Event end" :text="new Date(item.eventDate.end).toISOString()" icon="mdi-calendar-arrow-left" />
         </v-list>
-     
+        <v-list dense two-line subheader>
+        <v-subheader>Location details</v-subheader>
+            <list-item title="Country" :text="item.country.id ? `${item.country.name} (${item.country.code})` : null" icon="mdi-flag-outline" />
+            <list-item title="Altitude" :text="item.altitude" icon="mdi-image-filter-hdr" />
+            <list-item title="Locality" :text="item.locality" icon="mdi-map-marker" />
+            <list-item title="Habitat" :text="item.habitat" icon="mdi-pine-tree" />
+            <list-item title="Microhabitat" :text="item.microhabitat" icon="mdi-magnify" />
+          </v-list>
+        </v-row>
         </v-container>
       </td>
     </template>
@@ -97,9 +104,10 @@ export default {
         { text: 'Observation', value: 'data-table-expand' },
         { text: 'Method', value: 'method' },
         { text: 'Location', value: 'location' },
+
         //{ text: 'Dataset', value: 'dataset'},
         { text: 'Reference', value: 'reference'},
-        { text: 'Related records', value: 'rowLink'}
+        //{ text: 'Related records', value: 'rowLink'}
       ]
     }
   },
@@ -109,6 +117,9 @@ export default {
   watch: {
   },
   methods: {
+    hasLocDetails(item) {
+      return item.country.id || item.locality || item.habitat || item.microhabitat || item.altitude;
+    }
   },
   created () {
 

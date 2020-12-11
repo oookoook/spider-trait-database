@@ -58,7 +58,7 @@ const routes = [
     component: () => import(/* webpackChunkName: "data" */ '../views/Data.vue')
   },
   {
-    path: '/data/family/:family/genus/:genus/species/:species/original-name/:origname/trait-category/:traitcategory/trait/:trait/method/:method/location/:location/country/:country/dataset/:dataset/authors/:authors/reference/:reference/row-link/:rowlink',
+    path: '/data/order/:order/family/:family/genus/:genus/species/:species/original-name/:origname/trait-category/:traitcategory/trait/:trait/method/:method/location/:location/country/:country/dataset/:dataset/authors/:authors/reference/:reference/row-link/:rowlink',
     name: 'dataFullFilter',
     component: () => import(/* webpackChunkName: "data" */ '../views/Data.vue')
   },

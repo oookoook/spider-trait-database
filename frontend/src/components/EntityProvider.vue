@@ -76,7 +76,7 @@ export default {
     },
     remove(val) {
       this.loading = true;
-        this.$store.dispatch(`${this.list}/delete`, val)
+      this.$store.dispatch(`${this.list}/delete`, val)
         .then((data) => { 
           //console.log(data);
           this.loading= false; 

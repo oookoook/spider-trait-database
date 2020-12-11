@@ -13,7 +13,7 @@
       <h4>Creating a new user</h4>
         
         <p>If a new user has no affiliation with Masaryk University (i.e., he/she does not have a UCO number), a new Guest account 
-        has to be created. The administrator can create a new user in the <a href="https://inet.muni.cz/app/iam/guest" target="_blank">INET</a> system. The password that the system generates should 
+        has to be created. The administrator can create a new user in the <a href="https://perun.aai.muni.cz/organizations/363/sponsoredMembers" target="_blank">INET</a> system. The password that the system generates should 
         be saved and sent to the account owner. The new user will be assigned a unique identifier (UCO) that will be used for assigning 
         user privileges.</p>
         
@@ -22,7 +22,7 @@
 
       <p>The current user management takes place in the Perun identity management system. The following links lead to a page where users 
         can be added or removed from user groups using their unique identifier (UCO).</p>
-        <v-row class="pb-3"><action-button color="primary" text="Create user account(s)" icon="mdi-account-plus-outline" link="https://inet.muni.cz/app/iam/guest" /></v-row>
+        <v-row class="pb-3"><action-button color="primary" text="Create user account(s)" icon="mdi-account-plus-outline" link="https://perun.aai.muni.cz/organizations/363/sponsoredMembers" /></v-row>
       <h4>Assigning user privileges</h4>
         <p>Every user ho should be able to contribute data or approve them has to be assigned to one of the following user groups. Users in the higher-privilege groups
           automatically gain privileges of the lower groups (e.g. editor can also contribute, admin can also edit and contribute). It is sufficient to add the user to only one group.</p>

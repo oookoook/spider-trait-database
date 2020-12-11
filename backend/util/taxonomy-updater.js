@@ -125,6 +125,7 @@ const updateTaxon = async function(conn, t) {
     var id = await getExistingRecord(conn, t.taxon.lsid);
 
     var record = {
+        order: 'Araneae',
         family: p(t.taxon.family),
         genus: p(t.taxon.genus),
         species: p(t.taxon.species),
@@ -195,6 +196,7 @@ const update = async function(from) {
 }
 
 module.exports = {
-    update
+    update,
+    getFullName: gfn
 }
 

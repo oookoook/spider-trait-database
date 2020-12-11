@@ -1,5 +1,4 @@
 const converter = require('../converter');
-const fs = require('fs');
 const u = require('../taxonomy-updater');
 
 const run = async () => {

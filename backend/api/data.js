@@ -11,14 +11,15 @@ var join = `data `
 + `LEFT JOIN life_stage ON data.life_stage_id = life_stage.id `
 + `LEFT JOIN method ON data.method_id = method.id `
 + `LEFT JOIN location ON data.location_id = location.id `
-+ `LEFT JOIN country ON location.country_id = country.id `
++ `LEFT JOIN country ON data.country_id = country.id `
 + `LEFT JOIN dataset ON data.dataset_id = dataset.id `
 + `LEFT JOIN reference ON data.reference_id = reference.id`;
 
 const statsTypes = ['group-by', 'distinct'];
 
-const paramList = ['family','genus', 'species', 'origname', 'traitcat', 'trait', 'method', 'location','country', 'dataset', 'authors', 'reference', 'rowl'];
-const columnList = ['taxonomy.family', 'taxonomy.genus', 'data.taxonomy_id', 'data.original_name', 'trait.trait_category_id', 'data.trait_id', 'method.id', 'location.id', 'country.id', 
+
+const paramList = ['order','family','genus', 'species', 'origname', 'traitcat', 'trait', 'method', 'location','country', 'dataset', 'authors', 'reference', 'rowl'];
+const columnList = ['taxonomy.order','taxonomy.family', 'taxonomy.genus', 'data.taxonomy_id', 'data.original_name', 'trait.trait_category_id', 'data.trait_id', 'method.id', 'location.id', 'country.id', 
 'dataset.id', 'dataset.authors', 'data.reference_id', 'data.row_link'];
 
 const getCondition = function(params) {
@@ -40,11 +41,11 @@ const list = async function(params, limits) {
     var cond = getCondition(params);
     //console.dir(cond);
     var res = await db.prepareListResponse(limits, 'data', cond.clause, cond.values, join);
-    var results = await db.query({ table: 'data', sql: `SELECT data.*, taxonomy.wsc_lsid, taxonomy.family, taxonomy.genus, taxonomy.species, taxonomy.subspecies, `
+    var results = await db.query({ table: 'data', sql: `SELECT data.*, taxonomy.wsc_lsid, taxonomy.order, taxonomy.family, taxonomy.genus, taxonomy.species, taxonomy.subspecies, `
      + `trait.id, trait.abbrev, trait.name, trait_category.id, trait_category.name, `
      + `measure.id, measure.name, sex.id, sex.name, life_stage.id, life_stage.name, method.id, method.abbrev, method.name, `
      //+ `event_date_text, event_date_start, event_date_end, note, `
-     + `location.id, location.abbrev, location.locality, country.id, country.alpha3_code, country.name, `
+     + `location.id, location.abbrev, country.id, country.alpha3_code, country.name,`
      + `dataset.id, dataset.name, dataset.authors, reference.id, reference.abbrev `
      + `FROM ${join} WHERE ${cond.clause}`
      , values: cond.values, nestTables: true, limits, hasWhere: true});    
@@ -63,6 +64,7 @@ const list = async function(params, limits) {
                 },
                 taxonomy: {
                     lsid: r.taxonomy.wsc_lsid,
+                    order: r.taxonomy.order,
                     family: r.taxonomy.family, 
                     genus: r.taxonomy.genus, 
                     species: r.taxonomy.species, 
@@ -82,12 +84,12 @@ const list = async function(params, limits) {
                 location: {
                     id: r.location.id,
                     abbrev: r.location.abbrev,
-                    locality: r.location.locality,
-                    country: {
-                        id: r.country.id,
-                        name: r.country.name,
-                        code: r.country.alpha3_code
-                    }
+                },
+                locality: r.locality,
+                country: {
+                    id: r.country.id,
+                    name: r.country.name,
+                    code: r.country.alpha3_code
                 },
                 dataset: r.dataset,
                 reference: {
@@ -107,14 +109,14 @@ const csv =  async function(params, limits, tmpDir) {
     limits.limit = res.count;
     var c = await db.getConnection();
     var dstream = db.squery(c, { table: 'data', sql: `SELECT data.id, taxonomy.wsc_lsid, data.original_name as originalName, `
-     + `taxonomy.family, taxonomy.genus, taxonomy.species, taxonomy.subspecies, `
+     + `taxonomy.order, taxonomy.family, taxonomy.genus, taxonomy.species, taxonomy.subspecies, `
      + `trait.abbrev as trait, trait.name as traitFullName, trait_category.name as traitCategory, data.value, data.value_numeric, `
      + `measure.name as measure, sex.name as sex, life_stage.name as lifeStage, data.frequency, data.sample_size as sampleSize, `
      + `data.treatment as treatment, method.abbrev as method, method.name as methodFullName, `
      + `event_date_text as dateText, event_date_start as dateStart, event_date_end as dateEnd, data.note, `
-     + `location.abbrev as location, location.lat as decimalLatitude, location.lon as decimalLongitude, location.altitude, location.locality as verbatimLocality, `
+     + `location.abbrev as location, location.lat as decimalLatitude, location.lon as decimalLongitude, data.altitude, data.locality as verbatimLocality, `
      + `country.alpha3_code as countryCode, country.name as countryName, `
-     + `location.habitat as habitatVerbatim, location.microhabitat as microhabitatVerbatim, `
+     + `data.habitat as habitatVerbatim, data.microhabitat as microhabitatVerbatim, `
      + `dataset.name as datasetName, reference.abbrev as reference, reference.full_citation as referenceFull, reference.doi as referenceDOI, data.row_link as rowLinks `
      + `FROM ${join} WHERE ${cond.clause}`
      , values: cond.values, nestTables: false, limits, hasWhere: true});
@@ -128,16 +130,15 @@ const excel =  async function(params, limits, tmpDir) {
     var cond = getCondition(params);
     var res = await db.prepareListResponse(limits, 'data', cond.clause, cond.values, join);
     limits.limit = res.count;
-    
     var records = await db.query({ table: 'data', sql: `SELECT data.id, taxonomy.wsc_lsid, data.original_name as originalName, `
-     + `taxonomy.family, taxonomy.genus, taxonomy.species, taxonomy.subspecies, `
+     + `taxonomy.order, taxonomy.family, taxonomy.genus, taxonomy.species, taxonomy.subspecies, `
      + `trait.abbrev as trait, trait.name as traitFullName, trait_category.name as traitCategory, data.value, data.value_numeric, `
      + `measure.name as measure, sex.name as sex, life_stage.name as lifeStage, data.frequency, data.sample_size as sampleSize, `
      + `data.treatment as treatment, method.abbrev as method, method.name as methodFullName, `
      + `event_date_text as dateText, event_date_start as dateStart, event_date_end as dateEnd, data.note, `
-     + `location.abbrev as location, location.lat as decimalLatitude, location.lon as decimalLongitude, location.altitude, location.locality as verbatimLocality, `
+     + `location.abbrev as location, location.lat as decimalLatitude, location.lon as decimalLongitude, data.altitude, data.locality as verbatimLocality, `
      + `country.alpha3_code as countryCode, country.name as countryName, `
-     + `location.habitat as habitatVerbatim, location.microhabitat as microhabitatVerbatim, `
+     + `data.habitat as habitatVerbatim, data.microhabitat as microhabitatVerbatim, `
      + `dataset.name as datasetName, reference.abbrev as reference, reference.full_citation as referenceFull, reference.doi as referenceDOI, data.row_link as rowLinks `
      + `FROM ${join} WHERE ${cond.clause}`
      , values: cond.values, nestTables: false, limits, hasWhere: true});
@@ -269,13 +270,7 @@ const synonyms = {
     */
     'rowLink': 'row_link',
     'originalName': 'original_name',
-    'location.habitatGlobal.id': 'habitat_global.id',
-    'location.habitatGlobal.name': 'habitat_global.name',
-    'location.habitatGlobal.category': 'habitat_global.category',
-    'location.habitatGlobal.number': 'habitat_global.number',
-    'location.country.id': 'country.id',
-    'location.country.code': 'country.alpha3_code',
-    'location.country.name': 'country.name',
+    'country.code': 'country.alpha3_code',
     'trait.category.id':'trait_category.id',
     'trait.category.name':'trait_category.name',
     'lifeStage.name':'life_stage.name',
@@ -286,7 +281,8 @@ const synonyms = {
     'reference.fullCitation':  'reference.full_citation',
     'trait': 'trait.abbrev',
     'dataset': 'dataset.name',
-    'taxonomy.wsc.lsid': 'taxonomy.wsc_lsid',
+    //'taxonomy.wsc.lsid': 'taxonomy.wsc_lsid',
+    'taxonomy.lsid': 'taxonomy.wsc_lsid',
     'taxonomy.fullName': 'taxonomy.full_name',
     'sampleSize': 'sample_size',
     'eventDate.text': 'event_date_text',

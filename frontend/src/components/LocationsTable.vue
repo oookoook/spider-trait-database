@@ -4,12 +4,14 @@
       Locations
       <action-button tooltip color="primary" v-if="isEditor" to="/locations/new" />
       <v-spacer></v-spacer>
+      <!--
       <list-filter 
       :search-fields="searchFields" 
       :autocomplete-loading="autocompleteLoading" 
       :autocomplete-items="autocompleteItems" 
       @autocomplete="autocomplete"
       v-model="search"/>
+      -->
     </v-card-title>
   <v-data-table
       :headers="headers"
@@ -38,6 +40,7 @@
 
 <script>
 
+
 import ListTable from '../mixins/list-table'
 import Locations from '../mixins/locations'
 export default {
@@ -46,16 +49,13 @@ export default {
   data () {
     return {
       searchFields: [
-        { text: 'Country', valueField: 'country.id', textField: ['country.code', 'country.name'], searchField: ['country.name']},
-        //{ text: 'Global habitat (IUCN)', valueField: 'habitatGlobal.id', textField: 'habitatGlobal.name'},
-        { text: 'Locality', valueField: 'locality' }
+        //{ text: 'Country', valueField: 'country.id', textField: ['country.code', 'country.name'], searchField: ['country.name']},
       ],
       headers: [
         { text: 'Abbreviation', value: 'abbrev' },
-        { text: 'Country code', value: 'country.code' },
-        { text: 'Country name', value: 'country.name' },
+        //{ text: 'Country code', value: 'country.code' },
+        //{ text: 'Country name', value: 'country.name' },
         { text: 'Coordinates', value: 'coords' },
-        { text: 'Locality', value: 'locality' },
         //{ text: 'Global habitat (IUCN)', value: 'habitatGlobal.name' },
         { text: 'Actions', value: 'actions', sortable: false}
       ]

@@ -9,6 +9,11 @@ var db = null;
 var mail = null; 
 
 const columns = [
+  `taxonomy_order`,
+  `taxonomy_family`,
+  `taxonomy_genus`,
+  `taxonomy_species`,
+  `taxonomy_subspecies`,
   `wsc_lsid`,
   `original_name`,
   `trait_abbrev`,
@@ -35,12 +40,12 @@ const columns = [
   `location_lat`,
   `location_lon`,
   //`location_precision`,
-  `location_altitude`,
-  `location_locality`,
-  `location_country_code`,
+  `altitude`,
+  `locality`,
+  `country_code`,
   //`location_habitat_global`,
-  `location_habitat`,
-  `location_microhabitat`,
+  `habitat`,
+  `microhabitat`,
   //`location_stratum`,
   `note`
 ];
@@ -54,14 +59,14 @@ const validityColumns = [
 const colSynonyms = {
     'longitude': 'location_lon',
     'latitude': 'location_lat',
-    'altitude': 'location_altitude',
     'date': 'event_date',
-    'locality': 'location_locality',
-    'country_code': 'location_country_code',
-    'country': 'location_country_code',
-    'habitat': 'location_habitat',
-    'habitat_local': 'location_habitat',
-    'microhabitat': 'location_microhabitat', 
+    'country': 'country_code',
+    'habitat_local': 'habitat',
+    'order': `taxonomy_order`,
+    'family': `taxonomy_family`,
+    'genus': `taxonomy_genus`,
+    'species': `taxonomy_species`,
+    'subspecies': `taxonomy_subspecies`
 }
 
 const joinf = 'data LEFT JOIN trait ON data.trait_id = trait.id '
@@ -72,6 +77,7 @@ const joinf = 'data LEFT JOIN trait ON data.trait_id = trait.id '
             + 'LEFT JOIN method ON data.method_id = method.id '       
             + 'LEFT JOIN reference ON data.reference_id = reference.id '
             + 'LEFT JOIN location ON data.location_id = location.id '
+            + 'LEFT JOIN country ON data.country_id = country.id '
             + 'LEFT JOIN dataset ON data.dataset_id = dataset.id';
 
 const joind = 'import LEFT JOIN dataset ON import.dataset_id = dataset.id';
@@ -86,13 +92,13 @@ const joinv = 'import LEFT JOIN trait ON import.trait_abbrev = trait.abbrev '
             + 'LEFT JOIN taxonomy full_names ON import.original_name IS NOT NULL AND import.original_name = full_names.full_name '
             + 'LEFT JOIN taxonomy_name ON import.original_name IS NOT NULL AND import.original_name = taxonomy_name.name '
             + 'LEFT JOIN taxonomy synonyms ON taxonomy_name.taxonomy_id = synonyms.id '
+            + 'LEFT JOIN taxonomy nonsynctaxa ON import.taxonomy_order IS NOT NULL AND import.taxonomy_family IS NOT NULL AND import.taxonomy_order = nonsynctaxa.order AND import.taxonomy_family = nonsynctaxa.family AND import.taxonomy_genus = nonsynctaxa.genus AND import.taxonomy_species = nonsynctaxa.species AND import.taxonomy_subspecies = nonsynctaxa.subspecies '
             + 'LEFT JOIN sex ON import.sex = sex.name '
             + 'LEFT JOIN life_stage ON import.life_stage = life_stage.name '
             + 'LEFT JOIN measure ON import.measure = measure.name '
             + 'LEFT JOIN method ON import.method_abbrev = method.abbrev '
-            + 'LEFT JOIN country country3 ON import.location_country_code = country3.alpha3_code '
-            + 'LEFT JOIN country country2 ON import.location_country_code = country2.alpha2_code '
-            + 'LEFT JOIN habitat_global ON import.location_habitat_global = habitat_global.name '
+            + 'LEFT JOIN country country3 ON import.country_code = country3.alpha3_code '
+            + 'LEFT JOIN country country2 ON import.country_code = country2.alpha2_code '
             + 'LEFT JOIN reference refa ON import.reference_abbrev = refa.abbrev ' 
             + 'LEFT JOIN reference refd ON import.reference_doi = refd.doi '
             + 'LEFT JOIN reference reff ON import.reference = reff.full_citation '
@@ -121,9 +127,14 @@ const getObject = function(r) {
     // serialize timestamps
     return {
         id: r[`id`],
+        originalName: r[`original_name`],
         taxonomy: {
-            wscLsid: r[`wsc_lsid`],
-            originalName: r[`original_name`],
+            order: r['taxonomy_order'],
+            family: r['taxonomy_family'],
+            genus: r['taxonomy_genus'],
+            species: r['taxonomy_species'],
+            subspecies: r['taxonomy_subspecies'],
+            lsid: r[`wsc_lsid`],
             id: r[`taxonomy_id`],
             fullName: r[`full_name`]
         },
@@ -204,27 +215,19 @@ const getObject = function(r) {
                 }
                 */
             },
-            altitude: {
-                raw: r[`location_altitude`],
-                numeric: r[`location_altitude_numeric`]
-            },
-            locality: r[`location_locality`],
-            country: {
-                raw: r[`location_country_code`],
-                id: r[`location_country_id`]
-            },
-            /*
-            habitatGlobal: {
-                raw: r[`location_habitat_global`],
-                id: r[`location_habitat_global_id`]
-            },
-            */
-            habitat: r[`location_habitat`],
-            microhabitat: r[`location_microhabitat`],
-            //stratum: r[`location_stratum`],
-            //note: r[`location_note`],
             id: r[`location_id`]
         },
+        altitude: {
+            raw: r[`altitude`],
+            numeric: r[`altitude_numeric`]
+        },
+        locality: r[`locality`],
+        country: {
+            raw: r[`country_code`],
+            id: r[`country_id`]
+        },
+        habitat: r[`habitat`],
+        microhabitat: r[`microhabitat`],
         valid: {
             review: r[`valid_review`] == 1,
             approve: r[`valid`] == 1,
@@ -391,19 +394,21 @@ const transferToData = async function(params) {
     state.progress+=1;
 
     // INSERT INTO data (...) SELECT ... FROM import WHERE dataset_id = ?
-    await db.cquery(c, {table: 'data', sql:`INSERT INTO data`
-    + ` (taxonomy_id, original_name, trait_id, value, value_numeric, measure_id, sex_id, life_stage_id, frequency, `
-    + ` sample_size, event_date_text, event_date_start, event_date_end, method_id, location_id, reference_id, dataset_id, note, row_link) `
-    + ` SELECT taxonomy_id, original_name, trait_id, value, value_numeric, measure_id, sex_id, life_stage_id, frequency_numeric, `
-    + ` sample_size_numeric, event_date, event_date_start, event_date_end, method_id, location_id, reference_id, dataset_id, note, CONVERT(row_link, UNSIGNED) `
-    + ` FROM ${joind} WHERE dataset_id = ? AND ${aw}`, values: [id] });
+    await db.cquery(c, {table: 'data', sql:`INSERT INTO data
+        (taxonomy_id, original_name, trait_id, value, value_numeric, measure_id, sex_id, life_stage_id, frequency, 
+        sample_size, event_date_text, event_date_start, event_date_end, method_id, location_id, 
+        locality, altitude, habitat, microhabitat, country_id, reference_id, dataset_id, note, row_link) 
+        SELECT taxonomy_id, original_name, trait_id, value, value_numeric, measure_id, sex_id, life_stage_id, frequency_numeric, 
+        sample_size_numeric, event_date, event_date_start, event_date_end, method_id, location_id, 
+        locality, altitude, habitat, microhabitat, country_id, reference_id, dataset_id, note, CONVERT(row_link, UNSIGNED) 
+        FROM ${joind} WHERE dataset_id = ? AND ${aw}`, values: [id] });
     
     state.progress+=1;
     // DELETE FROM import WHERE dataset_id = ?
     await db.cquery(c, {table: 'import', sql:`DELETE import FROM ${joind} WHERE dataset_id = ? AND ${aw}`, values: [id] });
     
     state.progress+=1;
-
+    
     await db.cquery(c, {table: 'dataset', sql: `UPDATE dataset SET imported = 3, records = (SELECT COUNT(id) FROM data WHERE dataset_id = dataset.id), message = null WHERE id = ? AND ${aw}`, values: [id] });
     state.progress+=1;
 
@@ -423,13 +428,15 @@ const transferFromData = async function(params) {
     
     state.progress+=1000;
     // copy data to import
-    await db.cquery(c, {table: 'import', sql:`INSERT INTO import (`
-    + `wsc_lsid, original_name, trait_abbrev, value, value_numeric, measure, sex, life_stage, frequency, frequency_numeric, sample_size, sample_size_numeric, `
-    + `event_date, event_date_start, event_date_end, method_abbrev, location_abbrev, reference_abbrev, dataset_id, note, row_link, changed, valid, valid_review, duplicate`
-    + `) SELECT `
-    + `taxonomy.wsc_lsid, data.original_name, trait.abbrev, value, value_numeric, measure.name, sex.name, life_stage.name, frequency, frequency, sample_size, `
-    + `sample_size, event_date_text, event_date_start, event_date_end, method.abbrev, location.abbrev, reference.abbrev, dataset.id, data.note, data.row_link, 1, 0, 0, 0 `
-    + `FROM ${joinf} WHERE data.dataset_id = ?`, values: [id] });
+    await db.cquery(c, {table: 'import', sql:`INSERT INTO import (
+        wsc_lsid, original_name, trait_abbrev, value, value_numeric, measure, sex, life_stage, frequency, frequency_numeric, sample_size, sample_size_numeric, 
+        event_date, event_date_start, event_date_end, method_abbrev, location_abbrev, reference_abbrev, dataset_id, note, 
+        locality, altitude, altitude_numeric, habitat, microhabitat, country_code, row_link, changed, valid, valid_review, duplicate
+        ) SELECT 
+        taxonomy.wsc_lsid, data.original_name, trait.abbrev, value, value_numeric, measure.name, sex.name, life_stage.name, frequency, frequency, sample_size, 
+        sample_size, event_date_text, event_date_start, event_date_end, method.abbrev, location.abbrev, reference.abbrev, dataset.id, data.note, 
+        data.locality, data.altitude, data.altitude, data.habitat, data.microhabitat, country.alpha3_code, data.row_link, 1, 0, 0, 0 
+        FROM ${joinf} WHERE data.dataset_id = ?`, values: [id] });
 
     state.progress+=10000;
     // change dataset state
@@ -492,7 +499,7 @@ const importRow = async function(conn, ds, r, state, cache) {
    row['value_numeric'] = conv.parseNumber(row['value']); 
    row['frequency_numeric'] = conv.parseNumber(row['frequency']); 
    row['sample_size_numeric'] =conv.parseNumber(row['sample_size']);
-   row['location_altitude_numeric'] =conv.parseNumber(row['location_altitude']);
+   row['altitude_numeric'] =conv.parseNumber(row['altitude']);
    row['location_precision_numeric'] =conv.parseNumber(row['location_precision']);
 
    if(row['wsc_lsid']) {
@@ -652,11 +659,16 @@ const getColumnName = function(val) {
     if(val == 'valid.duplicate') {
         return 'duplicate';
     }
-    if(val == 'taxonomy.wscLsid') {
+    if(val == 'taxonomy.lsid') {
         return `wsc_lsid`;
     }
+    /*
     if(val == 'taxonomy.originalName') {
         return `original_name`;
+    }
+    */
+    if(val == 'taxonomy.fullName') {
+        return `taxonomy`;
     }
     if(val == 'reference.fullCitation') {
         return `reference`;
@@ -664,8 +676,8 @@ const getColumnName = function(val) {
     if(val == 'eventDate.text') {
         return `event_date`;
     }
-    if(val.indexOf('location.country') > -1) {
-        return `location_country_code`;
+    if(val.indexOf('country') == 0) {
+        return `country_code`;
     }
     if(val.indexOf('.coords')>0) {
         val = val.replace('.coords','');
@@ -750,8 +762,8 @@ const updateRow = async function(params, body, auth) {
         newAttrs['location_precision_numeric'] = conv.parseNumber(newAttrs['location_precision']);
     }
 
-    if(newAttrs['location_altitude']) {
-        newAttrs['location_altitude_numeric'] = conv.parseNumber(newAttrs['location_altitude']);
+    if(newAttrs['altitude']) {
+        newAttrs['altitude_numeric'] = conv.parseNumber(newAttrs['altitude']);
     }
     
     // convert timestamps (start, end)
@@ -840,9 +852,9 @@ const updateColumn = async function(params, body, auth) {
         await db.query({table: 'import', sql:`UPDATE ${joind} SET location_precision_numeric = ? WHERE ${cw} AND dataset_id = ? AND ${aw}`, values: [numVal, ds] });
     }
     
-    if(column == 'location_altitude') {
+    if(column == 'altitude') {
         var numVal = conv.parseNumber(nv);
-        await db.query({table: 'import', sql:`UPDATE ${joind} SET location_altitude_numeric = ? WHERE ${cw} AND dataset_id = ? AND ${aw}`, values: [numVal, ds] });
+        await db.query({table: 'import', sql:`UPDATE ${joind} SET altitude_numeric = ? WHERE ${cw} AND dataset_id = ? AND ${aw}`, values: [numVal, ds] });
     }
 
     // convert timestamps (start, end)
@@ -909,7 +921,8 @@ const getColumn = async function(params, limits, auth) {
     var entity = null;
     // there are some special cases
     if(column == 'taxonomy') {
-        cols = ['original_name', 'wsc_lsid', 'taxonomy_id'];
+        
+        cols = ['taxonomy_order', 'taxonomy_family', 'taxonomy_genus', 'taxonomy_species', 'taxonomy_subspecies', 'original_name', 'wsc_lsid', 'taxonomy_id'];
     } else if(column == 'reference' && params.column == 'reference') { // reference.fullCitation is also translated as reference
         cols = ['reference', 'reference_abbrev', 'reference_doi', 'reference_id'];
     } else if(column == 'event_date') {
@@ -921,9 +934,6 @@ const getColumn = async function(params, limits, auth) {
         if(column == 'location') {
             cols.push('location_lat_conv');
             cols.push('location_lon_conv');
-            cols.push('location_altitude_numeric')
-            cols.push('location_country_id');
-            //cols.push('location_habitat_global_id');
         }
         if(column == 'trait') {
             cols.push('trait_data_type_id');
@@ -992,11 +1002,11 @@ const validate = async function(params) {
     + ` import.trait_category_id = trait_category.id, `
     + ` import.reference_id = COALESCE(refa.id, refd.id, reff.id),  `
     + ` location_id = COALESCE(location.id, loccoord.id), `
-    // + `location_habitat_global_id = habitat_global.id, `
-    + ` location_country_id = COALESCE(country3.id,country2.id), `
-    + ` import.taxonomy_id = CASE WHEN taxonomy.id IS NOT NULL AND (full_names.id IS NOT NULL OR synonyms.id IS NOT NULL)`
-    + `   AND COALESCE(taxonomy.valid_id, taxonomy.id) <> COALESCE(full_names.valid_id, full_names.id, synonyms.valid_id, synonyms.id) `
-    + `    THEN NULL ELSE COALESCE(taxonomy.valid_id, taxonomy.id, full_names.valid_id, full_names.id, synonyms.valid_id, synonyms.id) END, `
+    // + `location_habitat_global_id = habitat_global.id, 
+    + ` import.country_id = COALESCE(country3.id,country2.id), `
+    + ` import.taxonomy_id = CASE WHEN taxonomy.id IS NOT NULL AND (full_names.id IS NOT NULL OR synonyms.id IS NOT NULL OR nonsynctaxa.id IS NOT NULL)`
+    + `   AND COALESCE(taxonomy.valid_id, taxonomy.id) <> COALESCE(full_names.valid_id, full_names.id, synonyms.valid_id, synonyms.id, nonsynctaxa.valid_id, nonsynctaxa.id) `
+    + `    THEN NULL ELSE COALESCE(taxonomy.valid_id, taxonomy.id, full_names.valid_id, full_names.id, synonyms.valid_id, synonyms.id, nonsynctaxa.valid_id, nonsynctaxa.id) END, `
     + ` require_numeric_value = CASE WHEN data_type.name <> 'Character' AND data_type.name <> 'Categorical' THEN 1 ELSE 0 END `
     + ` WHERE changed = 1 AND dataset_id = ?`, values: [ds] });
 
@@ -1025,15 +1035,16 @@ const validate = async function(params) {
     // method is not required
     + ` (method_id IS NOT NULL OR (method_name IS NULL AND method_description IS NULL) OR (method_name IS NOT NULL AND method_description IS NOT NULL)) AND`
     + ` (reference_id IS NOT NULL OR reference IS NOT NULL) AND`
-    + ` (original_name IS NOT NULL AND taxonomy_id IS NOT NULL) AND`
+    // validation logic for custom names - allow if at least order and famil are filled in
+    + ` ((original_name IS NOT NULL AND taxonomy_id IS NOT NULL) OR (taxonomy_order IS NOT NULL AND taxonomy_family IS NOT NULL)) AND`
     + ` (sample_size IS NULL OR sample_size_numeric IS NOT NULL) AND`
     + ` (frequency IS NULL OR frequency_numeric IS NOT NULL) AND`
     + ` (location_lat IS NULL OR location_lat_conv IS NOT NULL) AND`
     + ` (location_lon IS NULL OR location_lon_conv IS NOT NULL) AND`
     + ` ((location_lat_conv IS NULL AND location_lon_conv IS NULL) OR (location_lat_conv IS NOT NULL AND location_lon_conv IS NOT NULL)) AND`
-    + ` (location_altitude IS NULL OR location_altitude_numeric IS NOT NULL) AND`
+    + ` (altitude IS NULL OR altitude_numeric IS NOT NULL) AND`
+    + ` (country_code IS NULL OR country_id IS NOT NULL) AND`
     + ` (location_precision IS NULL OR location_precision_numeric IS NOT NULL) AND`
-    + ` (location_country_code IS NULL OR location_country_id IS NOT NULL) AND`
     // + ` (location_habitat_global IS NULL OR location_habitat_global_id IS NOT NULL) AND`
     + ` (event_date IS NULL OR (event_date_start IS NOT NULL AND event_date_end IS NOT NULL)) AND`
     //+ ` (require_numeric_value = 0 OR value_numeric = value OR (value = 'true' AND value_numeric = 1) OR (value = 'false' AND value_numeric = 0)) AND`
@@ -1047,19 +1058,15 @@ const validate = async function(params) {
     // step 4: set the valid attribute to 1 if the record is valid for review and also trait_id, method_id, 
 
     await db.cquery(c,{table: 'import', sql:`UPDATE import SET valid = 1 WHERE valid_review = 1 AND`
+    + ` (taxonomy_id IS NOT NULL) AND`
     + ` (trait_id IS NOT NULL) AND`
     //+ ` (method_id IS NOT NULL) AND`
     + ` (method_id IS NOT NULL OR (method_name IS NULL AND method_description IS NULL)) AND`
     + ` (import.reference_id IS NOT NULL) AND`
     //+ ` (event_date IS NULL OR event_date_start IS NOT NULL) AND`
     /* all location fields are null OR location_id is filled in */
-    + ` ((location_abbrev IS NULL AND location_lat IS NULL AND location_lon IS NULL AND`
-    //+ ` location_precision IS NULL AND`
-    + ` location_altitude IS NULL AND`
-    + ` location_locality IS NULL AND location_country_code IS NULL AND`
-    // + `AND location_habitat_global IS NULL AND location_habitat IS NULL AND `
-    + ` location_microhabitat IS NULL `
-    // + `AND location_stratum IS NULL AND location_note IS NULL `
+    + ` ((location_abbrev IS NULL AND location_lat IS NULL AND location_lon IS NULL AND` 
+    + ` location_precision IS NULL`
     + `) OR location_id IS NOT NULL) AND`
     + ` dataset_id = ? AND changed = 1`, values: [ds] });
     
@@ -1077,22 +1084,13 @@ const validate = async function(params) {
 }
 
 var synonyms = {
-    'taxonomy.wscLsid': 'wsc_lsid',
-    'taxonomy.originalName': `original_name`,
+    'taxonomy.lsid': 'wsc_lsid',
+    'originalName': `original_name`,
     'taxonomy.fullName': `taxonomy.full_name`,
     'location.abbrev': 'location_abbrev',
     'location.coords.lon': 'location_lon',
     'location.coords.lat': 'location_lat',
-    //'location.coords.precision': 'location_precision',
-    'location.altitude': `location_altitude`,
-    'location.locality': `location_locality`,
-    'location.country.code': `location_country_code`,
-    'location.country': `location_country_code`,
-    //'location.habitatGlobal': `location_habitat_global`,
-    'location.habitat': `location_habitat`,
-    'location.microhabitat': `location_microhabitat`,
-    //'location.stratum': `location_stratum`,
-    'location.note': `location_note`,
+    'location.coords.precision': 'location_precision',
     'trait.abbrev': `trait_abbrev`,
     'trait.name': `trait_name`,
     'trait.description': `trait_description`,

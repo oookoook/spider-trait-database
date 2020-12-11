@@ -33,25 +33,71 @@ export default [
     getIcon: (i) => i.valid.duplicate ? 'mdi-exclamation-thick' : 'mdi-check-outline',
     save: (o, v) => {},
     isValid: (i, e) => !i.valid.duplicate || 'Record is not valid',
-  },  
+  }, 
+  {
+      name: 'taxonomy.order',
+      text: 'Order',
+      entity: 'taxonomy',
+      displayValue: (i) => i.taxonomy.order,
+      save: (o, v) => {if(!o.taxonomy) o.taxonomy={}; o.taxonomy.order = v; },
+      isValid: (i, e) => true, 
+      similar: { endpoint: 'taxonomy', valueField: 'order' }
+  },
+  {
+    name: 'taxonomy.family',
+    text: 'Family',
+    entity: 'taxonomy',
+    displayValue: (i) => i.taxonomy.family,
+    save: (o, v) => {if(!o.taxonomy) o.taxonomy={}; o.taxonomy.family = v; },
+    isValid: (i, e) => true, 
+    similar: { endpoint: 'taxonomy', valueField: 'family' }
+  },
+  {
+    name: 'taxonomy.genus',
+    text: 'Genus',
+    entity: 'taxonomy',
+    displayValue: (i) => i.taxonomy.genus,
+    save: (o, v) => {if(!o.taxonomy) o.taxonomy={}; o.taxonomy.genus = v; },
+    isValid: (i, e) => true, 
+    similar: { endpoint: 'taxonomy', valueField: 'genus' }
+  },
+  {
+    name: 'taxonomy.species',
+    text: 'Species',
+    entity: 'taxonomy',
+    displayValue: (i) => i.taxonomy.species,
+    save: (o, v) => {if(!o.taxonomy) o.taxonomy={}; o.taxonomy.species = v; },
+    isValid: (i, e) => true, 
+    similar: { endpoint: 'taxonomy', valueField: 'species' }
+  },
+  {
+    name: 'taxonomy.subspecies',
+    text: 'Subspecies',
+    entity: 'taxonomy',
+    displayValue: (i) => i.taxonomy.subspecies,
+    save: (o, v) => {if(!o.taxonomy) o.taxonomy={}; o.taxonomy.subspecies = v; },
+    isValid: (i, e) => true, 
+    similar: { endpoint: 'taxonomy', valueField: 'subspecies' }
+  },
   { 
-      name: 'taxonomy.wscLsid',
+      name: 'taxonomy.lsid',
       text: 'WSC LSID',
       //entity: 'taxonomy', 
-      displayValue: (i) => i.taxonomy.wscLsid,
-      save: (o, v) => {if(!o.taxonomy) o.taxonomy={}; o.taxonomy.wscLsid = v; },
-      isValid: (i, e) => !!i.taxonomy.id || 'Taxon must be assigned to the record',
-      autocomplete: { endpoint: 'taxonomy', valueField: 'wsc.lsid' }
+      displayValue: (i) => i.taxonomy.lsid,
+      save: (o, v) => {if(!o.taxonomy) o.taxonomy={}; o.taxonomy.lsid = v; },
+      isValid: (i, e) => true, // Adjusted to work correctly for other orders !!i.taxonomy.id || 'Taxon must be assigned to the record',
+      autocomplete: { endpoint: 'taxonomy', valueField: 'lsid' }
     },
     { 
-      name: 'taxonomy.originalName',
+      name: 'originalName',
       text: 'Original name',
       //entity: 'taxonomy', 
-      displayValue: (i) => i.taxonomy.originalName,
-      save: (o, v) => {if(!o.taxonomy) o.taxonomy={}; o.taxonomy.originalName = v; }, 
-      isValid: (i, e) => !!i.taxonomy.id || 'Taxon must be assigned to the record',
+      displayValue: (i) => i.originalName,
+      save: (o, v) => { o.originalName = v; }, 
+      isValid: (i, e) => true, // Adjusted to work correctly for other orders !!i.taxonomy.id || 'Taxon must be assigned to the record',
       autocomplete: { endpoint: 'taxonomy', valueField: 'fullName' }
     },
+    // TODO test validation  for the WSC-based taxons
     { 
       name: 'taxonomy.fullName',
       text: 'Assigned name',
@@ -60,33 +106,52 @@ export default [
         if(i.taxonomy.fullName) {
           return i.taxonomy.fullName;
         }
-        if(!i.taxonomy.wscLsid && !i.taxonomy.originalName) {
+
+        if(!!i.taxonomy.order && !!i.taxonomy.family && !i.taxonomy.id) {
+          return 'Taxon not created';
+        }
+
+        if(!i.taxonomy.lsid && !i.taxonomy.originalName && !i.taxonomy.order && !i.taxonomy.family) {
           return 'No taxonomic information available';
         }
         
-        if (!!i.taxonomy.wscLsid && !!i.taxonomy.originalName && !i.taxonomy.id) {
+        if (!!i.taxonomy.lsid && !!i.taxonomy.originalName && !i.taxonomy.id) {
           return 'LSID and Original name do not refer to the same WSC taxon';
         }
-        if(!!i.taxonomy.originalName && !i.taxonomy.wscLsid && !i.taxonomy.id) {
+        if(!!i.taxonomy.originalName && !i.taxonomy.lsid && !i.taxonomy.id) {
           return 'Unknown original name';
         }
+        // taxon is not created
         return 'Unknown error';
       },
       readOnly: true,
       isValid: (i, e) => {
-        if(i.taxonomy.fullName) {
+        if(i.taxonomy.id) {
           return true;
         }
-        if(!i.taxonomy.wscLsid && !i.taxonomy.originalName) {
-          return 'No taxonomic information available';
+
+        if(!e && !!i.taxonomy.order && !!i.taxonomy.family) {
+          // pass record with at least order and family as valid if not 
+          return true;
         }
         
-        if (!!i.taxonomy.wscLsid && !!i.taxonomy.originalName && !i.taxonomy.id) {
+        if(e && !!i.taxonomy.order && !!i.taxonomy.family) {
+          console.dir(i);
+          console.log(e && !!i.taxonomy.order && !!i.taxonomy.family);  
+          return 'Taxon not created';
+        }
+
+        if(!i.taxonomy.lsid && !i.taxonomy.originalName && !i.taxonomy.order && !i.taxonomy.family) {
+          return 'No taxonomic information available. Provide either WCS LSID, orginal name, or full taxonomic categorization (order, family,...]';
+        }
+        
+        if (!!i.taxonomy.lsid && !!i.taxonomy.originalName && !i.taxonomy.id) {
           return 'LSID and Original name do not refer to the same WSC taxon';
         }
-        if(!!i.taxonomy.originalName && !i.taxonomy.wscLsid && !i.taxonomy.id) {
+        if(!!i.taxonomy.originalName && !i.taxonomy.lsid && !i.taxonomy.id) {
           return 'Unknown original name';
         }
+
         return 'Unknown error';
       },
     },
@@ -127,7 +192,6 @@ export default [
       entity: 'trait', 
       displayValue: (i) => i.trait.description,
       save: (o, v) => {if(!o.trait) o.trait={}; o.trait.description = v; }, 
-      //foreignMatchValue: (i) => i.taxonomy.wscLsid,
       isValid: (i, e) => {
         if(e === 'create') {
           return true;
@@ -295,24 +359,6 @@ export default [
       save: (o, v) => {if(!o.eventDate) o.eventDate={}; o.eventDate.text = v; }, 
       isValid: (i, e) => !i.eventDate.text || (!!i.eventDate.start && !!i.eventDate.end) || 'If date is provided, it must be in a valid format' 
     },
-    /*
-    { 
-      name: 'eventDate.start',
-      text: 'Event start', 
-      displayValue: (i) => i.taxonomy.wscLsid, 
-      foreignMatchValue: (i) => i.taxonomy.wscLsid,
-      isValid: (i, e) => i.taxonomy.id || 'Taxon must be assigned to the record',
-      autocomplete: { endpoint: 'taxonomy', valueField: 'country.code', textField: ['country.code', 'country.name'] }
-    },
-    { 
-      name: 'eventDate.end',
-      text: 'Event end', 
-      displayValue: (i) => i.taxonomy.wscLsid, 
-      foreignMatchValue: (i) => i.taxonomy.wscLsid,
-      isValid: (i, e) => i.taxonomy.id || 'Taxon must be assigned to the record',
-      autocomplete: { endpoint: 'taxonomy', valueField: 'country.code', textField: ['country.code', 'country.name'] }
-    },
-    */
     { 
       name: 'reference.fullCitation',
       text: 'Reference (Full)',
@@ -347,9 +393,9 @@ export default [
       save: (o, v) => {if(!o.location) o.location={}; o.location.abbrev = v; },
       // the valid function checks if all the props of the location are null  
       isValid: (i, e) => !!i.location.id || !e || e==='create' || 
-      Object.keys(i.location).reduce((total, k) => total && (i.location[k] == null 
+      Object.keys(i.location).every(k => i.location[k] == null 
       || (i.location[k] != null && k == 'coords' && i.location.coords.lat.raw == null && i.location.coords.lon.raw == null)
-      || (i.location[k] != null && k != 'coords' && i.location[k].raw == null)),  true) 
+      || (i.location[k] != null && k != 'coords' && i.location[k].raw == null)) 
       || 'Location Abbrev. must be set',
       autocomplete: { endpoint: 'locations', valueField: 'abbrev', textField: ['abbrev', 'locality' ] }
     },
@@ -380,29 +426,26 @@ export default [
     },
     */
     { 
-      name: 'location.altitude',
+      name: 'altitude',
       text: 'Altitude', 
-      entity: 'location', 
-      displayValue: (i) => i.location.altitude.numeric != null ? i.location.altitude.numeric : i.location.altitude.raw, 
-      save: (o, v) => {if(!o.location) o.location={}; if(!o.location.altitude) o.location.altitude = {}; o.location.altitude.raw = v; }, 
-      isValid: (i, e) => !i.location.altitude.raw || i.location.altitude.numeric != null || 'Value is not a valid number',
+      displayValue: (i) => i.altitude.numeric != null ? i.altitude.numeric : i.altitude.raw, 
+      save: (o, v) => { if(!o.altitude) o.altitude = {}; o.altitude.raw = v; }, 
+      isValid: (i, e) => !i.altitude.raw || i.altitude.numeric != null || 'Value is not a valid number',
     },
     { 
-      name: 'location.locality',
+      name: 'locality',
       text: 'Locality', 
-      entity: 'location',
-      displayValue: (i) => i.location.locality,
-      save: (o, v) => {if(!o.location) o.location={}; o.location.locality = v; },   
+      displayValue: (i) => i.locality,
+      save: (o, v) => { o.locality = v; },   
       isValid: (i, e) => true,
     },
     { 
-      name: 'location.country',
+      name: 'country',
       text: 'Country', 
-      entity: 'location',
-      displayValue: (i) => i.location.country.raw,
-      save: (o, v) => {if(!o.location) o.location={}; if(!o.location.country) o.location.country = {}; o.location.country.raw = v; }, 
-      isValid: (i, e) => !i.location.country.raw || !!i.location.country.id || 'Value does not match any existing country code',
-      autocomplete: { endpoint: 'locations', valueField: 'country.code', textField: ['country.code', 'country.name'] }
+      displayValue: (i) => i.country.raw,
+      save: (o, v) => { if(!o.country) o.country = {}; o.country.raw = v; }, 
+      isValid: (i, e) => !i.country.raw || !!i.country.id || 'Value does not match any existing country code',
+      autocomplete: { endpoint: 'countries', valueField: 'code', textField: ['code', 'name'] }
     },
     /*
     { 
@@ -416,19 +459,17 @@ export default [
     },
     */
     { 
-      name: 'location.habitat',
+      name: 'habitat',
       text: 'Habitat', 
-      entity: 'location',
-      displayValue: (i) => i.location.habitat,
-      save: (o, v) => {if(!o.location) o.location={}; o.location.habitat = v; },    
+      displayValue: (i) => i.habitat,
+      save: (o, v) => { o.habitat = v; },    
       isValid: (i, e) => true,
     },
     { 
-      name: 'location.microhabitat',
+      name: 'microhabitat',
       text: 'Microhabitat', 
-      entity: 'location',
-      displayValue: (i) => i.location.microhabitat, 
-      save: (o, v) => {if(!o.location) o.location={}; o.location.microhabitat = v; },   
+      displayValue: (i) => i.microhabitat, 
+      save: (o, v) => { o.microhabitat = v; },   
       isValid: (i, e) => true,
     },
     /*

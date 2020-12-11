@@ -103,16 +103,19 @@ export default {
         }
         */
       
-      
+      var ematch = this.getEntityMatch(this.prop.entity);
       var e = { 
         endpoint: this.getEntityEndpoint(this.prop.entity), 
         entity: {
           name: this.prop.entity, 
-          match: this.getEntityMatch(this.prop.entity), 
+          match: ematch, 
           props: this.getDistinctEntityProps(this.prop.entity) 
         },
         columns: {
-          column: this.getEntityMatch(this.prop.entity).name,
+          // TODO no need to replace anything when creating taxons
+          // modify this
+          // entity match is not working for taxons
+          column: ematch ? ematch.name : null,
           newValue: null, // to be filled in after the entity is created
           multipleColumns: true,
           valueColumns: this.getDistinctEntityProps(this.prop.entity),

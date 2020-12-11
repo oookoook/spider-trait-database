@@ -500,12 +500,14 @@ export default {
           this.jobCompletedAction = () => { 
             //this.showLog(); 
             this.jobCompletedAction = () => { this.refreshDS(); this.getData(); };
-            this.$store.dispatch(`editor/validate`, {id: this.dataset.id});
+            // after creation is completed run ad-hoc validation 
+            //this.$store.dispatch(`editor/validate`, {id: this.dataset.id});
+            this.validate();
           }
           evt.columns.dataset = this.dataset.id;
           this.$store.dispatch(`editor/createMultiple`, evt);
         
-          // after creation is completed run ad-hoc validation 
+          
           
       }
       this.confirm.dialog = true;  

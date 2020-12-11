@@ -5,9 +5,9 @@ module.exports = {
     },
     https: {
         enable: true,
-        key: '/../server.key',
-        crt: '/../server.crt',
-        passphrase: 'TODO'
+        key: '/etc/letsencrypt/live/spidertraits.sci.muni.cz/privkey.pem',
+        crt: '/etc/letsencrypt/live/spidertraits.sci.muni.cz/fullchain.pem',
+        passphrase: null
     },
     oidc: {
         client: 'TODO',

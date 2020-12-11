@@ -58,7 +58,7 @@ export default {
         { text: 'Dataset', value: 'dataset.name'},
         { text: 'Reference (preview)', value: 'reference.abbrev'},
         { text: 'Location (preview)', value: 'location.abbrev'},
-        { text: 'Country code', value: 'location.country.code'},
+        { text: 'Country code', value: 'country.code'},
         { text: 'Related records', value: 'rowLink'}
       ]
     }

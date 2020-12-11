@@ -1,4 +1,14 @@
 <template>
+  <!-- TODO rework to suport edits -->
+  <entity-detail entity="species" list="taxonomy" v-slot="{item, showUpdate, onEdit}">
+    <taxon-detail
+          :item="item"
+          :show-update="showUpdate"
+          @edit="onEdit"
+    />
+  </entity-detail>
+  
+  <!--
   <v-container>
   <entity-provider list="taxonomy" :id="id" v-slot="i">
     <taxon-detail :item="i.item" />
@@ -12,9 +22,11 @@
   </list-provider>
   
   </v-container>
+  -->
 </template>
 
 <script>
+/*
 import IdFromLsid from '../mixins/id-from-lsid' 
 import IdFromRoute from '../mixins/id-from-route' 
 import EntityProvider from '../components/EntityProvider'
@@ -22,8 +34,17 @@ import ListProvider from '../components/ListProvider'
 import TaxonDetail from '../components/TaxonDetail'
 import Taxons from '../mixins/taxons'
 import DataPreviewTable from '../components/DataPreviewTable'
+*/
+import EntityDetail from '../components/EntityDetail'
+import TaxonDetail from '../components/TaxonDetail'
+
 export default {
   name: 'taxon',
+  components: {
+    EntityDetail,
+    TaxonDetail
+  },
+  /*
   mixins: [IdFromLsid, IdFromRoute, Taxons],
   components: {
     EntityProvider,
@@ -31,6 +52,7 @@ export default {
     ListProvider,
     DataPreviewTable
   },
+  */
   props: [],
   data () {
     return {

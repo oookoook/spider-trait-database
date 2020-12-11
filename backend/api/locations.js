@@ -3,13 +3,12 @@ var db = null;
 const list = async function(limits) {
     var join = 'location LEFT JOIN country ON location.country_id = country.id';
     var res = await db.prepareListResponse(limits, 'location', null, null, join);
-    var results = await db.query({table: 'location', sql: `SELECT location.id, location.abbrev, location.locality, location.lat, location.lon, country.id, country.alpha3_code, country.name `
+    var results = await db.query({table: 'location', sql: `SELECT location.id, location.abbrev, location.lat, location.lon, country.id, country.alpha3_code, country.name `
      + `FROM ${join}`, nestTables: true, limits });    
      res.items = results.map(r => {    
         return {
                 id: r.location.id,
                 abbrev: r.location.abbrev,
-                locality: r.location.locality,
                 country: {
                     id: r.country.id,
                     name: r.country.name,
@@ -40,22 +39,17 @@ const get = async function(params) {
      return { item: {
         id: r.location.id,
         abbrev: r.location.abbrev,
-        locality: r.location.locality,
         coords: r.location.lat && r.location.lon ? {
             lat: r.location.lat,
             lon: r.location.lon,
             //precision: r.location.precision
         } : null,
-        altitude: r.location.altitude,
-        habitat: r.location.habitat,
-        microhabitat: r.location.microhabitat,
-        stratum: r.location.stratum,
         //note: r.location.note,
-        country: {
+        country: r.country.id ? {
             id: r.country.id,
             name: r.country.name,
             code: r.country.alpha3_code
-        },
+        } : null,
         /*
         habitatGlobal: {
             id: r.habitat_global.id,
@@ -101,23 +95,10 @@ const prepareForSql = async function(location) {
                 a.push(cr[0].alpha3_code);
             }
         }
-        if(location.habitatGlobal && location.habitatGlobal.id) {
-            var hgr = await db.query({table: 'habitat_global', sql: 'SELECT name FROM habitat_global WHERE id = ?', values: [location.habitatGlobal.id], nestTables: false}); 
-            if(hgr && hgr.lenth > 0) {
-                a.push(hgr[0].name);
-            }
-        }
-        if(location.habitatVerbatim) {
-            a.push(location.habitatVerbatim);
-        }
-        if(location.locality) {
-            a.push(location.locality);
-        }
 
         location.abbrev = db.unique(a.join(' ').replace(/[\W ]/,'').substring(0, 25));
     }
     //console.log(location.abbrev);
-    location.habitat_global_id = (location.habitatGlobal) ? location.habitatGlobal.id : null;
     location.country_id = (location.country) ? location.country.id : null;
     if(location.coords) {
         if(typeof(location.coords.lat) === 'object') {
@@ -135,14 +116,7 @@ const prepareForSql = async function(location) {
         } else {
             location.precision = location.coords.precision;
         }
-
-        if(typeof(location.altitude) === 'object') {
-            location.altitude = location.altitude.numeric;
-        } else {
-            location.altitude = location.altitude;
-        }
     }
-    delete location.habitatGlobal;
     delete location.country;
     delete location.coords;
 }
@@ -160,10 +134,6 @@ const remove = async function(params, auth) {
 }
 
 const synonyms = {
-    'habitatGlobal.id': 'habitat_global.id',
-    'habitatGlobal.name': 'habitat_global.name',
-    'habitatGlobal.category': 'habitat_global.category',
-    'habitatGlobal.number': 'habitat_global.number',
     'country.id': 'country.id',
     'country.code': 'country.alpha3_code',
     'country.name': 'country.name'

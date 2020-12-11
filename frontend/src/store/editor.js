@@ -327,7 +327,8 @@ export default {
         p.body = e;
         var data = await context.dispatch('post', p, { root: true });
         
-        if(data && data.id && data.entity) {
+        // when creating taxons, match is not defined
+        if(data && data.id && data.entity && payload.columns.match) {
           // use the entity.abbrev and do the column changes (disable validation for the requests)
           var pc = Object.assign({}, payload.columns);
           var o = {};
@@ -336,6 +337,9 @@ export default {
           pc.oldValues = payload.entity.oldValues[i];
           await context.dispatch(`editColumn`, pc);
           prog+=1;
+        } else if(data && data.id && data.entity && !payload.columns.match) {
+          // nothing special happens here :)
+          prog+=1; 
         } else if(data && data.error == 'validation') {
           prog+=1;
           err.push(`Error: ${data.validation} for ${JSON.stringify(e)}`);

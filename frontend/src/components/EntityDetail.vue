@@ -76,7 +76,7 @@ export default {
     EntityDialog,
     DataPreviewTable
   },
-  props: { list: String, entity: String, breadcrumbProp: { type: String, default: 'abbrev'}, deleteConfirmationText: String },
+  props: { list: String, entity: String, breadcrumbProp: { type: String, default: 'abbrev'}, breadcrumbList: { type: String }, deleteConfirmationText: String },
   data() {
     return {
       entityCreate: false,
@@ -87,6 +87,9 @@ export default {
     listTitle() {
       if (!this.list) {
         return "";
+      }
+      if(this.breadcrumbList) {
+        return this.breadcrumbList;
       }
       return this.list[0].toUpperCase() + this.list.substr(1);
     },

@@ -48,7 +48,7 @@ export default {
   },
   methods: {
     async getStats() {
-      // TODO get trait info
+      // get trait info
       if(!this.trait) {
         return;
       }
@@ -76,7 +76,7 @@ export default {
         this.$store.dispatch('data/stats', { filter: this.filter, type});
     },
     prepareData() {
-      // TODO switch again based on the type, create bins or assign to bins
+      // switch based on the type, create bins or assign to bins
         var r = this.stats;
         var bins = [];
         var binsData = [];

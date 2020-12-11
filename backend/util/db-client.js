@@ -349,7 +349,7 @@ const getAuthWhere = function(auth) {
 }
 
 const deleteEntity = async function (opts) {
-    var {params, table, auth, refs} = opts;
+    var {params, table, auth, refs, validate} = opts;
     var id = parseInt(params.id);
 
     if(!refs) {
@@ -378,6 +378,16 @@ const deleteEntity = async function (opts) {
         }
     }
 
+    if(typeof(validate) == 'function') {
+        var vr = await validate(id);
+        if (vr !== true) {
+            console.log('Delete validation failed');
+            return { 
+                error: 'validation',
+                validation: vr
+            }
+        }
+    }
 
     var r = await cquery(conn, {table, sql: `DELETE FROM ${table} WHERE id=? ${getAuthWhere(auth)}`, values: [id] });
     releaseConnection(conn);
