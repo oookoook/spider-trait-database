@@ -25,7 +25,7 @@ The Template contains the following 31 variables. Here follow their descriptions
 * `longitude` – The geographic longitude (in decimal degrees) using the spatial reference system (WGS84) of the geographic center of a Location. Other widely used formats are also parsed correctly. Examples: `102.478922`, `-0.4767`.
 * `altitude` – Altitude of the location, above sea level in meters (integer).
 * `locality` – The name or description of the place (character). Examples: `Municipality of Helsinki`, `small hill close to the river`, `Mount Fuji`.
-* `country` – The standard code for the country. Both two-character and three-character codes are recognized (character). Examples: `CZ`, `IT`, `BR`, `CZE`.
+* `country` – The standard code for the country. Both two-character and three-character codes according to ISO 3166 are recognized (character). Examples: `CZ`, `IT`, `BR`, `CZE`. The full list of recognized country codes is available on [https://en.wikipedia.org/w/index.php?title=List_of_ISO_3166_country_codes&oldid=933109715](this Wikipedia page) in `Alpha-2 code` and `Alpha-3 code` columns.
 * `habitat`– Habitat type according to a local classification, such as EUNIS, CORINE (character). Examples: pine `forest`, `grassland`, `cave`.
 * `microhabitat` – Microhabitat type (character). Examples: `under stones`, `ground`, `canopy`.
 * `date` – The date-time or interval associated with the trait. The value must comply with one of supported formats:

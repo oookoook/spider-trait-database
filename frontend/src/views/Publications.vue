@@ -4,7 +4,7 @@
     <hr class="primary mx-auto" style="height:3px; border:none;width:80%" />
     <v-row class="about-text text-xl-h5 text-subtitle-1 justify-center">
       <v-col cols="8">
-      <p class="mt-5">List of publications that used data from WST database:</p>
+      <p class="mt-5">List of publications that used data from WAT database:</p>
       <div v-html="publicationsHtml"></div>
       </v-col>
     </v-row>
