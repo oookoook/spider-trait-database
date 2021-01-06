@@ -6,7 +6,7 @@
       dark
     >
       <v-toolbar-title>
-        <router-link style="color:white;text-decoration:none" to="/"><v-icon left>mdi-spider</v-icon>World Arachnid database</router-link>
+        <router-link style="color:white;text-decoration:none" to="/"><v-icon left>mdi-spider</v-icon>World Arachnid Trait database</router-link>
         <!--<v-icon left>mdi-spider</v-icon>Spider Trait Database-->
         </v-toolbar-title>
 
