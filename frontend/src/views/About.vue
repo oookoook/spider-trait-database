@@ -7,7 +7,7 @@
       <div>
         <p class="mb-5">The development of the database was initiated by a workshop held at the 21st International Congress of Arachnology in Christchurch, New Zealand. 
         During this workshop, a core team was established to conceptualise, develop and test the database.</p>
-        <p>The WST database has been designed to contain 
+        <p>The WAT database has been designed to contain 
         trait data in a broad sense, from morphological traits to ecological characteristics, ecophysiology, behavioural habits, and more 
         (see <router-link to="/traits">Lists – Traits</router-link> for current bait of traits). The data includes individual measurements, observations, or composite characteristics, 
         but exclude molecular data (such as DNA or protein sequences). 
@@ -53,7 +53,7 @@
           The user is free to download, share and adapt the data, as long as the Database is cited 
           as the source of the information. This database should be cited as follows:</p>
           <blockquote class="blockquote about-text text-center">
-          Pekár S., Černecká Ľ., Wolff J., Mammola S., Cardoso P., Lowe E., Fukushima C.S., Birkhofer K. &amp; Herberstein M.E. 2020. The world spider trait database. Masaryk University, Brno, URL: https://spidertraits.sci.muni.cz
+          Pekár S., Černecká Ľ., Wolff J., Mammola S., Cardoso P., Lowe E., Fukushima C.S., Birkhofer K. &amp; Herberstein M.E. 2021. The world arachnid trait database. Masaryk University, Brno, URL: https://spidertraits.sci.muni.cz
           </blockquote>
         <v-img class="mx-auto mt-16" contain width="153" height="94" :src="require('../assets/edu.png')" />
         </v-col>

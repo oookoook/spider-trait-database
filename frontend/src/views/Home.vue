@@ -5,9 +5,9 @@
       <v-row  class="pt-2 mt-2 pt-xl-8 mt-xl-8 pt-xl-8 mt-xl-16 pl-xl-8 ml-xl-16">
         <v-col cols="auto">
       <v-row><div class="text-h3 text-xl-h2 font-weight-black">Welcome to the</div></v-row>
-      <v-row><div class="text-uppercase text-h3 text-xl-h2 primary--text font-weight-black">World Spider Trait</div></v-row>
-      <v-row justify="end"><div class="text-h3 text-h2 font-weight-black">database</div></v-row>
-      <v-row justify="start"><v-btn color="primary" class="mr-3" rounded to="/data">Explore</v-btn><v-btn color="primary" class="ml-3" rounded outlined to="/contribute">Contribute</v-btn></v-row>
+      <v-row class="py-4"><div class="text-uppercase text-h3 text-xl-h2 primary--text font-weight-black">World Arachnid Trait</div></v-row>
+      <v-row justify="end"><div class="text-h3 text-xl-h2 font-weight-black">database</div></v-row>
+      <v-row justify="start"><v-btn x-large color="primary" class="mr-5" rounded to="/data">Explore</v-btn><v-btn x-large color="primary" class="ml-5" rounded outlined to="/contribute">Contribute</v-btn></v-row>
         </v-col>
       </v-row>
       <v-row class="pl-xl-8 ml-xl-16">
