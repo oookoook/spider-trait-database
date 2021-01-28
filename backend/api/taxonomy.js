@@ -1,19 +1,19 @@
-const { getFullName } = require('../util/taxonomy-updater')
-
 var db = null;
 
 const list = async function(limits) {
     var res = await db.prepareListResponse(limits, 'taxonomy');
     var results = await db.query({table: 'taxonomy', sql: `SELECT taxonomy.id, taxonomy.wsc_lsid, taxonomy.valid, `
-     + `taxonomy.valid_id, taxonomy.family, taxonomy.genus, taxonomy.species, taxonomy.subspecies, `
+     + `taxonomy.valid_id, taxonomy.order, taxonomy.family, taxonomy.genus, taxonomy.species, taxonomy.subspecies, `
      + `taxonomy.author, taxonomy.year `
      + `FROM taxonomy`, nestTables: true, limits});    
      res.items = results.map(r => {    
         return {
                 id: r.taxonomy.id,
                 lsid: r.taxonomy.wsc_lsid,
+                synchronized: !!r.taxonomy.wsc_lsid,
                 valid: r.taxonomy.valid == 1,
                 validTaxon: { id: r.taxonomy.valid_id },
+                order: r.taxonomy.order,
                 family: r.taxonomy.family,
                 genus: r.taxonomy.genus,
                 species: r.taxonomy.species,
@@ -94,7 +94,9 @@ const validateDelete = async function(id) {
 }
 
 const prepareForSql = function(taxon) {
-    // prepare method
+    if(taxon.taxon) {
+        Object.assign(taxon, getTaxonFromFullName(taxon.taxon));
+    }
     
     // trim + capitalize first letter in names
     ['order', 'family', 'genus', 'species', 'subspecies'].forEach(k => {
@@ -122,6 +124,9 @@ const prepareForSql = function(taxon) {
     }
     delete(taxon.validTaxon);
     delete(taxon.lsid);
+    delete(taxon.originalName);
+    delete(taxon.taxon);
+    delete(taxon.synchronized);
     // full name
     taxon.full_name = getFullName(taxon);
     
@@ -139,6 +144,35 @@ const remove = async function(params, auth) {
     return await db.deleteEntity({params, table: 'taxonomy', auth, validate: validateDelete });
 }
 
+const getFullName = (r) => {
+    if(!r.genus) {
+        return r.family;
+    }
+    var t = [ r.genus ]
+    if(r.species) {
+        t.push(r.species);
+    }
+  
+    if(r.subspecies) {
+        t.push(r.subspecies);
+    }
+    
+    if(t.length == 1) {
+        t.push('sp.');
+    }
+
+    return t.join(' ');
+}
+
+const getTaxonFromFullName = function(fullName) {
+    var parts = fullName.split(' ');
+    var taxon = {};
+    ['genus', 'species', 'subspecies'].forEach((p, i) => {
+        taxon[p] = i < parts.length && !['sp', 'sp.'].includes(parts[i].toLowerCase()) ? parts[i] : null
+    });
+    return taxon;
+}
+
 const synonyms = {
     //'wsc.lsid': 'taxonomy.wsc_lsid',
     'lsid': 'wsc_lsid',
@@ -154,6 +188,8 @@ module.exports = function(dbClient) {
         get,
         create,
         update,
-        remove
+        remove,
+        getFullName,
+        getTaxonFromFullName
     }
 }

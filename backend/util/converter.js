@@ -11,6 +11,20 @@ const getSign = function(letter) {
     }
 }
 
+const validateCoord = function(coord) {
+    try {
+        if(Number.isNaN(coord)) {
+            return null;
+        }
+        if(coord > 180 || coord < -180) {
+            return null;
+        }
+        return coord;
+    } catch {
+        return null;
+    }
+}
+
 const parseCoord = function(str) {
     // there are many ways to write the coords:
     // 1. degrees, minutes, seconds and sings: -49°54"13'
@@ -26,13 +40,13 @@ const parseCoord = function(str) {
     // use regex to find the format:
     var f6 = new RegExp("^[+-]?\\d+.\\d+\\s*°?$");
     if(f6.test(str)) {
-        return parseFloat(str.replace('°',''));
+        return validateCoord(parseFloat(str.replace('°','')));
     }
 
     var f5 = new RegExp("^(\\d+.\\d+)\\s*°?\\s*(\\w)$");
     match = str.match(f5);
     if(match) {
-        return match[1] * getSign(match[2]);
+        return validateCoord(match[1] * getSign(match[2]));
     }
 
     // the easy formats did not match - we have to do it "per partes"
@@ -71,7 +85,7 @@ const parseCoord = function(str) {
         deg = parseInt(match[1]);
         min = parseInt(match[2]);
         sec = parseFloat(match[3]);
-        return sign * (deg + (min / 60) + (sec/3600));
+        return validateCoord(sign * (deg + (min / 60) + (sec/3600)));
     }
 
 
@@ -81,7 +95,7 @@ const parseCoord = function(str) {
     if(match) {
         deg = parseInt(match[1]);
         min = parseFloat(match[2]);
-        return sign * (deg + (min / 60));
+        return validateCoord(sign * (deg + (min / 60)));
     }
     return null;
 }

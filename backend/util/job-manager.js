@@ -31,6 +31,7 @@ const createJob = function(owner, total, func, params) {
         try { 
             await func(params); 
         } catch(e) { 
+            console.error(`${new Date().toISOString()}: ${e}`);
             console.error(e);
             state.aborted = true; 
             

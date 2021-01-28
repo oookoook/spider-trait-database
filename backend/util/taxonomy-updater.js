@@ -1,4 +1,5 @@
 const db = require('./db-client');
+const { getFullName } = require('../api/taxonomy');
 const axios = require('axios');
 const settings = require('../settings');
 
@@ -101,26 +102,6 @@ const pa = (v) => v && v.length > 0 ? v.substr(0, v.length - 6) : null;
 const py = (v) => v && v.length > 0 ? parseInt(v.substr(v.length-4,4)) : null;
 const ph = (v) => v.substr(v.indexOf('urn'));
 
-const gfn = (r) => {
-    if(!r.genus) {
-        return r.family;
-    }
-    var t = [ r.genus ]
-    if(r.species) {
-        t.push(r.species);
-    }
-  
-    if(r.subspecies) {
-        t.push(r.subspecies);
-    }
-    
-    if(t.length == 1) {
-        t.push('sp.');
-    }
-
-    return t.join(' ');
-}
-
 const updateTaxon = async function(conn, t) {
     var id = await getExistingRecord(conn, t.taxon.lsid);
 
@@ -137,12 +118,12 @@ const updateTaxon = async function(conn, t) {
 
     if(t.validTaxon) {
         record.valid_wsc_lsid = ph(t.validTaxon['_href']);
-        // null the valid id if this is a synonym or homonym - fill it later, the valid recort might not have been inserted yet at this moment
+        // null the valid id if this is a synonym or homonym - fill it later, the valid record might not have been inserted yet at this moment
         record.valid_id = null;
         record.valid = 0;
     }
 
-    record.full_name = gfn(record);
+    record.full_name = getFullName(record);
 
     if(!id) {
         record.wsc_lsid = t.taxon.lsid;
@@ -154,13 +135,33 @@ const updateTaxon = async function(conn, t) {
 }
 
 const updateTaxonLinks =async function(conn) {
+    // pair taxons based on valid lsid, fill in valid id
     await db.cquery(conn, {table: 'taxonomy', sql: `UPDATE taxonomy a LEFT JOIN taxonomy b ON a.wsc_lsid = b.valid_wsc_lsid SET b.valid_id = a.id 
     WHERE b.valid_id IS NULL AND b.valid = 0` });
 
+    // it might happen that there will be records that have valid_lsid, but no valid_id was found - we need to get the taxon from the WSC
+    
+    // get valid_wsc_id if not null and get the taxon and insert
+    var  missing = await db.cquery(conn, {table: 'taxonomy', sql: 'SELECT DISTINCT valid_wsc_lsid FROM taxonomy WHERE valid = 0 AND valid_wsc_lsid IS NOT NULL AND valid_id is NULL'});
+    missing.forEach(m => {
+        try {
+            let t = await getTaxonFromWsc(m['valid_wsc_lsid']);
+            await updateTaxon(conn, t);
+        } catch(e) {
+            console.log(`Error updating ${m}`);
+            console.dir(t);
+            console.dir(e);
+        }
+    });
+
+
     // update all the existing records in the data table
     // that are linked to invalid taxonomy records
-    await db.cquery(conn, {table: 'taxonomy', sql: 'UPDATE data INNER JOIN taxonomy ON data.taxonomy_id = taxonomy.id SET data.taxonomy_id = taxonomy.valid_id '
+    // IGNORE so the whole batch doesnt fail if something goes wrong
+    await db.cquery(conn, {table: 'taxonomy', sql: 'UPDATE IGNORE data INNER JOIN taxonomy ON data.taxonomy_id = taxonomy.id SET data.taxonomy_id = taxonomy.valid_id '
     +'WHERE taxonomy.valid = 0' });
+
+    
 }
 
 const update = async function(from) {
@@ -196,7 +197,6 @@ const update = async function(from) {
 }
 
 module.exports = {
-    update,
-    getFullName: gfn
+    update
 }
 

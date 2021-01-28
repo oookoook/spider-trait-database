@@ -40,7 +40,7 @@ export default [
       entity: 'taxonomy',
       displayValue: (i) => i.taxonomy.order,
       save: (o, v) => {if(!o.taxonomy) o.taxonomy={}; o.taxonomy.order = v; },
-      isValid: (i, e) => true, 
+      isValid: (i, e) => !!i.taxonomy.id || (!e && !!i.taxonomy.order) || (e === 'create' && !!i.taxonomy.order) ||  (!i.taxonomy.taxon && !!i.taxonomy.lsid) || 'Taxon must be assigned to the record', 
       similar: { endpoint: 'taxonomy', valueField: 'order' }
   },
   {
@@ -49,9 +49,19 @@ export default [
     entity: 'taxonomy',
     displayValue: (i) => i.taxonomy.family,
     save: (o, v) => {if(!o.taxonomy) o.taxonomy={}; o.taxonomy.family = v; },
-    isValid: (i, e) => true, 
+    isValid: (i, e) => !!i.taxonomy.id || (!e && !!i.taxonomy.family) || (e === 'create' && !!i.taxonomy.family) || (!i.taxonomy.taxon && !!i.taxonomy.lsid) || 'Taxon must be assigned to the record', 
     similar: { endpoint: 'taxonomy', valueField: 'family' }
   },
+  {
+    name: 'taxonomy.taxon',
+    text: 'Taxon',
+    entity: 'taxonomy',
+    displayValue: (i) => i.taxonomy.taxon,
+    save: (o, v) => {if(!o.taxonomy) o.taxonomy={}; o.taxonomy.taxon = v; },
+    isValid: (i, e) => !!i.taxonomy.id || (!e && !!i.taxonomy.taxon) || (e === 'create' && !!i.taxonomy.taxon) || (!i.taxonomy.taxon && !!i.taxonomy.lsid) || 'Taxon must be assigned to the record', 
+    similar: { endpoint: 'taxonomy', valueField: 'fullName' }
+  },
+  /*
   {
     name: 'taxonomy.genus',
     text: 'Genus',
@@ -79,22 +89,22 @@ export default [
     isValid: (i, e) => true, 
     similar: { endpoint: 'taxonomy', valueField: 'subspecies' }
   },
+  */
   { 
       name: 'taxonomy.lsid',
       text: 'WSC LSID',
       //entity: 'taxonomy', 
       displayValue: (i) => i.taxonomy.lsid,
       save: (o, v) => {if(!o.taxonomy) o.taxonomy={}; o.taxonomy.lsid = v; },
-      isValid: (i, e) => true, // Adjusted to work correctly for other orders !!i.taxonomy.id || 'Taxon must be assigned to the record',
+      isValid: (i, e) => !!i.taxonomy.id || !!i.taxonomy.taxon || 'Taxon must be assigned to the record',
       autocomplete: { endpoint: 'taxonomy', valueField: 'lsid' }
     },
     { 
       name: 'originalName',
       text: 'Original name',
-      //entity: 'taxonomy', 
-      displayValue: (i) => i.originalName,
+      displayValue: (i) => i.originalName, 
       save: (o, v) => { o.originalName = v; }, 
-      isValid: (i, e) => true, // Adjusted to work correctly for other orders !!i.taxonomy.id || 'Taxon must be assigned to the record',
+      isValid: (i, e) => !!i.taxonomy.id || !!i.taxonomy.taxon || 'Taxon must be assigned to the record',
       autocomplete: { endpoint: 'taxonomy', valueField: 'fullName' }
     },
     // TODO test validation  for the WSC-based taxons
@@ -121,6 +131,9 @@ export default [
         if(!!i.taxonomy.originalName && !i.taxonomy.lsid && !i.taxonomy.id) {
           return 'Unknown original name';
         }
+        if(!!i.taxonomy.lsid && !i.taxonomy.id) {
+          return 'Unknown WSC LSID';
+        }
         // taxon is not created
         return 'Unknown error';
       },
@@ -131,13 +144,11 @@ export default [
         }
 
         if(!e && !!i.taxonomy.order && !!i.taxonomy.family) {
-          // pass record with at least order and family as valid if not 
+          // pass record with at least order and family as valid if not an editor
           return true;
         }
         
-        if(e && !!i.taxonomy.order && !!i.taxonomy.family) {
-          console.dir(i);
-          console.log(e && !!i.taxonomy.order && !!i.taxonomy.family);  
+        if(e && !!i.taxonomy.order && !!i.taxonomy.family) {  
           return 'Taxon not created';
         }
 

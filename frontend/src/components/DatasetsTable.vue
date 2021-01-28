@@ -18,6 +18,8 @@
       :server-items-length="total"
       :loading="loading"
       class="elevation-1"
+      sort-by="uploaded"
+      :sort-desc="true"
     >
     
     <template v-slot:item.name="{ item }">

@@ -39,7 +39,7 @@ export default {
       // debounce solves repeated filter updates when processing a new data filter from route in the data explorer
       // the debounced function is defined in the data so each instance of the list provider has its own function definiton
       // (this is needed when multiple list providers are included within the same component)
-      update: debounce(500, true, this.updateDirect),
+      update: debounce(500, this.updateDirect),
       autocomplete: debounce(500, this.autocompleteDirect),
     }
   },
@@ -100,15 +100,25 @@ export default {
         params.search = null;
         params.searchField = null;
         console.dir(this.options);
+        if(this.options) {
+          // reset page if count required (e.i. changing filter)
+          this.options.page = 1;
+        }
         params.options = this.options ? this.options : {
           page: 1,
           itemsPerPage: 10,
           sortBy: [],
           sortDesc: []
         }
+        
       } else if(params.options) {
         console.log('assigning options');
         console.dir(this.options);
+        if(params.count) {
+          console.log('count required - resetting page');
+          // reset page if count required (e.i. changing filter)
+          params.options.page = 1;
+        }
         this.options = params.options;
         console.dir(params.options);
         /*

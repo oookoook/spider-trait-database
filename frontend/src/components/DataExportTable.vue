@@ -39,6 +39,7 @@ export default {
       headers: [
         { text: 'Id', value: 'id' },
         { text: 'WSC LSID', value: 'taxonomy.lsid' },
+        { text: 'Order', value: 'taxonomy.order' },
         { text: 'Family', value: 'taxonomy.family' },
         { text: 'Genus', value: 'taxonomy.genus' },
         { text: 'Species', value: 'taxonomy.species' },

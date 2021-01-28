@@ -37,7 +37,7 @@
     <v-row justify="space-between" align="center" class="my-16">
       <v-col cols="6" class="about-text text-xl-h5 text-subtitle-1">
       <div><p>
-        The core team (in alphabetical order) is: Klaus Birkhofer, Pedro Cardoso, Ludmila Cernecka, Caroline Fukushima, Marie Herberstein, Lizzy Lowe, Stefano Mammola, Stano Pekar, and Jonas Wolff.</li>
+        The core team (in alphabetical order) is: Klaus Birkhofer, Pedro Cardoso, Ludmila Cernecka, Caroline Fukushima, Marie Herberstein, Lizzy Lowe, Stefano Mammola, Stano Pekar, and Jonas Wolff.
       </p></div>
       </v-col>
       <v-col cols="4">

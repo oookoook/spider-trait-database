@@ -31,6 +31,9 @@ export default {
     downloadLink: (state, getters, rootState, rootGetters) => (id) => {
       return `${rootGetters.baseUrl}import/${id}/data/export`;
     },
+    sourceLink: (state, getters, rootState, rootGetters) => (id) => {
+      return `${rootGetters.baseUrl}import/${id}/data/source`;
+    },
     autocomplete: (state) => (entity) => state.autocomplete[entity],
     entityProps: (state) => state.entityProps,
     writableProps: (state) => state.entityProps.filter(e => !e.readOnly),

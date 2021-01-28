@@ -162,7 +162,7 @@ router.route('/datasets/:id')
     datasets.update(req.params, req.body, req.resourcesAuth).then(r => res.json(r)).catch(e => { err(e); res.sendStatus(400); })
   })
   .delete(requiresAuth(), auth.isContributor, function (req, res) {
-    datasets.remove(req.params, req.resourcesAuth).then(r => res.json(r)).catch(e => { err(e); res.sendStatus(400); })
+    datasets.remove(req.params, req.resourcesAuth, settings.files.sourceDir).then(r => res.json(r)).catch(e => { err(e); res.sendStatus(400); })
   })
 
 
@@ -224,7 +224,7 @@ router.route('/import/:id/data')
     // uploads a file to already existing dataset
     // returns only a jobId that can be used to track the progress
     // in the background transfers rows from the file to the import table
-    imports.uploadFile(req.params, req.body, req.files, req.resourcesAuth).then(r => res.json(r)).catch(e => { err(e); res.sendStatus(400); })
+    imports.uploadFile(req.params, req.body, req.files, req.resourcesAuth, settings.files.sourceDir).then(r => res.json(r)).catch(e => { err(e); res.sendStatus(400); })
   })
   .delete(requiresAuth(), auth.isContributor, function (req, res) {
     // delete all the records for a given dataset in the import table
@@ -235,6 +235,12 @@ router.route('/import/:id/data')
   // gets data for a given dataset in CSV
   .get(requiresAuth(), auth.isContributor, function (req, res) {
     imports.exportCsv(req.params, req.resourcesAuth,  settings.files.tmpDir).then(r => res.download(r)).catch(e => { err(e); res.sendStatus(400); })
+  })
+
+  router.route('/import/:id/data/source')
+  // gets original file for a given dataset
+  .get(requiresAuth(), auth.isContributor, function (req, res) {
+    imports.getSourceFile(req.params, req.resourcesAuth,  settings.files.sourceDir).then(r => res.download(r)).catch(e => { err(e); res.sendStatus(400); })
   })
   
   router.route('/import/:id/validate')

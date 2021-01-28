@@ -92,7 +92,7 @@ export default {
       return [
         { name: 'trait entries', value: this.$store.getters['data/homeStats']('id') },
         { name: 'traits', value: this.$store.getters['data/homeStats']('trait'), preposition: 'of' },
-        { name: 'species', value: this.$store.getters['data/homeStats']('species'), preposition: 'for' },
+        { name: 'taxa', value: this.$store.getters['data/homeStats']('species'), preposition: 'for' },
         { name: 'datasets', value: this.$store.getters['data/homeStats']('dataset'), preposition: 'from' }
       ];
     }

@@ -8,7 +8,7 @@ export default {
   mixins: [Bar],
   components: {
   },
-  props: { filter: Object, trait: Number, loading: Boolean },
+  props: { filter: Object, trait: Number, loading: Boolean, isVisible: Boolean },
   data () {
     return {
       options: {
@@ -28,7 +28,8 @@ export default {
         }
       },
       traitDataType: null,
-      traitDetail: null
+      traitDetail: null,
+      renderWaiting: null
     }
   },
   computed: {
@@ -44,6 +45,13 @@ export default {
     },
     stats() {
       this.prepareData();
+    },
+    isVisible() {
+      if(this.isVisible && this.renderWaiting) {
+        console.log('Running delayed render');
+        this.renderChart(this.renderWaiting, this.options);
+        this.renderWaiting = null;
+      }
     }
   },
   methods: {
@@ -132,7 +140,12 @@ export default {
       console.dir(d);
       console.log('rendering chart...');
       this.$emit('update:loading', false);
-      this.renderChart(d, this.options);
+      if(!this.isVisible) {
+        console.log('Chart is not visible, delaying render');
+        this.renderWaiting = d;  
+      } else {
+        this.renderChart(d, this.options);
+      }
     }
   },
   created () {

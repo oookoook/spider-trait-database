@@ -4,7 +4,8 @@
         <!--<v-card-title>Data editor</v-card-title>-->
         <action-button text="Dataset detail" icon="mdi-card-text-outline" toolbar @click="dsEdit = true" />
         <action-button color="success" text="Upload data" icon="mdi-upload" toolbar @click="upload = true" />
-        <action-button text="Download as CSV" icon="mdi-download" toolbar :link="downloadLink" />
+        <action-button text="Download the original uploaded file (Excel/CSV)" icon="mdi-microsoft-excel" toolbar :link="sourceLink" />
+        <action-button text="Download the current dataset state as CSV (backup progress)" icon="mdi-download" toolbar :link="downloadLink" />
         <action-button text="Delete all the data" icon="mdi-table-remove" toolbar @click="deleteData"/>
         <action-button text="Delete the dataset" icon="mdi-delete-forever-outline" toolbar @click="deleteDataset" />
         <v-divider vertical class="mx-3" />
@@ -259,6 +260,13 @@ export default {
         return '';
       }
     },
+    sourceLink() {
+      if(this.dataset) {
+        return this.$store.getters['editor/sourceLink'](this.dataset.id);
+      } else {
+        return '';
+      }
+    },
     ...mapState('editor', ['list', 'total']),
     ...mapGetters(['job', 'errors'])
   },
@@ -466,6 +474,11 @@ export default {
       this.edit.dialog = true;
     },
     showDistinct() {
+      // TODO add this functionality to Edit table
+      if(this.selectedCell.distinctForbidden) {
+        this.$store.dispatch('notify', {text: 'This column doesn\'t allow distinct values view.', error: true});
+        return;
+      }
       this.distinct.dialog = true;
     },
     showDuplicate() {

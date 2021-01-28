@@ -139,7 +139,7 @@ if(settings.https.enable) {
         passphrase: settings.https.passphrase
       }, app)
       .listen(settings.port, function () {
-        console.log(`Server is listening on port ${settings.port}. Go to https://localhost:${settings.port}/`)
+        console.log(`Server is listening on port ${settings.port}. Go to https://localhost:${settings.port}/ or ${settings.baseUrl}`)
       });
     
     // http server that redirects the requests
@@ -148,6 +148,6 @@ if(settings.https.enable) {
       res.end();
     }).listen(80);
 } else {
-    app.listen(settings.port, () => console.log(`Server is listening on port ${settings.port}. Go to http://localhost:${settings.port}/`))
+    app.listen(settings.port, () => console.log(`${new Date().toISOString()}: Server is listening on port ${settings.port}. Go to http://localhost:${settings.port}/`))
 }
 

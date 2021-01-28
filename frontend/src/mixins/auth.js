@@ -28,7 +28,7 @@ export default {
                 // redirect to the correct route from the url
                 // fill in the user info
                 this.$store.dispatch('getUserInfo').then(
-                    () => this.$store.dispatch('notify', { error: false, text: `You were successfully logged in as ${this.user.name}. Your role is ${role}.`}), 
+                    () => this.$store.dispatch('notify', { error: false, text: `You were successfully logged in as ${this.user.name}. Your role is ${this.role}.`}), 
                     () => this.$store.dispatch('notify', { error: true, text: `Unable to log you in.`}));
                 // should be stored in the local storage (vuex persistence)
                 var returnRoute = this.lastRoute ? this.lastRoute : '/';

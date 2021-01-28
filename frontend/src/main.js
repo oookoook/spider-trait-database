@@ -12,8 +12,12 @@ import VueGtag from "vue-gtag";
 Vue.use(resource);
 
 Vue.use(VueGtag, {
-  config: { id: process.env.VUE_APP_GA_ID }
-});
+  config: { id: process.env.VUE_APP_GA_ID,
+    params: {
+      send_page_view: true
+    }
+  }
+}, router);
 
 Vue.config.productionTip = false
 

@@ -33,6 +33,7 @@ module.exports = {
     },
     files: {
         tmpDir: '/var/tmp',
+        sourceDir: '/opt/spidertraits/sourceData',
         import: {
             sizeLimitMB: 100
         }

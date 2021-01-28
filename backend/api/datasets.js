@@ -1,5 +1,8 @@
 var db = null;
 
+const fs = require('fs').promises;
+const path = require('path');
+
 const getWhere = function(auth, showImport, remove) {
     if(!auth || !showImport) {
         return 'imported = 3';
@@ -112,19 +115,31 @@ const update = async function(params, body, auth) {
     return await db.updateEntity({params, body, table: 'dataset', auth, prepareForSql: prepareForUpdate, validate });
 }
 
-const remove = async function(params, auth) {
+const remove = async function(params, auth, sourceDir) {
     // delete all the records in the import and data tables
     var id = parseInt(params.id);
     var aw = getWhere(auth, true, true);
     await db.query({table: 'import', sql: `DELETE import FROM import JOIN dataset ON import.dataset_id = dataset.id WHERE dataset_id = ? AND ${aw}`, values: [id] });
     await db.query({table: 'data', sql: `DELETE data FROM data JOIN dataset ON data.dataset_id = dataset.id WHERE dataset_id = ? AND ${aw}`, values: [id] });
 
+    var dsfile = await db.query({table: 'dataset', sql: `SELECT source_file FROM dataset WHERE id=? AND ${aw}`, values: [id]});
+    console.dir(dsfile);
+    if(dsfile[0]['source_file']) {
+        try {
+            await fs.unlink(path.resolve(sourceDir, dsfile[0]['source_file']));
+        } catch (e) {
+            console.error(`unable to delete source file: ${JSON.stringify(dsfile)}`);
+        }
+    } else {
+        console.log(`No source file found for the dataset ${id}`);
+    }
+
     return await db.deleteEntity({params, table: 'dataset', auth});
 }
 
 module.exports = function(dbClient) {
     db = dbClient;
-    db.addSynonyms('datasets', 'dataset', {state: `imported` });
+    db.addSynonyms('datasets', 'dataset', {'state': `imported`, 'uploaded': 'date' });
     return {
         list,
         get,

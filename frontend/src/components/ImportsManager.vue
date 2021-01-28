@@ -23,7 +23,7 @@
       </v-card-actions>
     </v-card>
   </v-bottom-sheet>
-   <list-provider list="imports" v-slot="i">
+   <list-provider ref="lp" list="imports" v-slot="i">
     <imports-table :items="i.items"
     :editor="editor" 
     :loading="i.loading" 
@@ -117,6 +117,7 @@ export default {
         this.$store.dispatch('notify', {text: 'Dataset deleted.'});
         this.remove.dialog = false;
         this.dataset = null;
+        this.$refs.lp.update();
       });
     }
   },

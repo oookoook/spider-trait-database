@@ -85,7 +85,10 @@ const list = async function(params, limits) {
                     id: r.location.id,
                     abbrev: r.location.abbrev,
                 },
-                locality: r.locality,
+                altitude: r.data.altitude,
+                locality: r.data.locality,
+                habitat: r.data.habitat,
+                microhabitat: r.data.microhabitat,
                 country: {
                     id: r.country.id,
                     name: r.country.name,
@@ -121,7 +124,7 @@ const csv =  async function(params, limits, tmpDir) {
      + `FROM ${join} WHERE ${cond.clause}`
      , values: cond.values, nestTables: false, limits, hasWhere: true});
     
-    var f = await csvu.get(tmpDir, `spider-traits-${Date.now()}.csv`, dstream, c);
+    var f = await csvu.get(tmpDir, `watdb-${Date.now()}.csv`, dstream, c);
     db.releaseConnection(c);
     return f;
 }
@@ -143,7 +146,7 @@ const excel =  async function(params, limits, tmpDir) {
      + `FROM ${join} WHERE ${cond.clause}`
      , values: cond.values, nestTables: false, limits, hasWhere: true});
     
-    var f = await csvu.excel(tmpDir, `spider-traits-${Date.now()}.xlsx`, records);
+    var f = await csvu.excel(tmpDir, `watdb-${Date.now()}.xlsx`, records);
     
     return f;
 }

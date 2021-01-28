@@ -6,6 +6,8 @@
       :server-items-length="total"
       :loading="loading"
       dense
+      fixed-header
+      height="320"
     >
     
     <template v-slot:header.actions="{}">

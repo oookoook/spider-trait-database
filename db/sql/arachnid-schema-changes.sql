@@ -27,9 +27,7 @@ DROP COLUMN `location_stratum`,
 DROP COLUMN `location_habitat_global`,
 ADD COLUMN `taxonomy_order` VARCHAR(255) NULL DEFAULT NULL AFTER `original_name`,
 ADD COLUMN `taxonomy_family` VARCHAR(255) NULL DEFAULT NULL AFTER `taxonomy_order`,
-ADD COLUMN `taxonomy_genus` VARCHAR(255) NULL DEFAULT NULL AFTER `taxonomy_family`,
-ADD COLUMN `taxonomy_species` VARCHAR(255) NULL DEFAULT NULL AFTER `taxonomy_genus`,
-ADD COLUMN `taxonomy_subspecies` VARCHAR(255) NULL DEFAULT NULL AFTER `taxonomy_species`,
+ADD COLUMN `taxonomy_taxon` VARCHAR(255) NULL DEFAULT NULL AFTER `taxonomy_family`,
 CHANGE COLUMN `location_altitude` `altitude` VARCHAR(45) NULL DEFAULT NULL ,
 CHANGE COLUMN `location_locality` `locality` VARCHAR(255) NULL DEFAULT NULL ,
 CHANGE COLUMN `location_country_code` `country_code` VARCHAR(45) NULL DEFAULT NULL ,
@@ -51,6 +49,8 @@ ALTER TABLE `spider_traits_db`.`import` ADD CONSTRAINT `import_country_fk`
   ON DELETE NO ACTION
   ON UPDATE NO ACTION;
 
+ALTER TABLE `spider_traits_db`.`dataset` 
+ADD COLUMN `source_file` VARCHAR(512) NULL DEFAULT NULL AFTER `records`;
 
 SET SQL_MODE=@OLD_SQL_MODE;
 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;

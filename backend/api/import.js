@@ -2,8 +2,10 @@ const conv = require('../util/converter');
 const fcsv = require('fast-csv');
 const csv = require('../util/csv');
 const jm = require('../util/job-manager');
-const { snakeCase, camelCase } = require('change-case');
+const { snakeCase } = require('change-case');
 
+const fs = require('fs').promises;
+const path = require('path');
 
 var db = null;
 var mail = null; 
@@ -11,9 +13,9 @@ var mail = null;
 const columns = [
   `taxonomy_order`,
   `taxonomy_family`,
-  `taxonomy_genus`,
-  `taxonomy_species`,
-  `taxonomy_subspecies`,
+  `taxonomy_taxon`,
+  //`taxonomy_species`,
+  //`taxonomy_subspecies`,
   `wsc_lsid`,
   `original_name`,
   `trait_abbrev`,
@@ -64,9 +66,10 @@ const colSynonyms = {
     'habitat_local': 'habitat',
     'order': `taxonomy_order`,
     'family': `taxonomy_family`,
-    'genus': `taxonomy_genus`,
-    'species': `taxonomy_species`,
-    'subspecies': `taxonomy_subspecies`
+    'taxon': `taxonomy_taxon`
+    //'genus': `taxonomy_genus`,
+    //'species': `taxonomy_species`,
+    //'subspecies': `taxonomy_subspecies`
 }
 
 const joinf = 'data LEFT JOIN trait ON data.trait_id = trait.id '
@@ -92,7 +95,7 @@ const joinv = 'import LEFT JOIN trait ON import.trait_abbrev = trait.abbrev '
             + 'LEFT JOIN taxonomy full_names ON import.original_name IS NOT NULL AND import.original_name = full_names.full_name '
             + 'LEFT JOIN taxonomy_name ON import.original_name IS NOT NULL AND import.original_name = taxonomy_name.name '
             + 'LEFT JOIN taxonomy synonyms ON taxonomy_name.taxonomy_id = synonyms.id '
-            + 'LEFT JOIN taxonomy nonsynctaxa ON import.taxonomy_order IS NOT NULL AND import.taxonomy_family IS NOT NULL AND import.taxonomy_order = nonsynctaxa.order AND import.taxonomy_family = nonsynctaxa.family AND import.taxonomy_genus = nonsynctaxa.genus AND import.taxonomy_species = nonsynctaxa.species AND import.taxonomy_subspecies = nonsynctaxa.subspecies '
+            + 'LEFT JOIN taxonomy nonsynctaxa ON import.taxonomy_order IS NOT NULL AND import.taxonomy_family IS NOT NULL AND import.taxonomy_order = nonsynctaxa.order AND import.taxonomy_family = nonsynctaxa.family AND import.taxonomy_taxon = nonsynctaxa.full_name '
             + 'LEFT JOIN sex ON import.sex = sex.name '
             + 'LEFT JOIN life_stage ON import.life_stage = life_stage.name '
             + 'LEFT JOIN measure ON import.measure = measure.name '
@@ -131,12 +134,15 @@ const getObject = function(r) {
         taxonomy: {
             order: r['taxonomy_order'],
             family: r['taxonomy_family'],
-            genus: r['taxonomy_genus'],
-            species: r['taxonomy_species'],
-            subspecies: r['taxonomy_subspecies'],
+            //genus: r['taxonomy_genus'],
+            //species: r['taxonomy_species'],
+            //subspecies: r['taxonomy_subspecies'],
+            taxon: r['taxonomy_taxon'],
             lsid: r[`wsc_lsid`],
             id: r[`taxonomy_id`],
-            fullName: r[`full_name`]
+            fullName: r[`full_name`],
+            synchronized: !!r[`wsc_lsid`],
+            //originalName: r[`original_name`] // this is here just for the entity creation
         },
         trait: {
             abbrev: r[`trait_abbrev`],
@@ -255,7 +261,7 @@ const exportCsv = async function(params, auth, tmpDir) {
     var dstream = db.squery(c, {table: 'import', sql:`SELECT ${columns.map(c => 'import.'+c).join(',')} `
     + `FROM ${joind} WHERE dataset_id = ? AND ${aw}`, values: [id], nestTables: false, hasWhere: true });
    
-    var r = await csv.get(tmpDir, `spider-traits-import-${id}-${Date.now()}.csv`, dstream, c);
+    var r = await csv.get(tmpDir, `watdb-import-${id}-${Date.now()}.csv`, dstream, c);
     //console.log(r);
     db.releaseConnection(c);
     return r;
@@ -321,8 +327,8 @@ const changeState = async function(params, body, auth) {
     if(currStateNum < 3) {
     switch(state) {
         case 'created': mail.send({subject: 'Dataset added', text: 'A new dataset was created by a contributor.'}); break; // this will never happen
-        case 'rejected': mail.send({ to: await getUploaderEmail(id), subject: 'Dataset rejected', text: 'Your dataset was rejected by an editor. You can find more details at {BASEURL}/import'}); break;
-        case 'reviewed': mail.send({subject: 'Dataset review requested', text: 'A new dataset was submitted for review by a contributor. You can find more details at {BASEURL}/approve'}); break;
+        case 'rejected': mail.send({ to: await getUploaderEmail(id), subject: 'Dataset rejected', text: `Your dataset was rejected by an editor. You can find more details at {BASEURL}/prepare/${id}`}); break;
+        case 'reviewed': mail.send({subject: 'Dataset review requested', text: `A new dataset was submitted for review by a contributor. You can find more details at {BASEURL}/prepare/${id}`}); break;
         case 'approved': mail.send({ to: await getUploaderEmail(id), subject: 'Dataset approved', text: `Your dataset was approved by an editor. You can view the dataset detail at {BASEURL}/datasets/${id}`}); break; 
     }
     }
@@ -518,6 +524,14 @@ const importRow = async function(conn, ds, r, state, cache) {
 
     row['location_lon_conv'] = gfc('location_lon', conv.parseCoord);
 
+    // fill in original_name from taxon and vice versa
+    if(row['taxonomy_taxon'] && !row['original_name']) {
+        row['original_name'] = row['taxonomy_taxon'];
+    }
+    if(!row['taxonomy_taxon'] && row['original_name'] && row['taxonomy_order']) {
+        row['taxonomy_taxon'] = row['original_name'];
+    }
+
     row['dataset_id'] = ds;
     row['changed'] = 1;
     row['duplicate'] = 0;
@@ -537,20 +551,51 @@ const importRow = async function(conn, ds, r, state, cache) {
     return true;
 }
 
-const uploadFile = async function(params, body, files, auth) {
+const getSourceFile = async function(params, auth, sourceDir) {
+    var id = parseInt(params.id);
+    var aw = getAuthWhere(auth);
+    var d = await db.query({table: 'dataset', sql: `SELECT source_file FROM dataset WHERE id = ? AND ${aw}`, values: [id], hasWhere: true});
+    var fnf = path.resolve(sourceDir, 'no-source-file-found.txt');
+    if(!d[0]['source_file']) {
+        return fnf;
+    }
+    return path.resolve(sourceDir, d[0]['source_file']);
+
+}
+
+const saveSourceFile = async function({tempPath, sourceDir, filename, dataset}) {
+    if(dataset.sourceFile) {
+        // delete the current file
+        try {
+            await fs.unlink(path.resolve(sourceDir, dataset.sourceFile));
+        } catch (e) {
+            console.error(`unable to delete cuurent source file: ${JSON.stringify(dataset)}`);
+        }
+    }
+    // copy the file
+    let fn = `watdb-${dataset.id}-${dataset.name.toLowerCase().replace(/\W/g, '')}.${filename.substr(filename.lastIndexOf('.') + 1)}`;
+    await fs.copyFile(tempPath, path.resolve(sourceDir,fn));
+    await db.query({table: 'dataset', sql: 'UPDATE dataset SET source_file = ? WHERE id = ?', values: [fn, dataset.id]});
+};
+
+const uploadFile = async function(params, body, files, auth, sourceDir) {
     // uploads a file to already existing dataset
     // returns only a jobId that can be used to track the progress
     // in the background transfers rows from the file to the import table
     
+    if(!files || !params) {
+        throw 'Upload failed';
+    }
+
     // file is uploaded
     
     var ds = parseInt(params.id);
 
-    var dscheck = await db.query({table: 'dataset', sql: `SELECT id FROM dataset WHERE id=? AND ${getAuthWhere(auth)}`, values: [ds]});
+    var dscheck = await db.query({table: 'dataset', sql: `SELECT id, name, source_file FROM dataset WHERE id=? AND ${getAuthWhere(auth)}`, values: [ds]});
     if(!dscheck || dscheck.length == 0 || dscheck[0].id != ds) {
         throw 'Cannot upload to the given dataset';
     }
-
+    
     var f = files.dataset;
     if(f.truncated) {
         throw 'File size is too large';
@@ -565,10 +610,13 @@ const uploadFile = async function(params, body, files, auth) {
     if((f.mimetype == 'application/vnd.ms-excel' || f.mimetype == 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
     && f.name.toLowerCase().indexOf('.csv') + 4 != f.name.length) {
         //console.log('converting');
+        await saveSourceFile({ tempPath: fpath, sourceDir, filename: f.name, dataset: { id: ds, name: dscheck[0]['name'], sourceFile: dscheck[0]['source_file']}});
         fpath = await csv.convert(fpath);
     } else if(f.mimetype != 'text/csv' && f.name.toLowerCase().indexOf('.csv') + 4 != f.name.length) {
         throw 'Unknown file format';
     }
+
+
     // first passthrough - just get the number of lines
     var total = await csv.rows(fpath);
     var cnt = total;
@@ -922,11 +970,14 @@ const getColumn = async function(params, limits, auth) {
     // there are some special cases
     if(column == 'taxonomy') {
         
-        cols = ['taxonomy_order', 'taxonomy_family', 'taxonomy_genus', 'taxonomy_species', 'taxonomy_subspecies', 'original_name', 'wsc_lsid', 'taxonomy_id'];
+        cols = ['taxonomy_order', 'taxonomy_family', /*'taxonomy_genus', 'taxonomy_species', 'taxonomy_subspecies',*/ 'taxonomy_taxon', 'wsc_lsid', 'taxonomy_id'];
     } else if(column == 'reference' && params.column == 'reference') { // reference.fullCitation is also translated as reference
         cols = ['reference', 'reference_abbrev', 'reference_doi', 'reference_id'];
     } else if(column == 'event_date') {
         cols = ['event_date', 'event_date_start', 'event_date_end'];
+    } else if(['valid','valid_review','taxonomy_full_name'].includes(column)) {
+        // handle special cases
+        cols = [column];
     } else if(!columns.includes(column)) {
         // method, location, trait
         cols = columns.filter(c => c.indexOf(column) == 0);
@@ -1004,7 +1055,7 @@ const validate = async function(params) {
     + ` location_id = COALESCE(location.id, loccoord.id), `
     // + `location_habitat_global_id = habitat_global.id, 
     + ` import.country_id = COALESCE(country3.id,country2.id), `
-    + ` import.taxonomy_id = CASE WHEN taxonomy.id IS NOT NULL AND (full_names.id IS NOT NULL OR synonyms.id IS NOT NULL OR nonsynctaxa.id IS NOT NULL)`
+    + ` import.taxonomy_id = CASE WHEN taxonomy.id IS NOT NULL AND (full_names.id IS NOT NULL OR synonyms.id IS NOT NULL)`
     + `   AND COALESCE(taxonomy.valid_id, taxonomy.id) <> COALESCE(full_names.valid_id, full_names.id, synonyms.valid_id, synonyms.id, nonsynctaxa.valid_id, nonsynctaxa.id) `
     + `    THEN NULL ELSE COALESCE(taxonomy.valid_id, taxonomy.id, full_names.valid_id, full_names.id, synonyms.valid_id, synonyms.id, nonsynctaxa.valid_id, nonsynctaxa.id) END, `
     + ` require_numeric_value = CASE WHEN data_type.name <> 'Character' AND data_type.name <> 'Categorical' THEN 1 ELSE 0 END `
@@ -1051,7 +1102,7 @@ const validate = async function(params) {
     + ` (require_numeric_value = 0 OR (value = 'true' AND value_numeric = 1) OR (value = 'false' AND value_numeric = 0) OR ABS(value_numeric - CAST(value as decimal(15,4))) <= 0.0001) AND`
     
     + ` duplicate = 0 AND `
-    + ` dataset_id = ? AND changed = 1`, values: [ds] });
+    + ` changed = 1 AND dataset_id = ?`, values: [ds] });
 
     state.progress += 4000;
 
@@ -1127,6 +1178,7 @@ module.exports = function(dbClient, mailClient) {
         updateColumn,
         getColumn,
         deleteColumn,
-        startValidation
+        startValidation,
+        getSourceFile
     }
 }

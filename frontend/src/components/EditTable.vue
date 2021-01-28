@@ -6,6 +6,9 @@
       :server-items-length="total"
       :loading="loading"
       :footer-props="footerProps"
+      fixed-header
+      :height="tableHeight"
+      v-resize="computeTableHeight"
     >
 
     <template v-slot:item="{item, headers}">
@@ -46,11 +49,11 @@ export default {
     return {
       footerProps: { 'items-per-page-options': [ 10, 15, 50, 100, 200 ] },
       selectedId: null,
-      selectedProp: null
+      selectedProp: null,
+      tableHeight: this.computeTableHeight()
     }
   },
   computed: {
-
   },
   watch: {
     shorten() {
@@ -66,6 +69,9 @@ export default {
       }
       e.item = item;
       this.$emit('selectCell', e);
+    },
+    computeTableHeight() {
+      this.tableHeight = window.innerHeight - 235; 
     }
   },
   created () {

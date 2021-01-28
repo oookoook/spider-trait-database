@@ -62,14 +62,18 @@ export default {
       headers: [
         { text: 'Taxon', value: 'taxon', sortable: false },
         { text: 'Valid', value: 'valid' },
-        { text: 'Genus', value: 'genus' },
-        { text: 'Species', value: 'species' },
-        { text: 'Subspecies', value: 'subspecies' },
-        { text: 'Order', value: 'order' },
-        { text: 'Family', value: 'family' },
-        /* { text: 'LSID', value: 'wsc.lsid'}, */
         { text: 'Author', value: 'author'},
         { text: 'Year', value: 'year'},
+        { text: 'Order', value: 'order' },
+        { text: 'Family', value: 'family' },
+        
+        //{ text: 'Genus', value: 'genus' },
+        //{ text: 'Species', value: 'species' },
+        //{ text: 'Subspecies', value: 'subspecies' },
+        
+        /* { text: 'LSID', value: 'wsc.lsid'}, */
+        
+        
         /*{ text: 'Reference', value: 'reference'},*/
         { text: 'Actions', value: 'actions', sortable: false}
       ]

@@ -10,13 +10,13 @@
     <v-expansion-panel>
     <v-expansion-panel-header><h3><v-icon color="primary" left>mdi-account-multiple</v-icon> User management</h3></v-expansion-panel-header>
     <v-expansion-panel-content>
+      <p>The identity management for the WAT DB is performed using the Perun Indetity Management System provided by Masaryk University. A detailed documentation for the Perun Identity Management system is available at the <a href="https://it.muni.cz/en/services/group-and-access-management-at-muni" target="_blank">Masaryk University IT services catalog</a>.</p>
       <h4>Creating a new user</h4>
         
         <p>If a new user has no affiliation with Masaryk University (i.e., he/she does not have a UCO number), a new Guest account 
-        has to be created. The administrator can create a new user in the <a href="https://perun.aai.muni.cz/organizations/363/sponsoredMembers" target="_blank">INET</a> system. The password that the system generates should 
+        has to be created. The administrator can create a new user in the <a href="https://perun.aai.muni.cz/organizations/363/sponsoredMembers" target="_blank">Perun</a> system. The password that the system generates should 
         be saved and sent to the account owner. The new user will be assigned a unique identifier (UCO) that will be used for assigning 
         user privileges.</p>
-        
         <p>Every new user has to be assigned to one of the following user groups: contributor, editor, or administrator. 
         It is sufficient to add the user to only one group.</p>
 

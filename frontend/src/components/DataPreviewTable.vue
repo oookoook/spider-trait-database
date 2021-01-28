@@ -17,7 +17,7 @@
       show-expand
     >
     <template v-slot:item.taxon="{ item }">
-        <entity-link-cell :abbrev="getTaxon(item.taxonomy)" :text="item.taxonomy.lsid" tooltip="View in the World Spider Catalog (opens in a new tab)" external :link="getWscLink(item.taxonomy)" />
+        <entity-link-cell :abbrev="getTaxon(item.taxonomy)" :text="item.taxonomy.lsid || 'No LSID assigned'" tooltip="View in the World Spider Catalog (opens in a new tab)" external :link="getWscLink(item.taxonomy)" />
     </template>
 
     <template v-slot:item.trait="{item}">

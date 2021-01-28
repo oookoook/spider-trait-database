@@ -24,6 +24,7 @@ module.exports = {
     },
     files: {
         tmpDir: './test/tmp',
+        sourceDir: './test/source',
         import: {
             sizeLimitMB: 100
         }

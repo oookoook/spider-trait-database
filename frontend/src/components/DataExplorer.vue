@@ -110,7 +110,7 @@
         <v-alert type="warning" v-if="!allowChart">Please select a trait in the data filter to enable chart.</v-alert>
         <v-card :loading="chartLoading" v-else>
           <!-- <v-card-title>Trait value histogram</v-card-title> -->
-          <data-chart :filter="filter" :trait="chartTrait" :loading.sync="chartLoading" />
+          <data-chart :filter="filter" :trait="chartTrait" :loading.sync="chartLoading" v-intersect="chartIntersect" :isVisible="chartVisible"/>
         </v-card>
       </v-tab-item>
     </v-tabs-items>
@@ -166,7 +166,8 @@ export default {
       ],
       shareMenu: false,
       internalRouteChange: false,
-      chartLoading: false
+      chartLoading: false,
+      chartVisible: false
     }
   },
   computed: {
@@ -231,6 +232,11 @@ export default {
       /* Copy the text inside the text field */
       document.execCommand("copy");
       this.$store.dispatch('notify', { text: 'The link has been copied to the clipboard' });
+    },
+    chartIntersect (entries, observer) {
+        // More information about these options
+        // is located here: https://developer.mozilla.org/en-US/docs/Web/API/Intersection_Observer_API
+        this.chartVisible = entries[0].isIntersecting
     },
     processRoute() {
       console.log('Processing route');
