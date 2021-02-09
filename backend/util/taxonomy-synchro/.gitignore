@@ -2,3 +2,4 @@ lastrun
 *.log
 *.sql
 !combinations.sql
+!combinations-orders.sql
