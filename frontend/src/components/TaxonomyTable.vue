@@ -52,7 +52,7 @@ export default {
   data () {
     return {
       searchFields: [
-        { text: 'Order', valueField: 'order' },
+        //{ text: 'Order', valueField: 'order' },
         { text: 'Family', valueField: 'family' }, 
         { text: 'Genus', valueField: 'genus' },
         { text: 'Taxon', valueField: 'id', textField: ['fullName'], searchField: ['fullName']},
@@ -64,7 +64,7 @@ export default {
         { text: 'Valid', value: 'valid' },
         { text: 'Author', value: 'author'},
         { text: 'Year', value: 'year'},
-        { text: 'Order', value: 'order' },
+        //{ text: 'Order', value: 'order' },
         { text: 'Family', value: 'family' },
         
         //{ text: 'Genus', value: 'genus' },

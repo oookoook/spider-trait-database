@@ -34,6 +34,7 @@ export default [
     save: (o, v) => {},
     isValid: (i, e) => !i.valid.duplicate || 'Record is not valid',
   }, 
+  /*
   {
       name: 'taxonomy.order',
       text: 'Order',
@@ -60,34 +61,6 @@ export default [
     save: (o, v) => {if(!o.taxonomy) o.taxonomy={}; o.taxonomy.taxon = v; },
     isValid: (i, e) => !!i.taxonomy.id || (!e && !!i.taxonomy.taxon) || (e === 'create' && !!i.taxonomy.taxon) || (!i.taxonomy.taxon && !!i.taxonomy.lsid) || 'Taxon must be assigned to the record', 
     similar: { endpoint: 'taxonomy', valueField: 'fullName' }
-  },
-  /*
-  {
-    name: 'taxonomy.genus',
-    text: 'Genus',
-    entity: 'taxonomy',
-    displayValue: (i) => i.taxonomy.genus,
-    save: (o, v) => {if(!o.taxonomy) o.taxonomy={}; o.taxonomy.genus = v; },
-    isValid: (i, e) => true, 
-    similar: { endpoint: 'taxonomy', valueField: 'genus' }
-  },
-  {
-    name: 'taxonomy.species',
-    text: 'Species',
-    entity: 'taxonomy',
-    displayValue: (i) => i.taxonomy.species,
-    save: (o, v) => {if(!o.taxonomy) o.taxonomy={}; o.taxonomy.species = v; },
-    isValid: (i, e) => true, 
-    similar: { endpoint: 'taxonomy', valueField: 'species' }
-  },
-  {
-    name: 'taxonomy.subspecies',
-    text: 'Subspecies',
-    entity: 'taxonomy',
-    displayValue: (i) => i.taxonomy.subspecies,
-    save: (o, v) => {if(!o.taxonomy) o.taxonomy={}; o.taxonomy.subspecies = v; },
-    isValid: (i, e) => true, 
-    similar: { endpoint: 'taxonomy', valueField: 'subspecies' }
   },
   */
   { 

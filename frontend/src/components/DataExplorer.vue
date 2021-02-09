@@ -149,7 +149,7 @@ export default {
       tab: null,
       tips: false,
       filters: [
-        { entity: 'order', endpoint: 'taxonomy', label:'Order', icon: 'mdi-bug-outline', valueField: 'taxonomy.order', searchFromStart: true, search: null },
+        //{ entity: 'order', endpoint: 'taxonomy', label:'Order', icon: 'mdi-bug-outline', valueField: 'taxonomy.order', searchFromStart: true, search: null },
         { entity: 'family', endpoint: 'taxonomy', label:'Family', icon: 'mdi-spider-web', valueField: 'taxonomy.family', searchFromStart: true, search: null },
         { entity: 'genus', endpoint: 'taxonomy', label:'Genus', icon: 'mdi-spider-thread', valueField: 'taxonomy.genus', searchFromStart: true, search: null },
         { entity: 'species', endpoint: 'taxonomy', label:'Genus & Species', icon: 'mdi-spider', valueField: 'taxonomy.id', textField: 'taxonomy.fullName'/*textField: ['taxonomy.genus', 'taxonomy.species', 'taxonomy.subspecies']*/, searchFromStart: true, search: null },
@@ -162,7 +162,7 @@ export default {
         { entity: 'dataset', endpoint: 'datasets', label:'Dataset', icon: 'mdi-table', valueField: 'dataset.id', textField: 'dataset.name', search: null },
         //{ entity: 'authors', endpoint: 'datasets', label:'Authors', icon: 'mdi-account-multiple', valueField: 'dataset.authors', search: null },
         { entity: 'reference', endpoint: 'references', label:'References', icon: 'mdi-bookmark-outline', valueField: 'reference.id', textField:'reference.fullCitation', search: null },
-        //{ entity: 'row-link', endpoint: 'data', label:'Row links', icon: 'mdi-link', valueField: 'rowLink', search: null },
+        { entity: 'row-link', endpoint: 'data', label:'Row links', icon: 'mdi-link', valueField: 'rowLink', search: null },
       ],
       shareMenu: false,
       internalRouteChange: false,

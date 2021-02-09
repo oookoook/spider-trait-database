@@ -6,7 +6,7 @@
       dark
     >
       <v-toolbar-title>
-        <router-link style="color:white;text-decoration:none" to="/"><v-icon left>mdi-spider</v-icon>World Arachnid Trait database</router-link>
+        <router-link style="color:white;text-decoration:none" to="/"><v-icon left>mdi-spider</v-icon>World Spider Trait database</router-link>
         <!--<v-icon left>mdi-spider</v-icon>Spider Trait Database-->
         </v-toolbar-title>
 
@@ -173,7 +173,7 @@
           Stano Pekar, Caroline Sayuri, and Jonas Wolff.
           -->
           <div class="subtitle-2">
-          Pekár et al. 2021. The world arachnid trait database. Masaryk University, Brno
+          Pekár et al. 2021. The world spider trait database. Masaryk University, Brno
           <!-- , doi: -->
           </div>
         </v-col>

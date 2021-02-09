@@ -27,7 +27,7 @@
           <list-item v-if="!item.valid" title="Invalid taxon" text="Follow the link to the right to visit the valid taxon page." icon="mdi-content-duplicate" link-icon="mdi-arrow-right-bold-outline" link-tooltip="Go to the valid taxon page" :link="`/taxonomy/${item.validTaxon.id}`" />
           <list-item v-if="item.lsid" title="LSID" :text="item.lsid" icon="mdi-identifier" link-icon="mdi-spider" link-tooltip="View in the World Spider Catalog (opens in a new tab)" :link="getWscLink(item)" external />
           
-          <list-item title="Order" :text="item.order" icon="mdi-bug" link-icon="mdi-filter" link-tooltip="Set as filter in the data explorer" :link="`/data/order/${item.order}`"/>
+          <!-- <list-item title="Order" :text="item.order" icon="mdi-bug" link-icon="mdi-filter" link-tooltip="Set as filter in the data explorer" :link="`/data/order/${item.order}`"/> -->
           <list-item title="Family" :text="item.family" icon="mdi-spider-web" link-icon="mdi-filter" link-tooltip="Set as filter in the data explorer" :link="`/data/family/${item.family}`"/>
           <list-item title="Genus" v-if="item.genus" :text="item.genus" icon="mdi-spider-thread" link-icon="mdi-filter" link-tooltip="Set as filter in the data explorer" :link="`/data/genus/${item.genus}`"/>
           <list-item title="Species" v-if="item.species" :text="item.species" icon="mdi-spider" />
