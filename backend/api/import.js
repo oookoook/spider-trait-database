@@ -261,7 +261,7 @@ const exportCsv = async function(params, auth, tmpDir) {
     var dstream = db.squery(c, {table: 'import', sql:`SELECT ${columns.map(c => 'import.'+c).join(',')} `
     + `FROM ${joind} WHERE dataset_id = ? AND ${aw}`, values: [id], nestTables: false, hasWhere: true });
    
-    var r = await csv.get(tmpDir, `watdb-import-${id}-${Date.now()}.csv`, dstream, c);
+    var r = await csv.get(tmpDir, `wstdb-import-${id}-${Date.now()}.csv`, dstream, c);
     //console.log(r);
     db.releaseConnection(c);
     return r;
@@ -573,7 +573,7 @@ const saveSourceFile = async function({tempPath, sourceDir, filename, dataset}) 
         }
     }
     // copy the file
-    let fn = `watdb-${dataset.id}-${dataset.name.toLowerCase().replace(/\W/g, '')}.${filename.substr(filename.lastIndexOf('.') + 1)}`;
+    let fn = `wstdb-${dataset.id}-${dataset.name.toLowerCase().replace(/\W/g, '')}.${filename.substr(filename.lastIndexOf('.') + 1)}`;
     await fs.copyFile(tempPath, path.resolve(sourceDir,fn));
     await db.query({table: 'dataset', sql: 'UPDATE dataset SET source_file = ? WHERE id = ?', values: [fn, dataset.id]});
 };

@@ -16,13 +16,13 @@
       </div>
       </v-col>
       <v-col cols="4">
-        <v-img contain eager class="rounded-pill elevation-15" :src="require('../assets/spider1.jpg')" />
+        <v-img contain eager class="rounded-pill elevation-15" :src="require('../assets/spider2.jpg')" />
       </v-col>
     </v-row>
 
     <v-row justify="space-between"  align="center" class="my-16">
       <v-col cols="4">
-        <v-img contain eager class="rounded-pill elevation-15" :src="require('../assets/spider2.jpg')" />
+        <v-img contain eager class="rounded-pill elevation-15" :src="require('../assets/spider3.jpg')" />
       </v-col>
       <v-col cols="6" class="about-text text-xl-h5 text-subtitle-1">
       <div>
@@ -41,7 +41,7 @@
       </p></div>
       </v-col>
       <v-col cols="4">
-        <v-img contain eager class="rounded-pill elevation-15" :src="require('../assets/spider3.jpg')" />
+        <v-img contain eager class="rounded-pill elevation-15" :src="require('../assets/spider4.jpg')" />
       </v-col>
     </v-row>
     <hr class="primary mx-auto my-16" style="height:3px; border:none;width:80%" />

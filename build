@@ -1,9 +1,9 @@
 #!/bin/sh
 git pull
 cd frontend
-npm install
+npm ci
 npm run build
 cd ..
 cd backend
-npm install
+npm ci
 sudo pm2 restart spidertraits

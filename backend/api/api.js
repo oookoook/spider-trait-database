@@ -166,22 +166,22 @@ router.route('/datasets/:id')
   })
 
 
-router.route('/data/order/:order/family/:family/genus/:genus/species/:species/original-name/:origname/trait-category/:traitcat/trait/:trait/method/:method/location/:location/country/:country/dataset/:dataset/authors/:authors/reference/:reference/row-link/:rowl')
+router.route('/data/family/:family/genus/:genus/species/:species/original-name/:origname/trait-category/:traitcat/trait/:trait/method/:method/location/:location/country/:country/dataset/:dataset/authors/:authors/reference/:reference/row-link/:rowl')
   .get(function (req, res) {
     data.list(req.params, req.recordLimit).then(r => res.json(r)).catch(e => { err(e); res.sendStatus(400); })
   });
 
-router.route('/data/export/csv/order/:order/family/:family/genus/:genus/species/:species/original-name/:origname/trait-category/:traitcat/trait/:trait/method/:method/location/:location/country/:country/dataset/:dataset/authors/:authors/reference/:reference/row-link/:rowl')
+router.route('/data/export/csv/family/:family/genus/:genus/species/:species/original-name/:origname/trait-category/:traitcat/trait/:trait/method/:method/location/:location/country/:country/dataset/:dataset/authors/:authors/reference/:reference/row-link/:rowl')
   .get(function (req, res) {
     data.csv(req.params, req.recordLimit, settings.files.tmpDir).then(r => res.download(r)).catch(e => { err(e); res.sendStatus(400); })
   });
  
-router.route('/data/export/excel/order/:order/family/:family/genus/:genus/species/:species/original-name/:origname/trait-category/:traitcat/trait/:trait/method/:method/location/:location/country/:country/dataset/:dataset/authors/:authors/reference/:reference/row-link/:rowl')
+router.route('/data/export/excel/family/:family/genus/:genus/species/:species/original-name/:origname/trait-category/:traitcat/trait/:trait/method/:method/location/:location/country/:country/dataset/:dataset/authors/:authors/reference/:reference/row-link/:rowl')
   .get(function (req, res) {
     data.excel(req.params, req.recordLimit, settings.files.tmpDir).then(r => res.download(r)).catch(e => { err(e); res.sendStatus(400); })
   });
 
-router.route('/data/stats/:type/order/:order/family/:family/genus/:genus/species/:species/original-name/:origname/trait-category/:traitcat/trait/:trait/method/:method/location/:location/country/:country/dataset/:dataset/authors/:authors/reference/:reference/row-link/:rowl')
+router.route('/data/stats/:type/family/:family/genus/:genus/species/:species/original-name/:origname/trait-category/:traitcat/trait/:trait/method/:method/location/:location/country/:country/dataset/:dataset/authors/:authors/reference/:reference/row-link/:rowl')
     .get(function (req, res) {
       data.stats(req.params, req.query).then(r => res.json(r)).catch(e => { err(e); res.sendStatus(400); })
      });     

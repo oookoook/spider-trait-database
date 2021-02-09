@@ -18,8 +18,8 @@ var join = `data `
 const statsTypes = ['group-by', 'distinct'];
 
 
-const paramList = ['order','family','genus', 'species', 'origname', 'traitcat', 'trait', 'method', 'location','country', 'dataset', 'authors', 'reference', 'rowl'];
-const columnList = ['taxonomy.order','taxonomy.family', 'taxonomy.genus', 'data.taxonomy_id', 'data.original_name', 'trait.trait_category_id', 'data.trait_id', 'method.id', 'location.id', 'country.id', 
+const paramList = [/*'order',*/'family','genus', 'species', 'origname', 'traitcat', 'trait', 'method', 'location','country', 'dataset', 'authors', 'reference', 'rowl'];
+const columnList = [/*'taxonomy.order',*/'taxonomy.family', 'taxonomy.genus', 'data.taxonomy_id', 'data.original_name', 'trait.trait_category_id', 'data.trait_id', 'method.id', 'location.id', 'country.id', 
 'dataset.id', 'dataset.authors', 'data.reference_id', 'data.row_link'];
 
 const getCondition = function(params) {
@@ -112,7 +112,7 @@ const csv =  async function(params, limits, tmpDir) {
     limits.limit = res.count;
     var c = await db.getConnection();
     var dstream = db.squery(c, { table: 'data', sql: `SELECT data.id, taxonomy.wsc_lsid, data.original_name as originalName, `
-     + `taxonomy.order, taxonomy.family, taxonomy.genus, taxonomy.species, taxonomy.subspecies, `
+     + /*taxonomy.order,*/ `taxonomy.family, taxonomy.genus, taxonomy.species, taxonomy.subspecies, `
      + `trait.abbrev as trait, trait.name as traitFullName, trait_category.name as traitCategory, data.value, data.value_numeric, `
      + `measure.name as measure, sex.name as sex, life_stage.name as lifeStage, data.frequency, data.sample_size as sampleSize, `
      + `data.treatment as treatment, method.abbrev as method, method.name as methodFullName, `
@@ -124,7 +124,7 @@ const csv =  async function(params, limits, tmpDir) {
      + `FROM ${join} WHERE ${cond.clause}`
      , values: cond.values, nestTables: false, limits, hasWhere: true});
     
-    var f = await csvu.get(tmpDir, `watdb-${Date.now()}.csv`, dstream, c);
+    var f = await csvu.get(tmpDir, `wstdb-${Date.now()}.csv`, dstream, c);
     db.releaseConnection(c);
     return f;
 }
@@ -134,7 +134,7 @@ const excel =  async function(params, limits, tmpDir) {
     var res = await db.prepareListResponse(limits, 'data', cond.clause, cond.values, join);
     limits.limit = res.count;
     var records = await db.query({ table: 'data', sql: `SELECT data.id, taxonomy.wsc_lsid, data.original_name as originalName, `
-     + `taxonomy.order, taxonomy.family, taxonomy.genus, taxonomy.species, taxonomy.subspecies, `
+     + /*taxonomy.order,*/ `taxonomy.family, taxonomy.genus, taxonomy.species, taxonomy.subspecies, `
      + `trait.abbrev as trait, trait.name as traitFullName, trait_category.name as traitCategory, data.value, data.value_numeric, `
      + `measure.name as measure, sex.name as sex, life_stage.name as lifeStage, data.frequency, data.sample_size as sampleSize, `
      + `data.treatment as treatment, method.abbrev as method, method.name as methodFullName, `
@@ -146,7 +146,7 @@ const excel =  async function(params, limits, tmpDir) {
      + `FROM ${join} WHERE ${cond.clause}`
      , values: cond.values, nestTables: false, limits, hasWhere: true});
     
-    var f = await csvu.excel(tmpDir, `watdb-${Date.now()}.xlsx`, records);
+    var f = await csvu.excel(tmpDir, `wstdb-${Date.now()}.xlsx`, records);
     
     return f;
 }
