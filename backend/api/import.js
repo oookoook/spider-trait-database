@@ -1048,6 +1048,8 @@ const validate = async function(params) {
     state = state || { progress: 0 };
     if(!c) {
         c = await db.getConnection();
+    } else {
+        console.log('Validate: Reusing provided connection...');
     }
     state.progress += 1000;
 
