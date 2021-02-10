@@ -95,7 +95,7 @@
     </v-expansion-panel-content>
     </v-expansion-panel>
     <v-expansion-panel>
-    <v-expansion-panel-header><h3><v-icon color="primary" left>mdi-server</v-icon> Database backups</h3></v-expansion-panel-header>
+    <v-expansion-panel-header><h3><v-icon color="primary" left>mdi-database-check</v-icon> Database backups</h3></v-expansion-panel-header>
     <v-expansion-panel-content>
     <p>The database backups are performed using the Bacula tool and stored on the tape storage at the ICS MU. More information and guidelines (in Czech) are available at 
       <a href="https://it.muni.cz/sluzby/zalohovani-bacula" target="_blank">https://it.muni.cz/sluzby/zalohovani-bacula</a>.</p>
