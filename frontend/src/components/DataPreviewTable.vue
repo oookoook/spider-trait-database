@@ -27,6 +27,7 @@
     <template v-slot:item.method="{item}">
         <entity-link-cell v-if="item.method.abbrev" :abbrev="item.method.abbrev" :text="item.method.name" tooltip="View the method detail" :link="`/methods/${item.method.id}`" />
     </template>
+    
     <template v-slot:item.location="{item}">
         <entity-link-cell v-if="item.location.abbrev" :text="item.location.abbrev" tooltip="View the location detail" :link="`/locations/${item.location.id}`" />
     </template>
@@ -46,7 +47,7 @@
     <template v-slot:expanded-item="{ headers, item }">
       <td :colspan="headers.length">
         <v-container>
-        <v-row justify="start">
+        <v-row no-gutters justify="start">
         <v-list dense two-line subheader>
             <v-subheader>Observation details</v-subheader>
             <list-item title="Measure" :text="item.measure.name" icon="mdi-chart-bell-curve" />
@@ -103,7 +104,7 @@ export default {
         { text: 'Trait Value', value: 'value' },
         { text: 'Observation', value: 'data-table-expand' },
         { text: 'Method', value: 'method' },
-        { text: 'Location', value: 'location' },
+        { text: 'Geo coordinates', value: 'location' },
 
         //{ text: 'Dataset', value: 'dataset'},
         { text: 'Reference', value: 'reference'},
