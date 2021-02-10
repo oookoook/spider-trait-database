@@ -658,8 +658,9 @@ const uploadFile = async function(params, body, files, auth, sourceDir) {
                     await conn.query({table: 'import', sql: 'END'});
                     console.log('Last row processed. Enabling indexes...');
                     await conn.query({table: 'import', sql: 'ALTER TABLE import ENABLE KEYS'});
-                    db.releaseConnection(conn); 
-                    console.log('Connecton released');
+                    // do not release, pass to validate
+                    //db.releaseConnection(conn); 
+                    //console.log('Connecton released');
                     resolve();
                 }
             })(); 
@@ -677,7 +678,7 @@ const uploadFile = async function(params, body, files, auth, sourceDir) {
             return;
         }
         
-        await validate({ds, auth, state: params.state});
+        await validate({ds, auth, state: params.state, c: conn});
         params.state.progress += 1000;
         params.state.completed = true;
     };
@@ -1037,7 +1038,7 @@ const startValidation = async function(params, body, auth) {
 }
 
 const validate = async function(params) {
-    var { ds, auth, state } = params;
+    var { ds, auth, state, c } = params;
     try {
         checkOwner(ds, auth);
     } catch(e) {
@@ -1045,7 +1046,9 @@ const validate = async function(params) {
         state.errors.push(e);
     }
     state = state || { progress: 0 };
-    c = await db.getConnection();
+    if(!c) {
+        c = await db.getConnection();
+    }
     state.progress += 1000;
 
     await db.cquery(c,{table: 'import', sql:`UPDATE ${joinv} SET `
