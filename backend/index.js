@@ -86,9 +86,7 @@ if(!settings.oidc.disable) {
     clientID: settings.oidc.client,
     //appSessionSecret: settings.oidc.session.secret,
     /* will be required in a new version */
-    appSession: {
-      secret: settings.oidc.session.secret
-    },
+    secret: settings.oidc.session.secret,
     clientSecret: settings.oidc.secret,
     routes: false,
     authorizationParams: {
@@ -96,6 +94,14 @@ if(!settings.oidc.disable) {
         response_mode: "query",
         scope: "openid profile eduperson_entitlement"
     },
+    afterCallback: async (req, res, session, decodedState) => {
+      const additionalUserClaims = await req.oidc.fetchUserInfo();
+      return {
+        ...session,
+        ...additionalUserClaims
+      };
+    },
+    /*
     handleCallback: async function (req, res, next) {
       // replace this with a new version (appSession instead of identity) once a new relase is made
       const client = req.openid.client;
@@ -109,6 +115,7 @@ if(!settings.oidc.disable) {
         next(e);
       }
     }
+    */
   }));
   
 } else {
