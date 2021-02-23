@@ -1,6 +1,6 @@
 var claims;
 
-const resourcesAuth = function (req, res, next) {
+const resourcesAuth = async function (req, res, next) {
     
     //console.dir(claims);
     //console.dir(req.openid ? req.openid : 'no oidc present');
