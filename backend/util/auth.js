@@ -6,13 +6,14 @@ const resourcesAuth = async function (req, res, next) {
     //console.dir(req.openid ? req.openid : 'no oidc present');
     //console.dir((req.openid && req.openid.user) ? req.openid.user : 'no openid user');
     //console.log(`accessToken in resourcesAuth: ${JSON.stringify(req.oidc.accessToken)}`);
-    console.log(`claims: ${JSON.stringify(req.oidc.user)}`);
+    var d = new Date().toISOString();
+    console.log(`${d}  current claims: ${JSON.stringify(req.oidc.user)}`);
     //trying to fix this for the v2 of oidc client
     if(!req.oidc.user || Object.keys(req.oidc.user).length == 0) {
-        console.log(`Getting user info...`);
+        console.log(`${d} Getting user info...`);
         const additionalUserClaims = await req.oidc.fetchUserInfo();
-        console.log(`Additonal claims: ${JSON.stringify(additionalUserClaims)}`);
-        Object.assign(req.oidc.user || {}, additionalUserClaims);
+        console.log(`${d} Additonal claims: ${JSON.stringify(additionalUserClaims)}`);
+        req.oidc.user = Object.assign(req.oidc.user || {}, additionalUserClaims);
     }
     var groups = req.oidc.user && req.oidc.user[claims.name] ? req.oidc.user[claims.name] : [];
     var sub = req.oidc && req.oidc.user && req.oidc.user.sub ? req.oidc.user.sub : null;

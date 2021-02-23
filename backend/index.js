@@ -93,8 +93,8 @@ if(!settings.oidc.disable) {
       logout: false
     },
     authorizationParams: {
-        response_type: "code id_token",
-        response_mode: "form_post",
+        response_type: "code",
+        response_mode: "query",
         scope: "openid profile eduperson_entitlement"
     },
     /*
