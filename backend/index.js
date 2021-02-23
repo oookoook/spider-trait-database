@@ -97,7 +97,7 @@ if(!settings.oidc.disable) {
         response_mode: "form_post",
         scope: "openid profile eduperson_entitlement"
     },
-    
+    /*
     afterCallback: async (req, res, session, decodedState) => {
       console.log(`accessToken in afterCallback: ${JSON.stringify(req.oidc.accessToken)}`);
       const additionalUserClaims = await req.oidc.fetchUserInfo();
@@ -106,10 +106,9 @@ if(!settings.oidc.disable) {
         ...additionalUserClaims
       };
     },
-    
+    */
     /*
     handleCallback: async function (req, res, next) {
-      // replace this with a new version (appSession instead of identity) once a new relase is made
       const client = req.openid.client;
       req.appSession = req.appSession || {};
       try {
