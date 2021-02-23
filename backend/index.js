@@ -94,7 +94,7 @@ if(!settings.oidc.disable) {
     },
     authorizationParams: {
         response_type: "code id_token",
-        response_mode: "query",
+        response_mode: "form_post",
         scope: "openid profile eduperson_entitlement"
     },
     
