@@ -1,25 +1,15 @@
 var claims;
 
-const resourcesAuth = async function (req, res, next) {
+const resourcesAuth = function (req, res, next) {
     
     //console.dir(claims);
     //console.dir(req.openid ? req.openid : 'no oidc present');
     //console.dir((req.openid && req.openid.user) ? req.openid.user : 'no openid user');
-    //console.log(`accessToken in resourcesAuth: ${JSON.stringify(req.oidc.accessToken)}`);
-    var d = new Date().toISOString();
-    console.log(`${d}  current claims: ${JSON.stringify(req.oidc.user)}`);
-    //trying to fix this for the v2 of oidc client
-    if(!req.oidc.user || Object.keys(req.oidc.user).length == 0) {
-        console.log(`${d} Getting user info...`);
-        const additionalUserClaims = await req.oidc.fetchUserInfo();
-        console.log(`${d} Additonal claims: ${JSON.stringify(additionalUserClaims)}`);
-        req.oidc.user = Object.assign(req.oidc.user || {}, additionalUserClaims);
-    }
-    var groups = req.oidc.user && req.oidc.user[claims.name] ? req.oidc.user[claims.name] : [];
-    var sub = req.oidc && req.oidc.user && req.oidc.user.sub ? req.oidc.user.sub : null;
+    var groups = req.openid.user && req.openid.user[claims.name] ? req.openid.user[claims.name] : [];
+    var sub = req.openid && req.openid.user && req.openid.user.sub ? req.openid.user.sub : null;
     req.resourcesAuth = {
         sub, 
-        name: req.oidc && req.oidc.user && req.oidc.user.name ? req.oidc.user.name : sub, 
+        name: req.openid && req.openid.user && req.openid.user.name ? req.openid.user.name : sub, 
         isAdmin: groups.includes(claims.administration),
         isEditor: groups.includes(claims.dataValidation),
         isContributor: groups.includes(claims.dataEntry)
@@ -58,11 +48,11 @@ const setClaims = function(c) {
 
 const mockupAuth = function(returnPath, returnPathLogout) {
     return function (req, res, next) {    
-    req.oidc = { user: {
+    req.openid = { user: {
         sub: 'DEBUG',
         name: 'DEBUG',
     }};
-    res.oidc = {
+    res.openid = {
         login: (opts) => {
         res.redirect(returnPath);
         },
@@ -70,7 +60,7 @@ const mockupAuth = function(returnPath, returnPathLogout) {
             res.redirect(returnPathLogout);
         }
     };
-    req.oidc.user[claims.name] = [claims.administration, claims.dataEntry, claims.dataValidation].join(',');
+    req.openid.user[claims.name] = [claims.administration, claims.dataEntry, claims.dataValidation].join(',');
     next();
 }
 }
