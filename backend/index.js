@@ -98,10 +98,11 @@ if(!settings.oidc.disable) {
         scope: "openid profile eduperson_entitlement"
     },
     afterCallback: async (req, res, session, decodedState) => {
-      const additionalUserClaims = await req.oidc.fetchUserInfo();
+      console.log(`accessToken in afterCallback: ${JSON.stringify(req.oidc.accessToken)}`);
+      //const additionalUserClaims = await req.oidc.fetchUserInfo();
       return {
         ...session,
-        ...additionalUserClaims
+        //...additionalUserClaims
       };
     },
     /*
