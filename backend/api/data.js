@@ -37,7 +37,7 @@ const getCondition = function(params) {
     return { clause: cl.join(' AND '), values: val};
 } 
 
-const list = async function(params, limits) {
+const list = async function(params, limits, auth) {
     var cond = getCondition(params);
     //console.dir(cond);
     var res = await db.prepareListResponse(limits, 'data', cond.clause, cond.values, join);
@@ -48,7 +48,11 @@ const list = async function(params, limits) {
      + `location.id, location.abbrev, country.id, country.alpha3_code, country.name,`
      + `dataset.id, dataset.name, dataset.authors, reference.id, reference.abbrev `
      + `FROM ${join} WHERE ${cond.clause}`
-     , values: cond.values, nestTables: true, limits, hasWhere: true});    
+     , values: cond.values, nestTables: true, limits, hasWhere: true});
+     if(auth.sub) {
+         // temporary test of auth
+         res.loggedIn = true;
+     }    
      res.items = results.map(r => {    
         return {
                 id: r.data.id,
