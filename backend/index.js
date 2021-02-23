@@ -80,7 +80,7 @@ if(!settings.oidc.disable) {
   }));
   */
   app.use(auth({
-    required: false,
+    authRequired: false,
     issuerBaseURL: settings.oidc.issuer,
     baseURL: settings.oidc.url,
     clientID: settings.oidc.client,
