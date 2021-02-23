@@ -5,11 +5,11 @@ const resourcesAuth = function (req, res, next) {
     //console.dir(claims);
     //console.dir(req.openid ? req.openid : 'no oidc present');
     //console.dir((req.openid && req.openid.user) ? req.openid.user : 'no openid user');
-    var groups = req.openid.user && req.openid.user[claims.name] ? req.openid.user[claims.name] : [];
-    var sub = req.openid && req.openid.user && req.openid.user.sub ? req.openid.user.sub : null;
+    var groups = req.oidc.user && req.oidc.user[claims.name] ? req.oidc.user[claims.name] : [];
+    var sub = req.oidc && req.oidc.user && req.oidc.user.sub ? req.oidc.user.sub : null;
     req.resourcesAuth = {
         sub, 
-        name: req.openid && req.openid.user && req.openid.user.name ? req.openid.user.name : sub, 
+        name: req.oidc && req.oidc.user && req.oidc.user.name ? req.oidc.user.name : sub, 
         isAdmin: groups.includes(claims.administration),
         isEditor: groups.includes(claims.dataValidation),
         isContributor: groups.includes(claims.dataEntry)
@@ -48,11 +48,11 @@ const setClaims = function(c) {
 
 const mockupAuth = function(returnPath, returnPathLogout) {
     return function (req, res, next) {    
-    req.openid = { user: {
+    req.oidc = { user: {
         sub: 'DEBUG',
         name: 'DEBUG',
     }};
-    res.openid = {
+    res.oidc = {
         login: (opts) => {
         res.redirect(returnPath);
         },
@@ -60,7 +60,7 @@ const mockupAuth = function(returnPath, returnPathLogout) {
             res.redirect(returnPathLogout);
         }
     };
-    req.openid.user[claims.name] = [claims.administration, claims.dataEntry, claims.dataValidation].join(',');
+    req.oidc.user[claims.name] = [claims.administration, claims.dataEntry, claims.dataValidation].join(',');
     next();
 }
 }
