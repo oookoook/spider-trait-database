@@ -304,6 +304,7 @@ const synonyms = {
     'rowLink': 'row_link',
     'originalName': 'original_name',
     'country.code': 'country.alpha3_code',
+    'country': 'country.alpha3_code',
     'trait.category.id':'trait_category.id',
     'trait.category.name':'trait_category.name',
     'lifeStage.name':'life_stage.name',

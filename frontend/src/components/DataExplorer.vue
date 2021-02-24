@@ -100,7 +100,7 @@
     <v-tabs-items v-model="tab">
       <list-provider list="data" :filter="filter" v-slot="i">
       <v-tab-item value="preview">
-        <v-alert type="warning" v-if="!i.loading && restricted  && !exportDisabled" class="my-3">This query contains data with restricted access.
+        <v-alert type="warning" v-if="restricted  && !exportDisabled" class="my-3">This query contains data with restricted access.
           <span v-if="!isLoggedIn">Log in or request the data using the button in <strong>top right corner</strong> of the page.</span> Restricted datasets:
           
             <v-row class="my-1" no-gutters justify="start">
