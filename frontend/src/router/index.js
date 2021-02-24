@@ -161,6 +161,11 @@ const routes = [
     path: '/datasets/:id',
     name: 'dataset',
     component: () => import(/* webpackChunkName: "dataset" */ '../views/Dataset.vue')
+  },
+  {
+    path: '/api',
+    name: 'api',
+    component: () => import(/* webpackChunkName: "dataset" */ '../views/Api.vue')
   }
 
 

@@ -22,6 +22,11 @@
       <info-icon color="warning" v-if="item.state == 'reviewed'" icon="mdi-stamper" :text="getStateTooltip(item.state)"/>
     </template>
 
+  <template v-slot:item.restricted="{ item }">
+      <info-icon color="warning" text="Restricted access" v-if="item.restricted" icon="mdi-lock-outline"></info-icon>
+      <info-icon color="success" text="Free access" icon="mdi-lock-open-outline" v-else></info-icon>
+    </template>
+
     <template v-slot:expanded-item="{ headers, item }">
       <td :colspan="headers.length">
         <v-container>
@@ -69,6 +74,7 @@ export default {
         { text: 'Uploader', value: 'uploader' },
         //{ text: 'Uploader e-mail', value: 'email' },
         { text: 'Authors', value: 'authors' },
+        { text: 'Restricted access', value: 'restricted'},
         { text: 'Notes & Messages', value: 'data-table-expand', sortable: false},
         
         { text: 'Actions', value: 'actions', sortable: false }

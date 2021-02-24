@@ -8,6 +8,7 @@ export default {
       user: null,
       lastRoute: null,
       lastAction: null,
+      apiKey: null
     },
     mutations: {
       user(state, payload) {
@@ -18,11 +19,17 @@ export default {
       },
       lastAction(state, payload) {
         state.lastAction = payload.value;
+      },
+      apiKey(state, payload) {
+        state.apiKey = payload.value;
       }
     },
     getters: {
         user(state) {
             return state.user;
+        },
+        apiKey(state) {
+          return state.apiKey;
         },
         loginUrl(state) {
           return `${process.env.VUE_APP_BACKEND}user/login`;
@@ -44,6 +51,9 @@ export default {
         },
         isContributor(state) {
           return state.user && state.user.isContributor;
+        },
+        isLoggedIn(state) {
+          return state.user;
         }
     },
     actions: {
@@ -60,6 +70,16 @@ export default {
       async logout(context, payload) {
         context.commit('user', { value: null });
         //context.commit('lastAction', { value: Date.now().valueOf() });
+      },
+
+      async getApiKey(context, payload) {
+        try {
+          var result = await Vue.http.get(`${process.env.VUE_APP_BACKEND}user/key`);
+          context.commit('apiKey', { value: result.body.key });
+        } catch (err) {
+          console.error(err);
+          throw err;
+        }
       },
 
       verifySession(context, payload) {

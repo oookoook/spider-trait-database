@@ -12,7 +12,8 @@
           <list-item title="Author email(s)" v-if="showUpdate && item.authorsEmail" :text="item.authorsEmail" icon="mdi-email-edit-outline" />
           <list-item title="Uploaded" :text="new Date(item.date).toISOString().substring(0,10)" icon="mdi-calendar" />
           <list-item title="Record count" :text="item.records" icon="mdi-numeric" />
-          <list-item title="State" icon="mdi-checkbox-marked-outline" ><span style="text-transform: capitalize;">{{item.state}}</span></list-item>    
+          <list-item title="State" icon="mdi-checkbox-marked-outline" ><span style="text-transform: capitalize;">{{item.state}}</span></list-item>
+          <list-item title="Restricted access" :icon="item.restricted ? 'mdi-lock-outline' : 'mdi-lock-open-outline'"><span v-if="item.restricted" class="warning--text">Restricted</span><span v-else>Free</span></list-item>    
         </v-list>
         <v-card-actions  v-if="item">
           <v-btn text :to="`/data/dataset/${item.id}`"><v-icon left>mdi-filter</v-icon>Set as filter in the data explorer</v-btn>

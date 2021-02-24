@@ -35,7 +35,7 @@ const list = async function(limits, auth, showImport) {
     
     //console.dir(res);
     var results = await db.query({table: 'dataset', sql: `SELECT dataset.id, dataset.name, dataset.authors, dataset.uploader, `
-                        +`dataset.email, dataset.date, dataset.message, dataset.notes, dataset.imported, dataset.records `
+                        +`dataset.email, dataset.date, dataset.message, dataset.notes, dataset.imported, dataset.records, dataset.restricted `
                         + `FROM dataset WHERE ${where}`, limits, hasWhere: true });    
      
      res.items = results;
@@ -43,6 +43,7 @@ const list = async function(limits, auth, showImport) {
          setState(r);
          // JavaScript dates are serialized badly in JSON
          //console.log(r.date);
+         r.restricted = r.restricted == 1,
          r.date = r.date.toJSON();
      });
 
@@ -71,6 +72,7 @@ const get = async function(params, auth, showImport) {
      setState(r);
      // JavaScript dates are serialized badly in JSON
      r.date = r.date.valueOf();
+     r.restricted = r.restricted == 1;
      return {
          item: r
      }

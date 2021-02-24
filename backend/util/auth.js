@@ -1,4 +1,33 @@
+const crypto = require('crypto');
+
 var claims;
+
+var apiSecret;
+
+/* This is not bulletproof, but sufficient for now */
+
+const generateApiKey = function(auth) {
+    const hash = crypto.createHash('sha256');
+    hash.update(`${auth.sub}${apiSecret}`);
+    return hash.digest('base64');
+}
+
+const verifyKey = function(header) {
+    if(!header) {
+        return false;
+    }
+    // remove 'Basic '
+    var token = header.substr(6);
+    try {
+        var decoded = Buffer.from(token, 'base64').toString().split(':', 2);
+        const hash = crypto.createHash('sha256');
+        hash.update(`${decoded[0]}${apiSecret}`);
+        return hash.digest('base64') == decoded[1];
+    } catch(e) {
+        console.error(e);
+        return false;
+    }
+}
 
 const resourcesAuth = function (req, res, next) {
     
@@ -12,7 +41,8 @@ const resourcesAuth = function (req, res, next) {
         name: req.openid && req.openid.user && req.openid.user.name ? req.openid.user.name : sub, 
         isAdmin: groups.includes(claims.administration),
         isEditor: groups.includes(claims.dataValidation),
-        isContributor: groups.includes(claims.dataEntry)
+        isContributor: groups.includes(claims.dataEntry),
+        validApiKey: verifyKey(req.header('authorization'))
     }
     //console.dir(req.resourcesAuth);
     next();
@@ -46,21 +76,32 @@ const setClaims = function(c) {
     claims = c;
 }
 
+const setApiHashSecret = function(s) {
+    apiSecret = s;
+}
+
+var mockupLogin;
+
 const mockupAuth = function(returnPath, returnPathLogout) {
     return function (req, res, next) {    
     req.openid = { user: {
-        sub: 'DEBUG',
-        name: 'DEBUG',
+        sub: mockupLogin,
+        name: mockupLogin,
     }};
+    if(mockupLogin) {
+        req.openid.user[claims.name] = [claims.administration, claims.dataEntry, claims.dataValidation].join(',');
+    }
     res.openid = {
         login: (opts) => {
-        res.redirect(returnPath);
+            mockupLogin = 'DEBUG';
+            res.redirect(returnPath);
         },
         logout: (opts) => {
+            mockupLogin = null;
             res.redirect(returnPathLogout);
         }
     };
-    req.openid.user[claims.name] = [claims.administration, claims.dataEntry, claims.dataValidation].join(',');
+    
     next();
 }
 }
@@ -71,5 +112,7 @@ module.exports = {
     isEditor,
     isContributor,
     setClaims,
-    mockupAuth
+    mockupAuth,
+    setApiHashSecret,
+    generateApiKey
 }

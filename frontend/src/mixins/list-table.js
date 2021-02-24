@@ -1,13 +1,15 @@
 import EntityLinkCell from '../components/EntityLinkCell'
 import ListFilter from '../components/ListFilter'
 import ActionButton from '../components/ActionButton'
+import InfoIcon from '../components/InfoIcon'
 import { mapGetters } from 'vuex'
 
 export default {
     components: {
         EntityLinkCell,
         ListFilter,
-        ActionButton
+        ActionButton,
+        InfoIcon
       },
     props: { items: Array, total: { type: Number, default: 0 }, loading: Boolean, autocompleteLoading: Boolean, autocompleteItems: Array, savedOptions: Object },
     data() {

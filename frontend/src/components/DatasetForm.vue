@@ -54,7 +54,9 @@
             prepend-icon="mdi-at"
             :rules="aemailRules"
           ></v-text-field>
+          <v-switch v-model="dataset.restricted" label="Restricted access" />
           <v-textarea
+            v-model="dataset.notes"
             label="Notes"
             rows="5"
             prepend-icon="mdi-note-text-outline"

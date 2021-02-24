@@ -106,6 +106,10 @@
           <v-list-item-icon><v-icon>mdi-bookmark-multiple-outline</v-icon></v-list-item-icon>
           <v-list-item-content><v-list-item-title>Publications</v-list-item-title></v-list-item-content>
         </v-list-item>
+        <v-list-item to="/api">
+          <v-list-item-icon><v-icon>mdi-code-json</v-icon></v-list-item-icon>
+          <v-list-item-content><v-list-item-title>APIs</v-list-item-title></v-list-item-content>
+        </v-list-item>
         <v-list-item to="/policy">
           <v-list-item-icon><v-icon>mdi-shield-check-outline</v-icon></v-list-item-icon>
           <v-list-item-content><v-list-item-title>Policy statement</v-list-item-title></v-list-item-content>

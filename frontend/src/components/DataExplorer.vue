@@ -55,6 +55,7 @@
       <span v-if="!exportDisabled">Download the filtered data (all pages)</span>
       <span v-else>Please set up a filter before exporting</span>
     </v-tooltip>
+    <action-button v-if="!isLoggedIn" text="Request data" color="success" icon="mdi-lock-open-outline" :link="`mailto:spidertraits@sci.muni.cz?subject=Data%20request&body=Hello%2C%0D%0A%0D%0AI%20would%20like%20to%20request%20data%20for%20the%20following%20query%3A%0D%0A${requestAccessUri}%0D%0APlease%20provide%20me%20with%20instructions%20how%20to%20get%20approval%20to%20use%20the%20data.`" external />
     </v-card-title>
     <v-card-text>
     <v-row>
@@ -92,22 +93,27 @@
         <!--<v-icon>mdi-eye-outline</v-icon>-->
         <info-icon icon="mdi-eye-outline" text="Preview"/>
     </v-tab>
-    <!-- Raw -->
+    <!-- Raw
     <v-tab href="#raw"><info-icon icon="mdi-table-large" text="Raw data view"/></v-tab>
+     -->
     <v-tab href="#chart"><info-icon icon="mdi-chart-bar" text="Trait values chart (a single trait must be filtered)"/></v-tab>
     <v-tabs-items v-model="tab">
       <list-provider list="data" :filter="filter" v-slot="i">
       <v-tab-item value="preview">
+        <v-alert type="warning" v-if="restricted  && !exportDisabled" class="my-3">This query contains data with restricted access.
+          <span v-if="!isLoggedIn">Request the data using the button in top right corner of the page.</span></v-alert>
         <data-preview-table :items="i.items" :loading="i.loading" :total="i.total" :options="i.options" @update="i.update" />
       </v-tab-item>
+      <!--
       <v-tab-item value="raw">
         <v-responsive>
         <data-export-table :items="i.items" :loading="i.loading" :total="i.total" :options="i.options" @update="i.update" />
         </v-responsive>
       </v-tab-item>
+      -->
       </list-provider>
       <v-tab-item value="chart">
-        <v-alert type="warning" v-if="!allowChart">Please select a trait in the data filter to enable chart.</v-alert>
+        <v-alert type="warning" v-if="!allowChart" class="my-3">Please select a trait in the data filter to enable chart.</v-alert>
         <v-card :loading="chartLoading" v-else>
           <!-- <v-card-title>Trait value histogram</v-card-title> -->
           <data-chart :filter="filter" :trait="chartTrait" :loading.sync="chartLoading" v-intersect="chartIntersect" :isVisible="chartVisible"/>
@@ -190,7 +196,11 @@ export default {
     chartTrait() {
       return parseInt(this.filters[this.filtersLookup.trait].search);
     },
-    ...mapGetters('data', ['exportLinkCSV', 'exportLinkExcel', 'shareLink','routeLink'])
+    requestAccessUri() {
+      return encodeURI(this.shareLink);
+    },
+    ...mapGetters('data', ['exportLinkCSV', 'exportLinkExcel', 'shareLink','routeLink', 'restricted']),
+    ...mapGetters(['isLoggedIn'])
   },
   watch: {
     routeLink() {

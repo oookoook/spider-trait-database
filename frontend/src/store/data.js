@@ -18,6 +18,7 @@ export default {
       stats: [],
       homeStats: {},
       total: 0,
+      restricted: false,
       link: getParams(),
       autocomplete: {},
       savedOptions: null
@@ -31,6 +32,9 @@ export default {
       },
       total(state, payload) {
         state.total = payload.value;
+      },
+      restricted(state, payload) {
+        state.restricted = payload.value;
       },
       link(state,payload) {
         state.link = payload.value;
@@ -59,6 +63,9 @@ export default {
         routeLink(state) {
           return state.link;
         },
+        restricted(state) {
+          return state.restricted;
+        },
         autocomplete: (state) => (entity) => state.autocomplete[entity],
         homeStats: (state) => (entity) => state.homeStats[entity] !== null ? state.homeStats[entity] : '...'
 
@@ -76,6 +83,7 @@ export default {
             if(data){    
               if(data.count !== null) {
                     context.commit('total', { value: data.count});
+                    context.commit('restricted', { value: data.restricted});
                 }
               context.commit('list', { value: data.items});
             }

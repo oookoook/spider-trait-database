@@ -25,7 +25,13 @@ const props = {
       label: 'Author\'s e-mail',
       isValid: (v) => true
     },
-
+    {
+      name: 'restricted',
+      switch: true,
+      label: 'Restricted access',
+      hint: 'Turn on if data are not public.',
+      isValid: (v) => !!v || 'Access restriction information is required'
+    }
 ],
   traits: [
     {

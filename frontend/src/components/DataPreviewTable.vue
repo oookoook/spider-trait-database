@@ -21,19 +21,44 @@
     </template>
 
     <template v-slot:item.trait="{item}">
-        <entity-link-cell :abbrev="item.trait.abbrev" :text="item.trait.name" tooltip="View the trait detail" :link="`/traits/${item.trait.id}`" />
+        <entity-link-cell :abbrev="item.trait.name" :text="item.trait.abbrev" tooltip="View the trait detail" :link="`/traits/${item.trait.id}`" />
     </template>
 
+    <template v-slot:item.value="{item}">
+        <span v-if="item.value">{{item.value}}</span>
+        <info-icon v-else text="Restricted access - request the data using the button in top right corner of the page." color="warning" icon="mdi-lock-outline" />
+    </template>
+
+    <template v-slot:item.sex="{item}">
+        <span v-if="item.sex">{{item.sex.name}}</span>
+    </template>
+
+    <template v-slot:item.lifeStage="{item}">
+        <span v-if="item.lifeStage">{{item.lifeStage.name}}</span>
+    </template>
+    <!--
     <template v-slot:item.method="{item}">
         <entity-link-cell v-if="item.method.abbrev" :abbrev="item.method.abbrev" :text="item.method.name" tooltip="View the method detail" :link="`/methods/${item.method.id}`" />
     </template>
-    
+
     <template v-slot:item.location="{item}">
         <entity-link-cell v-if="item.location.abbrev" :text="item.location.abbrev" tooltip="View the location detail" :link="`/locations/${item.location.id}`" />
     </template>
+    -->
 
+    <template v-slot:item.country="{item}">
+        <entity-link-cell v-if="item.country.id" :abbrev="item.country.code" :text="item.country.name" no-link />
+    </template>
+
+    
+    
     <template v-slot:item.dataset="{item}">
         <entity-link-cell :text="item.dataset.name" tooltip="View the dataset detail" :link="`/datasets/${item.dataset.id}`" />
+    </template>
+
+    <template v-slot:item.restricted="{item}">
+        <info-icon v-if="item.dataset.restricted" color="warning" text="Restricted access" icon="mdi-lock-outline" />
+        <info-icon v-else color="success" text="Free access" icon="mdi-lock-open-outline" />
     </template>
 
     <template v-slot:item.reference="{ item }">
@@ -67,6 +92,8 @@
             <list-item title="Locality" :text="item.locality" icon="mdi-map-marker" />
             <list-item title="Habitat" :text="item.habitat" icon="mdi-pine-tree" />
             <list-item title="Microhabitat" :text="item.microhabitat" icon="mdi-magnify" />
+            <list-item v-if="item.location.id" title="Geolocation (WGS84)" :text="item.location.abbrev" 
+          icon="mdi-crosshairs-gps" link-tooltip="View the location detail" :link="`/locations/${item.location.id}`"/>
           </v-list>
         </v-row>
         </v-container>
@@ -82,15 +109,18 @@
 <script>
 
 import EntityLinkCell from '../components/EntityLinkCell'
+import InfoIcon from '../components/InfoIcon'
 import ListItem from '../components/ListItem'
 import DataTable from '../mixins/data-table'
 import Taxons from '../mixins/taxons'
+
 
 export default {
   name: 'DataPreviewTable',
   components: {
         EntityLinkCell,
-        ListItem
+        ListItem,
+        InfoIcon
   },
   mixins: [DataTable, Taxons],
   props: {
@@ -102,11 +132,14 @@ export default {
         { text: 'Original name', value: 'originalName' },
         { text: 'Trait Name', value: 'trait' },
         { text: 'Trait Value', value: 'value' },
+        { text: 'Sex', value: 'sex' },
+        {text: 'Life stage', value: 'lifeStage'},
         { text: 'Observation', value: 'data-table-expand' },
-        { text: 'Method', value: 'method' },
-        { text: 'Geo coordinates', value: 'location' },
-
-        //{ text: 'Dataset', value: 'dataset'},
+        //{ text: 'Method', value: 'method' },
+        //{ text: 'Geo coordinates', value: 'location' },
+        { text: 'Country', value: 'country' },
+        { text: 'Dataset', value: 'dataset'},
+        { text: 'Access', value: 'restricted'},
         { text: 'Reference', value: 'reference'},
         //{ text: 'Related records', value: 'rowLink'}
       ]
@@ -119,7 +152,7 @@ export default {
   },
   methods: {
     hasLocDetails(item) {
-      return item.country.id || item.locality || item.habitat || item.microhabitat || item.altitude;
+      return item.country.id || item.locality || item.habitat || item.microhabitat || item.altitude || item.location.id;
     }
   },
   created () {

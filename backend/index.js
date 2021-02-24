@@ -128,6 +128,10 @@ app.get('/user/info', requiresAuth(), cauth.resourcesAuth, function (req, res) {
     res.json(req.resourcesAuth);
   });
 
+app.get('/user/key', requiresAuth(), cauth.resourcesAuth, function(req, res) {
+  res.json({ key: cauth.generateApiKey(req.resourcesAuth) });
+});
+
 // sets up the data hnadling routes
 app.use('/backend', api);
 

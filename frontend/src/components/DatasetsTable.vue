@@ -35,6 +35,11 @@
       {{ new Date(item.date).toISOString().substr(0,10) }}
     </template>
 
+    <template v-slot:item.restricted="{ item }">
+      <info-icon color="warning" text="Restricted access" v-if="item.restricted" icon="mdi-lock-outline"></info-icon>
+      <info-icon color="success" text="Free access" icon="mdi-lock-open-outline" v-else></info-icon>
+    </template>
+
     <!--
     <template v-slot:item.approved="{ item }">
       <v-icon>{{ item.imported > 1 ? 'mdi-checkbox-marked-outline' : 'mdi-checkbox-blank-outline' }}</v-icon>
@@ -51,7 +56,6 @@
 <script>
 
 import ListTable from '../mixins/list-table'
-
 export default {
   name: 'DatasetsTable',
   mixins: [ ListTable ],
@@ -68,6 +72,7 @@ export default {
         { text: 'Authors', value: 'authors', width: 300 },
         { text: 'Uploader', value: 'uploader', width: 300 },
         { text: 'Uploaded', value: 'uploaded'},
+        { text: 'Restricted access', value: 'restricted'},
         //{ text: 'Approved', value: 'approved'},
         { text: 'Actions', value: 'actions', sortable: false }
       ]

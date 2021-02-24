@@ -35,5 +35,8 @@ module.exports = {
     wsc: {
         key: 'TODO'
     },
+    api: {
+        secret: 'a'
+    },
     baseUrl: 'http://localhost:8080'
 }

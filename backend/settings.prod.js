@@ -50,5 +50,8 @@ module.exports = {
     wsc: {
         key: 'TODO'
     },
+    api: {
+        secret: 'TODO'
+    },
     baseUrl: 'https://spidertraits.sci.muni.cz'
 }

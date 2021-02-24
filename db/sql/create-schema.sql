@@ -282,6 +282,7 @@ CREATE TABLE IF NOT EXISTS `spider_traits_db`.`dataset` (
   `message` VARCHAR(4096) NULL,
   `records` INT NOT NULL DEFAULT 0,
   `source_file` VARCHAR(512) NULL,
+  `restricted` TINYINT(1) NOT NULL DEFAULT 0,
   PRIMARY KEY (`id`),
   UNIQUE INDEX `name_UNIQUE` (`name` ASC),
   INDEX `authors_idx` (`authors`(100) ASC),

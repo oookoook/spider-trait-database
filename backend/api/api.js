@@ -173,12 +173,12 @@ router.route('/data/family/:family/genus/:genus/species/:species/original-name/:
 
 router.route('/data/export/csv/family/:family/genus/:genus/species/:species/original-name/:origname/trait-category/:traitcat/trait/:trait/method/:method/location/:location/country/:country/dataset/:dataset/authors/:authors/reference/:reference/row-link/:rowl')
   .get(function (req, res) {
-    data.csv(req.params, req.recordLimit, settings.files.tmpDir).then(r => res.download(r)).catch(e => { err(e); res.sendStatus(400); })
+    data.csv(req.params, req.recordLimit, settings.files.tmpDir, req.resourcesAuth).then(r => res.download(r)).catch(e => { err(e); res.sendStatus(400); })
   });
  
 router.route('/data/export/excel/family/:family/genus/:genus/species/:species/original-name/:origname/trait-category/:traitcat/trait/:trait/method/:method/location/:location/country/:country/dataset/:dataset/authors/:authors/reference/:reference/row-link/:rowl')
   .get(function (req, res) {
-    data.excel(req.params, req.recordLimit, settings.files.tmpDir).then(r => res.download(r)).catch(e => { err(e); res.sendStatus(400); })
+    data.excel(req.params, req.recordLimit, settings.files.tmpDir, req.resourcesAuth).then(r => res.download(r)).catch(e => { err(e); res.sendStatus(400); })
   });
 
 router.route('/data/stats/:type/family/:family/genus/:genus/species/:species/original-name/:origname/trait-category/:traitcat/trait/:trait/method/:method/location/:location/country/:country/dataset/:dataset/authors/:authors/reference/:reference/row-link/:rowl')
@@ -288,7 +288,7 @@ router.route('/jobs/:id')
      .delete(requiresAuth(), auth.isContributor, function (req, res) {
       jobs.remove(req.params, req.resourcesAuth).then(r => res.json(r)).catch(e => { err(e); res.sendStatus(400); })
     });
- 
+
 Object.keys(enums).forEach(e => {
   router.route(`/${e}`)
   .get(function (req, res) {

@@ -20,7 +20,7 @@ const statsTypes = ['group-by', 'distinct'];
 
 const paramList = [/*'order',*/'family','genus', 'species', 'origname', 'traitcat', 'trait', 'method', 'location','country', 'dataset', 'authors', 'reference', 'rowl'];
 const columnList = [/*'taxonomy.order',*/'taxonomy.family', 'taxonomy.genus', 'data.taxonomy_id', 'data.original_name', 'trait.trait_category_id', 'data.trait_id', 'method.id', 'location.id', 'country.id', 
-'dataset.id', 'dataset.authors', 'data.reference_id', 'data.row_link'];
+'dataset.id', 'dataset.authors', 'dataset.restricted', 'data.reference_id', 'data.row_link'];
 
 const getCondition = function(params) {
     var p = paramList;
@@ -41,23 +41,36 @@ const list = async function(params, limits, auth) {
     var cond = getCondition(params);
     //console.dir(cond);
     var res = await db.prepareListResponse(limits, 'data', cond.clause, cond.values, join);
+    var isAuthenticted = !!auth.sub || !!auth.validApiKey;
+    //console.log(`${isAuthenticted} ${auth.sub} ${auth.validApiKey}`);
+
+    if(res.count != null) {
+        // this is the first query
+        var hasRestricted = await db.query({table: 'data', sql: `SELECT SUM(dataset.restricted) as count FROM ${join} WHERE ${cond.clause}`, values: cond.values, hasWhere: true});
+        if(hasRestricted[0].count > 0) {
+            res.restricted = true;
+        } else {
+            res.restricted = false;
+        }
+    }
+
     var results = await db.query({ table: 'data', sql: `SELECT data.*, taxonomy.wsc_lsid, taxonomy.order, taxonomy.family, taxonomy.genus, taxonomy.species, taxonomy.subspecies, `
      + `trait.id, trait.abbrev, trait.name, trait_category.id, trait_category.name, `
      + `measure.id, measure.name, sex.id, sex.name, life_stage.id, life_stage.name, method.id, method.abbrev, method.name, `
      //+ `event_date_text, event_date_start, event_date_end, note, `
      + `location.id, location.abbrev, country.id, country.alpha3_code, country.name,`
-     + `dataset.id, dataset.name, dataset.authors, reference.id, reference.abbrev `
+     + `dataset.id, dataset.name, dataset.authors, dataset.restricted, reference.id, reference.abbrev `
      + `FROM ${join} WHERE ${cond.clause}`
      , values: cond.values, nestTables: true, limits, hasWhere: true});
-     if(auth.sub) {
-         // temporary test of auth
-         res.loggedIn = true;
-     }    
-     res.items = results.map(r => {    
+     res.items = results.map(r => {
+        value = null;
+        if(r.dataset.restricted == 0 || isAuthenticted) {
+            value = r.data.value_numeric ? r.data.value_numeric : r.data.value
+        }
         return {
                 id: r.data.id,
                 originalName: r.data.original_name,
-                value: r.data.value_numeric ? r.data.value_numeric : r.data.value,
+                value,
                 frequency: r.data.frequency,
                 sampleSize: r.data.sample_size,
                 treatment: r.data.treatment,
@@ -98,7 +111,12 @@ const list = async function(params, limits, auth) {
                     name: r.country.name,
                     code: r.country.alpha3_code
                 },
-                dataset: r.dataset,
+                dataset: {
+                    id: r.dataset.id,
+                    name: r.dataset.name,
+                    authors: r.dataset.authors,
+                    restricted:  r.dataset.restricted == 1
+                },
                 reference: {
                     id: r.reference.id,
                     abbrev: r.reference.abbrev,
@@ -110,45 +128,51 @@ const list = async function(params, limits, auth) {
     return res;
 }
 
-const csv =  async function(params, limits, tmpDir) {
+const csv =  async function(params, limits, tmpDir, auth) {
     var cond = getCondition(params);
     var res = await db.prepareListResponse(limits, 'data', cond.clause, cond.values, join);
     limits.limit = res.count;
     var c = await db.getConnection();
+    var isAuthenticated = !!auth.sub;
     var dstream = db.squery(c, { table: 'data', sql: `SELECT data.id, taxonomy.wsc_lsid, data.original_name as originalName, `
      + /*taxonomy.order,*/ `taxonomy.family, taxonomy.genus, taxonomy.species, taxonomy.subspecies, `
-     + `trait.abbrev as trait, trait.name as traitFullName, trait_category.name as traitCategory, data.value, data.value_numeric, `
+     + `trait.abbrev as trait, trait.name as traitFullName, trait_category.name as traitCategory, `
+     + `CASE WHEN 1=? OR dataset.restricted = 0 THEN data.value ELSE 'access restricted' END as value, `
+     + `CASE WHEN 1=? OR dataset.restricted = 0 THEN data.value_numeric ELSE 0 END as value_numeric, `
      + `measure.name as measure, sex.name as sex, life_stage.name as lifeStage, data.frequency, data.sample_size as sampleSize, `
      + `data.treatment as treatment, method.abbrev as method, method.name as methodFullName, `
      + `event_date_text as dateText, event_date_start as dateStart, event_date_end as dateEnd, data.note, `
      + `location.abbrev as location, location.lat as decimalLatitude, location.lon as decimalLongitude, data.altitude, data.locality as verbatimLocality, `
      + `country.alpha3_code as countryCode, country.name as countryName, `
      + `data.habitat as habitatVerbatim, data.microhabitat as microhabitatVerbatim, `
-     + `dataset.name as datasetName, reference.abbrev as reference, reference.full_citation as referenceFull, reference.doi as referenceDOI, data.row_link as rowLinks `
+     + `dataset.name as datasetName, dataset.restricted as datasetRestrictedAccess, reference.abbrev as reference, reference.full_citation as referenceFull, reference.doi as referenceDOI, data.row_link as rowLinks `
      + `FROM ${join} WHERE ${cond.clause}`
-     , values: cond.values, nestTables: false, limits, hasWhere: true});
+     , values: [isAuthenticated, isAuthenticated, ...cond.values], nestTables: false, limits, hasWhere: true});
     
     var f = await csvu.get(tmpDir, `wstdb-${Date.now()}.csv`, dstream, c);
     db.releaseConnection(c);
     return f;
 }
 
-const excel =  async function(params, limits, tmpDir) {
+const excel =  async function(params, limits, tmpDir, auth) {
     var cond = getCondition(params);
     var res = await db.prepareListResponse(limits, 'data', cond.clause, cond.values, join);
     limits.limit = res.count;
+    var isAuthenticated = !!auth.sub;
     var records = await db.query({ table: 'data', sql: `SELECT data.id, taxonomy.wsc_lsid, data.original_name as originalName, `
      + /*taxonomy.order,*/ `taxonomy.family, taxonomy.genus, taxonomy.species, taxonomy.subspecies, `
-     + `trait.abbrev as trait, trait.name as traitFullName, trait_category.name as traitCategory, data.value, data.value_numeric, `
+     + `trait.abbrev as trait, trait.name as traitFullName, trait_category.name as traitCategory, `
+     + `CASE WHEN 1=? OR dataset.restricted = 0 THEN data.value ELSE 'access restricted' END as value, `
+     + `CASE WHEN 1=? OR dataset.restricted = 0 THEN data.value_numeric ELSE 0 END as value_numeric, `
      + `measure.name as measure, sex.name as sex, life_stage.name as lifeStage, data.frequency, data.sample_size as sampleSize, `
      + `data.treatment as treatment, method.abbrev as method, method.name as methodFullName, `
      + `event_date_text as dateText, event_date_start as dateStart, event_date_end as dateEnd, data.note, `
      + `location.abbrev as location, location.lat as decimalLatitude, location.lon as decimalLongitude, data.altitude, data.locality as verbatimLocality, `
      + `country.alpha3_code as countryCode, country.name as countryName, `
      + `data.habitat as habitatVerbatim, data.microhabitat as microhabitatVerbatim, `
-     + `dataset.name as datasetName, reference.abbrev as reference, reference.full_citation as referenceFull, reference.doi as referenceDOI, data.row_link as rowLinks `
+     + `dataset.name as datasetName, dataset.restricted as datasetRestrictedAccess, reference.abbrev as reference, reference.full_citation as referenceFull, reference.doi as referenceDOI, data.row_link as rowLinks `
      + `FROM ${join} WHERE ${cond.clause}`
-     , values: cond.values, nestTables: false, limits, hasWhere: true});
+     , values: [isAuthenticated, isAuthenticated, ...cond.values], nestTables: false, limits, hasWhere: true});
     
     var f = await csvu.excel(tmpDir, `wstdb-${Date.now()}.xlsx`, records);
     
@@ -288,6 +312,7 @@ const synonyms = {
     'reference.fullCitation':  'reference.full_citation',
     'trait': 'trait.abbrev',
     'dataset': 'dataset.name',
+    'restricted': 'dataset.restricted',
     //'taxonomy.wsc.lsid': 'taxonomy.wsc_lsid',
     'taxonomy.lsid': 'taxonomy.wsc_lsid',
     'taxonomy.fullName': 'taxonomy.full_name',
