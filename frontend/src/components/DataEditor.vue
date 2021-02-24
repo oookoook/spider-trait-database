@@ -31,10 +31,39 @@
         <v-divider vertical class="mx-3" />
         <v-spacer />
         <v-divider vertical class="mx-3" />
+        <v-menu offset-y>
+        <template v-slot:activator="{ on, attrs }">
+        <action-button text="Edit only the selected cell" icon="mdi-dots-vertical" toolbar v-bind="attrs"
+          v-on="on"/>
+      </template>
+      <v-list>
+        <v-list-item @click="log.dialog = true;">
+          <v-list-item-icon><v-icon>mdi-clipboard-alert-outline</v-icon></v-list-item-icon>
+          <v-list-item-content>
+          <v-list-item-title>Open error log</v-list-item-title>
+          </v-list-item-content>
+        </v-list-item>
+        <v-list-item @click="refreshDS(); getData();">
+          <v-list-item-icon><v-icon>mdi-refresh</v-icon></v-list-item-icon>
+          <v-list-item-content>
+          <v-list-item-title>Refresh the table</v-list-item-title>
+          </v-list-item-content>
+        </v-list-item>
+        <v-list-item @click="validate">
+          <v-list-item-icon><v-icon>mdi-check-all</v-icon></v-list-item-icon>
+          <v-list-item-content>
+          <v-list-item-title>Revalidate the whole dataset</v-list-item-title>
+          </v-list-item-content>
+        </v-list-item>
+      </v-list>
+    </v-menu>
+    <!--
         <action-button text="Open error log" icon="mdi-clipboard-alert-outline" toolbar @click="log.dialog = true;" />
         <action-button text="Refresh the table" icon="mdi-refresh" toolbar @click="refreshDS(); getData();" />
         <action-button text="Revalidate the whole dataset" icon="mdi-check-all" toolbar @click="validate" />
         <v-divider vertical class="mx-3" />
+        -->
+        
         <action-button v-if="!editor && isValid" color="success" text="Send for review" icon="mdi-send" toolbar @click="review" />
         <action-button v-if="!editor && !isValid" color="warning" text="Send for review (dataset invalid)" icon="mdi-send" toolbar @click="review"/>
         <action-button v-if="editor" color="error" text="Reject" icon="mdi-undo" toolbar @click="reject"/>

@@ -71,7 +71,7 @@ export default {
       this.$emit('selectCell', e);
     },
     computeTableHeight() {
-      this.tableHeight = window.innerHeight - 235; 
+      this.tableHeight = window.innerHeight - 200; 
     }
   },
   created () {
