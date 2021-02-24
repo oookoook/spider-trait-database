@@ -26,8 +26,9 @@
 </template>
 
 <script>
-/*
+
 import IdFromLsid from '../mixins/id-from-lsid' 
+/*
 import IdFromRoute from '../mixins/id-from-route' 
 import EntityProvider from '../components/EntityProvider'
 import ListProvider from '../components/ListProvider'
@@ -44,8 +45,9 @@ export default {
     EntityDetail,
     TaxonDetail
   },
+  
+  mixins: [IdFromLsid],
   /*
-  mixins: [IdFromLsid, IdFromRoute, Taxons],
   components: {
     EntityProvider,
     TaxonDetail,
