@@ -44,11 +44,13 @@ const list = async function(params, limits, auth) {
     var isAuthenticted = !!auth.sub || !!auth.validApiKey;
     //console.log(`${isAuthenticted} ${auth.sub} ${auth.validApiKey}`);
 
-    if(res.count != null) {
+    console.log(cond.values.length);
+    if(res.count != null && cond.values.length > 0) {
         // this is the first query
-        var hasRestricted = await db.query({table: 'data', sql: `SELECT SUM(dataset.restricted) as count FROM ${join} WHERE ${cond.clause}`, values: cond.values, hasWhere: true});
-        if(hasRestricted[0].count > 0) {
+        var hasRestricted = await db.query({table: 'data', sql: `SELECT DISTINCT dataset.id, dataset.name FROM ${join} WHERE ${cond.clause} AND dataset.restricted = 1`, values: cond.values, hasWhere: true});
+        if(hasRestricted.length > 0) {
             res.restricted = true;
+            res.restrictedDatasets = hasRestricted.map(d => {return { id: d.id, name: d.name }});
         } else {
             res.restricted = false;
         }

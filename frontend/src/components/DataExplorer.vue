@@ -55,7 +55,7 @@
       <span v-if="!exportDisabled">Download the filtered data (all pages)</span>
       <span v-else>Please set up a filter before exporting</span>
     </v-tooltip>
-    <action-button v-if="!isLoggedIn" text="Request data" color="success" icon="mdi-lock-open-outline" :link="`mailto:spidertraits@sci.muni.cz?subject=Data%20request&body=Hello%2C%0D%0A%0D%0AI%20would%20like%20to%20request%20data%20for%20the%20following%20query%3A%0D%0A${requestAccessUri}%0D%0APlease%20provide%20me%20with%20instructions%20how%20to%20get%20approval%20to%20use%20the%20data.`" external />
+    <action-button v-if="!isLoggedIn && !exportDisabled" text="Request data" color="success" icon="mdi-lock-open-outline" :link="`mailto:spidertraits@sci.muni.cz?subject=Data%20request&body=Hello%2C%0D%0A%0D%0AI%20would%20like%20to%20request%20data%20for%20the%20following%20query%3A%0D%0A${requestAccessUri}%0D%0APlease%20provide%20me%20with%20instructions%20how%20to%20get%20approval%20to%20use%20the%20data.`" external />
     </v-card-title>
     <v-card-text>
     <v-row>
@@ -100,8 +100,16 @@
     <v-tabs-items v-model="tab">
       <list-provider list="data" :filter="filter" v-slot="i">
       <v-tab-item value="preview">
-        <v-alert type="warning" v-if="restricted  && !exportDisabled" class="my-3">This query contains data with restricted access.
-          <span v-if="!isLoggedIn">Request the data using the button in top right corner of the page.</span></v-alert>
+        <v-alert type="warning" v-if="!i.loading && restricted  && !exportDisabled" class="my-3">This query contains data with restricted access.
+          <span v-if="!isLoggedIn">Log in or request the data using the button in <strong>top right corner</strong> of the page.</span> Restricted datasets:
+          
+            <v-row class="my-1" no-gutters justify="start">
+          
+            <v-chip outlined color="white" class="mr-1" v-for="d in restrictedDatasets" :key="`ds${d.i}`" :to="`/datasets/${d.id}`">{{ d.name }}</v-chip>
+          
+          </v-row>
+          
+          </v-alert>
         <data-preview-table :items="i.items" :loading="i.loading" :total="i.total" :options="i.options" @update="i.update" />
       </v-tab-item>
       <!--
@@ -199,7 +207,7 @@ export default {
     requestAccessUri() {
       return encodeURI(this.shareLink);
     },
-    ...mapGetters('data', ['exportLinkCSV', 'exportLinkExcel', 'shareLink','routeLink', 'restricted']),
+    ...mapGetters('data', ['exportLinkCSV', 'exportLinkExcel', 'shareLink','routeLink', 'restricted', 'restrictedDatasets']),
     ...mapGetters(['isLoggedIn'])
   },
   watch: {
