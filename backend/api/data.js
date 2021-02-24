@@ -44,7 +44,7 @@ const list = async function(params, limits, auth) {
     var isAuthenticted = !!auth.sub || !!auth.validApiKey;
     //console.log(`${isAuthenticted} ${auth.sub} ${auth.validApiKey}`);
 
-    console.log(cond.values.length);
+    //console.log(cond.values.length);
     if(res.count != null && cond.values.length > 0) {
         // this is the first query
         var hasRestricted = await db.query({table: 'data', sql: `SELECT DISTINCT dataset.id, dataset.name FROM ${join} WHERE ${cond.clause} AND dataset.restricted = 1`, values: cond.values, hasWhere: true});
