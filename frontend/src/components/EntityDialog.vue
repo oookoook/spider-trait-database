@@ -6,7 +6,7 @@
       <v-form v-model="fv" ref="form">
       <v-row v-if="it">
       <v-col :cols="12" :md="4" v-for="prop in entityProps" :key="prop.name">
-      <v-text-field v-if="!prop.autocomplete && !prop.parent && !prop.switch"
+      <v-text-field v-if="!prop.autocomplete && !prop.parent && !prop.switch &&!prop.textarea"
         v-model="it[prop.name]"
         :label="prop.label"
         clearable
@@ -23,6 +23,16 @@
       :hint="prop.hint"
       :rules="[prop.isValid]" 
       />
+      <v-textarea
+            v-else-if="prop.textarea"
+            v-model="it[prop.name]"
+            :label="prop.label"
+            class="mr-3" 
+            persistent-hint
+            :hint="prop.hint"
+            :rules="[prop.isValid]"
+            rows="1"
+        ></v-textarea>
       <v-text-field v-else-if="!prop.autocomplete"
         v-model="it[prop.parent][prop.name]"
         :label="prop.label"

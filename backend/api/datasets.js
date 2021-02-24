@@ -84,6 +84,9 @@ const prepareForCreate = function(dataset, auth) {
     //dataset.name = db.unique(dataset.name);
     dataset.date = new Date();
     dataset['authors_email'] = dataset.authorsEmail;
+    if(dataset.restricted === null) {
+        delete(dataset.restricted);
+    }
     delete(dataset.authorsEmail);
 }
 
@@ -95,6 +98,9 @@ const prepareForUpdate = function(dataset, auth) {
     delete(dataset.date);
     //dataset.name = db.unique(dataset.name);
     dataset['authors_email'] = dataset.authorsEmail;
+    if(dataset.restricted === null) {
+        delete(dataset.restricted);
+    }
     delete(dataset.authorsEmail);
     
 }

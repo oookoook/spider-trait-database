@@ -30,8 +30,14 @@ const props = {
       switch: true,
       label: 'Restricted access',
       hint: 'Turn on if data are not public.',
-      isValid: (v) => !!v || 'Access restriction information is required'
-    }
+      isValid: (v) => v !== null || 'Access restriction information is required'
+    },
+    {
+      name: 'notes',
+      label: 'Notes',
+      textarea: true,
+      isValid: (v) => true
+    },
 ],
   traits: [
     {
