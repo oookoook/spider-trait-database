@@ -53,7 +53,7 @@
           The user is free to download, share and adapt the data, as long as the Database is cited 
           as the source of the information. This database should be cited as follows:</p>
           <blockquote class="blockquote about-text text-center">
-          Pekár S., Černecká Ľ., Wolff J., Mammola S., Cardoso P., Lowe E., Fukushima C.S., Birkhofer K. &amp; Herberstein M.E. 2021. The spider trait database. Masaryk University, Brno, URL: https://spidertraits.sci.muni.cz
+          Pekár S., Černecká Ľ., Wolff J., Mammola S., Cardoso P., Lowe E., Fukushima C.S., Birkhofer K. &amp; Herberstein M.E. 2021. The spider trait database v1.0. Masaryk University, Brno, URL: https://spidertraits.sci.muni.cz
           </blockquote>
         <v-img class="mx-auto mt-16" contain width="153" height="94" :src="require('../assets/edu.png')" />
         </v-col>

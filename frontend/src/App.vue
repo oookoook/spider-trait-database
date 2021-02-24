@@ -177,7 +177,7 @@
           Stano Pekar, Caroline Sayuri, and Jonas Wolff.
           -->
           <div class="subtitle-2">
-          Pekár et al. 2021. The world spider trait database. Masaryk University, Brno
+          Pekár et al. 2021. The world spider trait database v1.0. Masaryk University, Brno
           <!-- , doi: -->
           </div>
         </v-col>
