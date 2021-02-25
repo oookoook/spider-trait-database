@@ -1,1 +1,2 @@
-+ The first publication is yet to appear.
++ Lowe EC, Wolff JO, Aceves-Aparicio A, Birkhofer K, Branco VV, Cardoso P, Chichorro F, Fukushima CS, Gonçalves-Souza T, Haddad CR, Isaia M, Krehenwinkel H, Audisio TL, Macías-Hernández N, Malumbres-Olarte J, Mammola S, McLean DJ, Michalko R, Nentwig W, Pekár S, Pétillon J, Privet K, Scott C, Uhl G, Urbano-Tenorio F, Wong BH & Herberstein ME. 2020. Towards establishment of a centralized spider traits database. Journal of Arachnology 48(2): 103–109.
++ 
