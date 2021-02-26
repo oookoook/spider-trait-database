@@ -105,7 +105,7 @@
           
             <v-row class="my-1" no-gutters justify="start">
           
-            <v-chip outlined color="white" class="mr-1" v-for="d in restrictedDatasets" :key="`ds${d.i}`" :to="`/datasets/${d.id}`">{{ d.name }}</v-chip>
+            <v-chip outlined color="white" class="mr-1 mb-1" v-for="d in restrictedDatasets" :key="`ds${d.i}`" :to="`/datasets/${d.id}`">{{ d.name }}</v-chip>
           
           </v-row>
           
