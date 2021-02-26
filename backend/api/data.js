@@ -147,9 +147,11 @@ const csv =  async function(params, limits, tmpDir, auth) {
      + `location.abbrev as location, location.lat as decimalLatitude, location.lon as decimalLongitude, data.altitude, data.locality as verbatimLocality, `
      + `country.alpha3_code as countryCode, country.name as countryName, `
      + `data.habitat as habitatVerbatim, data.microhabitat as microhabitatVerbatim, `
-     + `dataset.name as datasetName, dataset.restricted as datasetRestrictedAccess, reference.abbrev as reference, reference.full_citation as referenceFull, reference.doi as referenceDOI, data.row_link as rowLinks `
+     + `dataset.name as datasetName, `
+     + `CASE WHEN dataset.restricted = 1 AND 1=? THEN CONCAT('Restricted access, contact the author at ', COALESCE(dataset.authors_email, dataset.email, 'spidertraits@sci.muni.cz')) WHEN dataset.restricted AND 1<>? THEN 'Restricted access' ELSE 'Free access' END as datasetRestrictedAccess, `
+     + `reference.abbrev as reference, reference.full_citation as referenceFull, reference.doi as referenceDOI, data.row_link as rowLinks `
      + `FROM ${join} WHERE ${cond.clause}`
-     , values: [isAuthenticated, isAuthenticated, ...cond.values], nestTables: false, limits, hasWhere: true});
+     , values: [isAuthenticated, isAuthenticated, isAuthenticated, isAuthenticated, ...cond.values], nestTables: false, limits, hasWhere: true});
     
     var f = await csvu.get(tmpDir, `wstdb-${Date.now()}.csv`, dstream, c);
     db.releaseConnection(c);
@@ -172,9 +174,11 @@ const excel =  async function(params, limits, tmpDir, auth) {
      + `location.abbrev as location, location.lat as decimalLatitude, location.lon as decimalLongitude, data.altitude, data.locality as verbatimLocality, `
      + `country.alpha3_code as countryCode, country.name as countryName, `
      + `data.habitat as habitatVerbatim, data.microhabitat as microhabitatVerbatim, `
-     + `dataset.name as datasetName, dataset.restricted as datasetRestrictedAccess, reference.abbrev as reference, reference.full_citation as referenceFull, reference.doi as referenceDOI, data.row_link as rowLinks `
+     + `dataset.name as datasetName, `
+     + `CASE WHEN dataset.restricted = 1 AND 1=? THEN CONCAT('Restricted access, contact the author at ', COALESCE(dataset.authors_email, dataset.email, 'spidertraits@sci.muni.cz')) WHEN dataset.restricted AND 1<>? THEN 'Restricted access' ELSE 'Free access' END as datasetRestrictedAccess, `
+     + `reference.abbrev as reference, reference.full_citation as referenceFull, reference.doi as referenceDOI, data.row_link as rowLinks `
      + `FROM ${join} WHERE ${cond.clause}`
-     , values: [isAuthenticated, isAuthenticated, ...cond.values], nestTables: false, limits, hasWhere: true});
+     , values: [isAuthenticated, isAuthenticated, isAuthenticated, isAuthenticated, ...cond.values], nestTables: false, limits, hasWhere: true});
     
     var f = await csvu.excel(tmpDir, `wstdb-${Date.now()}.xlsx`, records);
     
