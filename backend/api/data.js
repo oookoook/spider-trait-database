@@ -103,10 +103,10 @@ const list = async function(params, limits, auth) {
                 location: {
                     id: r.location.id,
                     abbrev: r.location.abbrev,
-                    coords: {
+                    coords: r.location.id ? {
                         lat: r.location.lat,
                         lon: r.location.lon
-                    }
+                    } : null
                 },
                 altitude: r.data.altitude,
                 locality: r.data.locality,

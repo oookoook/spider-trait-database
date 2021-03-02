@@ -125,7 +125,7 @@ export default {
         ListItem,
         InfoIcon
   },
-  mixins: [DataTable, Taxons, Location],
+  mixins: [DataTable, Taxons, Locations],
   props: {
   },
   data () {
