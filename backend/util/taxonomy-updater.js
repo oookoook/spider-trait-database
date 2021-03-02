@@ -161,6 +161,11 @@ const updateTaxonLinks =async function(conn) {
     await db.cquery(conn, {table: 'taxonomy', sql: 'UPDATE IGNORE data INNER JOIN taxonomy ON data.taxonomy_id = taxonomy.id SET data.taxonomy_id = taxonomy.valid_id '
     +'WHERE taxonomy.valid = 0' });
 
+    // do join species + genus and update family for records where genus.family <> species.family
+    // updates species after genus was updated (moved to another family)
+    await db.cquery(conn, {table: 'taxonomy', sql: `UPDATE IGNORE taxonomy sp LEFT JOIN (SELECT * from taxonomy WHERE genus IS NOT NULL AND species IS NULL) gen 
+    ON sp.genus = gen.genus SET sp.family = gen.family WHERE sp.family <> gen.family`});
+
     
 }
 
