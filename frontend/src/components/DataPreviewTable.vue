@@ -89,11 +89,13 @@
         <v-subheader>Location details</v-subheader>
             <list-item title="Country" :text="item.country.id ? `${item.country.name} (${item.country.code})` : null" icon="mdi-flag-outline" />
             <list-item title="Altitude" :text="item.altitude" icon="mdi-image-filter-hdr" />
-            <list-item title="Locality" :text="item.locality" icon="mdi-map-marker" />
+            <list-item title="Locality" :text="item.locality" icon="mdi-map-search-outline" />
             <list-item title="Habitat" :text="item.habitat" icon="mdi-pine-tree" />
             <list-item title="Microhabitat" :text="item.microhabitat" icon="mdi-magnify" />
-            <list-item v-if="item.location.id" title="Geolocation (WGS84)" :text="item.location.abbrev" 
-          icon="mdi-crosshairs-gps" link-tooltip="View the location detail" :link="`/locations/${item.location.id}`"/>
+            <list-item v-if="item.location.id" title="Location" :text="item.location.abbrev" 
+          icon="mdi-map-marker" link-tooltip="View the location detail" :link="`/locations/${item.location.id}`"/>
+            <list-item v-if="item.location.coords" title="Geolocation (WGS84)" :text="`Lat: ${item.location.coords.lat}, Lon: ${item.location.coords.lon}`" 
+          icon="mdi-crosshairs-gps" link-icon="mdi-map" link-tooltip="View in Google Maps" :link="getGMapsLink(item.location.coords)" external/>  
           </v-list>
         </v-row>
         </v-container>
@@ -113,6 +115,7 @@ import InfoIcon from '../components/InfoIcon'
 import ListItem from '../components/ListItem'
 import DataTable from '../mixins/data-table'
 import Taxons from '../mixins/taxons'
+import Locations from '../mixins/locations'
 
 
 export default {
@@ -122,7 +125,7 @@ export default {
         ListItem,
         InfoIcon
   },
-  mixins: [DataTable, Taxons],
+  mixins: [DataTable, Taxons, Location],
   props: {
   },
   data () {

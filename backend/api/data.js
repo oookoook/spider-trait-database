@@ -60,7 +60,7 @@ const list = async function(params, limits, auth) {
      + `trait.id, trait.abbrev, trait.name, trait_category.id, trait_category.name, `
      + `measure.id, measure.name, sex.id, sex.name, life_stage.id, life_stage.name, method.id, method.abbrev, method.name, `
      //+ `event_date_text, event_date_start, event_date_end, note, `
-     + `location.id, location.abbrev, country.id, country.alpha3_code, country.name,`
+     + `location.id, location.abbrev, location.lat, location.lon, country.id, country.alpha3_code, country.name,`
      + `dataset.id, dataset.name, dataset.authors, dataset.restricted, reference.id, reference.abbrev `
      + `FROM ${join} WHERE ${cond.clause}`
      , values: cond.values, nestTables: true, limits, hasWhere: true});
@@ -103,6 +103,10 @@ const list = async function(params, limits, auth) {
                 location: {
                     id: r.location.id,
                     abbrev: r.location.abbrev,
+                    coords: {
+                        lat: r.location.lat,
+                        lon: r.location.lon
+                    }
                 },
                 altitude: r.data.altitude,
                 locality: r.data.locality,

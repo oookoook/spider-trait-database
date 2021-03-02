@@ -4,7 +4,7 @@
       <v-card-subtitle><v-breadcrumbs class="px-0" :items="breadcrumbs"/></v-card-subtitle>
         <v-list  v-if="item" three-line>
           <list-item v-if="item.coords" title="Geolocation (WGS84)" :text="`Lat: ${item.coords.lat}, Lon: ${item.coords.lon}`" 
-          icon="mdi-crosshairs-gps" link-icon="mdi-google-maps" link-tooltip="View in Google Maps" :link="getGMapsLink(item.coords)" external/>  
+          icon="mdi-crosshairs-gps" link-icon="mdi-map" link-tooltip="View in Google Maps" :link="getGMapsLink(item.coords)" external/>  
         </v-list>
         <v-card-text v-if="item && item.notes">
       {{ item.notes }}
