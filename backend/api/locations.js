@@ -36,6 +36,9 @@ const get = async function(params) {
      + 'FROM location LEFT JOIN country ON location.country_id = country.id '
      + 'WHERE location.id = ?', values: [id], nestTables: true });
      var r = results[0];
+     if(r == null) {
+         return { item: null };
+     };
      return { item: {
         id: r.location.id,
         abbrev: r.location.abbrev,

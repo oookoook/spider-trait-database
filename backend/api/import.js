@@ -569,7 +569,7 @@ const saveSourceFile = async function({tempPath, sourceDir, filename, dataset}) 
         try {
             await fs.unlink(path.resolve(sourceDir, dataset.sourceFile));
         } catch (e) {
-            console.error(`unable to delete cuurent source file: ${JSON.stringify(dataset)}`);
+            console.error(`unable to delete current source file: ${JSON.stringify(dataset)}`);
         }
     }
     // copy the file
@@ -601,6 +601,7 @@ const uploadFile = async function(params, body, files, auth, sourceDir) {
         throw 'File size is too large';
     }
     var fpath = f.tempFilePath;
+    var sourcePath = fpath;
     //console.dir(fpath);
     //console.log(f.mimetype);
     //console.log(f.name);
@@ -610,12 +611,12 @@ const uploadFile = async function(params, body, files, auth, sourceDir) {
     if((f.mimetype == 'application/vnd.ms-excel' || f.mimetype == 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
     && f.name.toLowerCase().indexOf('.csv') + 4 != f.name.length) {
         //console.log('converting');
-        await saveSourceFile({ tempPath: fpath, sourceDir, filename: f.name, dataset: { id: ds, name: dscheck[0]['name'], sourceFile: dscheck[0]['source_file']}});
         fpath = await csv.convert(fpath);
     } else if(f.mimetype != 'text/csv' && f.name.toLowerCase().indexOf('.csv') + 4 != f.name.length) {
         throw 'Unknown file format';
     }
 
+    await saveSourceFile({ tempPath: sourcePath, sourceDir, filename: f.name, dataset: { id: ds, name: dscheck[0]['name'], sourceFile: dscheck[0]['source_file']}});
 
     // first passthrough - just get the number of lines
     var total = await csv.rows(fpath);
