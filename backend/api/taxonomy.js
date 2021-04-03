@@ -1,5 +1,70 @@
 var db = null;
 
+const validName = async function(params, query) {
+    console.dir(query);
+    let taxon = params.taxon || query.taxon;
+    var results = await db.query({table: 'taxonomy', sql: 'SELECT synonyms.*, valid.* '
+     + 'FROM taxonomy synonyms LEFT JOIN taxonomy valid ON synonyms.valid_id = valid.id '
+     + 'WHERE synonyms.full_name = ?', values: [taxon], nestTables: true});
+     if(results.length > 0) {
+        var r = results[0];
+        console.dir(r);
+        if(r.valid.id) {
+            return { item: {
+                id: r.valid.id,
+                lsid: r.valid.wsc_lsid,
+                valid: r.valid.valid == 1,
+                order: r.valid.order,
+                family: r.valid.family,
+                genus: r.valid.genus,
+                species: r.valid.species,
+                subspecies: r.valid.subspecies,
+                author: r.valid.author,
+                year: r.valid.year
+            }}    
+        } else if(!r.synonyms.valid_id && r.synonyms.id) {
+            return { item: {
+                id: r.synonyms.id,
+                lsid: r.synonyms.wsc_lsid,
+                valid: r.synonyms.valid == 1,
+                order: r.synonyms.order,
+                family: r.synonyms.family,
+                genus: r.synonyms.genus,
+                species: r.synonyms.species,
+                subspecies: r.synonyms.subspecies,
+                author: r.synonyms.author,
+                year: r.synonyms.year
+            }}
+        } 
+    } else {
+            // query the taxonomy name table
+            console.log(`Querying taxonomy_name for ${taxon}`)
+            results = await db.query({table: 'taxonomy', sql: 'SELECT valid.* '
+            + 'FROM taxonomy_name synonyms LEFT JOIN taxonomy valid ON synonyms.taxonomy_id = valid.id '
+            + 'WHERE synonyms.name = ?', values: [taxon], nestTables: true});
+            if(results.length == 0) {
+                return { item: null };
+            }
+            var r = results[0];
+            console.dir(r);
+            if(!r.valid.id) {
+                return { item: null };
+            }
+            return { item: {
+                id: r.valid.id,
+                lsid: r.valid.wsc_lsid,
+                valid: r.valid.valid == 1,
+                order: r.valid.order,
+                family: r.valid.family,
+                genus: r.valid.genus,
+                species: r.valid.species,
+                subspecies: r.valid.subspecies,
+                author: r.valid.author,
+                year: r.valid.year
+            }}
+        }
+}
+
 const list = async function(limits) {
     var res = await db.prepareListResponse(limits, 'taxonomy');
     var results = await db.query({table: 'taxonomy', sql: `SELECT taxonomy.id, taxonomy.wsc_lsid, taxonomy.valid, `
@@ -190,6 +255,7 @@ module.exports = function(dbClient) {
         update,
         remove,
         getFullName,
-        getTaxonFromFullName
+        getTaxonFromFullName,
+        validName
     }
 }

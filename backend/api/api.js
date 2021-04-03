@@ -134,6 +134,10 @@ router.route('/taxonomy')
     taxonomy.create(req.body).then(r => res.json(r)).catch(e => { err(e); res.sendStatus(400); })
   })
 
+router.route('/taxonomy/valid-names/:taxon?')
+  .get(function (req, res) {
+    taxonomy.validName(req.params, req.query).then(r => res.json(r)).catch(e => { err(e); res.sendStatus(400); })
+  })
 
 router.route('/taxonomy/:id')
   .get(function (req, res) {
@@ -145,7 +149,9 @@ router.route('/taxonomy/:id')
   .delete(requiresAuth(), auth.isEditor, function (req, res) {
     taxonomy.remove(req.params).then(r => res.json(r)).catch(e => { err(e); res.sendStatus(400); })
   })
-  
+
+
+
 router.route('/datasets')
   .get(function (req, res) {
     datasets.list(req.recordLimit).then(r => res.json(r)).catch(e => { err(e); res.sendStatus(400); })
