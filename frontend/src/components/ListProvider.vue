@@ -29,7 +29,8 @@ export default {
     autocompleteAction:{ type: String, default: 'autocomplete'},
     autocompleteState:{ type: String, default: 'autocomplete'},
     savedOptionsState:{ type: String, default: 'savedOptions'},
-    preload: Boolean
+    preload: Boolean,
+    limit: Number
   },
   data () {
     return {
@@ -106,7 +107,7 @@ export default {
         }
         params.options = this.options ? this.options : {
           page: 1,
-          itemsPerPage: 10,
+          itemsPerPage: this.limit || 10,
           sortBy: [],
           sortDesc: []
         }

@@ -5,7 +5,7 @@
     <v-card-text>
     <v-row>
       <v-col cols="12" md="6" lg="4" v-for="e in enums" :key="`${e.list}_col`">
-        <list-provider :list="e.list" v-slot="i" :key="`${e.list}_lp`" preload>
+        <list-provider :list="e.list" v-slot="i" :key="`${e.list}_lp`" :limit="1000" preload>
         <v-card>
             <v-card-title>{{ e.title }}</v-card-title>
         <v-list single-line :key="`${e.list}_list`">
@@ -53,7 +53,7 @@
     </v-row>
 
     <list-provider list="countries" v-slot="i">
-    <countries-table :items="i.items" 
+    <countries-table class="mt-3" :items="i.items" 
     :loading="i.loading" 
     :total="i.total" 
     :autocomplete-items="i.autocompleteItems" 
@@ -110,11 +110,11 @@ export default {
   data() {
     return {
       enums: [
-        {list: 'measures', title: 'Measures', edit: false, create: false, id: null}, 
-        {list: 'lifeStages', title: 'Life Stages', edit: false, create: false, id: null},
-        {list: 'sexes', title: 'Sexes', edit: false, create: false, id: null},
-        {list: 'dataTypes', title: 'Data Types', edit: false, create: false, id: null},
-        {list: 'traitCategories', title: 'Trait Categories', edit: false, create: false, id: null},
+        {list: 'measures', title: 'Measures', edit: false, create: false, id: null, options: null}, 
+        {list: 'lifeStages', title: 'Life Stages', edit: false, create: false, id: null, options: null},
+        {list: 'sexes', title: 'Sexes', edit: false, create: false, id: null, options: null},
+        {list: 'dataTypes', title: 'Data Types', edit: false, create: false, id: null, options: null},
+        {list: 'traitCategories', title: 'Trait Categories', edit: false, create: false, id: null, options: null},
         //{list: 'countries', title: 'Countries'}
         ],
         countries: {
