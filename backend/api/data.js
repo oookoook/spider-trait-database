@@ -18,9 +18,9 @@ var join = `data `
 const statsTypes = ['group-by', 'distinct'];
 
 
-const paramList = [/*'order',*/'family','genus', 'species', 'origname', 'traitcat', 'trait', 'method', 'location','country', 'dataset', 'authors', 'restricted', 'reference', 'rowl'];
+const paramList = [/*'order',*/'family','genus', 'species', 'origname', 'traitcat', 'trait', 'method', 'location','country', 'dataset', 'authors', 'reference', 'rowl'];
 const columnList = [/*'taxonomy.order',*/'taxonomy.family', 'taxonomy.genus', 'data.taxonomy_id', 'data.original_name', 'trait.trait_category_id', 'data.trait_id', 'method.id', 'location.id', 'country.id', 
-'dataset.id', 'dataset.authors', 'dataset.restricted', 'data.reference_id', 'data.row_link'];
+'dataset.id', 'dataset.authors', 'data.reference_id', 'data.row_link'];
 
 const getCondition = function(params) {
     var p = paramList;
