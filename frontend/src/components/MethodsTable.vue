@@ -22,7 +22,7 @@
     >
     
     <template v-slot:item.abbrev="{ item }">
-      <entity-link-cell :text="item.abbrev" tooltip="View the method detail" :link="`/methods/${item.id}`" />
+      <entity-link-cell new-tab :text="item.abbrev" tooltip="View the method detail" :link="`/methods/${item.id}`" />
     </template>
 
     <template v-slot:item.actions="{ item }">

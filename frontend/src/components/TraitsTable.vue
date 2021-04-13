@@ -34,7 +34,7 @@
     >
   
     <template v-slot:item.abbrev="{ item }">
-      <entity-link-cell :text="item.abbrev" tooltip="View the trait detail" :link="`/traits/${item.id}`" />
+      <entity-link-cell  new-tab :text="item.abbrev" tooltip="View the trait detail" :link="`/traits/${item.id}`" />
     </template>
 
     <template v-slot:item.actions="{ item }">

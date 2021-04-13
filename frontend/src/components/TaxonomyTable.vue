@@ -22,7 +22,7 @@
     >
     
     <template v-slot:item.taxon="{ item }">
-      <entity-link-cell :abbrev="getTaxon(item)" :text="item.lsid || 'No LSID available'" tooltip="View the taxon detail" :link="`/taxonomy/${item.id}`" />
+      <entity-link-cell new-tab :abbrev="getTaxon(item)" :text="item.lsid || 'No LSID available'" tooltip="View the taxon detail" :link="`/taxonomy/${item.id}`" />
     </template>
     
     <template v-slot:item.valid="{ item }">

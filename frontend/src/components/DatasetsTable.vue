@@ -23,7 +23,7 @@
     >
     
     <template v-slot:item.name="{ item }">
-      <entity-link-cell :text="item.name" tooltip="View the dataset detail" :link="`/datasets/${item.id}`" />
+      <entity-link-cell new-tab :text="item.name" tooltip="View the dataset detail" :link="`/datasets/${item.id}`" />
     </template>
     
   <template v-slot:item.uploader="{ item }">
