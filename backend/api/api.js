@@ -107,6 +107,11 @@ router.route('/references/:id')
     references.remove(req.params, req.resourcesAuth).then(r => res.json(r)).catch(e => { err(e); res.sendStatus(400); })
   })
 
+router.route('/references-replace/:id/:replacement')
+  .put(requiresAuth(), auth.isEditor, function (req, res) {
+    references.replace(req.params, req.resourcesAuth).then(r => res.json(r)).catch(e => { err(e); res.sendStatus(400); })
+  })
+
 router.route('/locations')
   .get(function (req, res) {
     locations.list(req.recordLimit).then(r => res.json(r)).catch(e => { err(e); res.sendStatus(400); })

@@ -71,6 +71,18 @@ const remove = async function(params, auth) {
     return await db.deleteEntity({params, table: 'reference', auth, refs: ['data', 'import', 'trait', 'method']});
 }
 
+const replace = async function(params, auth) {
+    // allowed only for Editor and above
+    const toDelete = parseInt(params.id)
+    const replacement = parseInt(params.replacement);
+    if(!replacement) {
+        throw 'No replacing reference defined';
+    }
+    await db.query({table: 'import', sql: 'UPDATE import SET reference_id = ? WHERE reference_id = ?', values: [replacement, toDelete], nestTables: false});
+    await db.query({table: 'data', sql: 'UPDATE data SET reference_id = ? WHERE reference_id = ?', values: [replacement, toDelete], nestTables: false});
+    return await db.deleteEntity({params, table: 'reference', auth, refs: ['data', 'import', 'trait', 'method']});
+}
+
 const synonyms = {
     'fullCitation': 'full_citation'
 }
@@ -83,6 +95,7 @@ module.exports = function(dbClient) {
         get,
         create,
         update,
-        remove
+        remove,
+        replace
     }
 }

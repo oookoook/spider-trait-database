@@ -381,5 +381,16 @@ export default {
         return true;
       }  
     },
+
+    referenceReplace: async function(context, payload) {
+      var p = {};
+      p.endpoint = `references-replace`;
+      p.params = `${payload.id}/${payload.replacement}`;
+      p.auth = true;
+      var data = await context.dispatch('put', p, {
+        root: true
+      });
+      return data;
+    }
   },
 }
