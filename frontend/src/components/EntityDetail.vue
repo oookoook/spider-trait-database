@@ -45,7 +45,7 @@
       </v-slide-x-transition>
     </entity-provider>
 
-    <list-provider v-if="id" list="data" :entity="entity" :id="id" v-slot="i">
+    <list-provider v-if="id" list="data" :entity="entity" :id="id" v-slot="i" nosave>
       <v-card>
         <v-card-title>Data preview ({{i.items.length}} records)</v-card-title>
         <data-preview-table

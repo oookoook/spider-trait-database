@@ -30,7 +30,8 @@ export default {
     autocompleteState:{ type: String, default: 'autocomplete'},
     savedOptionsState:{ type: String, default: 'savedOptions'},
     preload: Boolean,
-    limit: Number
+    limit: Number,
+    nosave: Boolean
   },
   data () {
     return {
@@ -178,9 +179,12 @@ export default {
     }
   },
   beforeDestroy() {
-    console.log('List provider destroyed');
+    
     //console.dir(this.options);
-    this.$store.commit(`${this.list}/${this.savedOptionsState}`, { value: this.options });
+    if(!this.nosave) {
+      console.log('List provider destroyed - saving options');
+      this.$store.commit(`${this.list}/${this.savedOptionsState}`, { value: this.options });
+    }
   }
 }
 </script>
