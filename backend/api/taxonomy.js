@@ -39,12 +39,13 @@ const validName = async function(params, query) {
     } else {
             // query the taxonomy name table
             console.log(`Querying taxonomy_name for ${taxon}`)
-            results = await db.query({table: 'taxonomy', sql: 'SELECT valid.* '
+            results = await db.query({table: 'taxonomy', sql: 'SELECT DISTINCT valid.* '
             + 'FROM taxonomy_name synonyms LEFT JOIN taxonomy valid ON synonyms.taxonomy_id = valid.id '
             + 'WHERE synonyms.name = ?', values: [taxon], nestTables: true});
             if(results.length == 0) {
                 return { item: null };
             }
+            /*
             var r = results[0];
             console.dir(r);
             if(!r.valid.id) {
@@ -62,6 +63,29 @@ const validName = async function(params, query) {
                 author: r.valid.author,
                 year: r.valid.year
             }}
+            */
+           let res = { combinations: true, items: [] };
+           results.forEach(r => {
+            if(!r.valid.id) {
+                return;
+            }
+            res.item.push({
+                id: r.valid.id,
+                lsid: r.valid.wsc_lsid,
+                valid: r.valid.valid == 1,
+                order: r.valid.order,
+                family: r.valid.family,
+                genus: r.valid.genus,
+                species: r.valid.species,
+                subspecies: r.valid.subspecies,
+                author: r.valid.author,
+                year: r.valid.year
+            })
+           });
+           // just to maintain backward compatibility
+           
+           res.item = res.items.length > 0 ? res.items[0] : null;
+           return res;
         }
 }
 
