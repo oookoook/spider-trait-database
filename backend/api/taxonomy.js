@@ -69,7 +69,7 @@ const validName = async function(params, query) {
             if(!r.valid.id) {
                 return;
             }
-            res.item.push({
+            res.items.push({
                 id: r.valid.id,
                 lsid: r.valid.wsc_lsid,
                 valid: r.valid.valid == 1,
