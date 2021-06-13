@@ -1,14 +1,14 @@
 # World Spider Traits Database API
 
-The WSTDB provides an API for a programmatic access to the data.
+The WSTDB provides an API for programmatic access to the data.
 
-The base data endpoint address is <https://spidertraits.sci.muni.cz/backend/data>, optionally followed by a query filters. The endpoint supports `GET` http verb.
+The base data endpoint address is <https://spidertraits.sci.muni.cz/backend/data>, optionally followed by query filters. The endpoint supports the `GET` HTTP verb.
 
 ## Response structure
 
-The API response returns an JSON object with the following structure:
+The API response returns a JSON object with the following structure:
 
-* `items` - Array of data records. The record structure is similar to the structure of the datasets that are inserted into the database, but it adds a hierarchical structure and it follows different naming conventions (using [camelCase](https://en.wikipedia.org/wiki/Camel_case) instead of [snake_case](https://en.wikipedia.org/wiki/Snake_case)). Refer to [the template specification](template.md) for more details on the provided attributes:
+* `items` - Array of data records. The record format is similar to the structure of the datasets that are inserted into the database. However, it adds a hierarchical structure, and it follows different naming conventions (using [camelCase](https://en.wikipedia.org/wiki/Camel_case) instead of [snake_case](https://en.wikipedia.org/wiki/Snake_case)). Refer to [the template specification](template.md) for more details on the provided attributes:
 
   * `id` - Unique record identifier.
   * `originalName` - Taxon name as reported in the original source.
@@ -16,7 +16,7 @@ The API response returns an JSON object with the following structure:
   * `frequency` - Relative frequency of occurrence.
   * `sampleSize` - Total number of observations per record.
   * `treatment` - Treatment conditions if applicable.
-  * `eventDate` - Temporal specification of the record. Consists of the following parts:
+  * `eventDate` - Temporal specification of the record. It consists of the following parts:
 
     * `text` - original value as provided in the dataset. Maps to the `date` column in [the template](template.md).
     * `start` - parsed beginning of the event.
@@ -31,7 +31,7 @@ The API response returns an JSON object with the following structure:
     * `species` - Taxonomic species.
     * `subspecies` - Taxonomic subspecies.
 
-  * `traint` - Information about the observed trait. Consists of:
+  * `trait` - Information about the observed trait. Consists of:
 
     * `id` - Unique trait ID.
     * `abbrev` - Unique trait abbreviation.
@@ -95,11 +95,11 @@ The API response returns an JSON object with the following structure:
   
   * `note` - Any note related to information provided
   * `rowLink` - To mark data from the same study, same individuals, or same populations.
-* `limit` - NUmber of records that were requested in the query.
+* `limit` - Number of records that were requested in the query.
 * `offset` - Number of records skipped (used for query paging - see below).
 * `count` - Total number of records matching the filter.
 * `restricted` - Boolean indicating if the query filter matches records with a restricted usage.
-* `restrictedDatasets` - An array of dataset identifiers. Every dataset in the list has an usage restriction in place. The array items consist of:
+* `restrictedDatasets` - An array of dataset identifiers. Every dataset in the list has a usage restriction in place. The array items consist of:
   
   * `id` - Unique dataset id.
   * `name` - Dataset name.
@@ -223,15 +223,15 @@ The most generic query with optional filters in place looks like this:
 
 <https://spidertraits.sci.muni.cz/backend/data/family/*/genus/*/species/*/original-name/*/trait-category/*/trait/*/method/*/location/*/country/*/dataset/*/authors/*/reference/*/row-link/*>
 
-Asterisk (`*`) serves as a wildcard meaning *all values*.
+Asterisk (`*`) serves as a wildcard, meaning *all values*.
 
-The easiest way to construct the filter is use to the WSTDB Data Explorer to compose the query and then use the *Share* button to get the link with the filter configured. Then modify the link to include `backend` before the `/data` part of the link to retrieve the results in JSON.
+The easiest way to construct the filter is to use the WSTDB Data Explorer to compose the query and then use the *Share* button to get the link with the filter configured. Then modify the link to include `backend` before the `/data` part of the link to retrieve JSON results.
 
-If you need to construct the filter programatically, you will have to use the other endpoints of the API. We will illustrate this approach by the following example:
+If you need to construct the filter programmatically, you will have to use the other endpoints of the API. We will illustrate this approach by the following example:
 
-The goal is to retrieve record for the *Atypus affinis* taxon.
+The goal is to retrieve records for the *Atypus affinis* taxon.
 
-First, we have to query thr taxonomy endpoint to get the ID of the taxon:
+First, we have to query the taxonomy endpoint to get the ID of the taxon:
 
 ```http
 GET https://spidertraits.sci.muni.cz/backend/taxonomy?searchField=fullName&searchValue=Atypus+affinis
@@ -277,11 +277,11 @@ This approach is similar for all the other query parameters.
 
 We can define three paging parameters for each query:
 
-* `count` - if set to true (`count=true`), the response will contain information about the total number of records matching the filter. Usually used only with the query for the first page.
+* `count` - if set to true (`count=true`), the response will contain information about the total number of records matching the filter.  The parameter is usually used only with the query for the first page.
 * `limit` - number of records returned. Default is 10 records.
-* `offset` - number of records from start to ommit. Used for subsequent queries to fetch more pages. Default is 0.
+* `offset` - number of records from start to omit. The parameter is used for subsequent queries to fetch more pages. Default is 0.
 
-A na example of subsequent queries:
+An example of subsequent queries:
 
 ```http
 
