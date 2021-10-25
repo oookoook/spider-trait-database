@@ -177,7 +177,7 @@
           Stano Pekar, Caroline Sayuri, and Jonas Wolff.
           -->
           <div class="subtitle-2">
-          Pekár et al. 2021. The world spider trait database v1.0. Masaryk University, Brno
+          Pekár S. et al. 2021. The World Spider Trait database: a centralised global open repository for curated data on spider traits. Database 2021: baab064.
           <!-- , doi: -->
           </div>
         </v-col>
@@ -201,7 +201,7 @@
 </template>
 
 <script>
-import { mapState, mapGetters } from 'vuex'
+import { mapGetters } from 'vuex'
 import Auth from './mixins/auth'
 export default {
   name: 'App',
@@ -212,13 +212,14 @@ export default {
   data: () => ({
   }),
   computed: {
-    showLargeLogo() {
+    showLargeLogo () {
       switch (this.$vuetify.breakpoint.name) {
-          case 'xs': return true; 
-          case 'sm': 
-          case 'md': return false;
-          case 'lg': 
-          case 'xl': return true;
+        case 'xs': return true
+        case 'sm':
+        case 'md': return false
+        case 'lg':
+        case 'xl':
+        default: return true
       }
     },
     ...mapGetters(['notification'])

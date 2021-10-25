@@ -48,12 +48,11 @@
       <v-row justify="space-around mt-16">
         <v-col cols="6">
         <p class="about-text text-center text-xl-h5 text-subtitle-1">
-          The use of this database is limited to <b>research, educational, non-commercial use</b>. 
-          Contained data are publicly available under a CC BY license (Creative Commons Attribution). 
-          The user is free to download, share and adapt the data, as long as the Database is cited 
+          The use of this database is not limited. Contained data are publicly available under a CC BY license (Creative Commons Attribution).
+          The user is free to download, share and adapt the data, as long as the Database is cited
           as the source of the information. This database should be cited as follows:</p>
           <blockquote class="blockquote about-text text-center">
-          Pekár S., Černecká Ľ., Wolff J., Mammola S., Cardoso P., Lowe E., Fukushima C.S., Birkhofer K. &amp; Herberstein M.E. 2021. The world spider trait database v1.0. Masaryk University, Brno, URL: https://spidertraits.sci.muni.cz
+          Pekár S., Wolff J., Černecká Ľ., Birkhofer K., Mammola S., Lowe E.C., Fukushima C.S., Herberstein M.E., Kučera A., Buzatto B., Djoudi E.A., Domenech M., Enciso A.V., Piñanez Espejo Y.M.G., Febles S., García L.F., Gonçalves-Souza T.,  Isaia M., Lafage D., Líznarová E., Macías-Hernánde N., Magalhães I., Malumbres-Olarte J., Michálek O., Michalik P., Michalko R., Milano F.,  Munévar A., Nentwig W., Nicolosi G., Painting C.J., Pétillon J., Piano E., Privet K., Ramírez M.J., Ramos C., Řezáč M., Ridel A., Růžička V., Santos I., Sentenská L., Walker L., Wierucka K., Zurita G.A. &amp; Cardoso P. 2021. The World Spider Trait database: a centralised global open repository for curated data on spider traits. Database 2021: baab064.
           </blockquote>
         <v-img class="mx-auto mt-16" contain width="153" height="94" :src="require('../assets/edu.png')" />
         </v-col>
