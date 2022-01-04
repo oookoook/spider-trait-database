@@ -53,6 +53,18 @@ There are prepared scripts for backuping the databse in the `db/backup` director
 
 You can call the backup manually: `backup` or `backup full` (the later command forces the script to make the full backup, removing all the older backups in the directory).
 
+## Restoring database backups
+
+1. Get all the backups since last full backup (e.g. from Bacula tape drive). In the following example, the folder is called `backup`.
+1. Prepare the backup using the procedure described in [MariaDB docs](https://mariadb.com/kb/en/incremental-backup-and-restore-with-mariabackup/) - run the commands from the directory *above* the `backup`
+
+    1. Prepare the full backup: `mariabackup --prepare --target-dir=$(find ./backup -name "*-full")`
+    1. Apply all incremental backup files: `find ./backup -name "*-incr" -print0 | sort -z | xargs -r0 -I{} --verbose mariabackup --prepare --target-dir=$(find ./backup -name "*-full") --incremental-dir={}`  
+
+1. Stop the MariaDB process - try `systemctl stop mariadb`
+1. Restore the backup: `mariabackup --copy-back --force-non-empty-directories --target-dir=$(find ./backup -name "*-full")`
+1. Start the MariaDB process: `systemctl start mariadb`
+
 ## Schema model
 
 * The `db-model.mwb` file is created in MySQL Workbench tool and contains the database design.
