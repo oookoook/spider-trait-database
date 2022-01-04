@@ -18,4 +18,4 @@ ln -sfn $TRGT $LAST
 # deleting the old backups
 # https://www.tecmint.com/delete-all-files-in-directory-except-one-few-file-extensions/
 # https://linuxize.com/post/remove-directory-linux/
-find $SPIDERTRAITS_BACKUP_DIR -type d -not \( -path "$SPIDERTRAITS_BACKUP_DIR" -or -name 'last' -or -name "$DATESTR-full" \) -exec rm -rf {} +
+find $SPIDERTRAITS_BACKUP_DIR -maxdepth 1 -type d -not \( -path "$SPIDERTRAITS_BACKUP_DIR" -or -name 'last' -or -name "$DATESTR-full" \) -exec rm -rf {} +
