@@ -143,7 +143,8 @@ const updateTaxonLinks =async function(conn) {
     
     // get valid_wsc_id if not null and get the taxon and insert
     var  missing = await db.cquery(conn, {table: 'taxonomy', sql: 'SELECT DISTINCT valid_wsc_lsid FROM taxonomy WHERE valid = 0 AND valid_wsc_lsid IS NOT NULL AND valid_id is NULL'});
-    missing.forEach(m => {
+    for(let i = 0; i < missing.length; i++) {
+        let m = missing[i]
         try {
             let t = await getTaxonFromWsc(m['valid_wsc_lsid']);
             await updateTaxon(conn, t);
@@ -152,7 +153,7 @@ const updateTaxonLinks =async function(conn) {
             console.dir(t);
             console.dir(e);
         }
-    });
+    };
 
 
     // update all the existing records in the data table
