@@ -1,5 +1,5 @@
 const db = require('./db-client');
-const { getFullName } = require('../api/taxonomy');
+const { getFullName } = require('./taxonomy-common');
 const axios = require('axios');
 const settings = require('../settings');
 
@@ -149,8 +149,8 @@ const updateTaxonLinks =async function(conn) {
             let t = await getTaxonFromWsc(m['valid_wsc_lsid']);
             await updateTaxon(conn, t);
         } catch(e) {
-            console.log(`Error updating ${m}`);
-            console.dir(t);
+            console.log(`Error updating ${JSON.stringify(m)}`);
+            //console.dir(t);
             console.dir(e);
         }
     };

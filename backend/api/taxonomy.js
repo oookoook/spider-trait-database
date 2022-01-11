@@ -1,4 +1,5 @@
 var db = null;
+const { getFullName } = require('../util/taxonomy-common');
 
 const validName = async function(params, query) {
     console.dir(query);
@@ -233,25 +234,7 @@ const remove = async function(params, auth) {
     return await db.deleteEntity({params, table: 'taxonomy', auth, validate: validateDelete });
 }
 
-const getFullName = (r) => {
-    if(!r.genus) {
-        return r.family;
-    }
-    var t = [ r.genus ]
-    if(r.species) {
-        t.push(r.species);
-    }
-  
-    if(r.subspecies) {
-        t.push(r.subspecies);
-    }
-    
-    if(t.length == 1) {
-        t.push('sp.');
-    }
 
-    return t.join(' ');
-}
 
 const getTaxonFromFullName = function(fullName) {
     var parts = fullName.split(' ');
