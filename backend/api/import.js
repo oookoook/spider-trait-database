@@ -950,6 +950,12 @@ const deleteColumn = async function(params, auth) {
     if (v == 'empty') {
         v = '';
     }
+    if(v == 'true' || v == 1) {
+        v = true;
+    }
+    if(v == 'false' || v === 0 || v === '0') {
+        v = false;
+    }
     var results = await db.query({table: 'import', sql:`DELETE import FROM ${joind} WHERE dataset_id = ? AND ??=? AND ${aw}`, values: [ds, column, v] });
     return {
         affected: results.affectedRows
