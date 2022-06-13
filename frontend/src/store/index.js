@@ -17,8 +17,8 @@ import api from './api'
 import data from './data'
 import editor from './editor'
 import jobs from './jobs'
+import doi from './doi'
 import EntityModule from './entity-module'
-
 
 
 export default new Vuex.Store({
@@ -42,6 +42,7 @@ export default new Vuex.Store({
     imports: new EntityModule('import'),
     editor,
     data,
-    jobs
+    jobs,
+    doi
   }
 })

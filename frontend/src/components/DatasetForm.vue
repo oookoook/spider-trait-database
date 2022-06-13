@@ -17,6 +17,7 @@
             label="Dataset name"
             prepend-icon="mdi-table-search"
             :suffix="dataset.suffix"
+            :readonly="!!dataset.doi"
             required
           ></v-text-field>
             </v-col>
@@ -41,19 +42,38 @@
           </v-col>
           </v-row>
           <v-text-field
-            v-model="dataset.authors"
-            :counter="4096"
-            label="Authors"
-            :rules="authorsRules"
-            prepend-icon="mdi-table-edit"
-          ></v-text-field>
-          <v-text-field
             v-model="dataset.authorsEmail"
             label="Author email(s)"
             :counter="255"
             prepend-icon="mdi-at"
             :rules="aemailRules"
           ></v-text-field>
+          <!--<v-text-field
+            v-model="dataset.authors"
+            :counter="4096"
+            label="Authors"
+            :rules="authorsRules"
+            prepend-icon="mdi-table-edit"
+            :readonly="!!dataset.doi"
+          ></v-text-field>
+          -->
+          <dataset-authors-editor v-model="dataset.authors" :readonly="!!dataset.doi" />
+          <!--
+          <v-text-field
+            v-model="dataset.orcid"
+            label="First author ORCID"
+            prepend-icon="mdi-account-search-outline"
+            :rules="orcidRules"
+            :readonly="!!dataset.doi"
+          ></v-text-field>
+          
+          <v-text-field
+            v-model="dataset.doi"
+            label="Dataset DOI"
+            readonly
+            prepend-icon="mdi-protocol"
+          ></v-text-field>
+          -->
           <v-switch v-model="dataset.restricted" label="Restricted access" />
           <v-textarea
             v-model="dataset.notes"
@@ -61,7 +81,7 @@
             rows="5"
             prepend-icon="mdi-note-text-outline"
         ></v-textarea>
-
+          
         </v-form>
       </v-card-text>
     <v-card-actions>
@@ -74,11 +94,13 @@
 <script>
 
 import ActionButton from './ActionButton'
+import DatasetAuthorsEditor from './DatasetAuthorsEditor.vue'
 
 export default {
   name: 'DatasetForm',
   components: {
-    ActionButton
+    ActionButton,
+    DatasetAuthorsEditor
   },
   props: { value: Object, loading: Boolean, create: Boolean },
   data () {
@@ -103,6 +125,9 @@ export default {
       aemailRules: [
         v => !v || v.length <= 255 || 'Author email(s) must be less than 255 characters'
       ],
+      orcidRules: [
+        v => !!v || /$\d{4}-\d{4}-\d{4}-\d{4}^/.test(v) || 'This not a valid ORCID'
+      ]
     }
   },
   computed: {
@@ -125,11 +150,9 @@ export default {
       } else {
         this.$store.dispatch('notify', {error: true, text: 'Please correct the invalid inputs before saving.'})
       }
-    }
-
+    },
   },
   created () {
-
   },
   mounted () {
   }

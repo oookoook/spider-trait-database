@@ -38,5 +38,13 @@ module.exports = {
     api: {
         secret: 'a'
     },
+    dataCite: {
+        url: 'https://api.test.datacite.org',
+        editUrl: 'https://doi.test.datacite.org',
+        prefix: '10.82248',
+        user: 'TODO',
+        password: 'TODO',
+        publisher: 'Masaryk University'
+    },
     baseUrl: 'http://localhost:8080'
 }

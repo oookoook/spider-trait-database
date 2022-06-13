@@ -53,5 +53,13 @@ module.exports = {
     api: {
         secret: 'TODO'
     },
+    dataCite: {
+        url: 'https://api.datacite.org',
+        editUrl: 'https://doi.datacite.org',
+        prefix: '10.82248',
+        user: 'TODO',
+        password: 'TODO',
+        publisher: 'Masaryk University'
+    },
     baseUrl: 'https://spidertraits.sci.muni.cz'
 }

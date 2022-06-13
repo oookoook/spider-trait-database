@@ -12,6 +12,7 @@
         v-on="on"
         :loading="loading"
         :href="link"
+        :disabled="disabled"
         :to="to"
         :target="link ? '_blank' : null"
         ><v-icon>{{ icon }}</v-icon></v-btn>
@@ -25,6 +26,7 @@
       :loading="loading" 
       :href="link"
       :to="to"
+      :disabled="disabled"
       :target="link ? '_blank' : null"
       ><v-icon left>{{ icon }}</v-icon> {{ text }}</v-btn>
     </span>
@@ -37,7 +39,7 @@ export default {
   components: {
   },
   props: { icon: { type: String, default: 'mdi-plus-circle' }, text: { type: String, default: 'Add new' }, 
-  color: String, tooltip: Boolean, toolbar: Boolean, menu: Boolean, small: Boolean, link: String, loading: Boolean, to: String },
+  color: String, tooltip: Boolean, toolbar: Boolean, menu: Boolean, small: Boolean, link: String, loading: Boolean, to: String, disabled: Boolean },
   data () {
     return {
 

@@ -5,15 +5,16 @@
     <v-card-text>
       <v-form v-model="fv" ref="form">
       <v-row v-if="it">
-      <v-col :cols="12" :md="4" v-for="prop in entityProps" :key="prop.name">
-      <v-text-field v-if="!prop.autocomplete && !prop.parent && !prop.switch &&!prop.textarea"
+      <v-col :cols="12" :md="prop.cols || 4" v-for="prop in entityProps" :key="prop.name">
+      <v-text-field v-if="!prop.autocomplete && !prop.parent && !prop.switch &&!prop.textarea &&!prop.component"
         v-model="it[prop.name]"
         :label="prop.label"
-        clearable
+        :clearable="!prop.isReadonly(it)"
         class="mr-3"
         persistent-hint
         :hint="prop.hint"
-        :rules="[prop.isValid]" 
+        :rules="[prop.isValid]"
+        :readonly="prop.isReadonly(it)" 
       ></v-text-field>
       <v-switch v-else-if="prop.switch" 
       v-model="it[prop.name]"
@@ -33,6 +34,7 @@
             :rules="[prop.isValid]"
             rows="1"
         ></v-textarea>
+      <component v-else-if="prop.component" :is="prop.component" v-model="it[prop.name]" :readonly="prop.isReadonly(it)" />
       <v-text-field v-else-if="!prop.autocomplete"
         v-model="it[prop.parent][prop.name]"
         :label="prop.label"
@@ -89,13 +91,15 @@
 import ActionButton from './ActionButton'
 import AutocompleteProvider from './AutocompleteProvider'
 import DataFilter from './DataFilter'
+import DatasetAuthorsEditor from './DatasetAuthorsEditor'
 
 export default {
   name: 'EntityDialog',
   components: {
     ActionButton,
     AutocompleteProvider,
-    DataFilter
+    DataFilter,
+    DatasetAuthorsEditor
   },
   props: { item: Object, create: Boolean, loading: Boolean, entityProps: Array, breadcrumbs: Array, 
   confirmationText: { type: String, default: 'Are you sure you want to delete the entity? This can\'t be undone.'}},
@@ -138,7 +142,7 @@ export default {
         }
         if(!this.it[e.parent]) {
           this.it[e.parent]  = {};
-        };
+        }
         this.it[e.parent][e.name] = null;
       } else {
         this.it[e.name] = null;

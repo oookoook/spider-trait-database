@@ -167,7 +167,7 @@ router.route('/datasets')
 
 router.route('/datasets/:id')
   .get(function (req, res) {
-    datasets.get(req.params).then(r => res.json(r)).catch(e => { err(e); res.sendStatus(400); })
+    datasets.get(req.params, req.resourcesAuth).then(r => res.json(r)).catch(e => { err(e); res.sendStatus(400); })
   })
   .put(requiresAuth(), auth.isContributor, function (req, res) {
     datasets.update(req.params, req.body, req.resourcesAuth).then(r => res.json(r)).catch(e => { err(e); res.sendStatus(400); })
@@ -176,6 +176,13 @@ router.route('/datasets/:id')
     datasets.remove(req.params, req.resourcesAuth, settings.files.sourceDir).then(r => res.json(r)).catch(e => { err(e); res.sendStatus(400); })
   })
 
+router.route('/datasets/:id/doi')
+  .get(function (req, res) {
+    datasets.getDoi(req.params, req.resourcesAuth).then(r => res.json(r)).catch(e => { err(e); res.sendStatus(400); })
+  })
+  .post(requiresAuth(), auth.isEditor, function (req, res) {
+    datasets.createDoi(req.params, req.body, req.resourcesAuth).then(r => res.json(r)).catch(e => { err(e); res.sendStatus(400); })
+  })
 
 router.route('/data/family/:family/genus/:genus/species/:species/original-name/:origname/trait-category/:traitcat/trait/:trait/method/:method/location/:location/country/:country/dataset/:dataset/authors/:authors/reference/:reference/row-link/:rowl')
   .get(function (req, res) {
