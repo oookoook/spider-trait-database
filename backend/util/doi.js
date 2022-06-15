@@ -4,6 +4,7 @@ const settings = require('../settings');
 
 const convertDataset = (dataset, year, event) => {
     let title = dataset.name;
+    let records = dataset.records;
     authors = dataset.authors.split(',').map(a => {
         let affiliation = null;
         let nameIdentifiers = [];
@@ -50,7 +51,8 @@ const convertDataset = (dataset, year, event) => {
         authors,
         url,
         year,
-        event
+        event,
+        records
     }
 }
 
@@ -58,7 +60,7 @@ const getEditUrl = (doi) => {
   return `${settings.dataCite.editUrl}/dois/${encodeURIComponent(doi)}/edit`;
 }
 
-const createDoi = async ({title, authors, url, year, event}) => {
+const createDoi = async ({title, authors, url, year, records, event}) => {
 /*
 https://api.test.datacite.org/dois
 {
@@ -96,10 +98,16 @@ https://api.test.datacite.org/dois
             "types": {
               "resourceTypeGeneral": "Dataset"
             },
+            "sizes": [ `${records} records` ],
             "url": url
           }
         }
-      }    
+      }
+    
+    if(settings.dataCite.commonAttributes) {
+      Object.assign(data.data.attributes, settings.dataCite.commonAttributes);
+    }
+      
     if(event) {
       data.data.attributes.event = event;
     }

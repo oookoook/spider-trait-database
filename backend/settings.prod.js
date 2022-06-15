@@ -59,7 +59,40 @@ module.exports = {
         prefix: '10.82248',
         user: 'TODO',
         password: 'TODO',
-        publisher: 'Masaryk University'
+        publisher: 'Masaryk University',
+        commonAttributes: {
+            "subjects":[
+                {
+                "subject": "FOS: Biological sciences",
+                "valueUri": "http://www.oecd.org/science/inno/38235147.pdf",
+                "schemeUri": "http://www.oecd.org/science/inno",
+                "subjectScheme": "Fields of Science and Technology (FOS)"
+                }
+            ],
+            "formats":[
+                "CSV"
+            ],
+            "relatedIdentifiers":[
+                {
+                "schemeUri": null,
+                "schemeType": null,
+                "relationType": "IsCitedBy",
+                "relatedIdentifier": "https://doi.org/10.1093/database/baab064",
+                "resourceTypeGeneral": "Collection",
+                "relatedIdentifierType": "URL",
+                "relatedMetadataScheme": null
+                }
+            ],
+            "rightsList":[
+                {
+                "rights": "Creative Commons Attribution 4.0 International",
+                "rightsUri": "https://creativecommons.org/licenses/by/4.0/legalcode",
+                "schemeUri": "https://spdx.org/licenses/",
+                "rightsIdentifier": "cc-by-4.0",
+                "rightsIdentifierScheme": "SPDX"
+                }
+            ],
+        }
     },
     baseUrl: 'https://spidertraits.sci.muni.cz'
 }
