@@ -1,4 +1,4 @@
-// node ./doi-batch-creator 0 10
+// node ./doi-batch-creator 0 10 all
 const db = require('../util/db-client');
 let ds = require('../api/datasets')(db);
 let doiapi = require('./doi');

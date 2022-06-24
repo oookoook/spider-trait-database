@@ -44,16 +44,26 @@ const validate = async function(reference) {
     return (r.length == 0 || (reference.id && r[0].id == reference.id)) ? true : 'Reference abbrev. is already used.';
 }
 
-const getAbbrev = function (val) {
+const getAbbrev = async function (val) {
     val = val || '';
     var yearPos = val.search(/. \d\d\d\d./);
-    return db.unique(val.substr(0, Math.min(yearPos > 0 ? yearPos + 6 : 50, 50)));
+    var abbrev = val.substr(0, Math.min(yearPos > 0 ? yearPos + 6 : 50, 50)); 
+    abbrev = abbrev.replace(/ [A-Z]+\.?([ ,])/g,'$1');
+    if(abbrev.indexOf(',') > -1) {
+        abbrev = abbrev.replace(/,.*(\d{4})/, ' et al. $1');
+    }
+    var r = await db.query({table: 'reference', sql: 'SELECT id FROM reference WHERE abbrev = ?', values: [abbrev], nestTables: false});
+    if(!(r.length == 0 || (abbrev && r[0].id == abbrev))) {
+        abbrev = db.unique(abbrev);
+    }
+    
+    return abbrev;
 }
 
-const prepareForSql = function(reference) {
+const prepareForSql = async function(reference) {
     // prepare reference - create the abbrev
     if(!reference.abbrev) {
-        reference.abbrev = getAbbrev(reference.fullCitation);
+        reference.abbrev = await getAbbrev(reference.fullCitation);
     }
     reference['full_citation'] = reference.fullCitation;
     delete(reference.fullCitation);
