@@ -1,5 +1,5 @@
 <template>
-    <v-card tile :loading="loading">
+    <v-card tile :loading="loading" :style="style">
       <v-card-title>{{ actionText }}
         <!--
         <v-spacer />
@@ -134,6 +134,13 @@ export default {
     actionText() {
       return this.create ? 'Create dataset' : 'Update dataset'
     },
+    style() {
+      console.debug('recomputing height to ', this.$vuetify.breakpoint.height - 150);
+      return {
+        'overflow-y': 'auto',
+        'max-height': `${this.$vuetify.breakpoint.height - 150}px`
+      }
+    }
   },
   watch: {
     value(val) {
