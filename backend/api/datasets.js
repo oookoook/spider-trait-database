@@ -131,14 +131,13 @@ const validate = async function(dataset) {
     // this is update
     
     if(dataset.id) {
-        let s = await db.query({table: 'dataset', sql: 'SELECT name, authors, orcid, doi FROM dataset WHERE id = ?', values: [dataset.id], nestTables: false});
+        let s = await db.query({table: 'dataset', sql: 'SELECT name, authors, doi FROM dataset WHERE id = ?', values: [dataset.id], nestTables: false});
         let d = s[0];
         if(d.doi != null) { //&& await doi.isPublished(dataset.id)
             let doii = await doi.getDoi(d.doi);
             if(
             dataset.name != doii.spidertraits.name
             || dataset.authors != doii.spidertraits.authors
-            //|| dataset.orcid != d.orcid
             ) {
                 v = 'Name or Authors do not match the DOI information.'
             }
@@ -170,11 +169,7 @@ const createDoi = async function(params, body, auth) {
     if(dataset.doi) {
         throw 'DOI already created';
     }
-    /*
-    if(!dataset.orcid) {
-        throw 'ORCID must be set';
-    }
-    */
+   
     if(!dataset.state == 'approved') {
         throw 'Dataset is not approved';
     }
