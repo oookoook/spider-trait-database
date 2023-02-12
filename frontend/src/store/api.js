@@ -1,4 +1,4 @@
-import Vue from 'vue';
+import axios from 'axios';
 
 const baseUrl = `${process.env.VUE_APP_BACKEND}backend/` //Vue.config.devtools ? 'http://localhost:3000/backend/' : '/backend/';
 
@@ -101,8 +101,8 @@ export default {
             }
             try {
                 var params = getListParams(payload);
-                var result = await Vue.http.get(url, { params });
-                return result.body;
+                var result = await axios.get(url, { params });
+                return result.data;
             } catch (err) {
                 console.error(err);
                 context.dispatch('notify', { error: true, text: `Unable to get records.`});
@@ -116,8 +116,8 @@ export default {
                 return false;
             }
             try {
-                var result = await Vue.http.get(url, { params: payload.query });
-            return result.body;
+                var result = await axios.get(url, { params: payload.query });
+            return result.data;
             } catch (err) {
                 console.error(err);
                 context.dispatch('notify', { error: true, text: `Unable to get record.`});
@@ -131,13 +131,13 @@ export default {
                 return false;
             }
             try {
-                var result = await Vue.http.post(url, payload.body, { params: payload.query });
-                if(result.body.error) {
-                    if(result.body.error == 'validation') {
-                        context.dispatch('notify', { error: true, text: result.body.validation});
+                var result = await axios.post(url, payload.body, { params: payload.query });
+                if(result.data.error) {
+                    if(result.data.error == 'validation') {
+                        context.dispatch('notify', { error: true, text: result.data.validation});
                     }
                 }
-                return result.body;
+                return result.data;
             } catch (err) {
                 console.error(err);
                 context.dispatch('notify', { error: true, text: `Unable to create record.`});
@@ -151,13 +151,13 @@ export default {
                 return false;
             }
             try {
-                var result = await Vue.http.put(url, payload.body, { params: payload.query });
-                if(result.body.error) {
-                    if(result.body.error == 'validation') {
-                        context.dispatch('notify', { error: true, text: result.body.validation});
+                var result = await axios.put(url, payload.body, { params: payload.query });
+                if(result.data.error) {
+                    if(result.data.error == 'validation') {
+                        context.dispatch('notify', { error: true, text: result.data.validation});
                     }
                 }
-                return result.body;
+                return result.data;
             } catch (err) {
                 console.error(err);
                 context.dispatch('notify', { error: true, text: `Unable to update record.`});
@@ -170,13 +170,13 @@ export default {
                 return false;
             }
             try {
-                var result = await Vue.http.delete(url, { params: payload.query });
-                if(result.body.error) {
-                    if(result.body.error == 'validation') {
-                        context.dispatch('notify', { error: true, text: result.body.validation});
+                var result = await axios.delete(url, { params: payload.query });
+                if(result.data.error) {
+                    if(result.data.error == 'validation') {
+                        context.dispatch('notify', { error: true, text: result.data.validation});
                     }
                 }
-                return result.body;
+                return result.data;
             } catch (err) {
                 console.error(err);
                 context.dispatch('notify', { error: true, text: `Unable to delete record.`});

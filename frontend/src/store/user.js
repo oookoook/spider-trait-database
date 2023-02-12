@@ -1,4 +1,4 @@
-import Vue from 'vue';
+import axios from 'axios';
 
 const sessionTimeout = parseInt(process.env.VUE_APP_SESSION_TIMEOUT);
 
@@ -59,8 +59,8 @@ export default {
     actions: {
       async getUserInfo(context, payload) {
         try {
-          var result = await Vue.http.get(`${process.env.VUE_APP_BACKEND}user/info`);
-          context.commit('user', { value: result.body });
+          var result = await axios.get(`${process.env.VUE_APP_BACKEND}user/info`);
+          context.commit('user', { value: result.data });
           context.commit('lastAction', { value: Date.now().valueOf() });
         } catch (err) {
           console.error(err);
@@ -74,8 +74,8 @@ export default {
 
       async getApiKey(context, payload) {
         try {
-          var result = await Vue.http.get(`${process.env.VUE_APP_BACKEND}user/key`);
-          context.commit('apiKey', { value: result.body.key });
+          var result = await axios.get(`${process.env.VUE_APP_BACKEND}user/key`);
+          context.commit('apiKey', { value: result.data.key });
         } catch (err) {
           console.error(err);
           throw err;

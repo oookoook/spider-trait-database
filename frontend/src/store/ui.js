@@ -1,4 +1,4 @@
-import Vue from 'vue';
+import axios from 'axios';
 
 export default {
     state: {
@@ -36,10 +36,10 @@ export default {
           value: n
         });
       },
-      async getPublications(context, payloar) {
+      async getPublications(context, payload) {
         try {
-          var md  = await Vue.http.get('https://raw.githubusercontent.com/oookoook/spider-trait-database/master/docs/publications.md');
-          context.commit('publications', { value: md.body });
+          var md  = await axios.get('https://raw.githubusercontent.com/oookoook/spider-trait-database/master/docs/publications.md');
+          context.commit('publications', { value: md.data });
         } catch (err) {
           console.error(err);
           context.dispatch('notify', {error: true, text: 'Unable to load publications.' });
