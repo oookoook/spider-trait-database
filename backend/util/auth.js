@@ -92,8 +92,10 @@ const mockupAuth = function(returnPath, returnPathLogout) {
         sub: mockupLogin,
         name: mockupLogin,
     }};
+    req.oidc.isAuthenticated = () => mockupLogin ? true : false
     if(mockupLogin) {
-        req.oidc.user[claims.name] = [claims.administration, claims.dataEntry, claims.dataValidation].join(',');
+        // old req.oidc.user[claims.name] = [claims.administration, claims.dataEntry, claims.dataValidation].join(',');
+        req.appSession = { claims: { [claims.name]: [claims.administration, claims.dataEntry, claims.dataValidation].join(',') }};
     }
     res.oidc = {
         login: (opts) => {
