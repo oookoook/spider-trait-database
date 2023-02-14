@@ -101,7 +101,8 @@ if(!settings.oidc.disable) {
       req.appSession = req.appSession || {};
       try {
         var t = await client.userinfo(req.openidTokens);
-        //console.dir(t);
+        console.log('additional claims obtained', JSON.stringify(t));
+        console.log('original appsession', JSON.stringify(req.appSession));
         req.appSession.claims = t;
         next();
       } catch(e) {
