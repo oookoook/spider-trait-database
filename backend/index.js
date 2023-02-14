@@ -88,7 +88,7 @@ if(!settings.oidc.disable) {
     /* will be required in a new version */
     secret: settings.oidc.session.secret,
     clientSecret: settings.oidc.secret,
-    routes: false,
+    routes: {},
     authorizationParams: {
         response_type: "code",
         response_mode: "query",
