@@ -99,7 +99,8 @@ if(!settings.oidc.disable) {
         response_mode: "query",
         scope: "openid profile eduperson_entitlement"
     },
-    afterCallback: async function (req, res, session, decodedState) {
+    
+    afterCallbackx: async function (req, res, session, decodedState) {
       // replace this with a new version (appSession instead of identity) once a new relase is made
       /*
       const client = req.oidc.client;
