@@ -88,7 +88,12 @@ if(!settings.oidc.disable) {
     /* will be required in a new version */
     secret: settings.oidc.session.secret,
     clientSecret: settings.oidc.secret,
-    routes: {},
+    routes: {
+      login: '/user/login',
+      logout: '/user/logout',
+      callback: '/login',
+      postLogoutRedirect: '/logout'
+    },
     authorizationParams: {
         response_type: "code",
         response_mode: "query",
@@ -124,9 +129,9 @@ if(!settings.oidc.disable) {
 }
 // route used to show the SSO login screen
 // 
-app.get('/user/login', (req, res) => res.oidc.login({ returnTo: `/login` }));
+//app.get('/user/login', (req, res) => res.oidc.login({ returnTo: `/login` }));
 
-app.get('/user/logout', (req, res) => res.oidc.logout({ returnTo: `/logout` }));
+//app.get('/user/logout', (req, res) => res.oidc.logout({ returnTo: `/logout` }));
 
 
 
