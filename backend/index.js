@@ -114,12 +114,14 @@ if(!settings.oidc.disable) {
         next(e);
       }
       */
+     /*
       const additionalUserClaims = await req.oidc.fetchUserInfo();
       console.log('additonal user claims', additionalUserClaims);
       return {
         ...session,
         ...additionalUserClaims
       };
+      */
     }
   }));
   
