@@ -80,15 +80,13 @@ if(!settings.oidc.disable) {
   }));
   */
   app.use(auth({
-    required: false,
+    authRequired: false,
     issuerBaseURL: settings.oidc.issuer,
     baseURL: settings.oidc.url,
     clientID: settings.oidc.client,
     //appSessionSecret: settings.oidc.session.secret,
     /* will be required in a new version */
-    appSession: {
-      secret: settings.oidc.session.secret
-    },
+    secret: settings.oidc.session.secret,
     clientSecret: settings.oidc.secret,
     routes: false,
     authorizationParams: {
@@ -96,9 +94,10 @@ if(!settings.oidc.disable) {
         response_mode: "query",
         scope: "openid profile eduperson_entitlement"
     },
-    handleCallback: async function (req, res, next) {
+    afterCallback: async function (req, res, session, decodedState) {
       // replace this with a new version (appSession instead of identity) once a new relase is made
-      const client = req.openid.client;
+      /*
+      const client = req.oidc.client;
       req.appSession = req.appSession || {};
       try {
         var t = await client.userinfo(req.openidTokens);
@@ -108,6 +107,13 @@ if(!settings.oidc.disable) {
       } catch(e) {
         next(e);
       }
+      */
+      const additionalUserClaims = await req.oidc.fetchUserInfo();
+      console.log('additonal user claims', additionalUserClaims);
+      return {
+        ...session,
+        ...additionalUserClaims
+      };
     }
   }));
   
@@ -117,9 +123,9 @@ if(!settings.oidc.disable) {
 }
 // route used to show the SSO login screen
 // 
-app.get('/user/login', (req, res) => res.openid.login({ returnTo: `/login` }));
+app.get('/user/login', (req, res) => res.oidc.login({ returnTo: `/login` }));
 
-app.get('/user/logout', (req, res) => res.openid.logout({ returnTo: `/logout` }));
+app.get('/user/logout', (req, res) => res.oidc.logout({ returnTo: `/logout` }));
 
 
 
