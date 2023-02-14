@@ -98,33 +98,6 @@ if(!settings.oidc.disable) {
         response_type: "code",
         response_mode: "query",
         scope: "openid profile eduperson_entitlement"
-    },
-    
-    afterCallbackx: async function (req, res, session, decodedState) {
-      // replace this with a new version (appSession instead of identity) once a new relase is made
-      /*
-      const client = req.oidc.client;
-      req.appSession = req.appSession || {};
-      try {
-        var t = await client.userinfo(req.openidTokens);
-        console.log('additional claims obtained', JSON.stringify(t));
-        console.log('original appsession', JSON.stringify(req.appSession));
-        req.appSession.claims = t;
-        next();
-      } catch(e) {
-        next(e);
-      }
-      */
-     /*
-      const additionalUserClaims = await req.oidc.fetchUserInfo();
-      console.log('additonal user claims', additionalUserClaims);
-      return {
-        ...session,
-        ...additionalUserClaims
-      };
-      */
-     console.dir('afterCallback session', JSON.stringify(session));
-     console.dir('decodedState', JSON.stringify(decodedState));
     }
   }));
   
