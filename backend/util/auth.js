@@ -34,21 +34,21 @@ const resourcesAuth = function (req, res, next) {
     //console.dir(claims);
     //console.dir(req.openid ? req.openid : 'no oidc present');
     //console.dir((req.openid && req.openid.user) ? req.openid.user : 'no openid user');
-    req.resourcesAuth = checkRights(req.oidc?.user);
+    req.resourcesAuth = checkRights(req.oidc?.user, req.header('authorization'));
     //console.dir(req.resourcesAuth);
     next();
 }
 
-const checkRights = function(user) {
+const checkRights = function(user, header) {
     let groups = user?.[claims.name] ?? [];
     let sub = user?.sub;
     return {
         sub, 
-        name: req.oidc && req.oidc.user && req.oidc.user.name ? req.oidc.user.name : sub, 
+        name: user?.name ?? sub, 
         isAdmin: groups.includes(claims.administration),
         isEditor: groups.includes(claims.dataValidation),
         isContributor: groups.includes(claims.dataEntry),
-        validApiKey: verifyKey(req.header('authorization'))
+        validApiKey: verifyKey(header)
     }
 }
 
