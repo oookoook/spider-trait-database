@@ -113,8 +113,14 @@ app.get('/user/logout', (req, res) => res.oidc.logout({ returnTo: `/logout` }));
 
 
 
-app.get('/user/info', requiresAuth(), cauth.resourcesAuth, function (req, res) {
+app.get('/user/info', requiresAuth(), cauth.resourcesAuth, async function (req, res) {
     //console.dir(req.openid.user);
+    // get the additional subs!
+    
+    console.log('current req.appSession', req.appSession);
+    console.log('current req.oidc', req.oidc);
+    const additionalUserClaims = await req.oidc.fetchUserInfo();
+    console.log('obtained additional claims', additionalUserClaims);
     res.json(req.resourcesAuth);
   });
 
