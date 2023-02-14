@@ -112,17 +112,24 @@ app.get('/user/login', (req, res) => res.oidc.login({ returnTo: `/login` }));
 app.get('/user/logout', (req, res) => res.oidc.logout({ returnTo: `/logout` }));
 
 
-
-app.get('/user/info', requiresAuth(), cauth.resourcesAuth, async function (req, res) {
+// additional user claims are usually not obtained at this moment yet
+app.get('/user/info', requiresAuth(), /*cauth.resourcesAuth,*/ async function (req, res) {
     //console.dir(req.openid.user);
     // get the additional subs!
     
     console.log('current req.appSession', req.appSession);
     console.log('current req.oidc', req.oidc);
-    const additionalUserClaims = await req.oidc.fetchUserInfo();
-    console.log('obtained additional claims', additionalUserClaims);
     console.log('idTokenClaims', req.oidc.idTokenClaims);
-    res.json(req.resourcesAuth);
+    console.log('user', req.oidc.user);
+
+    if(!req.oidc.user[settings.oidc.claims.name]) {
+      const additionalUserClaims = await req.oidc.fetchUserInfo();
+      console.log('obtained additional claims', additionalUserClaims);
+      //req.oidc.idTokenClaims[settings.oidc.claims.name]=additionalUserClaims[settings.oidc.claims.name];
+      
+      req.oidc.user[settings.oidc.claims.name]=additionalUserClaims[settings.oidc.claims.name];
+    }
+    res.json(cauth.checkRights(req.oidc.user));
   });
 
 app.get('/user/key', requiresAuth(), cauth.resourcesAuth, function(req, res) {

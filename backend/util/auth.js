@@ -34,9 +34,15 @@ const resourcesAuth = function (req, res, next) {
     //console.dir(claims);
     //console.dir(req.openid ? req.openid : 'no oidc present');
     //console.dir((req.openid && req.openid.user) ? req.openid.user : 'no openid user');
-    var groups = req.oidc.user && req.oidc.user[claims.name] ? req.oidc.user[claims.name] : [];
-    var sub = req.oidc && req.oidc.user && req.oidc.user.sub ? req.oidc.user.sub : null;
-    req.resourcesAuth = {
+    req.resourcesAuth = checkRights(req.oidc?.user);
+    //console.dir(req.resourcesAuth);
+    next();
+}
+
+const checkRights = function(user) {
+    let groups = user?.[claims.name] ?? [];
+    let sub = user?.sub;
+    return {
         sub, 
         name: req.oidc && req.oidc.user && req.oidc.user.name ? req.oidc.user.name : sub, 
         isAdmin: groups.includes(claims.administration),
@@ -44,8 +50,6 @@ const resourcesAuth = function (req, res, next) {
         isContributor: groups.includes(claims.dataEntry),
         validApiKey: verifyKey(req.header('authorization'))
     }
-    //console.dir(req.resourcesAuth);
-    next();
 }
 
 const isAdmin = function (req, res, next) {
@@ -108,6 +112,7 @@ const mockupAuth = function(returnPath, returnPathLogout) {
 
 module.exports = {
     resourcesAuth,
+    checkRights,
     isAdmin,
     isEditor,
     isContributor,
