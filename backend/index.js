@@ -122,14 +122,16 @@ app.get('/user/info', requiresAuth(), /*cauth.resourcesAuth,*/ async function (r
     console.log('idTokenClaims', req.oidc.idTokenClaims);
     console.log('user', req.oidc.user);
 
-    if(!req.oidc.user[settings.oidc.claims.name]) {
+    if(!req.appSession.claims) {
       const additionalUserClaims = await req.oidc.fetchUserInfo();
       console.log('obtained additional claims', additionalUserClaims);
       //req.oidc.idTokenClaims[settings.oidc.claims.name]=additionalUserClaims[settings.oidc.claims.name];
       
-      req.oidc.user[settings.oidc.claims.name]=additionalUserClaims[settings.oidc.claims.name];
+      //req.oidc.user[settings.oidc.claims.name]=additionalUserClaims[settings.oidc.claims.name];
+      req.appSession.claims = { [settings.oidc.claims.name]:  additionalUserClaims[settings.oidc.claims.name]}
     }
-    res.json(cauth.checkRights(req.oidc.user));
+
+    res.json(cauth.checkRights(req.oidc.user, req.appSession));
   });
 
 app.get('/user/key', requiresAuth(), cauth.resourcesAuth, function(req, res) {

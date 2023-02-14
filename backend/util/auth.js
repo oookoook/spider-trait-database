@@ -34,13 +34,13 @@ const resourcesAuth = function (req, res, next) {
     //console.dir(claims);
     //console.dir(req.openid ? req.openid : 'no oidc present');
     //console.dir((req.openid && req.openid.user) ? req.openid.user : 'no openid user');
-    req.resourcesAuth = checkRights(req.oidc?.user, req.header('authorization'));
+    req.resourcesAuth = checkRights(req.oidc?.user, req.appSession, req.header('authorization'));
     //console.dir(req.resourcesAuth);
     next();
 }
 
-const checkRights = function(user, header) {
-    let groups = user?.[claims.name] ?? [];
+const checkRights = function(user, session, header) {
+    let groups = session?.claims?.[claims.name] ?? [];
     let sub = user?.sub;
     return {
         sub, 
