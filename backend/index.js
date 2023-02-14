@@ -121,6 +121,7 @@ app.get('/user/info', requiresAuth(), cauth.resourcesAuth, async function (req, 
     console.log('current req.oidc', req.oidc);
     const additionalUserClaims = await req.oidc.fetchUserInfo();
     console.log('obtained additional claims', additionalUserClaims);
+    console.log('idTokenClaims', req.oidc.idTokenClaims);
     res.json(req.resourcesAuth);
   });
 
