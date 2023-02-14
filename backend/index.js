@@ -122,6 +122,8 @@ if(!settings.oidc.disable) {
         ...additionalUserClaims
       };
       */
+     console.dir('afterCallback session', JSON.stringify(session));
+     console.dir('decodedState', JSON.stringify(decodedState));
     }
   }));
   
