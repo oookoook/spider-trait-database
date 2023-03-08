@@ -47,7 +47,8 @@ module.exports = (settings) => {
         auth: {
             user: settings.mail.user, // generated ethereal user
             pass: settings.mail.pass // generated ethereal password
-        }
+        },
+        tls: settings.mail.tls
     });
     transporter.verify(function (error, success) {
         if (error) {
