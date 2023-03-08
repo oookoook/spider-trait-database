@@ -1,4 +1,5 @@
 const nodemailer = require('nodemailer');
+const fs = require('fs');
 
 var transporter = null;
 var sender = null;
@@ -40,6 +41,13 @@ module.exports = (settings) => {
     sender = settings.mail.sender;
     admins = settings.mail.admins;
     baseUrl = settings.baseUrl;
+    let tls = settings.mail.tls;
+    // using the https cert when cert and key are set just to true
+    if(tls?.key === true || tls?.cert === true) {
+        tls.key = fs.readFileSync(settings.https.key),
+        tls.cert = fs.readFileSync(settings.https.crt),
+        tls.passphrase = settings.https.passphrase
+    }
     transporter = nodemailer.createTransport({
         host: settings.mail.host,
         port: settings.mail.port,
@@ -48,7 +56,7 @@ module.exports = (settings) => {
             user: settings.mail.user, // generated ethereal user
             pass: settings.mail.pass // generated ethereal password
         },
-        tls: settings.mail.tls
+        tls 
     });
     transporter.verify(function (error, success) {
         if (error) {
