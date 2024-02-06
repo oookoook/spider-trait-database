@@ -116,12 +116,12 @@ app.get('/user/logout', (req, res) => res.oidc.logout({ returnTo: `/logout` }));
 app.get('/user/info', requiresAuth(), /*cauth.resourcesAuth,*/ async function (req, res) {
     //console.dir(req.openid.user);
     // get the additional subs!
-    
+    console.log('user info endpoint called', new Date().toISOString());
     console.log('current req.appSession', req.appSession);
     console.log('current req.oidc', req.oidc);
     console.log('idTokenClaims', req.oidc.idTokenClaims);
     console.log('user', req.oidc.user);
-
+    
     if(!req.appSession.claims) {
       const additionalUserClaims = await req.oidc.fetchUserInfo();
       console.log('obtained additional claims', additionalUserClaims);
@@ -130,8 +130,9 @@ app.get('/user/info', requiresAuth(), /*cauth.resourcesAuth,*/ async function (r
       //req.oidc.user[settings.oidc.claims.name]=additionalUserClaims[settings.oidc.claims.name];
       req.appSession.claims = { [settings.oidc.claims.name]:  additionalUserClaims[settings.oidc.claims.name]}
     }
-
-    res.json(cauth.checkRights(req.oidc.user, req.appSession));
+    let rights = cauth.checkRights(req.oidc.user, req.appSession);
+    console.log('final rights', rights);
+    res.json(rights);
   });
 
 app.get('/user/key', requiresAuth(), cauth.resourcesAuth, function(req, res) {
