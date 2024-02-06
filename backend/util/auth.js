@@ -35,6 +35,7 @@ const resourcesAuth = function (req, res, next) {
     //console.dir(req.openid ? req.openid : 'no oidc present');
     //console.dir((req.openid && req.openid.user) ? req.openid.user : 'no openid user');
     req.resourcesAuth = checkRights(req.oidc?.user, req.appSession, req.header('authorization'));
+    console.log('resourcesAuth', req.originalUrl, new Date().toISOString());
     console.dir(req.resourcesAuth);
     next();
 }
