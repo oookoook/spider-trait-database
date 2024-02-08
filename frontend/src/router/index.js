@@ -183,6 +183,8 @@ const router = new VueRouter({
 router.beforeEach((to, from, next) => {
   if(!!router.app.$store.getters.user) {
     router.app.$store.dispatch('getUserInfo').then(() => next());
+  } else {
+    next();
   }
   
   //next();
