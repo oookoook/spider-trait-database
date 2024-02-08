@@ -181,7 +181,11 @@ const router = new VueRouter({
 })
 
 router.beforeEach((to, from, next) => {
-  router.app.$store.dispatch('getUserInfo')
+  if(!!router.app.$store.user) {
+    router.app.$store.dispatch('getUserInfo');
+  }
+  
+  next();
 })
 
 export default router
