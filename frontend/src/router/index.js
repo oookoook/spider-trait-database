@@ -1,4 +1,5 @@
 import Vue from 'vue'
+import store from '/vuex'
 import VueRouter from 'vue-router'
 import Home from '../views/Home.vue'
 
@@ -177,6 +178,10 @@ const router = new VueRouter({
   scrollBehavior (to, from, savedPosition) {
     return { x: 0, y: 0 }
   }
+})
+
+router.beforeEach((to, from, next) => {
+  router.app.$store.dispatch('getUserInfo')
 })
 
 export default router
