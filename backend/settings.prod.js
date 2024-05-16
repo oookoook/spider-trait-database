@@ -11,7 +11,7 @@ module.exports = {
     },
     oidc: {
         client: 'TODO',
-        issuer: 'https://oidc.muni.cz/oidc',
+        issuer: 'https://id.muni.cz/oidc',
         secret: 'TODO',
         url: 'https://spidertraits.sci.muni.cz',
         session: {
