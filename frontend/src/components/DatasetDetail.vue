@@ -7,7 +7,7 @@
       </v-card-text>
         <v-list  v-if="item" three-line>
           <list-item title="DOI" icon="mdi-protocol" >
-            <a v-if="item.doi" :href="`https://search.datacite.org/works/${item.doi}`">{{ item.doi}}</a>
+            <a v-if="item.doi" :href="`https://doi.datacite.org/dois/${encodeURIComponent(item.doi)}`">{{ item.doi}}</a>
             <span v-else>Not assigned</span>
           </list-item>
           <list-item title="Uploader" :text="item.uploader" icon="mdi-account" />
