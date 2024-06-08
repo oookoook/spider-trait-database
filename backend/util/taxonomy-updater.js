@@ -103,6 +103,10 @@ const py = (v) => v && v.length > 0 ? parseInt(v.substr(v.length-4,4)) : null;
 const ph = (v) => v.substr(v.indexOf('urn'));
 
 const updateTaxon = async function(conn, t) {
+    if(!t) {
+        //console.error('No taxon provided');
+        return;
+    }
     var id = await getExistingRecord(conn, t.taxon.lsid);
 
     var record = {
