@@ -115,7 +115,7 @@ const getTaxonFromWsc = async function(lsid) {
 const p = (v) => v && v.length > 0 ? v : null; 
 const pb = (v) => v ? v.replace(/\(|\)/g, '') : null;
 const pa = (v) => v && v.length > 0 ? v.substr(0, v.length - 6) : null;
-const py = (v) => v && v.length > 0 ? parseInt(v.substr(v.length-4,4)) : null;
+const py = (v) => v && v.length > 0 ? ((y) => Number.isNaN(y) ? null : y)(parseInt(v.substr(v.length - 4, 4), 10)) : null;
 const ph = (v) => v.substr(v.indexOf('urn'));
 
 const updateTaxon = async function(conn, t) {
