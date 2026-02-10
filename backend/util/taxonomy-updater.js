@@ -27,7 +27,7 @@ const getIdsFromWsc = async function(type, date) {
             lsids = lsids.concat(res.data.updates);
             console.log(`[getIdsFromWsc] Page ${page} fetched, ${res.data.updates.length} updates received (total so far: ${lsids.length})`);
             page+=1;
-            hasLast = res.data._links.last != null && !res.data._links.last.equals(res.data._links.self);
+            hasLast = res.data._links.last != null && res.data._links.last !== res.data._links.self;
         } catch(e) {
             console.error(`[getIdsFromWsc] ERROR fetching ${type} page ${page}: ${e.message}`);
             if(e.response) {
