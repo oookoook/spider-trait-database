@@ -158,6 +158,7 @@
 <script>
 import { mapState, mapGetters } from 'vuex'
 import {mixin as VueTimers} from 'vue-timers'
+import { setOrder } from '@/store/order-sync'
 
 import ActionButton from './ActionButton'
 import InfoIcon from './InfoIcon'
@@ -374,7 +375,10 @@ export default {
     refreshDS() {
       if(this.id) {
         this.loading = true;
-        this.$store.dispatch(`imports/get`,{ id: this.id }).then(() => {this.loading = false; });
+        this.$store.dispatch(`imports/get`,{ id: this.id }).then(() => {
+          this.loading = false;
+          setOrder(this.$store, this.dataset && this.dataset.order);
+        });
       }
     },
     uploadFile(f) {

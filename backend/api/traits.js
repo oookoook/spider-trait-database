@@ -3,7 +3,7 @@ var db = null;
 
 
 const list = async function(limits) {
-    const join = 'trait LEFT JOIN trait_category ON trait.trait_category_id = trait_category.id';
+    const join = 'trait_order_view trait LEFT JOIN trait_category ON trait.trait_category_id = trait_category.id';
     
     var res = await db.prepareListResponse(limits, 'trait', null, null, join);
     
@@ -109,7 +109,7 @@ const synonyms = {
 
 module.exports = function(dbClient) {
     db = dbClient;
-    db.addSynonyms('traits','trait', synonyms);
+    db.addSynonyms('traits','trait_order_view', synonyms);
     return {
         list,
         get,

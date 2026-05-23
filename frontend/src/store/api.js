@@ -33,6 +33,7 @@ const getListParams = function(payload) {
     var count = payload.count;
     var sortField = (payload.options.sortBy && payload.options.sortBy[0]) ? payload.options.sortBy[0] : null;
     var sortDirection = (payload.options.sortDesc && payload.options.sortDesc[0]) ? 'desc' : 'asc';
+    var order = (payload.order) ? payload.order : null;
 
     //sortField = adjustSortField(sortField);
 
@@ -55,6 +56,11 @@ const getListParams = function(payload) {
         params.sortField = sortField;
         params.sortDirection = sortDirection;
     }
+
+    if(order) {
+        params.order = order;
+    }
+
     //console.dir(params);
     return params;
 }

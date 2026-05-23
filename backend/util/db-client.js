@@ -53,6 +53,13 @@ const addLimits = function (values, limits, table, hasWhere, aggregate, customWh
     } else {
         whereClause = ` ${searchStart} 1=1`;
     }
+
+    if(limits.order) {
+        whereClause += ` AND ?? = ?`;
+        values.push(getSynonym(table, 'order'));
+        values.push(limits.order.value);
+    }
+
     if(limits.search) {
         //whereClause = ` ${searchStart} ${mysql.escapeId(table+'.'+limits.search.field)} ${op} '${mysql.escape(limits.search.value)}${wildcard}'`;
         //console.log(`has search: `);
@@ -195,6 +202,10 @@ const limits = function (req, res, next) {
         };
     }
 
+    if(req.query.order) {
+        req.recordLimit.order = req.query.order;
+    }
+
     next();
 }
 
@@ -222,7 +233,7 @@ const prepareListResponse = async function (limits, table, customWhereClause, cu
     return res;
 }
 
-const getAutocomplete = async function(endpoint, valueField, textField, search, count, searchByValue, searchFromStart) {
+const getAutocomplete = async function(endpoint, order, valueField, textField, search, count, searchByValue, searchFromStart) {
     
     var qt = getSynonym(endpoint); 
     var vf = getSynonym(endpoint, valueField);
@@ -246,6 +257,8 @@ const getAutocomplete = async function(endpoint, valueField, textField, search, 
         st = `%${search}%`;
     }
 
+
+
     values.push(vf);
 
     if(textField && Array.isArray(textField)) {        
@@ -253,6 +266,9 @@ const getAutocomplete = async function(endpoint, valueField, textField, search, 
         var syn = textField.map(f => getSynonym(endpoint,f));
         values = values.concat(syn); // ?? AS TEXT
         values.push(qt); // FROM ??
+        values.push('order');
+        values.push(order);
+        
         if(!searchByValue) {
             values = values.concat(syn); // WHERE ??    
         } else {
@@ -287,13 +303,13 @@ const getAutocomplete = async function(endpoint, valueField, textField, search, 
         values.push(count);
     }
     if(textSql && searchByValue) {
-        sql = `SELECT DISTINCT ?? as value, ${textSql} as text FROM ?? WHERE ?? = ? ORDER BY ${textSql} ${countSql}`;
+        sql = `SELECT DISTINCT ?? as value, ${textSql} as text FROM ?? WHERE ?? = ? AND ?? = ? ORDER BY ${textSql} ${countSql}`;
     } else if(textSql) {
-        sql = `SELECT DISTINCT ?? as value, ${textSql} as text FROM ?? WHERE ${textSql} LIKE ? ORDER BY ${textSql} ${countSql}`;
+        sql = `SELECT DISTINCT ?? as value, ${textSql} as text FROM ?? WHERE ?? = ? AND ${textSql} LIKE ? ORDER BY ${textSql} ${countSql}`;
     } else if(searchByValue) {
-        sql = `SELECT DISTINCT ?? as value FROM ?? WHERE ?? = ? ORDER BY ?? ${countSql}`;
+        sql = `SELECT DISTINCT ?? as value FROM ?? WHERE ?? = ? AND ?? = ? ORDER BY ?? ${countSql}`;
     } else {
-        sql = `SELECT DISTINCT ?? as value FROM ?? WHERE ?? LIKE ? ORDER BY ?? ${countSql}`;
+        sql = `SELECT DISTINCT ?? as value FROM ?? WHERE ?? = ? AND ?? LIKE ? ORDER BY ?? ${countSql}`;
     }
     //console.log(typeof textField);
     //console.dir(textField);

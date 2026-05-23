@@ -18,6 +18,7 @@ const taxonomy = require('./taxonomy')(db);
 const datasets = require('./datasets')(db);
 const data = require('./data')(db);
 const imports = require('./import')(db, mail);
+const orders = require('./orders')(db);
 
 const et = require('./enums');
 const enums = {
@@ -46,7 +47,7 @@ const err = (e) => {
 
 router.route('/autocomplete/:endpoint')
   .get(function(req, res) {
-    db.getAutocomplete(req.params.endpoint, req.query.valueField, req.query.textField, 
+    db.getAutocomplete(req.params.endpoint, req.query.order, req.query.valueField, req.query.textField, 
       req.query.search, req.query.count ? parseInt(req.query.count) : null, req.query.searchByValue == 'true', req.query.searchFromStart == 'true').then(r => res.json({ items: r })).catch(e => { err(e); res.sendStatus(400); })
   })
 
@@ -142,6 +143,25 @@ router.route('/taxonomy')
 router.route('/taxonomy/valid-names/:taxon?')
   .get(function (req, res) {
     taxonomy.validName(req.params, req.query).then(r => res.json(r)).catch(e => { err(e); res.sendStatus(400); })
+  })
+
+router.route('/orders')
+  .get(function (req, res) {
+    orders.list(req.recordLimit).then(r => res.json(r)).catch(e => { err(e); res.sendStatus(400); })
+  })
+  .post(requiresAuth(), auth.isEditor, function (req, res) {
+    orders.create(req.body, req.resourcesAuth).then(r => res.json(r)).catch(e => { err(e); res.sendStatus(400); })
+  })
+
+router.route('/orders/:id')
+  .get(function (req, res) {
+    orders.get(req.params).then(r => res.json(r)).catch(e => { err(e); res.sendStatus(400); })
+  })
+  .put(requiresAuth(), auth.isEditor, function (req, res) {
+    orders.update(req.params, req.body, req.resourcesAuth).then(r => res.json(r)).catch(e => { err(e); res.sendStatus(400); })
+  })
+  .delete(requiresAuth(), auth.isEditor, function (req, res) {
+    orders.remove(req.params, req.resourcesAuth).then(r => res.json(r)).catch(e => { err(e); res.sendStatus(400); })
   })
 
 router.route('/taxonomy/:id')

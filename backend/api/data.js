@@ -18,8 +18,8 @@ var join = `data `
 const statsTypes = ['group-by', 'distinct'];
 
 
-const paramList = [/*'order',*/'family','genus', 'species', 'origname', 'traitcat', 'trait', 'method', 'location','country', 'dataset', 'authors', 'reference', 'rowl'];
-const columnList = [/*'taxonomy.order',*/'taxonomy.family', 'taxonomy.genus', 'data.taxonomy_id', 'data.original_name', 'trait.trait_category_id', 'data.trait_id', 'method.id', 'location.id', 'country.id', 
+const paramList = ['order','family','genus', 'species', 'origname', 'traitcat', 'trait', 'method', 'location','country', 'dataset', 'authors', 'reference', 'rowl'];
+const columnList = ['taxonomy.order','taxonomy.family', 'taxonomy.genus', 'data.taxonomy_id', 'data.original_name', 'trait.trait_category_id', 'data.trait_id', 'method.id', 'location.id', 'country.id', 
 'dataset.id', 'dataset.authors', 'data.reference_id', 'data.row_link'];
 
 const getCondition = function(params) {
@@ -141,7 +141,7 @@ const csv =  async function(params, limits, tmpDir, auth) {
     var c = await db.getConnection();
     var isAuthenticated = !!auth.sub;
     var dstream = db.squery(c, { table: 'data', sql: `SELECT data.id, taxonomy.wsc_lsid, data.original_name as originalName, `
-     + /*taxonomy.order,*/ `taxonomy.family, taxonomy.genus, taxonomy.species, taxonomy.subspecies, `
+     + `taxonomy.order, taxonomy.family, taxonomy.genus, taxonomy.species, taxonomy.subspecies, `
      + `trait.abbrev as trait, trait.name as traitFullName, trait_category.name as traitCategory, `
      + `CASE WHEN 1=? OR dataset.restricted = 0 THEN data.value ELSE 'access restricted' END as value, `
      + `CASE WHEN 1=? OR dataset.restricted = 0 THEN data.value_numeric ELSE 0 END as value_numeric, `
@@ -168,7 +168,7 @@ const excel =  async function(params, limits, tmpDir, auth) {
     limits.limit = res.count;
     var isAuthenticated = !!auth.sub;
     var records = await db.query({ table: 'data', sql: `SELECT data.id, taxonomy.wsc_lsid, data.original_name as originalName, `
-     + /*taxonomy.order,*/ `taxonomy.family, taxonomy.genus, taxonomy.species, taxonomy.subspecies, `
+     + `taxonomy.order, taxonomy.family, taxonomy.genus, taxonomy.species, taxonomy.subspecies, `
      + `trait.abbrev as trait, trait.name as traitFullName, trait_category.name as traitCategory, `
      + `CASE WHEN 1=? OR dataset.restricted = 0 THEN data.value ELSE 'access restricted' END as value, `
      + `CASE WHEN 1=? OR dataset.restricted = 0 THEN data.value_numeric ELSE 0 END as value_numeric, `

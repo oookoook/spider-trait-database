@@ -1,14 +1,13 @@
 const endpoint = 'data';
 
-const getParams = function(filter) {
+const getParams = function(filter, order) {
   var f = filter;
   if(!f) {
     f= {};
   }
-    var filters = [/*'order',*/'family', 'genus', 'species', 'original-name', 'trait-category', 'trait', 'method', 'location', 'country', 'dataset', 'authors','reference','row-link'];
-    return filters.map(i => `${i}/${f[i] ? encodeURIComponent(f[i]) : '*'}`).join('/');
-    // `family/:family/genus/:genus/species/:species/trait-category/:traitcat/trait/:trait/country/:country/habitat/:habitat/dataset/:dataset/authors/:authors/reference/:reference/row-link/:rowl`
-
+    var filters = ['family', 'genus', 'species', 'original-name', 'trait-category', 'trait', 'method', 'location', 'country', 'dataset', 'authors','reference','row-link'];
+    var path = filters.map(i => `${i}/${f[i] ? encodeURIComponent(f[i]) : '*'}`).join('/');
+    return order ? `order/${encodeURIComponent(order)}/${path}` : path;
 };
 
 export default {
@@ -22,7 +21,8 @@ export default {
       restrictedDatasets: null,
       link: getParams(),
       autocomplete: {},
-      savedOptions: null
+      savedOptions: null,
+      order: null
     },
     mutations: {
       list(state, payload) {
@@ -51,6 +51,15 @@ export default {
       },
       savedOptions(state, payload) {
         // do nothing - this is just for compatibility with entity module
+      },
+      setOrder(state, payload) {
+        state.order = payload.value;
+      },
+      reset(state) {
+        state.list = [];
+        state.total = 0;
+        state.savedOptions = null;
+        state.order = null;
       }
     },
     getters: {
@@ -83,7 +92,7 @@ export default {
             //console.log(`${endpoint}/list`);
             payload.endpoint = endpoint;
             payload.currCount = context.state.total;
-            payload.params = getParams(payload.filter);
+            payload.params = getParams(payload.filter, context.state.order);
             context.commit('link', { value: payload.params });
             //console.log(payload.params);
             var data = await context.dispatch('list', payload, { root: true });
@@ -99,7 +108,7 @@ export default {
 
         stats: async function(context, payload) {
           payload.endpoint = endpoint + '/stats';
-          payload.params = `${payload.type}/${getParams(payload.filter)}`;
+          payload.params = `${payload.type}/${getParams(payload.filter, context.state.order)}`;
           var data = await context.dispatch('get', payload, { root: true });
           if(data){    
             context.commit('stats', { value: data});

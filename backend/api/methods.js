@@ -3,7 +3,7 @@ var db = null;
 const list = async function(limits) {
     var res = await db.prepareListResponse(limits, 'method');
     var results = await db.query({ table: 'method', sql: `SELECT method.id, method.abbrev, method.name, method.description `
-     + `FROM method`, nestTables: true, limits });    
+     + `FROM method_order_view method`, nestTables: true, limits });    
      res.items = results.map(r => {    
         return {
                 id: r.method.id,
@@ -68,7 +68,7 @@ const synonyms = {
 
 module.exports = function(dbClient) {
     db = dbClient;
-    db.addSynonyms('methods','method', synonyms);
+    db.addSynonyms('methods','method_order_view', synonyms);
     return {
         list,
         get,

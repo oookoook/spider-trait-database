@@ -40,6 +40,7 @@ export default new Vuex.Store({
     traitCategories: new EntityModule('traitCategories'),
     countries: new EntityModule('countries'),
     imports: new EntityModule('import'),
+    orders: new EntityModule('orders'),
     editor,
     data,
     jobs,

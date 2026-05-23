@@ -1,6 +1,7 @@
 import Vue from 'vue'
 import store from '@/store'
 import VueRouter from 'vue-router'
+import { setOrder, resetOrderModules } from '@/store/order-sync'
 import Home from '../views/Home.vue'
 
 Vue.use(VueRouter)
@@ -10,6 +11,11 @@ const routes = [
     path: '/',
     name: 'home',
     component: Home
+  },
+  {
+    path: '/:order',
+    name: 'orderHome',
+    component: OrderHome
   },
   {
     path: '/about',
@@ -49,17 +55,17 @@ const routes = [
     component: () => import(/* webpackChunkName: "publications" */ '../views/Publications.vue')
   },
   {
-    path: '/data',
+    path: '/:order/data',
     name: 'data',
     component: () => import(/* webpackChunkName: "data" */ '../views/Data.vue')
   },
   {
-    path: '/data/:entity/:id',
+    path: '/:order/data/:entity/:id',
     name: 'dataQucikFilter',
     component: () => import(/* webpackChunkName: "data" */ '../views/Data.vue')
   },
   {
-    path: '/data/family/:family/genus/:genus/species/:species/original-name/:origname/trait-category/:traitcategory/trait/:trait/method/:method/location/:location/country/:country/dataset/:dataset/authors/:authors/reference/:reference/row-link/:rowlink',
+    path: '/:order/data/family/:family/genus/:genus/species/:species/original-name/:origname/trait-category/:traitcategory/trait/:trait/method/:method/location/:location/country/:country/dataset/:dataset/authors/:authors/reference/:reference/row-link/:rowlink',
     name: 'dataFullFilter',
     component: () => import(/* webpackChunkName: "data" */ '../views/Data.vue')
   },
@@ -99,67 +105,67 @@ const routes = [
     component: () => import(/* webpackChunkName: "prepare" */ '../views/Enums.vue')
   },
   {
-    path: '/traits',
+    path: '/:order/traits',
     name: 'traits',
     component: () => import(/* webpackChunkName: "traits" */ '../views/Traits.vue')
   },
   {
-    path: '/methods',
+    path: '/:order/methods',
     name: 'methods',
     component: () => import(/* webpackChunkName: "methods" */ '../views/Methods.vue')
   },
   {
-    path: '/taxonomy',
+    path: '/:order/taxonomy',
     name: 'taxonomy',
     component: () => import(/* webpackChunkName: "taxonomy" */ '../views/Taxonomy.vue')
   },
   {
-    path: '/locations',
+    path: '/:order/locations',
     name: 'locations',
     component: () => import(/* webpackChunkName: "locations" */ '../views/Locations.vue')
   },
   {
-    path: '/references',
+    path: '/:order/references',
     name: 'references',
     component: () => import(/* webpackChunkName: "references" */ '../views/References.vue')
   },
   {
-    path: '/datasets',
+    path: '/:order/datasets',
     name: 'datasets',
     component: () => import(/* webpackChunkName: "datasets" */ '../views/Datasets.vue')
   },
   {
-    path: '/traits/:id',
+    path: '/:order/traits/:id',
     name: 'trait',
     component: () => import(/* webpackChunkName: "trait" */ '../views/Trait.vue')
   },
   {
-    path: '/methods/:id',
+    path: '/:order/methods/:id',
     name: 'method',
     component: () => import(/* webpackChunkName: "method" */ '../views/Method.vue')
   },
   {
-    path: '/taxonomy/:id',
+    path: '/:order/taxonomy/:id',
     name: 'taxon',
     component: () => import(/* webpackChunkName: "taxon" */ '../views/Taxon.vue')
   },
   {
-    path: '/taxonomy/lsid/:lsid',
+    path: '/:order/taxonomy/lsid/:lsid',
     name: 'lsid',
     component: () => import(/* webpackChunkName: "taxon" */ '../views/Taxon.vue')
   },
   {
-    path: '/locations/:id',
+    path: '/:order/locations/:id',
     name: 'location',
     component: () => import(/* webpackChunkName: "location" */ '../views/Location.vue')
   },
   {
-    path: '/references/:id',
+    path: '/:order/references/:id',
     name: 'reference',
     component: () => import(/* webpackChunkName: "reference" */ '../views/Reference.vue')
   },
   {
-    path: '/datasets/:id',
+    path: '/:order/datasets/:id',
     name: 'dataset',
     component: () => import(/* webpackChunkName: "dataset" */ '../views/Dataset.vue')
   },
@@ -181,6 +187,13 @@ const router = new VueRouter({
 })
 
 router.beforeEach((to, from, next) => {
+  if (to.params.order) {
+    if (from.params.order && from.params.order !== to.params.order) {
+      resetOrderModules(router.app.$store)
+    }
+    setOrder(router.app.$store, to.params.order)
+  }
+
   if(!!router.app.$store.getters.user) {
     router.app.$store.dispatch('getUserInfo').then(() => next());
   } else {

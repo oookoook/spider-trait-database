@@ -1,5 +1,17 @@
 import props from './entity-props' 
 
+
+const normalizeOrderName = (order) => {
+    if(!order) {
+        return null;
+    }
+    let normalizedOrder = order.toLowerCase().replace(/ /g, '_');
+    // first letter uppercase
+    normalizedOrder = normalizedOrder.charAt(0).toUpperCase() + normalizedOrder.slice(1);
+    return normalizedOrder;
+}
+
+
 export default (endpoint) => {
     return {
     namespaced: true,
@@ -10,6 +22,7 @@ export default (endpoint) => {
       autocomplete: [],
       search: null,
       savedOptions: null,
+      order: null,
       props: props(endpoint)
     },
     mutations: {
@@ -30,6 +43,15 @@ export default (endpoint) => {
       },
       savedOptions(state, payload) {
           state.savedOptions = payload.value;
+      },
+      setOrder(state, payload) {
+          state.order = payload.value;
+      },
+      reset(state) {
+          state.list = [];
+          state.total = 0;
+          state.savedOptions = null;
+          state.order = null;
       }
     },
     getters: {
@@ -39,7 +61,10 @@ export default (endpoint) => {
         list: async function(context, payload) {
             console.log(`${endpoint}/list`);
             payload.endpoint = endpoint;
-            payload.currCount = context.state.total;                
+            payload.currCount = context.state.total;
+            if (context.state.order) {
+                payload.order = normalizeOrderName(context.state.order);
+            }
             var data = await context.dispatch('list', payload, { root: true });
             if(data) {    
                 if(data.count !== null) {
@@ -64,6 +89,9 @@ export default (endpoint) => {
             console.log(`${endpoint}/autocomplete`);
             //console.dir(payload);
             payload.endpoint = `autocomplete/${endpoint}`;
+            if (context.state.order) {
+                payload.order = normalizeOrderName(context.state.order);
+            }
             var data = await context.dispatch('get', payload, { root: true });
             if(data) {
                 context.commit('autocomplete', { value: data.items });
@@ -77,7 +105,7 @@ export default (endpoint) => {
             p.endpoint = `${endpoint}`;
             p.auth = true;
             p.body = payload;
-           
+            p.body.order = normalizeOrderName(context.state.order);
             var data = await context.dispatch('post', p, { root: true });
                 // the api module returns false uf user is not authenticated
             if(data) {
@@ -92,6 +120,7 @@ export default (endpoint) => {
             p.params = payload.id;
             p.auth = true;
             p.body = payload;
+            p.body.order = normalizeOrderName(context.state.order);
 
             var r = await context.dispatch('put', p, { root: true });
             return r;
