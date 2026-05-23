@@ -3,6 +3,7 @@ import store from '@/store'
 import VueRouter from 'vue-router'
 import { setOrder, resetOrderModules } from '@/store/order-sync'
 import Home from '../views/Home.vue'
+import OrderHome from '../views/OrderHome.vue'
 
 Vue.use(VueRouter)
 
@@ -12,25 +13,15 @@ const routes = [
     name: 'home',
     component: Home
   },
-  {
-    path: '/:order',
-    name: 'orderHome',
-    component: OrderHome
-  },
+  // Static top-level routes — must be defined before /:order to take priority
   {
     path: '/about',
     name: 'about',
-    // route level code-splitting
-    // this generates a separate chunk (about.[hash].js) for this route
-    // which is lazy-loaded when the route is visited.
     component: () => import(/* webpackChunkName: "about" */ '../views/About.vue')
   },
   {
     path: '/contribute',
     name: 'contribute',
-    // route level code-splitting
-    // this generates a separate chunk (about.[hash].js) for this route
-    // which is lazy-loaded when the route is visited.
     component: () => import(/* webpackChunkName: "contribute" */ '../views/Contribute.vue')
   },
   {
@@ -41,33 +32,12 @@ const routes = [
   {
     path: '/policy',
     name: 'policy',
-    // route level code-splitting
-    // this generates a separate chunk (about.[hash].js) for this route
-    // which is lazy-loaded when the route is visited.
     component: () => import(/* webpackChunkName: "policy" */ '../views/Policy.vue')
   },
   {
     path: '/publications',
     name: 'publications',
-    // route level code-splitting
-    // this generates a separate chunk (about.[hash].js) for this route
-    // which is lazy-loaded when the route is visited.
     component: () => import(/* webpackChunkName: "publications" */ '../views/Publications.vue')
-  },
-  {
-    path: '/:order/data',
-    name: 'data',
-    component: () => import(/* webpackChunkName: "data" */ '../views/Data.vue')
-  },
-  {
-    path: '/:order/data/:entity/:id',
-    name: 'dataQucikFilter',
-    component: () => import(/* webpackChunkName: "data" */ '../views/Data.vue')
-  },
-  {
-    path: '/:order/data/family/:family/genus/:genus/species/:species/original-name/:origname/trait-category/:traitcategory/trait/:trait/method/:method/location/:location/country/:country/dataset/:dataset/authors/:authors/reference/:reference/row-link/:rowlink',
-    name: 'dataFullFilter',
-    component: () => import(/* webpackChunkName: "data" */ '../views/Data.vue')
   },
   {
     path: '/import',
@@ -103,6 +73,32 @@ const routes = [
     path: '/enums',
     name: 'enums',
     component: () => import(/* webpackChunkName: "prepare" */ '../views/Enums.vue')
+  },
+  {
+    path: '/api',
+    name: 'api',
+    component: () => import(/* webpackChunkName: "dataset" */ '../views/Api.vue')
+  },
+  // Order-scoped routes
+  {
+    path: '/:order',
+    name: 'orderHome',
+    component: OrderHome
+  },
+  {
+    path: '/:order/data',
+    name: 'data',
+    component: () => import(/* webpackChunkName: "data" */ '../views/Data.vue')
+  },
+  {
+    path: '/:order/data/:entity/:id',
+    name: 'dataQucikFilter',
+    component: () => import(/* webpackChunkName: "data" */ '../views/Data.vue')
+  },
+  {
+    path: '/:order/data/family/:family/genus/:genus/species/:species/original-name/:origname/trait-category/:traitcategory/trait/:trait/method/:method/location/:location/country/:country/dataset/:dataset/authors/:authors/reference/:reference/row-link/:rowlink',
+    name: 'dataFullFilter',
+    component: () => import(/* webpackChunkName: "data" */ '../views/Data.vue')
   },
   {
     path: '/:order/traits',
@@ -169,13 +165,6 @@ const routes = [
     name: 'dataset',
     component: () => import(/* webpackChunkName: "dataset" */ '../views/Dataset.vue')
   },
-  {
-    path: '/api',
-    name: 'api',
-    component: () => import(/* webpackChunkName: "dataset" */ '../views/Api.vue')
-  }
-
-
 ]
 
 const router = new VueRouter({

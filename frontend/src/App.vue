@@ -6,45 +6,45 @@
       dark
     >
       <v-toolbar-title>
-        <router-link style="color:white;text-decoration:none" to="/"><v-icon left>mdi-spider</v-icon>World Spider Trait database</router-link>
-        <!--<v-icon left>mdi-spider</v-icon>Spider Trait Database-->
+        <router-link style="color:white;text-decoration:none" to="/"><v-icon left>mdi-spider</v-icon>{{ currentOrder ? orderDisplayName + ' Trait Database' : 'World Arachnida Trait Database' }}</router-link>
         </v-toolbar-title>
 
 
       <v-divider vertical class="mx-5"></v-divider>
       <v-toolbar-items>
       <v-btn
-        to="/data"
+        v-if="currentOrder"
+        :to="`/${currentOrder}/data`"
         text
       ><v-icon left>mdi-magnify</v-icon> Data Explorer 
       </v-btn>
 
-      <v-menu right bottom offset-y>
+      <v-menu v-if="currentOrder" right bottom offset-y>
       <template v-slot:activator="{ on }">
         <v-btn text v-on="on"><v-icon left>mdi-format-list-bulleted-square</v-icon>Lists<v-icon right>mdi-chevron-down</v-icon></v-btn>
       </template>
       <v-list>
-        <v-list-item to="/datasets">
+        <v-list-item :to="`/${currentOrder}/datasets`">
           <v-list-item-icon><v-icon>mdi-table</v-icon></v-list-item-icon>
           <v-list-item-content><v-list-item-title>Datasets</v-list-item-title></v-list-item-content>
         </v-list-item>
-        <v-list-item to="/references">
+        <v-list-item :to="`/${currentOrder}/references`">
           <v-list-item-icon><v-icon>mdi-bookmark-multiple-outline</v-icon></v-list-item-icon>
           <v-list-item-content><v-list-item-title>References</v-list-item-title></v-list-item-content>
         </v-list-item>
-        <v-list-item to="/locations">
+        <v-list-item :to="`/${currentOrder}/locations`">
           <v-list-item-icon><v-icon>mdi-map-marker</v-icon></v-list-item-icon>
           <v-list-item-content><v-list-item-title>Locations</v-list-item-title></v-list-item-content>
         </v-list-item>
-        <v-list-item to="/traits">
+        <v-list-item :to="`/${currentOrder}/traits`">
           <v-list-item-icon><v-icon>mdi-comment-question-outline</v-icon></v-list-item-icon>
           <v-list-item-content><v-list-item-title>Traits</v-list-item-title></v-list-item-content>
         </v-list-item>
-        <v-list-item to="/taxonomy">
+        <v-list-item :to="`/${currentOrder}/taxonomy`">
           <v-list-item-icon><v-icon>mdi-file-tree</v-icon></v-list-item-icon>
           <v-list-item-content><v-list-item-title>Taxa</v-list-item-title></v-list-item-content>
         </v-list-item>
-        <v-list-item to="/methods">
+        <v-list-item :to="`/${currentOrder}/methods`">
           <v-list-item-icon><v-icon>mdi-chart-bell-curve</v-icon></v-list-item-icon>
           <v-list-item-content><v-list-item-title>Methods</v-list-item-title></v-list-item-content>
         </v-list-item>
@@ -93,7 +93,9 @@
         text
       ><v-icon left>mdi-cogs</v-icon> Administration 
     </v-btn>
-    <v-menu right bottom offset-y>
+    <v-btn v-if="currentOrder" to="/about" text><v-icon left>mdi-frequently-asked-questions</v-icon> About</v-btn>
+
+    <v-menu v-if="!currentOrder" right bottom offset-y>
       <template v-slot:activator="{ on }">
         <v-btn text v-on="on"><v-icon left>mdi-help</v-icon> More<v-icon right>mdi-chevron-down</v-icon></v-btn>
       </template>
@@ -222,7 +224,17 @@ export default {
         default: return true
       }
     },
-    ...mapGetters(['notification'])
+    ...mapGetters(['notification']),
+    currentOrder() {
+      return this.$route.params.order || null;
+    },
+    orderDisplayName() {
+      if (!this.currentOrder) return '';
+      const found = this.$store.state.orders.list.find(
+        (o) => o.id.toLowerCase() === this.currentOrder.toLowerCase()
+      );
+      return found ? found.name : this.currentOrder;
+    },
   }
 }
 </script>

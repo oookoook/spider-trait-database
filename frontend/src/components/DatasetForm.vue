@@ -179,8 +179,10 @@ export default {
   created () {
   },
   mounted () {
-    this.ordersLoading = true;
-    this.$store.dispatch(`orders/list`).then(() => { this.ordersLoading = false; });
+    if (!this.$store.state.orders.list.length) {
+      this.ordersLoading = true;
+      this.$store.dispatch(`orders/list`).then(() => { this.ordersLoading = false; });
+    }
   }
 }
 </script>
