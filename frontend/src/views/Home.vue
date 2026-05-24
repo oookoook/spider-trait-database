@@ -8,9 +8,10 @@
             <v-row><div class="text-h3 text-xl-h2 font-weight-black">Welcome to the</div></v-row>
             <v-row class="py-4"><div class="text-uppercase text-h3 text-xl-h2 primary--text font-weight-black">World Arachnida Trait</div></v-row>
             <v-row justify="end"><div class="text-h3 text-xl-h2 font-weight-black">database</div></v-row>
-            <v-row class="mt-4"><div class="text-h6">First centralised online open-access database of phenotypic traits of arachnid species at a global scale</div></v-row>
+            <!--<v-row class="mt-4"><div class="text-h6">First centralised online open-access database of phenotypic traits of arachnid species at a global scale</div></v-row>
             <v-row class="mt-2"><div class="text-h6">Freely accessible, curated, and constantly updated archive by assembling published and unpublished data</div></v-row>
             <v-row class="mt-2"><div class="text-h6">It should offer and foster collaboration opportunities and open up new areas of investigation</div></v-row>
+            -->
           </v-col>
         </v-row>
       </v-container>
@@ -20,14 +21,14 @@
 
     <!-- Order cards -->
     <v-container>
-      <v-row justify="center">
+      <v-row>
         <v-col v-if="ordersLoading" cols="12" class="text-center py-8">
           <v-progress-circular indeterminate color="primary" size="48" />
         </v-col>
         <template v-else>
-          <v-col v-for="order in orders" :key="order.id" cols="6" sm="4" md="3" lg="2" class="pa-2">
+          <v-col v-for="(order, i) in orders" :key="order.id" :offset-lg="i % 5 == 0 ? 1 : 0" cols="6" sm="4" md="3" lg="2" class="pa-2">
             <v-card :to="`/${order.id.toLowerCase()}`" rounded class="rounded-xl" hover>
-              <v-img :src="`/img/orders/${order.id.toLowerCase()}.jpg`" height="120" class="grey lighten-3">
+              <v-img :src="`/img/thumb/ohome_${order.id.toLowerCase()}.jpg`" height="120" class="grey lighten-3">
                 <template v-slot:placeholder>
                   <v-row class="fill-height ma-0" align="center" justify="center">
                     <v-icon large color="grey lighten-1">mdi-image</v-icon>

@@ -107,6 +107,7 @@ export default {
         },
 
         stats: async function(context, payload) {
+          console.info('reading stats for order', context.state.order);
           payload.endpoint = endpoint + '/stats';
           payload.params = `${payload.type}/${getParams(payload.filter, context.state.order)}`;
           var data = await context.dispatch('get', payload, { root: true });
@@ -129,7 +130,7 @@ export default {
           var data = await Promise.all(payload.entities.map(e => {
             var f = {};
             f[e] = 'distinct';
-            var p = {endpoint: endpoint + '/stats', params: `count/${getParams(f)}` };
+            var p = {endpoint: endpoint + '/stats', params: `count/${getParams(f, context.state.order)}` };
 
             return context.dispatch('get', p, { root: true });
           }));

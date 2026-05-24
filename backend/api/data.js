@@ -290,7 +290,7 @@ const stats =  async function(params, query) {
         group = `GROUP BY 1 ORDER BY 1`;
     }
     var sql = `SELECT ${select} FROM ${join} WHERE ${cond.clause} ${group}`;
-    //console.log(sql);
+    console.log(sql);
     var records = await db.query({ table: 'data', sql, values: cond.values, nestTables: false, hasWhere: true});
     
     var data = { items: records }

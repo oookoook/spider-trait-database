@@ -65,6 +65,23 @@ You can call the backup manually: `backup` or `backup full` (the later command f
 1. Restore the backup: `mariabackup --copy-back --force-non-empty-directories --target-dir=$(find ./backup -name "*-full")`
 1. Start the MariaDB process: `systemctl start mariadb`
 
+## Running SQL scripts in the Docker MariaDB container
+
+When the local MariaDB runs in the `mariadb-spidertraits` Docker container and the `app` database user does not have enough privileges for schema migrations, copy the SQL file into the container and run it from an interactive root session:
+
+```powershell
+docker cp .\db\sql\order-tables.sql mariadb-spidertraits:/tmp/order-tables.sql
+docker exec -it mariadb-spidertraits mariadb -u root -p spider_traits_db
+```
+
+Then execute the copied file in the MariaDB prompt:
+
+```sql
+SOURCE /tmp/order-tables.sql;
+```
+
+This two-step approach avoids issues with entering the root password while also streaming the SQL file through standard input.
+
 ## Schema model
 
 * The `db-model.mwb` file is created in MySQL Workbench tool and contains the database design.

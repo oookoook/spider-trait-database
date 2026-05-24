@@ -6,7 +6,7 @@
       dark
     >
       <v-toolbar-title>
-        <router-link style="color:white;text-decoration:none" to="/"><v-icon left>mdi-spider</v-icon>{{ currentOrder ? orderDisplayName + ' Trait Database' : 'World Arachnida Trait Database' }}</router-link>
+        <router-link style="color:white;text-decoration:none" to="/"><v-icon left>mdi-spider</v-icon>World {{ currentOrder ? orderDisplayName : 'Arachnida' }} Trait Database</router-link>
         </v-toolbar-title>
 
 
