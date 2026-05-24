@@ -85,7 +85,7 @@ cd backend
 npm install
 node index.js
 
-# Frontend (dev server na portu 8080)
+# Frontend (Vite dev server na portu 5173)
 cd frontend
 npm install
 npm run serve
@@ -95,7 +95,7 @@ cd frontend
 npm run build
 ```
 
-Backend servíruje statické soubory z `frontend/dist` a API na `/backend/*`. OIDC lze vypnout nastavením `settings.oidc.disable: true` pro vývoj. CORS je povolena pro `localhost:8080`.
+Backend servíruje statické soubory z `frontend/dist` a API na `/backend/*`. OIDC lze vypnout nastavením `settings.oidc.disable: true` pro vývoj. CORS je povolena pro lokální frontend dev servery `localhost:8080` a `localhost:5173`.
 
 ---
 

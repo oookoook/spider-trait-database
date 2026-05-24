@@ -20,7 +20,7 @@ app.use(compression())
 
 // userd for testing. Other CORS requests should be blocked
 app.use(cors({
-  origin: 'http://localhost:8080',
+  origin: ['http://localhost:8080', 'http://localhost:5173'],
 }));
 
 app.use(bodyParser.json());
@@ -103,7 +103,7 @@ if(!settings.oidc.disable) {
   
 } else {
   // everything is authorized
-  app.use(cauth.mockupAuth('http://localhost:8080/login', 'http://localhost:8080/logout'));
+  app.use(cauth.mockupAuth('http://localhost:5173/login', 'http://localhost:5173/logout'));
 }
 // route used to show the SSO login screen
 // 

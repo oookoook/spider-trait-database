@@ -1,7 +1,7 @@
 <template>
   <v-container fluid>
     <!-- Order images go to public/img/orders/{orderName}.jpg (e.g. /img/orders/araneae.jpg) -->
-    <v-img eager :src="`/img/orders/${order}.jpg`" height="100vh" max-height="100vh" contain position="right">
+    <v-img eager :src="`/img/ohome_${order.toLowerCase()}.jpg`" height="100vh" max-height="100vh" contain position="right">
       <v-container fill-height>
         <v-row class="pt-2 mt-2 pt-xl-8 mt-xl-8 pt-xl-8 mt-xl-16 pl-xl-8 ml-xl-16">
           <v-col cols="auto">

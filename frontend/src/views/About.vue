@@ -16,13 +16,13 @@
       </div>
       </v-col>
       <v-col cols="4">
-        <v-img contain eager class="rounded-pill elevation-15" :src="require('../assets/spider2.jpg')" />
+        <v-img contain eager class="rounded-pill elevation-15" :src="spider2Img" />
       </v-col>
     </v-row>
 
     <v-row justify="space-between"  align="center" class="my-16">
       <v-col cols="4">
-        <v-img contain eager class="rounded-pill elevation-15" :src="require('../assets/spider3.jpg')" />
+        <v-img contain eager class="rounded-pill elevation-15" :src="spider3Img" />
       </v-col>
       <v-col cols="6" class="about-text text-xl-h5 text-subtitle-1">
       <div>
@@ -41,7 +41,7 @@
       </p></div>
       </v-col>
       <v-col cols="4">
-        <v-img contain eager class="rounded-pill elevation-15" :src="require('../assets/spider4.jpg')" />
+        <v-img contain eager class="rounded-pill elevation-15" :src="spider4Img" />
       </v-col>
     </v-row>
     <hr class="primary mx-auto my-16" style="height:3px; border:none;width:80%" />
@@ -54,14 +54,14 @@
           <blockquote class="blockquote about-text text-center">
           Pekár S., Wolff J., Černecká Ľ., Birkhofer K., Mammola S., Lowe E.C., Fukushima C.S., Herberstein M.E., Kučera A., Buzatto B., Djoudi E.A., Domenech M., Enciso A.V., Piñanez Espejo Y.M.G., Febles S., García L.F., Gonçalves-Souza T.,  Isaia M., Lafage D., Líznarová E., Macías-Hernánde N., Magalhães I., Malumbres-Olarte J., Michálek O., Michalik P., Michalko R., Milano F.,  Munévar A., Nentwig W., Nicolosi G., Painting C.J., Pétillon J., Piano E., Privet K., Ramírez M.J., Ramos C., Řezáč M., Ridel A., Růžička V., Santos I., Sentenská L., Walker L., Wierucka K., Zurita G.A. &amp; Cardoso P. 2021. The World Spider Trait database: a centralised global open repository for curated data on spider traits. Database 2021: <a href="https://academic.oup.com/database/article-pdf/doi/10.1093/database/baab064/40759987/baab064.pdf" target="_blank">baab064</a>.
           </blockquote>
-        <v-img class="mx-auto mt-16" contain width="153" height="94" :src="require('../assets/edu.png')" />
+        <v-img class="mx-auto mt-16" contain width="153" height="94" :src="eduImg" />
         </v-col>
       </v-row>
 
     <hr class="primary mx-auto my-16" style="height:3px; border:none;width:80%" />
     <v-row justify="center" class="mt-16">
       
-        <v-img contain max-width="50" max-height="50" width="50" height="50" :src="require('../assets/repair.png')" />
+        <v-img contain max-width="50" max-height="50" width="50" height="50" :src="repairImg" />
       
       <v-col cols="6"  class="d-flex flex-column">
         <p class="about-text text-center text-xl-h5 text-subtitle-1">
@@ -70,10 +70,29 @@
         <v-btn class="mx-auto mt-8" width="300" x-large rounded color="primary" href="mailto:spidertraits@sci.muni.cz">E-mail</v-btn>
         <p class="about-text text-center text-xl-h5 text-subtitle-1 mt-16">Suggestions for improvement of the database are also welcomed.</p>
       </v-col>
-      <v-img contain max-width="50" max-height="50" width="50" height="50" :src="require('../assets/repair.png')" />
+      <v-img contain max-width="50" max-height="50" width="50" height="50" :src="repairImg" />
     </v-row>
   </v-container>
 </template>
+<script>
+import spider2Img from '../assets/spider2.jpg'
+import spider3Img from '../assets/spider3.jpg'
+import spider4Img from '../assets/spider4.jpg'
+import eduImg from '../assets/edu.png'
+import repairImg from '../assets/repair.png'
+
+export default {
+  data() {
+    return {
+      spider2Img,
+      spider3Img,
+      spider4Img,
+      eduImg,
+      repairImg
+    }
+  }
+}
+</script>
 <style scoped>
   .about-text {
     line-height: 2.5rem;

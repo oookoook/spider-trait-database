@@ -12,14 +12,14 @@
       and a tutorial on data modification using the online data editing tool.
       </v-col>
       <v-col cols="4">
-        <v-img contain width="497" :src="require('../assets/contribute.png')" />
+        <v-img contain width="497" :src="contributeImg" />
       </v-col>
     </v-row>
 
 
     <v-row justify="space-between" align="center" class="my-16">
       <v-col cols="4">
-        <v-img contain width="515" :src="require('../assets/contact.png')" />
+        <v-img contain width="515" :src="contactImg" />
       </v-col>
       <v-col cols="7" class="about-text text-xl-h5 text-subtitle-1">
       If you are ready to contribute data to the database, please contact the <a href="mailto:spidertraits@sci.muni.cz">administrator</a>. 
@@ -65,6 +65,19 @@ The contributor should also provide either only the <code>method_abbrev</code> i
 <p class="about-text text-xl-h5 text-subtitle-1">Thank you for considering contributing your data to the world spider database and if you have any further questions please contact us at <a href="mailto:spidertraits@sci.muni.cz">spidertraits@sci.muni.cz</a>.</p>
   </v-container>
 </template>
+<script>
+import contributeImg from '../assets/contribute.png'
+import contactImg from '../assets/contact.png'
+
+export default {
+  data() {
+    return {
+      contributeImg,
+      contactImg
+    }
+  }
+}
+</script>
 <style scoped>
   .about-text {
     line-height: 2.5rem;

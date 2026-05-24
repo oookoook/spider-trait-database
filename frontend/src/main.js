@@ -8,7 +8,7 @@ import vuetify from './plugins/vuetify'
 import VueGtag from "vue-gtag";
 
 Vue.use(VueGtag, {
-  config: { id: process.env.VUE_APP_GA_ID,
+  config: { id: import.meta.env.VITE_GA_ID,
     params: {
       send_page_view: true
     }

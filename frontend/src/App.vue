@@ -166,10 +166,10 @@
       <v-row class="mx-5 my-4 text-body-2">
         <v-col cols="12" sm="4" class="d-inline-flex align-start flex-row">
           <a target="_blank" href="https://muni.cz/en">
-          <v-img contain :src="require('./assets/muni-white.png')" height="47" max-width="164" class="mr-5"/>
+          <v-img contain :src="muniWhite" height="47" max-width="164" class="mr-5"/>
           </a>
           <a target="_blank" href="https://muni.cz/en" v-if="showLargeLogo">
-          <v-img contain :src="require('./assets/muni-lg-text-eng-white.png')" height="47" max-width="183" class="ml-5"/>
+          <v-img contain :src="muniText" height="47" max-width="183" class="ml-5"/>
           </a>
         </v-col>
         <v-col cols="12" sm="4" class="d-flex align-center flex-row">
@@ -189,10 +189,10 @@
           </v-row>
           <v-row class="mx-1 align-center">
           <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" title="Creative Commons Attribution 4.0 International (CC BY 4.0)">
-          <v-img class="mr-2" width="30" height="30" :src="require('./assets/cc.svg')" alt="CC" />
+          <v-img class="mr-2" width="30" height="30" :src="ccIcon" alt="CC" />
           </a>
           <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" title="Creative Commons Attribution 4.0 International (CC BY 4.0)">
-          <v-img width="30" height="30" :src="require('./assets/by.svg')" alt="BY" />
+          <v-img width="30" height="30" :src="byIcon" alt="BY" />
           </a>
           </v-row>
           
@@ -205,6 +205,11 @@
 <script>
 import { mapGetters } from 'vuex'
 import Auth from './mixins/auth'
+import muniWhite from './assets/muni-white.png'
+import muniText from './assets/muni-lg-text-eng-white.png'
+import ccIcon from './assets/cc.svg'
+import byIcon from './assets/by.svg'
+
 export default {
   name: 'App',
   mixins: [Auth],
@@ -212,6 +217,10 @@ export default {
   },
 
   data: () => ({
+    muniWhite,
+    muniText,
+    ccIcon,
+    byIcon
   }),
   computed: {
     showLargeLogo () {

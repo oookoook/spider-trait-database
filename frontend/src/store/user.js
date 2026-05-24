@@ -1,6 +1,7 @@
 import axios from 'axios';
 
-const sessionTimeout = parseInt(process.env.VUE_APP_SESSION_TIMEOUT);
+const sessionTimeout = parseInt(import.meta.env.VITE_SESSION_TIMEOUT);
+const backendUrl = import.meta.env.VITE_BACKEND;
 
 
 export default {
@@ -32,10 +33,10 @@ export default {
           return state.apiKey;
         },
         loginUrl(state) {
-          return `${process.env.VUE_APP_BACKEND}user/login`;
+          return `${backendUrl}user/login`;
         },
         logoutUrl(state) {
-          return `${process.env.VUE_APP_BACKEND}user/logout`;
+          return `${backendUrl}user/logout`;
         },
         lastRoute(state) {
           return state.lastRoute;
@@ -59,7 +60,7 @@ export default {
     actions: {
       async getUserInfo(context, payload) {
         try {
-          var result = await axios.get(`${process.env.VUE_APP_BACKEND}user/info`);
+          var result = await axios.get(`${backendUrl}user/info`);
           context.commit('user', { value: result.data });
           context.commit('lastAction', { value: Date.now().valueOf() });
         } catch (err) {
@@ -74,7 +75,7 @@ export default {
 
       async getApiKey(context, payload) {
         try {
-          var result = await axios.get(`${process.env.VUE_APP_BACKEND}user/key`);
+          var result = await axios.get(`${backendUrl}user/key`);
           context.commit('apiKey', { value: result.data.key });
         } catch (err) {
           console.error(err);
