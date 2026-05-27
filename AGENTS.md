@@ -97,6 +97,8 @@ npm run build
 
 Backend servíruje statické soubory z `frontend/dist` a API na `/backend/*`. OIDC lze vypnout nastavením `settings.oidc.disable: true` pro vývoj. CORS je povolena pro lokální frontend dev servery `localhost:8080` a `localhost:5173`.
 
+Poznámka pro vizuální ladění přes Playwright/MCP v Dockeru: `localhost` v browser kontejneru ukazuje dovnitř kontejneru, ne na hostitelský VS Code/dev server. Pro přístup na lokální Vite frontend používej `http://host.docker.internal:5173/`. Pokud vrací `ERR_CONNECTION_REFUSED`, DNS funguje, ale frontend dev server pravděpodobně neběží nebo neposlouchá na portu 5173.
+
 ---
 
 ## Databázové schéma (klíčové tabulky)

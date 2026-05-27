@@ -1,9 +1,9 @@
 <template>
-  <v-container fluid>
+  <v-container fluid class="pa-0">
     <!-- Header hero -->
-    <v-img eager :src="require('../assets/spider1.jpg')" height="100vh" max-height="100vh" contain position="right">
-      <v-container fill-height>
-        <v-row class="pt-2 mt-2 pt-xl-8 mt-xl-8 pt-xl-8 mt-xl-16 pl-xl-8 ml-xl-16">
+    <v-img eager :src="require('../assets/spider1.jpg')" height="calc(100vh - 64px)" max-height="calc(100vh - 64px)" contain position="right" class="home-hero">
+      <v-container fluid class="home-hero-content d-flex flex-column justify-space-between">
+        <v-row class="pt-2 mt-2 pt-xl-8 mt-xl-8 pt-xl-8 mt-xl-16 pl-xl-8 ml-xl-16" no-gutters>
           <v-col cols="auto">
             <v-row><div class="text-h3 text-xl-h2 font-weight-black">Welcome to the</div></v-row>
             <v-row class="py-4"><div class="text-uppercase text-h3 text-xl-h2 primary--text font-weight-black">World Arachnida Trait</div></v-row>
@@ -14,35 +14,33 @@
             -->
           </v-col>
         </v-row>
+
+        <!-- Order cards -->
+        <v-container class="order-cards-container px-0 pb-3 pb-md-6" fluid>
+          <v-row class="order-cards-row flex-nowrap flex-md-wrap">
+            <v-col v-if="ordersLoading" cols="12" class="text-center py-8">
+              <v-progress-circular indeterminate color="primary" size="48" />
+            </v-col>
+            <template v-else>
+              <v-col v-for="order in orders" :key="order.id" cols="5" sm="3" md="2" class="order-card-col pa-2 pa-md-3">
+                <v-card :to="`/${order.id.toLowerCase()}`" rounded class="rounded-xl order-card" hover>
+                  <v-img :src="`/img/thumb/ohome_${order.id.toLowerCase()}.jpg`" height="84" class="grey lighten-3 order-card-img">
+                    <template v-slot:placeholder>
+                      <v-row class="fill-height ma-0" align="center" justify="center">
+                        <v-icon large color="grey lighten-1">mdi-image</v-icon>
+                      </v-row>
+                    </template>
+                  </v-img>
+                  <v-card-title class="justify-center primary--text font-weight-bold text-center order-card-title">
+                    {{ order.name }}
+                  </v-card-title>
+                </v-card>
+              </v-col>
+            </template>
+          </v-row>
+        </v-container>
       </v-container>
     </v-img>
-
-    <hr class="primary mx-auto mb-10" style="height:3px; border:none;width:75%" />
-
-    <!-- Order cards -->
-    <v-container>
-      <v-row>
-        <v-col v-if="ordersLoading" cols="12" class="text-center py-8">
-          <v-progress-circular indeterminate color="primary" size="48" />
-        </v-col>
-        <template v-else>
-          <v-col v-for="(order, i) in orders" :key="order.id" :offset-lg="i % 5 == 0 ? 1 : 0" cols="6" sm="4" md="3" lg="2" class="pa-2">
-            <v-card :to="`/${order.id.toLowerCase()}`" rounded class="rounded-xl" hover>
-              <v-img :src="`/img/thumb/ohome_${order.id.toLowerCase()}.jpg`" height="120" class="grey lighten-3">
-                <template v-slot:placeholder>
-                  <v-row class="fill-height ma-0" align="center" justify="center">
-                    <v-icon large color="grey lighten-1">mdi-image</v-icon>
-                  </v-row>
-                </template>
-              </v-img>
-              <v-card-title class="justify-center text-subtitle-1 primary--text font-weight-bold text-center" style="word-break: normal;">
-                {{ order.name }}
-              </v-card-title>
-            </v-card>
-          </v-col>
-        </template>
-      </v-row>
-    </v-container>
 
     <hr class="primary mx-auto my-16" style="height:3px; border:none;width:75%" />
 
@@ -120,4 +118,54 @@ export default {
 };
 </script>
 <style scoped>
+.home-hero-content {
+  height: 100%;
+}
+
+.order-cards-container {
+  max-width: 1280px;
+}
+
+.order-cards-row {
+  justify-content: flex-start;
+  overflow-x: auto;
+  overflow-y: hidden;
+}
+
+.order-card-col {
+  flex: 0 0 auto;
+}
+
+.order-card {
+  overflow: hidden;
+}
+
+.order-card-title {
+  min-height: 52px;
+  padding: 8px 10px;
+  font-size: 0.95rem;
+  line-height: 1.2rem;
+  word-break: normal;
+}
+
+@media (min-width: 960px) {
+  .order-cards-row {
+    justify-content: center;
+  }
+
+  .order-card-col {
+    flex: 0 0 20%;
+    max-width: 20%;
+  }
+
+  .order-card-img {
+    height: 108px !important;
+  }
+}
+
+@media (min-width: 1264px) {
+  .order-card-img {
+    height: 120px !important;
+  }
+}
 </style>
