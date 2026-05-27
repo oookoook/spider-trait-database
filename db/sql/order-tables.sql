@@ -275,7 +275,7 @@ INSERT INTO `spider_traits_db`.`method_order` (`method_id`, `order_id`)
 --
 -- Note: 'scle' in the source spreadsheet (Scutum length, Opiliones) conflicts
 --       with the existing trait 'scle' (Sclerotisation, Anatomy). The new trait
---       is inserted here with the resolved abbreviation 'sclen'.
+--       is inserted here with the resolved abbreviation 'sule'.
 -- =============================================================================
 
 -- ── Amblypygi ────────────────────────────────────────────────────────────────
@@ -324,7 +324,7 @@ INSERT IGNORE INTO `spider_traits_db`.`trait_order` (`trait_id`, `order_id`)
 INSERT IGNORE INTO `spider_traits_db`.`trait`
     (`abbrev`, `trait_category_id`, `name`, `description`, `data_type_id`, `standard`)
   VALUES
-  ('sclen', (SELECT id FROM `spider_traits_db`.`trait_category` WHERE name = 'Morphometry'),
+  ('sule', (SELECT id FROM `spider_traits_db`.`trait_category` WHERE name = 'Morphometry'),
             'Scutum length',       'Length of scutum',
             (SELECT id FROM `spider_traits_db`.`data_type` WHERE UPPER(name) = 'REAL NUMBER'), 'mm'),
   ('scwi', (SELECT id FROM `spider_traits_db`.`trait_category` WHERE name = 'Morphometry'),
