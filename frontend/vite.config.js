@@ -7,8 +7,10 @@ export default defineConfig({
     vue()
   ],
   resolve: {
+    dedupe: ['vue'],
     extensions: ['.mjs', '.js', '.mts', '.ts', '.jsx', '.tsx', '.json', '.vue'],
     alias: {
+      vue: path.resolve(__dirname, 'node_modules/vue/dist/vue.runtime.esm.js'),
       '@': path.resolve(__dirname, 'src')
     }
   },
