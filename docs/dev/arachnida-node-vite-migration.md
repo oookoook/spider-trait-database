@@ -104,7 +104,7 @@ pm2 logs spidertraits --lines 50   # žádné chyby při startu
 Před restartem aplikace po upgradu kódu spustit migraci pro podporu řádů (issue #44 — World Arachnida Traits Database):
 
 ```bash
-mysql -u <user> -p spider_traits_db < /opt/spider-traits/spider-trait-database/db/sql/order-tables.sql
+mysql -u root spider_traits_db < /opt/spider-traits/spider-trait-database/db/sql/order-tables.sql
 ```
 
 ### TLS certifikát (Let's Encrypt)
