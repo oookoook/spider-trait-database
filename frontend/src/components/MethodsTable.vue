@@ -26,7 +26,7 @@
     </template>
 
     <template v-slot:item.actions="{ item }">
-    <entity-link-cell tooltip="Set as filter in the data explorer" :link="`data/method/${item.id}`" icon="mdi-filter" />
+    <entity-link-cell tooltip="Set as filter in the data explorer" :link="`/data/order/${currentOrder}/method/${item.id}`" icon="mdi-filter" />
     </template>
 
     </v-data-table>
@@ -54,6 +54,9 @@ export default {
     }
   },
   computed: {
+    currentOrder() {
+      return this.$store.state.methods.order;
+    }
   },
   watch: {
   },

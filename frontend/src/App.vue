@@ -14,7 +14,7 @@
       <v-toolbar-items>
       <v-btn
         v-if="currentOrder"
-        :to="`/${currentOrder}/data`"
+        :to="`/data/order/${currentOrder}`"
         text
       ><v-icon left>mdi-magnify</v-icon> Data Explorer 
       </v-btn>
@@ -242,7 +242,7 @@ export default {
       const found = this.$store.state.orders.list.find(
         (o) => o.id.toLowerCase() === this.currentOrder.toLowerCase()
       );
-      return found ? found.name : this.currentOrder;
+      return found ? found.name : (this.currentOrder.charAt(0).toUpperCase() + this.currentOrder.slice(1));
     },
   }
 }

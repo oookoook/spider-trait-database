@@ -106,7 +106,7 @@ export default {
   position: absolute;
   top: 0; left: 0; right: 0; bottom: 0;
   background-size: contain;
-  background-position: right center;
+  background-position: right top;
   background-repeat: no-repeat;
   /* transform: translateX(30%) translateY(-10%); */
 }

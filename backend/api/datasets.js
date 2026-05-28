@@ -36,7 +36,7 @@ const list = async function(limits, auth, showImport) {
     
     //console.dir(res);
     var results = await db.query({table: 'dataset', sql: `SELECT dataset.id, dataset.name, dataset.authors, dataset.uploader, `
-                        +`dataset.email, dataset.date, dataset.doi, dataset.message, dataset.notes, dataset.imported, dataset.records, dataset.restricted, dataset.order `
+                        +`dataset.email, dataset.date, dataset.doi, dataset.message, dataset.notes, dataset.imported, dataset.records, dataset.restricted, dataset.order_id `
                         + `FROM dataset WHERE ${where}`, limits, hasWhere: true });    
      
      res.items = results;

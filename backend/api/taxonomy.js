@@ -249,7 +249,9 @@ const synonyms = {
     //'wsc.lsid': 'taxonomy.wsc_lsid',
     'lsid': 'wsc_lsid',
     'fullName': 'taxonomy.full_name',
-    'taxonomy.fullName': 'taxonomy.full_name'
+    'taxonomy.fullName': 'taxonomy.full_name',
+    'order_id': 'taxonomy.order',
+    'taxonomy.order_id': 'taxonomy.order',
 }
 
 module.exports = function(dbClient) {

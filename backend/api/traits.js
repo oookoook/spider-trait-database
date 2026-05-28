@@ -109,6 +109,8 @@ const synonyms = {
 
 module.exports = function(dbClient) {
     db = dbClient;
+    
+    db.addSynonyms('traits','trait', synonyms);
     db.addSynonyms('traits','trait_order_view', synonyms);
     return {
         list,

@@ -56,8 +56,8 @@ const addLimits = function (values, limits, table, hasWhere, aggregate, customWh
 
     if(limits.order) {
         whereClause += ` AND ?? = ?`;
-        values.push(getSynonym(table, 'order'));
-        values.push(limits.order.value);
+        values.push(getSynonym(table, 'order_id'));
+        values.push(limits.order);
     }
 
     if(limits.search) {
@@ -98,7 +98,7 @@ hasWhere
 */
 
 const getQueryParams = function(opt) {
-    //console.dir(opt);
+    console.dir(opt);
     if(!opt.values) {
         opt.values = [];
     }
@@ -234,7 +234,7 @@ const prepareListResponse = async function (limits, table, customWhereClause, cu
 }
 
 const getAutocomplete = async function(endpoint, order, valueField, textField, search, count, searchByValue, searchFromStart) {
-    
+    let orderClause = '1=1';
     var qt = getSynonym(endpoint); 
     var vf = getSynonym(endpoint, valueField);
     var vfparts = vf.split('.');
@@ -266,8 +266,11 @@ const getAutocomplete = async function(endpoint, order, valueField, textField, s
         var syn = textField.map(f => getSynonym(endpoint,f));
         values = values.concat(syn); // ?? AS TEXT
         values.push(qt); // FROM ??
-        values.push('order');
-        values.push(order);
+        if(order) {
+            values.push(getSynonym(endpoint, 'order_id'));
+            values.push(order);
+            orderClause = '?? = ?';
+        }
         
         if(!searchByValue) {
             values = values.concat(syn); // WHERE ??    
@@ -281,6 +284,11 @@ const getAutocomplete = async function(endpoint, order, valueField, textField, s
         var syn = getSynonym(endpoint, textField);
         values.push(syn); // ?? as text
         values.push(qt); // FROM ??
+        if(order) {
+            values.push(getSynonym(endpoint, 'order_id'));
+            values.push(order);
+            orderClause = '?? = ?';
+        }
         if(!searchByValue) {
             values.push(syn); // WHERE ??
         } else {
@@ -293,6 +301,13 @@ const getAutocomplete = async function(endpoint, order, valueField, textField, s
         var syn = getSynonym(endpoint, valueField);
         values.push(syn); // ?? as text
         values.push(qt); // FROM ??
+        
+        if(order) {
+            values.push(getSynonym(endpoint, 'order_id'));
+            values.push(order);
+            orderClause = '?? = ?';
+        }
+
         values.push(syn); // WHERE ??
         values.push(st); // LIKE ?
         values.push(syn); // ORDER BY
@@ -303,13 +318,13 @@ const getAutocomplete = async function(endpoint, order, valueField, textField, s
         values.push(count);
     }
     if(textSql && searchByValue) {
-        sql = `SELECT DISTINCT ?? as value, ${textSql} as text FROM ?? WHERE ?? = ? AND ?? = ? ORDER BY ${textSql} ${countSql}`;
+        sql = `SELECT DISTINCT ?? as value, ${textSql} as text FROM ?? WHERE ${orderClause} AND ?? = ? ORDER BY ${textSql} ${countSql}`;
     } else if(textSql) {
-        sql = `SELECT DISTINCT ?? as value, ${textSql} as text FROM ?? WHERE ?? = ? AND ${textSql} LIKE ? ORDER BY ${textSql} ${countSql}`;
+        sql = `SELECT DISTINCT ?? as value, ${textSql} as text FROM ?? WHERE ${orderClause} AND ${textSql} LIKE ? ORDER BY ${textSql} ${countSql}`;
     } else if(searchByValue) {
-        sql = `SELECT DISTINCT ?? as value FROM ?? WHERE ?? = ? AND ?? = ? ORDER BY ?? ${countSql}`;
+        sql = `SELECT DISTINCT ?? as value FROM ??  WHERE ${orderClause} AND ?? = ? ORDER BY ?? ${countSql}`;
     } else {
-        sql = `SELECT DISTINCT ?? as value FROM ?? WHERE ?? = ? AND ?? LIKE ? ORDER BY ?? ${countSql}`;
+        sql = `SELECT DISTINCT ?? as value FROM ??  WHERE ${orderClause} AND ?? LIKE ? ORDER BY ?? ${countSql}`;
     }
     //console.log(typeof textField);
     //console.dir(textField);
