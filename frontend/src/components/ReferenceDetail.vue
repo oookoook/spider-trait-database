@@ -10,7 +10,7 @@
           <list-item v-if="item.doi" title="DOI" :text="item.doi" icon="mdi-id" link-tooltip="View the original paper" :link="getDOILink(item.doi)" />  
         </v-list>
         <v-card-actions  v-if="item">
-          <v-btn text :to="`/data/reference/${item.id}`"><v-icon left>mdi-filter</v-icon>Set as filter in the data explorer</v-btn>
+          <v-btn text :to="`/data/order/${currentOrder}/reference/${item.id}`"><v-icon left>mdi-filter</v-icon>Set as filter in the data explorer</v-btn>
           <v-btn v-if="showUpdate" text color="warning" @click="$emit('edit')"><v-icon left>mdi-pencil-outline</v-icon>Edit</v-btn>
           <v-btn v-if="showUpdate" text color="error" @click="showReplace = true"><v-icon left>mdi-pencil-outline</v-icon>Replace &amp; delete</v-btn>
         </v-card-actions>
@@ -37,7 +37,9 @@ export default {
     }
   },
   computed: {
-
+    currentOrder() {
+      return this.$store.state.references.order;
+    }
   },
   watch: {
 

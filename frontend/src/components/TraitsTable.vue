@@ -38,7 +38,7 @@
     </template>
 
     <template v-slot:item.actions="{ item }">
-    <entity-link-cell tooltip="Set as filter in the data explorer" :link="`data/trait/${item.id}`" icon="mdi-filter" />
+    <entity-link-cell tooltip="Set as filter in the data explorer" :link="`/data/order/${currentOrder}/trait/${item.id}`" icon="mdi-filter" />
     </template>
     <!--
     <template v-slot:expanded-item="{ headers, item }">
@@ -71,6 +71,9 @@ export default {
     }
   },
   computed: {
+    currentOrder() {
+      return this.$store.state.traits.order;
+    }
   },
   watch: {
   },

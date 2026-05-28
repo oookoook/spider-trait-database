@@ -33,7 +33,7 @@
     <template v-slot:item.actions="{ item }">
     <entity-link-cell icon="mdi-spider" tooltip="View in the World Spider Catalog (opens in a new tab)" external :link="getWscLink(item)" />
 
-    <entity-link-cell tooltip="Set as filter in the data explorer" :link="`data/species/${item.id}`" icon="mdi-filter" />
+    <entity-link-cell tooltip="Set as filter in the data explorer" :link="`/data/order/${currentOrder}/species/${item.id}`" icon="mdi-filter" />
     </template>
     </v-data-table>
   </v-card>
@@ -80,6 +80,9 @@ export default {
     }
   },
   computed: {
+    currentOrder() {
+      return this.$store.state.taxonomy.order;
+    }
   },
   watch: {
   },
