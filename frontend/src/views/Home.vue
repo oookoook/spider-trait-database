@@ -5,8 +5,8 @@
       <v-container fluid class="home-hero-content d-flex flex-column justify-space-between">
         <v-row class="pt-2 mt-2 pt-xl-8 mt-xl-8 pt-xl-8 mt-xl-16 pl-xl-8 ml-xl-16" no-gutters>
           <v-col cols="auto">
-            <v-row><div class="text-h3 text-xl-h2 font-weight-black">Welcome to the</div></v-row>
-            <v-row class="py-4"><div class="text-uppercase text-h3 text-xl-h2 primary--text font-weight-black">World Arachnida Trait</div></v-row>
+            <v-row class="mx-5 mt-5 mt-xl-0"><div class="text-h3 text-xl-h2 font-weight-black">Welcome to the</div></v-row>
+            <v-row class="py-4 mx-5"><div class="text-uppercase text-h3 text-xl-h2 primary--text font-weight-black">World Arachnida Trait</div></v-row>
             <v-row justify="end"><div class="text-h3 text-xl-h2 font-weight-black">database</div></v-row>
             <!--<v-row class="mt-4"><div class="text-h6">First centralised online open-access database of phenotypic traits of arachnid species at a global scale</div></v-row>
             <v-row class="mt-2"><div class="text-h6">Freely accessible, curated, and constantly updated archive by assembling published and unpublished data</div></v-row>
