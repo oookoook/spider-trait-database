@@ -5,11 +5,7 @@
 
     <v-row justify="space-between" align="center" class="my-16">
       <v-col cols="7" class="about-text text-xl-h5 text-subtitle-1">
-      Anybody is welcome to contribute data to the database. Since many journals require data to be made publicly available, 
-      the database can be used as a free public repository. As an alternative to standard databases such as Dryad, the WST 
-      database will have a higher visibility as it can be searched in different contexts and presented in systematic reviews conducted 
-      through the database. If you wish to contribute data, please read below to find the procedure and rules of data submission, 
-      and a tutorial on data modification using the online data editing tool.
+      Anybody is welcome to contribute data to the database. Since many journals require data to be made publicly available, the database can be used as a free public repository. As an alternative to standard databases such as Dryad, the WAT database will have a higher visibility as it can be searched in different contexts and presented in systematic reviews conducted through the database. Every dataset receives DOI which can be further used for reference. If you wish to contribute data, please read below to find the procedure and rules of data submission, and a tutorial on data modification using the online data editing tool.
       </v-col>
       <v-col cols="4">
         <v-img contain width="497" :src="contributeImg" />
@@ -22,8 +18,7 @@
         <v-img contain width="515" :src="contactImg" />
       </v-col>
       <v-col cols="7" class="about-text text-xl-h5 text-subtitle-1">
-      If you are ready to contribute data to the database, please contact the <a href="mailto:spidertraits@sci.muni.cz">administrator</a>. 
-      You will receive a username and a password, which will give you access to the submission page.
+      If you are ready to contribute data to the database, please contact the <a href="mailto:arachnidatraits@sci.muni.cz">administrator</a>.
       </v-col>
     </v-row>
 
@@ -62,7 +57,7 @@ The contributor should also provide either only the <code>method_abbrev</code> i
 <p class="about-text text-xl-h5 text-subtitle-1">When the contributor completes the changes and the dataset is valid, they can send the dataset to the editor for review (by clicking the <em>Send for review</em> button). The contributor can include a message to the editor when submitting the dataset for review in which they can explain any problems they had encountered while editing the dataset.</p>
 <p class="about-text text-xl-h5 text-subtitle-1">Once the dataset is validated by the editor it will be submitted to the database. This means that all the data are transferred from the temporary import cache to the main database and become available for the general public to view and download.</p>
 <p class="about-text text-xl-h5 text-subtitle-1">If the dataset is rejected by the editor, the contributor can edit the dataset again by clicking the pen icon on the right. The contributor can also view any message from the editor by clicking the arrow that points downward.</p>
-<p class="about-text text-xl-h5 text-subtitle-1">Thank you for considering contributing your data to the world spider database and if you have any further questions please contact us at <a href="mailto:spidertraits@sci.muni.cz">spidertraits@sci.muni.cz</a>.</p>
+<p class="about-text text-xl-h5 text-subtitle-1">Thank you for considering contributing your data to the World Arachnida Trait database and if you have any further questions please contact us at <a href="mailto:arachnidatraits@sci.muni.cz">arachnidatraits@sci.muni.cz</a>.</p>
   </v-container>
 </template>
 <script>
@@ -70,6 +65,7 @@ import contributeImg from '../assets/contribute.png'
 import contactImg from '../assets/contact.png'
 
 export default {
+  name: 'ContributePage',
   data() {
     return {
       contributeImg,

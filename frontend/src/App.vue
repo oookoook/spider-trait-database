@@ -11,7 +11,7 @@
 
 
       <v-divider vertical class="mx-5"></v-divider>
-      <v-toolbar-items>
+      <v-toolbar-items :key="currentOrder ? `order-navigation-${currentOrder}` : 'global-navigation'">
       <v-btn
         v-if="currentOrder"
         :to="`/data/order/${currentOrder}`"
@@ -179,7 +179,7 @@
           Stano Pekar, Caroline Sayuri, and Jonas Wolff.
           -->
           <div class="subtitle-2">
-          Pekár S. et al. 2026. The Archanida Spider Trait database: a centralised global open repository for curated data on spider traits. Database 2026: xxxx000.
+          Pekár S. et al. 2027. The Archanida Spider Trait database: a centralised global open repository for curated data on traits of arachnid orders. Database 2027: xxxx000.
           <!-- , doi: -->
           </div>
         </v-col>
