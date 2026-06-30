@@ -139,3 +139,4 @@ pm2 restart spidertraits
 
 - Postup je identický, pouze jiná hostname.
 - Před migrací na produkci doporučeno udělat snapshot/zálohu.
+- Na produkci je dále třeba prověřit "dirty" soubory v repozitáří, jsou to shellové skripty, kde je napevno cesta k node 16. Tyto soubory nejspíš bude stačit resetovat na verze z repozitáře, aby se spouštely s default verzí node.
