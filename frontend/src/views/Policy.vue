@@ -1,10 +1,10 @@
 <template>
   <v-container>
     <h1>Privacy policy statement</h1>
-    <p>The World Spider Trait database is hosted by the <a target="_blank" href="https://muni.cz/en">Masaryk University</a>. The 
+    <p>The World Arachnida Trait database is hosted by the <a target="_blank" href="https://muni.cz/en">Masaryk University</a>. The 
     <a href="https://www.muni.cz/en/about-us/official-notice-board/personal-data-protection">privacy policy</a> of the university applies to this web page.</p>
 
-    <p>This page provides further information on usage of your personal data by the The World Spider Trait database.</p>
+    <p>This page provides further information on usage of your personal data by the The World Arachnida Trait database.</p>
     
     <h2>What data do we collect?</h2>
     <p>When you visit our website, we collect usage data using cookies (see below). If you decide to contribute to the database, this website requires access to your Personal identification information (Name, email address). The data are managed and stored by the Masaryk University. See the <a href="https://www.muni.cz/en/about-us/official-notice-board/personal-data-protection">Information on MU Processing and Protection of Personal Data</a> for more information on the handling of your personal data.

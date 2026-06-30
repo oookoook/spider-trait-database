@@ -2,7 +2,7 @@
   <v-container>
     
     <h2>REST API</h2>
-    <p>The WSTDB provides an REST API for programmatic access.</p>
+    <p>The WATDB provides an REST API for programmatic access.</p>
     <p>Visit the <a href="https://github.com/oookoook/spider-trait-database/blob/master/docs/api.md" target="_blank">API documentation page</a> for more details. You can also inspect the API using the browser Developer tools.</p>
     <p>To fully use the API (e.g. view items with restricted access), you have to have an user account.</p>
     <auth-section>

@@ -1,7 +1,7 @@
 <template>
   <v-container fluid class="pa-0">
     <!-- Header hero -->
-    <v-img eager :src="require('../assets/spider1.jpg')" height="calc(100vh - 64px)" max-height="calc(100vh - 64px)" contain position="right" class="home-hero">
+    <!--<v-img eager :src="require('../assets/spider1.jpg')" height="calc(100vh - 64px)" max-height="calc(100vh - 64px)" contain position="right" class="home-hero">-->
       <v-container fluid class="home-hero-content d-flex flex-column justify-space-between">
         <v-row class="pt-2 mt-2 pt-xl-8 mt-xl-8 pt-xl-8 mt-xl-16 pl-xl-8 ml-xl-16" no-gutters>
           <v-col cols="auto">
@@ -16,7 +16,7 @@
         </v-row>
 
         <!-- Order cards -->
-        <v-container class="order-cards-container px-0 pb-3 pb-md-6" fluid>
+        <v-container class="order-cards-container mt-8 px-0 pb-3 pb-md-6" fluid>
           <v-row class="order-cards-row flex-nowrap flex-md-wrap">
             <v-col v-if="ordersLoading" cols="12" class="text-center py-8">
               <v-progress-circular indeterminate color="primary" size="48" />
@@ -31,7 +31,7 @@
                       </v-row>
                     </template>
                   </v-img>
-                  <v-card-title class="justify-center primary--text font-weight-bold text-center order-card-title">
+                  <v-card-title class="justify-center font-weight-bold text-center order-card-title">
                     {{ order.name }}
                   </v-card-title>
                 </v-card>
@@ -40,7 +40,7 @@
           </v-row>
         </v-container>
       </v-container>
-    </v-img>
+    <!--</v-img>-->
 
     <hr class="primary mx-auto my-16" style="height:3px; border:none;width:75%" />
 
@@ -118,7 +118,7 @@ export default {
 };
 </script>
 <style scoped>
-.home-hero-content {
+.home-hero-contentx {
   height: 100%;
 }
 

@@ -179,7 +179,7 @@
           Stano Pekar, Caroline Sayuri, and Jonas Wolff.
           -->
           <div class="subtitle-2">
-          Pekár S. et al. 2027. The Archanida Spider Trait database: a centralised global open repository for curated data on traits of arachnid orders. Database 2027: xxxx000.
+          Pekár S. et al. 2027. The World Arachnida Trait database: a global repository for curated data on traits of arachnid orders.. Database 2027: xxxx000.
           <!-- , doi: -->
           </div>
         </v-col>

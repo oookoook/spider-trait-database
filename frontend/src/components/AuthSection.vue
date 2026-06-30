@@ -3,7 +3,7 @@
     <v-card v-if="!user">
       <v-card-title><v-icon color="warning" left>mdi-cancel</v-icon>Authentication required</v-card-title>
       <v-card-text>You must be logged in to access this section of the portal. Please sign in or request access by writing an email to the administrators of the
-        Spider Trait Database (<a :href="`mailto:${adminMail}`">{{adminMail}}</a>).
+        World Arachnida Trait Database (<a :href="`mailto:${adminMail}`">{{adminMail}}</a>).
       </v-card-text>
     <v-card-actions>
       <v-btn text :href="loginUrl"><v-icon color="primary" left>mdi-account-arrow-right-outline</v-icon>  Log in </v-btn>
@@ -13,13 +13,13 @@
     <v-card v-else-if="editor && !isEditor">
       <v-card-title><v-icon color="warning" left>mdi-cancel</v-icon>Unsufficient rights</v-card-title>
       <v-card-text>You must be an editor to access this section of the portal. If you want to became one of the editors, please write an email to the administrators of the
-        Spider Trait Database (<a :href="`mailto:${adminMail}`">{{adminMail}}</a>).
+        World Arachnida Trait Database (<a :href="`mailto:${adminMail}`">{{adminMail}}</a>).
       </v-card-text>
     </v-card>
     <v-card v-else-if="admin && !isAdmin">
       <v-card-title><v-icon color="warning" left>mdi-cancel</v-icon>Unsufficient rights</v-card-title>
       <v-card-text>You must be an administrator to access this section of the portal. If you want to became one of the administrators, please write an email to the administrators of the
-        Spider Trait Database (<a :href="`mailto:${adminMail}`">{{adminMail}}</a>).
+        World Arachnida Trait Database (<a :href="`mailto:${adminMail}`">{{adminMail}}</a>).
       </v-card-text>
     </v-card>
     <slot v-else :isEditor="isEditor" :isAdmin="isAdmin" :user="user">

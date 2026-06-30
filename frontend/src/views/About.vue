@@ -69,9 +69,9 @@
   </v-container>
 </template>
 <script>
-import spider2Img from '../assets/spider2.jpg'
-import spider3Img from '../assets/spider3.jpg'
-import spider4Img from '../assets/spider4.jpg'
+import spider2Img from '../assets/about-1.jpg'
+import spider3Img from '../assets/about-2.jpg'
+import spider4Img from '../assets/about-3.jpg'
 import eduImg from '../assets/edu.png'
 import repairImg from '../assets/repair.png'
 
