@@ -107,7 +107,13 @@ Před restartem aplikace po upgradu kódu spustit migraci pro podporu řádů (i
 mysql -u root spider_traits_db < /opt/spider-traits/spider-trait-database/db/sql/order-tables.sql
 ```
 
-Dále je třeba spustit sql soubory pro import jednotlivých katalogů druhů pro všechny řády.
+Dále je třeba spustit sql soubory pro import jednotlivých katalogů druhů pro všechny řády:
+
+```bash
+for f in /opt/spider-traits/spider-trait-database/db/sql/arachind-taxa/*.sql; do
+  sudo mysql -u root spider_traits_db < "$f"
+done
+```
 
 ### TLS certifikát (Let's Encrypt)
 

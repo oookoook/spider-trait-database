@@ -1,6 +1,20 @@
 // Parses a WSC-style order taxon list (XLSX) and emits a SQL file with
-// taxonomy / taxonomy_name INSERTs for manual review (see taxa-importer.prompt.md).
+// taxonomy / taxonomy_name INSERTs for manual review (see rules below)
 // Usage: node taxa-importer.js <path-to-order.xlsx> <path-to-output.sql>
+
+/*
+- type of entity is in the second column. Every type is trailed by `]` which we will remove
+- Based on the type of the entity the rules for parsing the first column will change:
+  - For genus and family, the first word in the column is the name of the entity. the rest of the column is interpreted as authors. The authors format **cannot** be changed.
+  - For species, the first two words in the column are the genus and species name. The rest of the column is interpreted as authors. The authors format **cannot** be changed.
+- There are different symbols a the start of the line with a distinct meaning:
+  - `†` indicates extinct species, we ignore this symbol and import the species as normal.
+  - `?` this indicates uncertain species, we ignore this row.
+  - `=` indicates a synonym, we import this row as a synonym and link it to the accepted species which is the last row above this one without the `=`.
+- Special symbols can be combined with the above symbols, for example `†?` or `†?` indicates an extinct and uncertain species, we ignore this row.
+- The order of the taxonomy record is contained in the file name (e.g., solifugae.md) and should be used to populate the order field in the database. The filename should be normalized beforehand to ensure it is in a consistent format with the database records (e.g., CamelCase, no spaces, etc.).
+*/
+
 const fs = require('fs');
 const path = require('path');
 const XLSX = require('xlsx');
