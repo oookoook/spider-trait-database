@@ -18,6 +18,26 @@ const app = express();
 
 app.use(compression())
 
+// redirects the old "spidertraits.*" domain to the new "arachnidatraits.*/araneae/*" domain
+// matches only the first hostname label so it also works for test servers (e.g. spidertraits.nastojte.cz)
+app.use((req, res, next) => {
+  const hostname = (req.headers.host || '').split(':')[0];
+  const match = hostname.match(/^spidertraits\.(.+)$/i);
+  if (!match) {
+    return next();
+  }
+
+  const newHost = `arachnidatraits.${match[1]}`;
+  const [pathname, ...queryParts] = req.originalUrl.split('?');
+  const search = queryParts.length ? '?' + queryParts.join('?') : '';
+
+  const newPath = (pathname === '/data' || pathname.startsWith('/data/'))
+    ? '/data/order/araneae' + pathname.slice('/data'.length)
+    : '/araneae' + pathname;
+
+  return res.redirect(301, `${req.protocol}://${newHost}${newPath}${search}`);
+});
+
 // userd for testing. Other CORS requests should be blocked
 app.use(cors({
   origin: ['http://localhost:8080', 'http://localhost:5173'],
@@ -60,7 +80,8 @@ app.use(history({
           // just get the same url that was on input
           return 'index.html';
         }
-      }
+      },
+
     ],
     //verbose: true
   }));
