@@ -2,7 +2,7 @@
   <v-card>
     <v-card-title>
       Traits 
-      <action-button tooltip color="primary" v-if="isEditor" to="/traits/new" />
+      <action-button tooltip color="primary" v-if="isEditor" :to="`/${currentOrder}/traits/new`" />
       <v-spacer></v-spacer>
       <list-filter 
       :search-fields="searchFields" 
@@ -34,7 +34,7 @@
     >
   
     <template v-slot:item.abbrev="{ item }">
-      <entity-link-cell new-tab :text="item.abbrev" tooltip="View the trait detail" :link="`/traits/${item.id}`" />
+      <entity-link-cell new-tab :text="item.abbrev" tooltip="View the trait detail" :link="`/${currentOrder}/traits/${item.id}`" />
     </template>
 
     <template v-slot:item.actions="{ item }">

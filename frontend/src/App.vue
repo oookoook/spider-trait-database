@@ -205,6 +205,7 @@
 <script>
 import { mapGetters } from 'vuex'
 import Auth from './mixins/auth'
+import CurrentOrder from './mixins/current-order'
 import muniWhite from './assets/muni-white.png'
 import muniText from './assets/muni-lg-text-eng-white.png'
 import ccIcon from './assets/cc.svg'
@@ -212,7 +213,7 @@ import byIcon from './assets/by.svg'
 
 export default {
   name: 'App',
-  mixins: [Auth],
+  mixins: [Auth, CurrentOrder],
   components: {
   },
 
@@ -234,16 +235,6 @@ export default {
       }
     },
     ...mapGetters(['notification']),
-    currentOrder() {
-      return this.$route.params.order || null;
-    },
-    orderDisplayName() {
-      if (!this.currentOrder) return '';
-      const found = this.$store.state.orders.list.find(
-        (o) => o.id.toLowerCase() === this.currentOrder.toLowerCase()
-      );
-      return found ? found.name : (this.currentOrder.charAt(0).toUpperCase() + this.currentOrder.slice(1));
-    },
   }
 }
 </script>

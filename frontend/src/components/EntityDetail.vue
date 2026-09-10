@@ -63,13 +63,14 @@
 import { mapGetters } from "vuex";
 
 import IdFromRoute from "../mixins/id-from-route";
+import CurrentOrder from "../mixins/current-order";
 import EntityProvider from "../components/EntityProvider";
 import ListProvider from "../components/ListProvider";
 import EntityDialog from "../components/EntityDialog";
 import DataPreviewTable from "../components/DataPreviewTable";
 export default {
   name: "entityDetail",
-  mixins: [IdFromRoute],
+  mixins: [IdFromRoute /*, CurrentOrder */],
   components: {
     EntityProvider,
     ListProvider,
@@ -105,6 +106,10 @@ export default {
     editDialog() {
       return this.isEditor && (this.entityCreate || this.entityEdit);
     },
+    currentOrder() {
+      //console.log("entitiy dialog deriving entity / list from store", this.entity, this.list);
+      return this.$store.state[this.list].order;
+    },
     ...mapGetters(["isEditor"])
   },
   watch: {
@@ -114,7 +119,7 @@ export default {
     entityCreate(val, oldVal) {
       console.log('entityCreate watcher executed');
       if(oldVal && !val) {
-        this.$router.push(`/${this.list}`);
+        this.$router.push(`/${this.currentOrder}/${this.list}`);
       }
     }
   },
@@ -142,7 +147,7 @@ export default {
       }
     },
     entityList(endpoint) {
-      this.$router.push(`/${endpoint}`);
+      this.$router.push(`/${this.currentOrder}/${endpoint}`);
     },
     hideEdit() {
       this.entityEdit=false;

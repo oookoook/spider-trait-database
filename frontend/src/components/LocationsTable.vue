@@ -2,7 +2,7 @@
   <v-card>
     <v-card-title>
       Locations
-      <action-button tooltip color="primary" v-if="isEditor" to="/locations/new" />
+      <action-button tooltip color="primary" v-if="isEditor" :to="`/${currentOrder}/locations/new`" />
       <v-spacer></v-spacer>
       <!--
       <list-filter 
@@ -24,7 +24,7 @@
     >
     
     <template v-slot:item.abbrev="{ item }">
-      <entity-link-cell new-tab :text="item.abbrev" tooltip="View the location detail" :link="`/locations/${item.id}`" />
+      <entity-link-cell new-tab :text="item.abbrev" tooltip="View the location detail" :link="`/${currentOrder}/locations/${item.id}`" />
     </template>
     
     <template v-slot:item.coords="{ item }">

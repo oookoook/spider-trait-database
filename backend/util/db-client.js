@@ -343,7 +343,7 @@ const getAutocomplete = async function(endpoint, order, valueField, textField, s
 }
 
 const createEntity = async function (opts) {
-    var {body, table, auth, prepareForSql, validate} = opts;
+    var {body, table, auth, prepareForSql, validate, order} = opts;
     var obj = body;
     await prepareForSql(obj, auth);
     if (typeof validate == 'function') {
@@ -358,11 +358,34 @@ const createEntity = async function (opts) {
     delete(obj.id);
     //console.dir(obj);
     var r = await query({table, sql: `INSERT INTO ${table} SET ?`, values: [obj] });
+    
     obj.id = r.insertId; 
+    
+    if(order) {
+        var q = await query({table: `${table}_order`, sql: `INSERT INTO ${table}_order SET ?? = ?, order_id = ?`, values: [`${table}_id`, obj.id, order]})
+        obj.order = order;
+    }
+    
     return {
         id: r.insertId,
         entity: obj
     }
+}
+
+const getEntityOrderAssignments = async function (opts) {
+    let { table, id } = opts;
+    var r = await query({table: `${table}_order`, sql: `SELECT order_id FROM ${table}_order WHERE ?? = ?`, values: [`${table}_id`, id]});
+    return r.map(i => i.order_id);
+}
+
+const updateEntityOrderAssignment = async function (opts) {
+    let { table, id, orders } = opts;
+    for(let i = 0; i < orders.length; i++) {
+        let order = orders[i];
+        await query({table: `${table}_order`, sql: `INSERT INTO ${table}_order SET ?? = ?, order_id = ? ON DUPLICATE KEY UPDATE order_id = ?`, values: [`${table}_id`, id, order, order]});
+    }
+    // remove assignments that are not in the orders array
+    await query({table: `${table}_order`, sql: `DELETE FROM ${table}_order WHERE ?? = ? AND order_id NOT IN (?)`, values: [`${table}_id`, id, orders]});
 }
 
 const getAuthWhere = function(auth) {
@@ -532,6 +555,8 @@ module.exports = {
     createEntity,
     updateEntity,
     deleteEntity,
+    getEntityOrderAssignments,
+    updateEntityOrderAssignment,
     getAutocomplete,
     addSynonyms,
     escape: mysql.escape,

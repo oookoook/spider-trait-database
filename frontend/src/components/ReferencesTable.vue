@@ -2,7 +2,7 @@
   <v-card>
     <v-card-title>
       References
-      <action-button tooltip color="primary" v-if="isEditor" to="/references/new" />
+      <action-button tooltip color="primary" v-if="isEditor" :to="`/${currentOrder}/references/new`" />
       <v-spacer></v-spacer>
       <list-filter 
       :search-fields="searchFields" 
@@ -24,7 +24,7 @@
     >
     
     <template v-slot:item.abbrev="{ item }">
-      <entity-link-cell new-tab :text="item.abbrev" tooltip="View the reference detail" :link="`/references/${item.id}`" />
+      <entity-link-cell new-tab :text="item.abbrev" tooltip="View the reference detail" :link="`/${currentOrder}/references/${item.id}`" />
     </template>
 
     <template v-slot:item.doi="{ item }">

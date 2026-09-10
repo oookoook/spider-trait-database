@@ -34,7 +34,7 @@ export default [
     save: (o, v) => {},
     isValid: (i, e) => !i.valid.duplicate || 'Record is not valid',
   }, 
-  /*
+  
   {
       name: 'taxonomy.order',
       text: 'Order',
@@ -42,7 +42,8 @@ export default [
       displayValue: (i) => i.taxonomy.order,
       save: (o, v) => {if(!o.taxonomy) o.taxonomy={}; o.taxonomy.order = v; },
       isValid: (i, e) => !!i.taxonomy.id || (!e && !!i.taxonomy.order) || (e === 'create' && !!i.taxonomy.order) ||  (!i.taxonomy.taxon && !!i.taxonomy.lsid) || 'Taxon must be assigned to the record', 
-      similar: { endpoint: 'taxonomy', valueField: 'order' }
+      similar: { endpoint: 'taxonomy', valueField: 'order' },
+      readOnly: true
   },
   {
     name: 'taxonomy.family',
@@ -57,12 +58,12 @@ export default [
     name: 'taxonomy.taxon',
     text: 'Taxon',
     entity: 'taxonomy',
-    displayValue: (i) => i.taxonomy.taxon,
+    displayValue: (i) => i.taxonomy.taxon, // loads assigned taxon name so it is visible in distinct dialog
     save: (o, v) => {if(!o.taxonomy) o.taxonomy={}; o.taxonomy.taxon = v; },
-    isValid: (i, e) => !!i.taxonomy.id || (!e && !!i.taxonomy.taxon) || (e === 'create' && !!i.taxonomy.taxon) || (!i.taxonomy.taxon && !!i.taxonomy.lsid) || 'Taxon must be assigned to the record', 
+    isValid: (i, e) => (e !== 'create' && !!i.taxonomy.id) || (!e && !!i.taxonomy.taxon) || (e === 'create' && !!i.taxonomy.taxon) || (!i.taxonomy.taxon && !!i.taxonomy.lsid) || 'Taxon must be assigned to the record', 
     similar: { endpoint: 'taxonomy', valueField: 'fullName' }
   },
-  */
+  
   { 
       name: 'taxonomy.lsid',
       text: 'WSC LSID',
@@ -75,7 +76,8 @@ export default [
     { 
       name: 'originalName',
       text: 'Original name',
-      displayValue: (i) => i.originalName, 
+      entity: 'taxonomy',
+      displayValue: (i) => i.originalName || i.taxonomy.originalName, 
       save: (o, v) => { o.originalName = v; }, 
       isValid: (i, e) => !!i.taxonomy.id || !!i.taxonomy.taxon || 'Taxon must be assigned to the record',
       autocomplete: { endpoint: 'taxonomy', valueField: 'fullName' }
@@ -84,17 +86,24 @@ export default [
     { 
       name: 'taxonomy.fullName',
       text: 'Assigned name',
-      //entity: 'taxonomy', 
+      entity: 'taxonomy', 
       displayValue: (i) => {
         if(i.taxonomy.fullName) {
           return i.taxonomy.fullName;
         }
 
-        if(!!i.taxonomy.order && !!i.taxonomy.family && !i.taxonomy.id) {
+        // full name was added to backend
+        // this happens when reading distinct values - full nname is not available here,
+        // but because we were able to match it to an existing taxon, we can display its name
+        if(i.taxonomy.id) {
+          return i.taxonomy.taxon || i.taxonomy.originalName;
+        }
+
+        if(!!i.taxonomy.order && !!i.taxonomy.family && !!i.taxonomy.taxon && !i.taxonomy.id) {
           return 'Taxon not created';
         }
 
-        if(!i.taxonomy.lsid && !i.taxonomy.originalName && !i.taxonomy.order && !i.taxonomy.family) {
+        if(!i.taxonomy.lsid  && (!i.taxonomy.order || !i.taxonomy.family || !i.taxonomy.taxon)) {
           return 'No taxonomic information available';
         }
         
@@ -121,12 +130,17 @@ export default [
           return true;
         }
         
-        if(e && !!i.taxonomy.order && !!i.taxonomy.family) {  
+        if(e === 'create' && !!i.taxonomy.order && !!i.taxonomy.family && !!i.taxonomy.taxon) {
+          // this allows to create a new taxon in the distinct entity table
+          return true;
+        }
+
+        if(e && !!i.taxonomy.order && !!i.taxonomy.family && !!i.taxonomy.taxon) {
           return 'Taxon not created';
         }
 
-        if(!i.taxonomy.lsid && !i.taxonomy.originalName && !i.taxonomy.order && !i.taxonomy.family) {
-          return 'No taxonomic information available. Provide either WCS LSID, orginal name, or full taxonomic categorization (order, family,...]';
+        if(!i.taxonomy.lsid && !i.taxonomy.originalName &&(!i.taxonomy.order || !i.taxonomy.family || !i.taxonomy.taxon)) {
+          return 'No taxonomic information available. Provide either WSC LSID, original name, or full taxonomic categorization (order, family, taxon, ...)';
         }
         
         if (!!i.taxonomy.lsid && !!i.taxonomy.originalName && !i.taxonomy.id) {

@@ -42,21 +42,30 @@ const validate = async function(method) {
     }
 
     var r = await db.query({table: 'method', sql: 'SELECT method.id FROM method WHERE abbrev = ?', values: [method.abbrev], nestTables: false});
-    return (r.length == 0 || (method.id && r[0].id == method.id)) ? true : 'Method abbrev. is already used.';
+    return (r.length == 0 || (method.id && r[0].id == method.id)) ? true : 'Method abbrev. is already used. It might be already defined for a different order.';
 }
 
 const prepareForSql = function(method) {
     // prepare method
     method.reference_id = (method.reference) ? method.reference.id : null;
+    delete(method.order);
     delete(method.reference);
 }
 
 const create = async function(body, auth) {
-    return await db.createEntity({ body, table: 'method', auth, prepareForSql, validate});
+    return await db.createEntity({ body, table: 'method', auth, prepareForSql, validate, order: body.order});
 }
 
 const update = async function(params, body, auth) {
     return await db.updateEntity({params, body, table: 'method', auth, prepareForSql, validate});
+}
+
+const getOrderAssignments = async function(id) {
+    return await db.getEntityOrderAssignments({ table: 'trait', id });
+}
+
+const updateOrderAssignment = async function(id, orders) {
+    return await db.updateEntityOrderAssignment({ table: 'method', id, orders });
 }
 
 const remove = async function(params, auth) {
@@ -75,6 +84,8 @@ module.exports = function(dbClient) {
         get,
         create,
         update,
-        remove
+        remove,
+        getOrderAssignments,
+        updateOrderAssignment
     }
 }

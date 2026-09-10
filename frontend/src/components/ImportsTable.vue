@@ -69,6 +69,7 @@ export default {
     return {
       headers: [
         { text: 'Name', value: 'name' },
+        { text: 'Order', value: 'order_id' },
         { text: 'Created', value: 'date'},
         { text: 'State', value: 'state'},
         { text: 'Uploader', value: 'uploader' },

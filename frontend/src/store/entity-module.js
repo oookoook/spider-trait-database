@@ -1,18 +1,11 @@
 import props from './entity-props' 
 
 
-const normalizeOrderName = (order) => {
-    if(!order) {
-        return null;
-    }
-    let normalizedOrder = order.toLowerCase().replace(/ /g, '_');
-    // first letter uppercase
-    normalizedOrder = normalizedOrder.charAt(0).toUpperCase() + normalizedOrder.slice(1);
-    return normalizedOrder;
-}
+import { normalizeOrderName, orderSensitiveModules } from './order-sync'
 
 
-export default (endpoint, useOrder = false) => {
+export default (endpoint) => {
+    const useOrder = orderSensitiveModules.includes(endpoint)
     return {
     namespaced: true,
     state: {

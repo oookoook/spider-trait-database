@@ -58,6 +58,9 @@ router.route('/traits')
   .post(requiresAuth(), auth.isEditor, function (req, res) {
     traits.create(req.body, req.resourcesAuth).then(r => res.json(r)).catch(e => { err(e); res.sendStatus(400); })
   })
+  .patch(requiresAuth(), auth.isEditor, function (req, res) {
+    traits.updateOrderAssignment(req.params.id, req.body.orders).then(r => res.json(r)).catch(e => { err(e); res.sendStatus(400); })
+  })
 
 router.route('/traits/:id')
   .get(function (req, res) {
@@ -70,6 +73,14 @@ router.route('/traits/:id')
     traits.remove(req.params, req.resourcesAuth).then(r => res.json(r)).catch(e => { err(e); res.sendStatus(400); })
   })
 
+router.route('/traits/:id/assignments')
+  .get(function (req, res) {
+    traits.getOrderAssignments(req.params.id).then(r => res.json(r)).catch(e => { err(e); res.sendStatus(400); })
+  })
+  .patch(requiresAuth(), auth.isEditor, function (req, res) {
+    traits.updateOrderAssignment(req.params.id, req.body.orders).then(r => res.json(r)).catch(e => { err(e); res.sendStatus(400); })
+  })
+
 router.route('/methods')
   .get(function (req, res) {
     methods.list(req.recordLimit).then(r => res.json(r)).catch(e => { err(e); res.sendStatus(400); })
@@ -77,7 +88,7 @@ router.route('/methods')
   .post(requiresAuth(), auth.isEditor, function (req, res) {
     methods.create(req.body, req.resourcesAuth).then(r => res.json(r)).catch(e => { err(e); res.sendStatus(400); })
   })
-
+  
 router.route('/methods/:id')
   .get(function (req, res) {
     methods.get(req.params).then(r => res.json(r)).catch(e => { err(e); res.sendStatus(400); })
@@ -87,6 +98,14 @@ router.route('/methods/:id')
   })
   .delete(requiresAuth(), auth.isEditor, function (req, res) {
     methods.remove(req.params, req.resourcesAuth).then(r => res.json(r)).catch(e => { err(e); res.sendStatus(400); })
+  })
+
+router.route('/methods/:id/assignments')
+  .get(function (req, res) {
+    methods.getOrderAssignments(req.params.id).then(r => res.json(r)).catch(e => { err(e); res.sendStatus(400); })
+  })
+  .patch(requiresAuth(), auth.isEditor, function (req, res) {
+    methods.updateOrderAssignment(req.params.id, req.body.orders).then(r => res.json(r)).catch(e => { err(e); res.sendStatus(400); })
   })
 
 router.route('/references')

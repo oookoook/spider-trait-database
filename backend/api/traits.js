@@ -70,7 +70,7 @@ const validate = async function(trait) {
     }
 
     var r = await db.query({table: 'trait', sql: 'SELECT trait.id FROM trait WHERE abbrev = ?', values: [trait.abbrev], nestTables: false});
-    return (r.length == 0 || (trait.id && r[0].id == trait.id)) ? true : 'Trait abbrev. is already used.';
+    return (r.length == 0 || (trait.id && r[0].id == trait.id)) ? true : 'Trait abbrev. is already used. It might be already defined for a different order.';
 }
 
 const prepareForSql = function(trait) {
@@ -82,17 +82,26 @@ const prepareForSql = function(trait) {
         trait.reference_id = trait.reference.id;
     }
 
+    delete trait.order;
     delete trait.reference;
     delete trait.category;
     delete trait.dataType;
 }
 
 const create = async function(body, auth) {
-    return await db.createEntity({body, table: 'trait', auth, prepareForSql, validate});
+    return await db.createEntity({body, table: 'trait', auth, prepareForSql, validate, order: body.order});
 }
 
 const update = async function(params, body, auth) {
     return await db.updateEntity({params, body, table: 'trait', auth, prepareForSql, validate});
+}
+
+const getOrderAssignments = async function(id) {
+    return await db.getEntityOrderAssignments({ table: 'trait', id });
+}
+
+const updateOrderAssignment = async function(id, orders) {
+    return await db.updateEntityOrderAssignment({ table: 'trait', id, orders });
 }
 
 const remove = async function(params, auth) {
@@ -117,6 +126,8 @@ module.exports = function(dbClient) {
         get,
         create,
         update,
-        remove
+        remove,
+        getOrderAssignments,
+        updateOrderAssignment
     }
 }

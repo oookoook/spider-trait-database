@@ -86,7 +86,7 @@ const routes = [
     component: OrderHome
   },
   {
-    path: '/data/order/:order;',
+    path: '/data/order/:order',
     name: 'data',
     component: () => import(/* webpackChunkName: "data" */ '../views/Data.vue')
   },

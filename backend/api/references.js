@@ -66,6 +66,8 @@ const prepareForSql = async function(reference) {
         reference.abbrev = await getAbbrev(reference.fullCitation);
     }
     reference['full_citation'] = reference.fullCitation;
+    reference['order_id'] = reference.order;
+    delete(reference.order);
     delete(reference.fullCitation);
 }
 
@@ -94,7 +96,8 @@ const replace = async function(params, auth) {
 }
 
 const synonyms = {
-    'fullCitation': 'full_citation'
+    'fullCitation': 'full_citation',
+    //'order': 'order_id'
 }
 
 module.exports = function(dbClient) {

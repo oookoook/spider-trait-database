@@ -107,6 +107,8 @@ Před restartem aplikace po upgradu kódu spustit migraci pro podporu řádů (i
 mysql -u root spider_traits_db < /opt/spider-traits/spider-trait-database/db/sql/order-tables.sql
 ```
 
+Dále je třeba spustit sql soubory pro import jednotlivých katalogů druhů pro všechny řády.
+
 ### TLS certifikát (Let's Encrypt)
 
 Pokud se mění doménové názvy nebo je certifikát nutné obnovit, vystavit přes certbot.

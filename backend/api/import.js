@@ -88,7 +88,8 @@ const joind = 'import LEFT JOIN dataset ON import.dataset_id = dataset.id';
 const joindt = 'import LEFT JOIN dataset ON import.dataset_id = dataset.id '
              + 'LEFT JOIN taxonomy ON import.taxonomy_id = taxonomy.id ';
 
-const joinv = 'import LEFT JOIN trait ON import.trait_abbrev = trait.abbrev '
+const joinv = 'import LEFT JOIN dataset order_constraint ON import.dataset_id = order_constraint.id ' 
+            + 'LEFT JOIN trait_order_view trait ON import.trait_abbrev = trait.abbrev AND order_constraint.order_id = trait.order_id '
             + 'LEFT JOIN data_type ON import.trait_data_type = data_type.name OR trait.data_type_id = data_type.id '
             + 'LEFT JOIN trait_category ON import.trait_category = trait_category.name OR trait.trait_category_id = trait_category.id '
             + 'LEFT JOIN taxonomy ON import.wsc_lsid IS NOT NULL AND import.wsc_lsid = taxonomy.wsc_lsid '
@@ -99,14 +100,14 @@ const joinv = 'import LEFT JOIN trait ON import.trait_abbrev = trait.abbrev '
             + 'LEFT JOIN sex ON import.sex = sex.name '
             + 'LEFT JOIN life_stage ON import.life_stage = life_stage.name '
             + 'LEFT JOIN measure ON import.measure = measure.name '
-            + 'LEFT JOIN method ON import.method_abbrev = method.abbrev '
+            + 'LEFT JOIN method_order_view method ON import.method_abbrev = method.abbrev AND order_constraint.order_id = method.order_id '
             + 'LEFT JOIN country country3 ON import.country_code = country3.alpha3_code '
             + 'LEFT JOIN country country2 ON import.country_code = country2.alpha2_code '
-            + 'LEFT JOIN reference refa ON import.reference_abbrev = refa.abbrev ' 
-            + 'LEFT JOIN reference refd ON import.reference_doi = refd.doi '
-            + 'LEFT JOIN reference reff ON import.reference = reff.full_citation '
-            + 'LEFT JOIN location ON import.location_abbrev = location.abbrev '
-            + 'LEFT JOIN location loccoord ON import.location_lat_conv = loccoord.lat AND import.location_lon_conv = loccoord.lon '
+            + 'LEFT JOIN reference refa ON import.reference_abbrev = refa.abbrev AND order_constraint.order_id = refa.order_id ' 
+            + 'LEFT JOIN reference refd ON import.reference_doi = refd.doi AND order_constraint.order_id = refd.order_id '
+            + 'LEFT JOIN reference reff ON import.reference = reff.full_citation AND order_constraint.order_id = reff.order_id  '
+            + 'LEFT JOIN location ON import.location_abbrev = location.abbrev AND order_constraint.order_id = location.order_id ' 
+            + 'LEFT JOIN location loccoord ON import.location_lat_conv = loccoord.lat AND import.location_lon_conv = loccoord.lon AND order_constraint.order_id = loccoord.order_id '
             //+ 'LEFT JOIN dataset ON import.dataset_id = dataset.id';
 
 const getAuthWhere = function(auth) {
@@ -142,7 +143,7 @@ const getObject = function(r) {
             id: r[`taxonomy_id`],
             fullName: r[`full_name`],
             synchronized: !!r[`wsc_lsid`],
-            //originalName: r[`original_name`] // this is here just for the entity creation
+            originalName: r[`original_name`] // this is here just for the entity creation
         },
         trait: {
             abbrev: r[`trait_abbrev`],
@@ -435,11 +436,11 @@ const transferFromData = async function(params) {
     state.progress+=1000;
     // copy data to import
     await db.cquery(c, {table: 'import', sql:`INSERT INTO import (
-        wsc_lsid, original_name, trait_abbrev, value, value_numeric, measure, sex, life_stage, frequency, frequency_numeric, sample_size, sample_size_numeric, 
+        wsc_lsid, taxonomy_order, taxonomy_family, taxonomy_taxon, original_name, trait_abbrev, value, value_numeric, measure, sex, life_stage, frequency, frequency_numeric, sample_size, sample_size_numeric, 
         event_date, event_date_start, event_date_end, method_abbrev, location_abbrev, reference_abbrev, dataset_id, note, 
         locality, altitude, altitude_numeric, habitat, microhabitat, country_code, row_link, changed, valid, valid_review, duplicate
         ) SELECT 
-        taxonomy.wsc_lsid, data.original_name, trait.abbrev, value, value_numeric, measure.name, sex.name, life_stage.name, frequency, frequency, sample_size, 
+        taxonomy.wsc_lsid, taxonomy.order, taxonomy.family, taxonomy.full_name, data.original_name, trait.abbrev, value, value_numeric, measure.name, sex.name, life_stage.name, frequency, frequency, sample_size, 
         sample_size, event_date_text, event_date_start, event_date_end, method.abbrev, location.abbrev, reference.abbrev, dataset.id, data.note, 
         data.locality, data.altitude, data.altitude, data.habitat, data.microhabitat, country.alpha3_code, data.row_link, 1, 0, 0, 0 
         FROM ${joinf} WHERE data.dataset_id = ?`, values: [id] });
@@ -457,7 +458,7 @@ const transferFromData = async function(params) {
     state.completed = true;
 }
 
-const importRow = async function(conn, ds, r, state, cache) {
+const importRow = async function(conn, ds, r, state, cache, dsorder) {
     var row = {};
     // copy the values and convert to snake case
     //console.dir(r);
@@ -528,10 +529,11 @@ const importRow = async function(conn, ds, r, state, cache) {
     if(row['taxonomy_taxon'] && !row['original_name']) {
         row['original_name'] = row['taxonomy_taxon'];
     }
-    if(!row['taxonomy_taxon'] && row['original_name'] && row['taxonomy_order']) {
+    if(!row['taxonomy_taxon'] && row['original_name']/* && row['taxonomy_family']*/) {
         row['taxonomy_taxon'] = row['original_name'];
     }
 
+    row['taxonomy_order'] = row['taxonomy_order'] || order;
     row['dataset_id'] = ds;
     row['changed'] = 1;
     row['duplicate'] = 0;
@@ -591,11 +593,11 @@ const uploadFile = async function(params, body, files, auth, sourceDir) {
     
     var ds = parseInt(params.id);
 
-    var dscheck = await db.query({table: 'dataset', sql: `SELECT id, name, source_file FROM dataset WHERE id=? AND ${getAuthWhere(auth)}`, values: [ds]});
+    var dscheck = await db.query({table: 'dataset', sql: `SELECT id, name, source_file, order_id FROM dataset WHERE id=? AND ${getAuthWhere(auth)}`, values: [ds]});
     if(!dscheck || dscheck.length == 0 || dscheck[0].id != ds) {
         throw 'Cannot upload to the given dataset';
     }
-    
+    var dsorder = dscheck[0]['order_id'];
     var f = files.dataset;
     if(f.truncated) {
         throw 'File size is too large';
@@ -651,7 +653,7 @@ const uploadFile = async function(params, body, files, auth, sourceDir) {
                     await conn.query({table: 'import', sql: 'END'});
                     await conn.query({table: 'import', sql: 'BEGIN'});
                 }
-                await importRow(conn, params.ds, row, params.state, valCache);
+                await importRow(conn, params.ds, row, params.state, valCache, dsorder);
                 
                 cnt-=1;
                 parser.resume();
@@ -978,7 +980,7 @@ const getColumn = async function(params, limits, auth) {
     // there are some special cases
     if(column == 'taxonomy') {
         
-        cols = ['taxonomy_order', 'taxonomy_family', /*'taxonomy_genus', 'taxonomy_species', 'taxonomy_subspecies',*/ 'taxonomy_taxon', 'wsc_lsid', 'taxonomy_id'];
+        cols = ['taxonomy_order', 'taxonomy_family', /*'taxonomy_genus', 'taxonomy_species', 'taxonomy_subspecies',*/ 'taxonomy_taxon', 'wsc_lsid', 'taxonomy_id', 'original_name'];
     } else if(column == 'reference' && params.column == 'reference') { // reference.fullCitation is also translated as reference
         cols = ['reference', 'reference_abbrev', 'reference_doi', 'reference_id'];
     } else if(column == 'event_date') {
@@ -1006,7 +1008,7 @@ const getColumn = async function(params, limits, auth) {
     } else if(!cols) {
         cols = [column];
     } else {
-        // there are cols from the special cases - the netity column was specified
+        // there are cols from the special cases - the entity column was specified
         entity = column;
     }
     

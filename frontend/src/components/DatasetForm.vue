@@ -12,13 +12,14 @@
             <v-col cols="12" md="6">
               <v-select
                 v-model="dataset.order"
-                :items="$store.state.orders.items"
+                :items="$store.state.orders.list"
                 item-text="name"
                 item-value="id"
                 label="Order"
                 :loading="ordersLoading"
                 prepend-icon="mdi-format-list-bulleted-type"
                 :rules="orderRules"
+                :readonly="!create"
                 required
               ></v-select>
             </v-col>
@@ -161,7 +162,7 @@ export default {
   },
   watch: {
     value(val) {
-      this.dataset = Object.assign({}, this.value || {});
+      this.dataset = Object.assign({}, val || {});
     }
   },
   methods: {
@@ -181,7 +182,8 @@ export default {
   mounted () {
     if (!this.$store.state.orders.list.length) {
       this.ordersLoading = true;
-      this.$store.dispatch(`orders/list`).then(() => { this.ordersLoading = false; });
+      this.$store.dispatch('orders/list', { options: { page: 1, itemsPerPage: 100 } })
+        .finally(() => { this.ordersLoading = false; });
     }
   }
 }

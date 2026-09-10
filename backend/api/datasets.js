@@ -74,6 +74,8 @@ const get = async function(params, auth, showImport) {
      
     r.authorsEmail = r[`authors_email`];
     delete(r[`authors_email`]);
+    r.order = r[`order_id`];
+    delete(r[`order_id`]);
      setState(r);
      // JavaScript dates are serialized badly in JSON
      r.date = r.date.valueOf();
@@ -94,10 +96,12 @@ const prepareForCreate = function(dataset, auth) {
     //dataset.name = db.unique(dataset.name);
     dataset.date = new Date();
     dataset['authors_email'] = dataset.authorsEmail;
+    dataset.order_id = dataset.order;
     if(dataset.restricted === null) {
         delete(dataset.restricted);
     }
     delete(dataset.authorsEmail);
+    delete(dataset.order);
 }
 
 const prepareForUpdate = function(dataset, auth) {
@@ -108,6 +112,7 @@ const prepareForUpdate = function(dataset, auth) {
     delete(dataset.date);
     delete(dataset.doi);
     delete(dataset.doiEditUrl);
+    delete(dataset.order);
     //dataset.name = db.unique(dataset.name);
     dataset['authors_email'] = dataset.authorsEmail;
     if(dataset.restricted === null) {
@@ -213,7 +218,7 @@ const remove = async function(params, auth, sourceDir) {
 
 module.exports = function(dbClient) {
     db = dbClient;
-    db.addSynonyms('datasets', 'dataset', {'state': `imported`, 'uploaded': 'date' });
+    db.addSynonyms('datasets', 'dataset', {'state': `imported`, 'uploaded': 'date', 'order': 'order_id' });
     return {
         list,
         get,

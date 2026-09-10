@@ -619,6 +619,10 @@ INSERT IGNORE INTO `spider_traits_db`.`trait_order` (`trait_id`, `order_id`)
   CROSS JOIN `spider_traits_db`.`order` o
   WHERE t.`abbrev` IN ('ltel','utel','ncan');
 
+-- backfill oder for the current records in the taxonomy table (which were inserted with NULL order values)
+UPDATE taxonomy SET `order` = 'Araneae';
+
+
 -- =============================================================================
 
 SET SQL_MODE=@OLD_SQL_MODE;
