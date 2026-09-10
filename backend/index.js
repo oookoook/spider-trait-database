@@ -18,9 +18,9 @@ const app = express();
 
 app.use(compression())
 
-// redirects the old "spider*" domain (derived from settings.baseUrl) to the new "arachnida*/araneae/*" domain
+// redirects the old "spider*" domain to the new "arachnida*/araneae/*" domain (settings.baseUrl holds the new host)
 // only the first hostname label is checked, so it also works for test servers (e.g. spidertraits.nastojte.cz)
-const oldHostLabel = new URL(settings.baseUrl).hostname.split('.')[0]; // e.g. "spidertraits"
+const oldHostLabel = new URL(settings.baseUrl).hostname.split('.')[0].replace(/arachnida/i, 'spider'); // e.g. "spidertraits"
 app.use((req, res, next) => {
   const hostname = (req.headers.host || '').split(':')[0];
   if (!hostname.toLowerCase().startsWith(oldHostLabel.toLowerCase() + '.')) {
