@@ -75,6 +75,11 @@ const routes = [
     component: () => import(/* webpackChunkName: "prepare" */ '../views/Enums.vue')
   },
   {
+    path: '/assignments',
+    name: 'assignments',
+    component: () => import(/* webpackChunkName: "prepare" */ '../views/Assignments.vue')
+  },
+  {
     path: '/api',
     name: 'api',
     component: () => import(/* webpackChunkName: "dataset" */ '../views/Api.vue')

@@ -80,6 +80,10 @@
           <v-list-item-icon><v-icon>mdi-lifebuoy</v-icon></v-list-item-icon>
           <v-list-item-content><v-list-item-title>Data editor How To</v-list-item-title></v-list-item-content>
         </v-list-item>
+        <v-list-item to="/assignments" v-if="isEditor">
+          <v-list-item-icon><v-icon>mdi-format-list-checks</v-icon></v-list-item-icon>
+          <v-list-item-content><v-list-item-title>Assignments to orders</v-list-item-title></v-list-item-content>
+        </v-list-item>
       </v-list>
     </v-menu>    
     <v-btn v-else

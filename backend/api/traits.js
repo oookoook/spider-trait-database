@@ -3,7 +3,10 @@ var db = null;
 
 
 const list = async function(limits) {
-    const join = 'trait_order_view trait LEFT JOIN trait_category ON trait.trait_category_id = trait_category.id';
+    // without an order filter, joining trait_order_view would duplicate rows for traits assigned to multiple orders
+    const join = (limits && limits.order)
+        ? 'trait_order_view trait LEFT JOIN trait_category ON trait.trait_category_id = trait_category.id'
+        : 'trait LEFT JOIN trait_category ON trait.trait_category_id = trait_category.id';
     
     var res = await db.prepareListResponse(limits, 'trait', null, null, join);
     

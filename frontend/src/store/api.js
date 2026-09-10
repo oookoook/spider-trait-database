@@ -170,6 +170,25 @@ export default {
                 return false;
             }
         },
+        patch: async function(context, payload) {
+            var url = getUrl(payload);
+            if(!await authenticate(context, payload)) {
+                return false;
+            }
+            try {
+                var result = await axios.patch(url, payload.body, { params: payload.query });
+                if(result.data && result.data.error) {
+                    if(result.data.error == 'validation') {
+                        context.dispatch('notify', { error: true, text: result.data.validation});
+                    }
+                }
+                return result.data || true;
+            } catch (err) {
+                console.error(err);
+                context.dispatch('notify', { error: true, text: `Unable to update record.`});
+                return false;
+            }
+        },
         delete: async function(context, payload) {
             var url = getUrl(payload);
             if(!await authenticate(context, payload)) {

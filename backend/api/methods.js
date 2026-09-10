@@ -1,9 +1,11 @@
 var db = null;
 
 const list = async function(limits) {
-    var res = await db.prepareListResponse(limits, 'method', null, null, 'method_order_view method');
+    // without an order filter, joining method_order_view would duplicate rows for methods assigned to multiple orders
+    const join = (limits && limits.order) ? 'method_order_view method' : 'method';
+    var res = await db.prepareListResponse(limits, 'method', null, null, join);
     var results = await db.query({ table: 'method', sql: `SELECT method.id, method.abbrev, method.name, method.description `
-     + `FROM method_order_view method`, nestTables: true, limits });    
+     + `FROM ${join}`, nestTables: true, limits });    
      res.items = results.map(r => {    
         return {
                 id: r.method.id,
@@ -61,7 +63,7 @@ const update = async function(params, body, auth) {
 }
 
 const getOrderAssignments = async function(id) {
-    return await db.getEntityOrderAssignments({ table: 'trait', id });
+    return await db.getEntityOrderAssignments({ table: 'method', id });
 }
 
 const updateOrderAssignment = async function(id, orders) {

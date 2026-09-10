@@ -134,6 +134,23 @@ export default (endpoint) => {
 
             var r = await context.dispatch('delete', p, { root: true });
             return r;
+        },
+        getOrderAssignments: async function(context, payload) {
+            console.log(`${endpoint}/getOrderAssignments`);
+            var p = {};
+            p.endpoint = `${endpoint}/${payload.id}/assignments`;
+            var data = await context.dispatch('get', p, { root: true });
+            return data || [];
+        },
+        updateOrderAssignment: async function(context, payload) {
+            console.log(`${endpoint}/updateOrderAssignment`);
+            var p = {};
+            p.endpoint = `${endpoint}/${payload.id}/assignments`;
+            p.auth = true;
+            p.body = { orders: payload.orders };
+
+            var r = await context.dispatch('patch', p, { root: true });
+            return r;
         }
     },
   }

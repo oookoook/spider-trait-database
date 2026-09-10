@@ -218,14 +218,14 @@ const prepareListResponse = async function (limits, table, customWhereClause, cu
     };
     if (limits.count && !distinctCols) {
         // count is limited when using filter
-        var r = await query({table, sql: `SELECT COUNT(${table}.id) as count FROM ${join ? join : table}`, limits, aggregate: true, customWhereClause, values: customWhereValues});
+        var r = await query({table, sql: `SELECT COUNT(${table}.id) as count FROM ${join ? join : '`' + table + '`'}`, limits, aggregate: true, customWhereClause, values: customWhereValues});
         var count = r[0].count;
         res.count = count;
     } else if (limits.count && distinctCols) {
         //console.log(`Preparing distinct response ${distinctCols} ${join ? join : table}`);
         //var r = await query({table, sql: `SELECT COUNT(*) as count FROM ( SELECT DISTINCT ${distinctSql} FROM ${join ? join : table}) ${table}`, limits, aggregate: true, customWhereClause, values: customWhereValues});
         //console.log(`SELECT COUNT(DISTINCT ${distinctCols.map(c => `COALESCE(${c}, '')`).join(',')}) as COUNT FROM ${join ? join : table}`);
-        var r = await query({table, sql: `SELECT COUNT(DISTINCT ${distinctCols.map(c => `COALESCE(${c}, '')`).join(',')}) as count FROM ${join ? join : table}`, limits, aggregate: true, customWhereClause, values: customWhereValues});
+        var r = await query({table, sql: `SELECT COUNT(DISTINCT ${distinctCols.map(c => `COALESCE(${c}, '')`).join(',')}) as count FROM ${join ? join : '`' + table + '`'}`, limits, aggregate: true, customWhereClause, values: customWhereValues});
         var count = r[0].count;
         res.count = count;
     }
