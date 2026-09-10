@@ -27,7 +27,7 @@
         :item="i.item" 
         :showUpdate="isEditor" 
         :onEdit="() => {entityEdit = true}"
-        :breadcrumbs="[{ text: listTitle, to: `/${list}`, exact: true }, { text: i.item[breadcrumbProp], to: currentPath }]">
+        :breadcrumbs="[{ text: listTitle, to: `/${currentOrder}/${list}`, exact: true }, { text: i.item[breadcrumbProp], to: currentPath }]">
         {{ JSON.stringify(i.item) }}
         </slot>
         <entity-dialog
@@ -36,7 +36,7 @@
           :create="entityCreate"
           :item="i.item"
           :entity-props="i.entityProps"
-          :breadcrumbs="[{ text: listTitle, to: `/${list}`, exact: true }, { text: i.item ? i.item[breadcrumbProp] : 'New item', to: currentPath }]"
+          :breadcrumbs="[{ text: listTitle, to: `/${currentOrder}/${list}`, exact: true }, { text: i.item ? i.item[breadcrumbProp] : 'New item', to: currentPath }]"
           :confirmation-text="deleteConfirmationText"
           @save="i.save"
           @remove="i.remove"
