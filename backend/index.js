@@ -124,7 +124,7 @@ if(!settings.oidc.disable) {
   
 } else {
   // everything is authorized
-  app.use(cauth.mockupAuth('http://localhost:5173/login', 'http://localhost:5173/logout'));
+  app.use(cauth.mockupAuth(settings.baseUrl +'/login', settings.baseUrl + '/logout'));
 }
 // route used to show the SSO login screen
 // 
