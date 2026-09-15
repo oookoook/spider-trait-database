@@ -533,7 +533,7 @@ const importRow = async function(conn, ds, r, state, cache, dsorder) {
         row['taxonomy_taxon'] = row['original_name'];
     }
 
-    row['taxonomy_order'] = row['taxonomy_order'] || order;
+    row['taxonomy_order'] = row['taxonomy_order'] || dsorder;
     row['dataset_id'] = ds;
     row['changed'] = 1;
     row['duplicate'] = 0;

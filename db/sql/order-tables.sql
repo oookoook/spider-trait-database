@@ -29,8 +29,14 @@ INSERT INTO `spider_traits_db`.`order` (`id`, `name`) VALUES
   ('Opiliones',         'Opiliones');
 
 -- =============================================================================
--- PHASE 2: Fix Palpigradi typo and add FK constraint on taxonomy.order
+-- PHASE 2: Expand WSC LSIDs, fix Palpigradi typo, and add taxonomy.order FK
 -- =============================================================================
+
+ALTER TABLE `spider_traits_db`.`taxonomy`
+  MODIFY COLUMN `wsc_lsid` VARCHAR(64) NULL;
+
+ALTER TABLE `spider_traits_db`.`import`
+  MODIFY COLUMN `wsc_lsid` VARCHAR(64) NULL;
 
 -- Fix leading-space typo introduced in arachnid-taxonomy-families.sql
 UPDATE `spider_traits_db`.`taxonomy`
