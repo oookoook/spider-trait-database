@@ -108,7 +108,7 @@ export default [
         }
         
         if (!!i.taxonomy.lsid && !!i.taxonomy.originalName && !i.taxonomy.id) {
-          return 'LSID and Original name do not refer to the same WSC taxon';
+          return 'Unable to match taxon neither by LSID nor by original name';
         }
         if(!!i.taxonomy.originalName && !i.taxonomy.lsid && !i.taxonomy.id) {
           return 'Unknown original name';
