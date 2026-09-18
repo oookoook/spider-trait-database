@@ -243,7 +243,9 @@ const update = async function(params, body, auth) {
 }
 
 const remove = async function(params, auth) {
-    return await db.deleteEntity({params, table: 'taxonomy', auth, validate: validateDelete });
+    return await db.deleteEntity({params, table: 'taxonomy', auth, validate: validateDelete,
+        refs: ['import', 'data', {table: 'taxonomy', field: 'valid_id'}, {table: 'taxonomy_name', field: 'taxonomy_id', cascade: true}]
+    });
 }
 
 

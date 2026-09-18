@@ -403,7 +403,7 @@ const getAuthWhere = function(auth) {
 }
 
 const deleteEntity = async function (opts) {
-    var {params, table, auth, refs, validate} = opts;
+    var {params, table, auth, refs, validate, cascade} = opts;
     var id = parseInt(params.id);
 
     if(!refs) {
@@ -416,11 +416,17 @@ const deleteEntity = async function (opts) {
     for(var i = 0; i < refs.length; i++) {
         var reftbl = typeof refs[i] === 'string' ? refs[i] : refs[i].table;
         var reffld = typeof refs[i] === 'string' ? `${table}_id` : refs[i].field;
+        // ref-level cascade wins over the global flag, otherwise fall back to the global cascade opt
+        var refCascade = typeof refs[i] === 'object' && typeof refs[i].cascade !== 'undefined' ? refs[i].cascade : cascade;
         var cntres = await cquery(conn, {table: reftbl, sql: `SELECT COUNT(id) as cnt FROM ?? WHERE ?? = ?`, values: [ reftbl, reffld, id]});
         var cnt = parseInt(cntres[0].cnt);
         if (cnt > 0) {
-            err += `The entity is referenced in the table ${refs[i]} ${cnt} times.`
-            canDelete = false;
+            if(refCascade) {
+                await cquery(conn, {table: reftbl, sql: `DELETE FROM ?? WHERE ?? = ?`, values: [reftbl, reffld, id]});
+            } else {
+                err += `The entity is referenced in the table ${reftbl} ${cnt} times.`
+                canDelete = false;
+            }
         }        
     }
 
