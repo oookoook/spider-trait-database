@@ -343,7 +343,7 @@ const getAutocomplete = async function(endpoint, order, valueField, textField, s
 }
 
 const createEntity = async function (opts) {
-    var {body, table, auth, prepareForSql, validate, order} = opts;
+    var {body, table, auth, prepareForSql, validate, order, allOrders} = opts;
     var obj = body;
     await prepareForSql(obj, auth);
     if (typeof validate == 'function') {
@@ -361,7 +361,10 @@ const createEntity = async function (opts) {
     
     obj.id = r.insertId; 
     
-    if(order) {
+    if(allOrders) {
+        // assign the new entity to every order currently defined, not just the one being browsed
+        await query({table: `${table}_order`, sql: `INSERT INTO ${table}_order (??, order_id) SELECT ?, id FROM \`order\``, values: [`${table}_id`, obj.id]});
+    } else if(order) {
         var q = await query({table: `${table}_order`, sql: `INSERT INTO ${table}_order SET ?? = ?, order_id = ?`, values: [`${table}_id`, obj.id, order]})
         obj.order = order;
     }

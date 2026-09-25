@@ -92,7 +92,8 @@ const prepareForSql = function(trait) {
 }
 
 const create = async function(body, auth) {
-    return await db.createEntity({body, table: 'trait', auth, prepareForSql, validate, order: body.order});
+    // new traits become available for every order, not just the one currently being browsed
+    return await db.createEntity({body, table: 'trait', auth, prepareForSql, validate, allOrders: true});
 }
 
 const update = async function(params, body, auth) {
@@ -108,7 +109,9 @@ const updateOrderAssignment = async function(id, orders) {
 }
 
 const remove = async function(params, auth) {
-    return await db.deleteEntity({params, table: 'trait', auth});
+    return await db.deleteEntity({params, table: 'trait', auth,
+        refs: ['import', 'data', {table: 'trait_order', field: 'trait_id', cascade: true}]
+    });
 }
 
 const synonyms = {
