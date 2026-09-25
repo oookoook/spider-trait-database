@@ -66,7 +66,7 @@ const getListParams = function(payload) {
 }
 
 
-const authenticate = function(context, payload) {
+const authenticate = async function(context, payload) {
     var authRequired = payload.auth;
     
     if(authRequired) {
@@ -77,7 +77,7 @@ const authenticate = function(context, payload) {
         console.log(Date.now());
         console.log((lastAction + sessionTimeout) > Date.now());
         */ 
-        if(context.dispatch('verifySession', { required: true })) {
+        if(await context.dispatch('verifySession', { required: true })) {
             context.commit('lastAction', {value: Date.now()});
             return Promise.resolve(true);
         } else {
@@ -196,7 +196,7 @@ export default {
             }
             try {
                 var result = await axios.delete(url, { params: payload.query });
-                if(result.data.error) {
+                if(result.data && result.data.error) {
                     if(result.data.error == 'validation') {
                         context.dispatch('notify', { error: true, text: result.data.validation});
                     }

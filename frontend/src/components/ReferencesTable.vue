@@ -33,6 +33,7 @@
 
     <template v-slot:item.actions="{ item }">
     <entity-link-cell tooltip="Set as filter in the data explorer" :link="`/data/order/${currentOrder}/reference/${item.id}`" icon="mdi-filter" />
+    <entity-link-cell v-if="item.hasPdf && isLoggedIn" tooltip="Download PDF" external :link="`${backendUrl}references/${item.id}/pdf`" icon="mdi-file-pdf-box" />
     </template>
 
     </v-data-table>
@@ -61,6 +62,12 @@ export default {
   computed: {
     currentOrder() {
       return this.$store.state.references.order;
+    },
+    backendUrl() {
+      return this.$store.getters.baseUrl;
+    },
+    isLoggedIn() {
+      return !!this.$store.getters.isLoggedIn;
     }
   },
   watch: {

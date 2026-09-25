@@ -101,6 +101,22 @@ pm2 logs spidertraits --lines 50   # žádné chyby při startu
 
 ### DB migrace
 
+Na serveru s `/etc/mysql/mariadb.conf.d/50-server.cnf` nastavit trvale `max_allowed_packet` na 64 MiB (příkaz vytvoří zálohu `.bak`). Restart MariaDB naplánovat do servisního okna:
+
+```bash
+sudo sed -i.bak -E 's/^[[:space:]]*#?[[:space:]]*max_allowed_packet[[:space:]]*=.*/max_allowed_packet = 64M/' /etc/mysql/mariadb.conf.d/50-server.cnf
+sudo systemctl restart mariadb
+sudo mariadb -e "SHOW GLOBAL VARIABLES LIKE 'max_allowed_packet';"
+```
+
+Očekávaná hodnota je `67108864`.
+
+Pro PDF přílohy referencí po záloze databáze aplikovat migraci:
+
+```bash
+mysql -u root spider_traits_db < /opt/spider-traits/spider-trait-database/db/sql/reference-pdf.sql
+```
+
 Před restartem aplikace po upgradu kódu spustit migraci pro podporu řádů (issue #44 — World Arachnida Traits Database):
 
 ```bash

@@ -7,9 +7,9 @@
         -->
       </v-card-title>
       <v-card-text>
-        <p>CSV and Excel files are supported. Maximum allowed file size is 100 MB.</p>
+        <p>{{ description || `CSV and Excel files are supported. Maximum allowed file size is ${sizeLabel}.` }}</p>
         <v-form v-model="valid" ref="form">
-          <v-file-input :rules="uploadRules" v-model="file" accept=".xls,.xlsx,application/vnd.ms-excel,.csv,text/csv,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" label="Dataset source file" show-size></v-file-input> 
+          <v-file-input :rules="uploadRules" v-model="file" :accept="accept" :label="inputLabel" show-size></v-file-input>
         </v-form>
       </v-card-text>
     <v-card-actions>
@@ -28,16 +28,24 @@ export default {
   components: {
     ActionButton
   },
-  props: {},
+  props: {
+    accept: { type: String, default: '.xls,.xlsx,application/vnd.ms-excel,.csv,text/csv,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' },
+    maxFileSize: { type: Number, default: 100 * 1024 * 1024 },
+    description: { type: String, default: '' },
+    inputLabel: { type: String, default: 'Dataset source file' }
+  },
   data () {
     return {
       valid: false,
-      file: null,
-      uploadRules: [ value => !!value || 'You must provide a file to upload', 
-        value => !value || value.size < (100 * 1024 * 1024) || 'File size be less than 100 MB' ],    
+      file: null
     }
   },
   computed: {
+    sizeLabel() { return `${this.maxFileSize / (1024 * 1024)} MiB`; },
+    uploadRules() {
+      return [value => !!value || 'You must provide a file to upload',
+        value => !value || value.size <= this.maxFileSize || `File size must not exceed ${this.sizeLabel}`];
+    }
   },
   watch: {
   },

@@ -27,6 +27,9 @@ module.exports = {
         sourceDir: './test/source',
         import: {
             sizeLimitMB: 100
+        },
+        referencePdf: {
+            sizeLimitMB: 20
         }
     },
     mail: {

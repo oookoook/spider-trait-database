@@ -3,7 +3,7 @@
         <v-card>
             <v-card-title>Replace reference</v-card-title>
             <v-card-text>
-            <v-alert type="warning">This operation cannot be taken back. All records related to this reference will be updated and will use the reference you select below.</v-alert>
+            <v-alert type="warning">This operation cannot be taken back. Linked records will use the selected reference. Its PDF is retained if present; otherwise this reference's PDF is transferred. If both have PDFs, this reference's PDF is discarded on deletion.</v-alert>
             Replace <i>{{item.fullCitation}}</i> with:
             <autocomplete-provider 
                 list="references" 
@@ -69,10 +69,15 @@ export default {
             
             //this.$store.dispatch('notify', {text: `Replacing ${this.item.id} with ${this.replacement}!`});
             this.progress = true;
-            this.$store.dispatch('editor/referenceReplace', {id: this.item.id, replacement: this.replacement});
-            this.progress = false;
-            this.open = false;
-            this.$emit('completed', this.replacement);
+            try {
+                const result = await this.$store.dispatch('editor/referenceReplace', {id: this.item.id, replacement: this.replacement});
+                if (result && !result.error) {
+                    this.open = false;
+                    this.$emit('completed', this.replacement);
+                }
+            } finally {
+                this.progress = false;
+            }
         }
     }
 }

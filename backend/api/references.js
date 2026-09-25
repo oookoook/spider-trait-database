@@ -3,13 +3,14 @@ var db = null;
 const list = async function(limits) {
     var res = await db.prepareListResponse(limits, 'reference');
     //console.dir(res);
-    var results = await db.query({table: 'reference', sql: `SELECT id, abbrev, full_citation, doi `
-     + `FROM reference`, nestTables: false, limits});    
+    var results = await db.query({table: 'reference', sql: `SELECT reference.id, reference.abbrev, reference.full_citation, reference.doi, `
+    + `reference_pdf.id IS NOT NULL AS has_pdf FROM reference LEFT JOIN reference_pdf ON reference_pdf.reference_id = reference.id`, nestTables: false, limits});
      res.items = results.map(r => { return {
                 id: r.id,
                 abbrev: r.abbrev,
                 fullCitation: r.full_citation,
-                doi: r.doi
+                doi: r.doi,
+                hasPdf: !!r.has_pdf
             }
         });
     return res;
@@ -84,15 +85,24 @@ const remove = async function(params, auth) {
 }
 
 const replace = async function(params, auth) {
-    // allowed only for Editor and above
-    const toDelete = parseInt(params.id)
-    const replacement = parseInt(params.replacement);
-    if(!replacement) {
-        throw 'No replacing reference defined';
+    const validId = value => /^[1-9]\d*$/.test(String(value)) && Number.isSafeInteger(Number(value));
+    if (!validId(params.id) || !validId(params.replacement) || Number(params.id) === Number(params.replacement)) {
+        return {error: 'validation', validation: 'Select a different, existing reference.'};
     }
-    await db.query({table: 'import', sql: 'UPDATE import SET reference_id = ? WHERE reference_id = ?', values: [replacement, toDelete], nestTables: false});
-    await db.query({table: 'data', sql: 'UPDATE data SET reference_id = ? WHERE reference_id = ?', values: [replacement, toDelete], nestTables: false});
-    return await db.deleteEntity({params, table: 'reference', auth, refs: ['data', 'import', 'trait', 'method']});
+    const source = Number(params.id);
+    const target = Number(params.replacement);
+    const connection = await db.getConnection();
+    try {
+        const rows = await db.cquery(connection, {sql: 'SELECT id FROM reference WHERE id IN (?, ?)', values: [source, target]});
+        if (rows.length !== 2) return {error: 'validation', validation: 'Reference not found.'};
+        for (const table of ['import', 'data', 'trait', 'method']) {
+            await db.cquery(connection, {sql: `UPDATE ${table} SET reference_id = ? WHERE reference_id = ?`, values: [target, source]});
+        }
+        await db.cquery(connection, {sql: 'UPDATE reference_pdf SET reference_id = ? WHERE reference_id = ? AND NOT EXISTS (SELECT 1 FROM (SELECT id FROM reference_pdf WHERE reference_id = ?) target_pdf)', values: [target, source, target]});
+        return await db.deleteEntity({params, table: 'reference', auth, refs: ['data', 'import', 'trait', 'method'], connection});
+    } finally {
+        db.releaseConnection(connection);
+    }
 }
 
 const synonyms = {

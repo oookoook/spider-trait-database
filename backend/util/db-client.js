@@ -98,7 +98,6 @@ hasWhere
 */
 
 const getQueryParams = function(opt) {
-    console.dir(opt);
     if(!opt.values) {
         opt.values = [];
     }
@@ -413,7 +412,8 @@ const deleteEntity = async function (opts) {
         refs = ['import', 'data'];
     }
 
-    var conn = await getConnection();
+    var conn = opts.connection || await getConnection();
+    try {
     var canDelete = true;
     var err = '';
     for(var i = 0; i < refs.length; i++) {
@@ -434,7 +434,6 @@ const deleteEntity = async function (opts) {
     }
 
     if(!canDelete) {
-        releaseConnection(conn);
         return { 
             error: 'validation',
             validation: err
@@ -453,7 +452,6 @@ const deleteEntity = async function (opts) {
     }
 
     var r = await cquery(conn, {table, sql: `DELETE FROM ${table} WHERE id=? ${getAuthWhere(auth)}`, values: [id] });
-    releaseConnection(conn);
     if(r.affectedRows > 0) {
         return {
             id
@@ -461,7 +459,9 @@ const deleteEntity = async function (opts) {
     } else {
         throw 'No record was deleted';
     }
-    
+    } finally {
+        if (!opts.connection) releaseConnection(conn);
+    }
 }
 
 const updateEntity = async function (opts) {
@@ -488,7 +488,8 @@ const updateEntity = async function (opts) {
     // we don't want to update the id
     delete(obj.id);
     //console.dir(obj);
-    var r = await query({table, sql: `UPDATE \`${table}\` SET ? WHERE id = ? ${getAuthWhere(auth)}`, values: [obj, id] });
+    var runQuery = opts.connection ? opt => cquery(opts.connection, opt) : query;
+    var r = await runQuery({table, sql: `UPDATE \`${table}\` SET ? WHERE id = ? ${getAuthWhere(auth)}`, values: [obj, id] });
     obj.id = id;
     return {
         id,

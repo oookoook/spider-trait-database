@@ -13,6 +13,7 @@ const mail = require('../util/mail')(settings);
 const traits = require('./traits')(db);
 const methods = require('./methods')(db);
 const references = require('./references')(db);
+const referencePdf = require('./reference-pdf')(db, settings);
 const locations = require('./locations')(db);
 const taxonomy = require('./taxonomy')(db);
 const datasets = require('./datasets')(db);
@@ -126,6 +127,12 @@ router.route('/references/:id')
   .delete(requiresAuth(), auth.isEditor, function (req, res) {
     references.remove(req.params, req.resourcesAuth).then(r => res.json(r)).catch(e => { err(e); res.sendStatus(400); })
   })
+
+router.get('/references/:id/pdf/metadata', requiresAuth(), referencePdf.getMetadata);
+router.route('/references/:id/pdf')
+  .get(requiresAuth(), referencePdf.download)
+  .put(requiresAuth(), auth.isEditor, referencePdf.parseUpload, referencePdf.uploadError, referencePdf.upload)
+  .delete(requiresAuth(), auth.isEditor, referencePdf.remove);
 
 router.route('/references-replace/:id/:replacement')
   .put(requiresAuth(), auth.isEditor, function (req, res) {

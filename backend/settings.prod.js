@@ -36,6 +36,9 @@ module.exports = {
         sourceDir: '/opt/spidertraits/sourceData',
         import: {
             sizeLimitMB: 100
+        },
+        referencePdf: {
+            sizeLimitMB: 20
         }
     },
     mail: {
