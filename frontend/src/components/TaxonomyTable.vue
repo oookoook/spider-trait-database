@@ -2,7 +2,7 @@
   <v-card>
     <v-card-title>
       Taxa
-      <action-button tooltip color="primary" v-if="isEditor" to="/taxonomy/new" />
+      <action-button tooltip color="primary" v-if="isEditor" :to="`/${currentOrder}/taxonomy/new`" />
       <v-spacer></v-spacer>
       <list-filter 
       :search-fields="searchFields" 
@@ -22,18 +22,18 @@
     >
     
     <template v-slot:item.taxon="{ item }">
-      <entity-link-cell new-tab :abbrev="getTaxon(item)" :text="item.lsid || 'No LSID available'" tooltip="View the taxon detail" :link="`/taxonomy/${item.id}`" />
+      <entity-link-cell new-tab :abbrev="getTaxon(item)" :text="item.lsid || 'No LSID available'" tooltip="View the taxon detail" :link="`/${currentOrder}/taxonomy/${item.id}`" />
     </template>
     
     <template v-slot:item.valid="{ item }">
-      <entity-link-cell v-if="!item.valid" tooltip="View the valid taxon" :link="`/taxonomy/${item.validTaxon.id}`" icon="mdi-content-duplicate" color="warning"/>
+      <entity-link-cell v-if="!item.valid" tooltip="View the valid taxon" :link="`/${currentOrder}/taxonomy/${item.validTaxon.id}`" icon="mdi-content-duplicate" color="warning"/>
       <info-icon v-else color="success" icon="mdi-check" text="This a valid taxon" />
     </template>
 
     <template v-slot:item.actions="{ item }">
     <entity-link-cell icon="mdi-spider" tooltip="View in the World Spider Catalog (opens in a new tab)" external :link="getWscLink(item)" />
 
-    <entity-link-cell tooltip="Set as filter in the data explorer" :link="`data/species/${item.id}`" icon="mdi-filter" />
+    <entity-link-cell tooltip="Set as filter in the data explorer" :link="`/data/order/${currentOrder}/species/${item.id}`" icon="mdi-filter" />
     </template>
     </v-data-table>
   </v-card>
@@ -80,6 +80,9 @@ export default {
     }
   },
   computed: {
+    currentOrder() {
+      return this.$store.state.taxonomy.order;
+    }
   },
   watch: {
   },

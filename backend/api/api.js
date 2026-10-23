@@ -13,11 +13,13 @@ const mail = require('../util/mail')(settings);
 const traits = require('./traits')(db);
 const methods = require('./methods')(db);
 const references = require('./references')(db);
+const referencePdf = require('./reference-pdf')(db, settings);
 const locations = require('./locations')(db);
 const taxonomy = require('./taxonomy')(db);
 const datasets = require('./datasets')(db);
 const data = require('./data')(db);
 const imports = require('./import')(db, mail);
+const orders = require('./orders')(db);
 
 const et = require('./enums');
 const enums = {
@@ -46,7 +48,7 @@ const err = (e) => {
 
 router.route('/autocomplete/:endpoint')
   .get(function(req, res) {
-    db.getAutocomplete(req.params.endpoint, req.query.valueField, req.query.textField, 
+    db.getAutocomplete(req.params.endpoint, req.query.order, req.query.valueField, req.query.textField, 
       req.query.search, req.query.count ? parseInt(req.query.count) : null, req.query.searchByValue == 'true', req.query.searchFromStart == 'true').then(r => res.json({ items: r })).catch(e => { err(e); res.sendStatus(400); })
   })
 
@@ -56,6 +58,9 @@ router.route('/traits')
   })
   .post(requiresAuth(), auth.isEditor, function (req, res) {
     traits.create(req.body, req.resourcesAuth).then(r => res.json(r)).catch(e => { err(e); res.sendStatus(400); })
+  })
+  .patch(requiresAuth(), auth.isEditor, function (req, res) {
+    traits.updateOrderAssignment(req.params.id, req.body.orders).then(r => res.json(r)).catch(e => { err(e); res.sendStatus(400); })
   })
 
 router.route('/traits/:id')
@@ -69,6 +74,14 @@ router.route('/traits/:id')
     traits.remove(req.params, req.resourcesAuth).then(r => res.json(r)).catch(e => { err(e); res.sendStatus(400); })
   })
 
+router.route('/traits/:id/assignments')
+  .get(function (req, res) {
+    traits.getOrderAssignments(req.params.id).then(r => res.json(r)).catch(e => { err(e); res.sendStatus(400); })
+  })
+  .patch(requiresAuth(), auth.isEditor, function (req, res) {
+    traits.updateOrderAssignment(req.params.id, req.body.orders).then(r => res.json(r)).catch(e => { err(e); res.sendStatus(400); })
+  })
+
 router.route('/methods')
   .get(function (req, res) {
     methods.list(req.recordLimit).then(r => res.json(r)).catch(e => { err(e); res.sendStatus(400); })
@@ -76,7 +89,7 @@ router.route('/methods')
   .post(requiresAuth(), auth.isEditor, function (req, res) {
     methods.create(req.body, req.resourcesAuth).then(r => res.json(r)).catch(e => { err(e); res.sendStatus(400); })
   })
-
+  
 router.route('/methods/:id')
   .get(function (req, res) {
     methods.get(req.params).then(r => res.json(r)).catch(e => { err(e); res.sendStatus(400); })
@@ -86,6 +99,14 @@ router.route('/methods/:id')
   })
   .delete(requiresAuth(), auth.isEditor, function (req, res) {
     methods.remove(req.params, req.resourcesAuth).then(r => res.json(r)).catch(e => { err(e); res.sendStatus(400); })
+  })
+
+router.route('/methods/:id/assignments')
+  .get(function (req, res) {
+    methods.getOrderAssignments(req.params.id).then(r => res.json(r)).catch(e => { err(e); res.sendStatus(400); })
+  })
+  .patch(requiresAuth(), auth.isEditor, function (req, res) {
+    methods.updateOrderAssignment(req.params.id, req.body.orders).then(r => res.json(r)).catch(e => { err(e); res.sendStatus(400); })
   })
 
 router.route('/references')
@@ -106,6 +127,12 @@ router.route('/references/:id')
   .delete(requiresAuth(), auth.isEditor, function (req, res) {
     references.remove(req.params, req.resourcesAuth).then(r => res.json(r)).catch(e => { err(e); res.sendStatus(400); })
   })
+
+router.get('/references/:id/pdf/metadata', requiresAuth(), referencePdf.getMetadata);
+router.route('/references/:id/pdf')
+  .get(requiresAuth(), referencePdf.download)
+  .put(requiresAuth(), auth.isEditor, referencePdf.parseUpload, referencePdf.uploadError, referencePdf.upload)
+  .delete(requiresAuth(), auth.isEditor, referencePdf.remove);
 
 router.route('/references-replace/:id/:replacement')
   .put(requiresAuth(), auth.isEditor, function (req, res) {
@@ -142,6 +169,25 @@ router.route('/taxonomy')
 router.route('/taxonomy/valid-names/:taxon?')
   .get(function (req, res) {
     taxonomy.validName(req.params, req.query).then(r => res.json(r)).catch(e => { err(e); res.sendStatus(400); })
+  })
+
+router.route('/orders')
+  .get(function (req, res) {
+    orders.list(req.recordLimit).then(r => res.json(r)).catch(e => { err(e); res.sendStatus(400); })
+  })
+  .post(requiresAuth(), auth.isEditor, function (req, res) {
+    orders.create(req.body, req.resourcesAuth).then(r => res.json(r)).catch(e => { err(e); res.sendStatus(400); })
+  })
+
+router.route('/orders/:id')
+  .get(function (req, res) {
+    orders.get(req.params).then(r => res.json(r)).catch(e => { err(e); res.sendStatus(400); })
+  })
+  .put(requiresAuth(), auth.isEditor, function (req, res) {
+    orders.update(req.params, req.body, req.resourcesAuth).then(r => res.json(r)).catch(e => { err(e); res.sendStatus(400); })
+  })
+  .delete(requiresAuth(), auth.isEditor, function (req, res) {
+    orders.remove(req.params, req.resourcesAuth).then(r => res.json(r)).catch(e => { err(e); res.sendStatus(400); })
   })
 
 router.route('/taxonomy/:id')
@@ -184,22 +230,22 @@ router.route('/datasets/:id/doi')
     datasets.createDoi(req.params, req.body, req.resourcesAuth).then(r => res.json(r)).catch(e => { err(e); res.sendStatus(400); })
   })
 
-router.route('/data/family/:family/genus/:genus/species/:species/original-name/:origname/trait-category/:traitcat/trait/:trait/method/:method/location/:location/country/:country/dataset/:dataset/authors/:authors/reference/:reference/row-link/:rowl')
+router.route('/data/order/:order/family/:family/genus/:genus/species/:species/original-name/:origname/trait-category/:traitcat/trait/:trait/method/:method/location/:location/country/:country/dataset/:dataset/authors/:authors/reference/:reference/row-link/:rowl')
   .get(function (req, res) {
     data.list(req.params, req.recordLimit, req.resourcesAuth).then(r => res.json(r)).catch(e => { err(e); res.sendStatus(400); })
   });
 
-router.route('/data/export/csv/family/:family/genus/:genus/species/:species/original-name/:origname/trait-category/:traitcat/trait/:trait/method/:method/location/:location/country/:country/dataset/:dataset/authors/:authors/reference/:reference/row-link/:rowl')
+router.route('/data/export/csv/order/:order/family/:family/genus/:genus/species/:species/original-name/:origname/trait-category/:traitcat/trait/:trait/method/:method/location/:location/country/:country/dataset/:dataset/authors/:authors/reference/:reference/row-link/:rowl')
   .get(function (req, res) {
     data.csv(req.params, req.recordLimit, settings.files.tmpDir, req.resourcesAuth).then(r => res.download(r)).catch(e => { err(e); res.sendStatus(400); })
   });
  
-router.route('/data/export/excel/family/:family/genus/:genus/species/:species/original-name/:origname/trait-category/:traitcat/trait/:trait/method/:method/location/:location/country/:country/dataset/:dataset/authors/:authors/reference/:reference/row-link/:rowl')
+router.route('/data/export/excel/order/:order/family/:family/genus/:genus/species/:species/original-name/:origname/trait-category/:traitcat/trait/:trait/method/:method/location/:location/country/:country/dataset/:dataset/authors/:authors/reference/:reference/row-link/:rowl')
   .get(function (req, res) {
     data.excel(req.params, req.recordLimit, settings.files.tmpDir, req.resourcesAuth).then(r => res.download(r)).catch(e => { err(e); res.sendStatus(400); })
   });
 
-router.route('/data/stats/:type/family/:family/genus/:genus/species/:species/original-name/:origname/trait-category/:traitcat/trait/:trait/method/:method/location/:location/country/:country/dataset/:dataset/authors/:authors/reference/:reference/row-link/:rowl')
+router.route('/data/stats/:type/order/:order/family/:family/genus/:genus/species/:species/original-name/:origname/trait-category/:traitcat/trait/:trait/method/:method/location/:location/country/:country/dataset/:dataset/authors/:authors/reference/:reference/row-link/:rowl')
     .get(function (req, res) {
       data.stats(req.params, req.query).then(r => res.json(r)).catch(e => { err(e); res.sendStatus(400); })
      });     

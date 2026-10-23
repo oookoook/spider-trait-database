@@ -2,7 +2,7 @@
   <v-card>
     <v-card-title>
       References
-      <action-button tooltip color="primary" v-if="isEditor" to="/references/new" />
+      <action-button tooltip color="primary" v-if="isEditor" :to="`/${currentOrder}/references/new`" />
       <v-spacer></v-spacer>
       <list-filter 
       :search-fields="searchFields" 
@@ -24,7 +24,7 @@
     >
     
     <template v-slot:item.abbrev="{ item }">
-      <entity-link-cell new-tab :text="item.abbrev" tooltip="View the reference detail" :link="`/references/${item.id}`" />
+      <entity-link-cell new-tab :text="item.abbrev" tooltip="View the reference detail" :link="`/${currentOrder}/references/${item.id}`" />
     </template>
 
     <template v-slot:item.doi="{ item }">
@@ -32,7 +32,8 @@
     </template>
 
     <template v-slot:item.actions="{ item }">
-    <entity-link-cell tooltip="Set as filter in the data explorer" :link="`data/reference/${item.id}`" icon="mdi-filter" />
+    <entity-link-cell tooltip="Set as filter in the data explorer" :link="`/data/order/${currentOrder}/reference/${item.id}`" icon="mdi-filter" />
+    <entity-link-cell v-if="item.hasPdf && isLoggedIn" tooltip="Download PDF" external :link="`${backendUrl}references/${item.id}/pdf`" icon="mdi-file-pdf-box" />
     </template>
 
     </v-data-table>
@@ -59,6 +60,15 @@ export default {
     }
   },
   computed: {
+    currentOrder() {
+      return this.$store.state.references.order;
+    },
+    backendUrl() {
+      return this.$store.getters.baseUrl;
+    },
+    isLoggedIn() {
+      return !!this.$store.getters.isLoggedIn;
+    }
   },
   watch: {
   },

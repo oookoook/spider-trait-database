@@ -10,7 +10,7 @@
       {{ item.notes }}
       </v-card-text>
         <v-card-actions  v-if="item">
-          <v-btn text :to="`/data/location/${item.id}`"><v-icon left>mdi-filter</v-icon>Set as filter in the data explorer</v-btn>
+          <v-btn text :to="`/data/order/${currentOrder}/location/${item.id}`"><v-icon left>mdi-filter</v-icon>Set as filter in the data explorer</v-btn>
           <v-btn v-if="showUpdate" text color="warning" @click="$emit('edit')"><v-icon left>mdi-pencil-outline</v-icon>Edit</v-btn>
         </v-card-actions>
       <!--  -->
@@ -35,7 +35,9 @@ export default {
     }
   },
   computed: {
-
+    currentOrder() {
+      return this.$store.state.locations.order;
+    }
   },
   watch: {
 

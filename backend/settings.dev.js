@@ -27,6 +27,9 @@ module.exports = {
         sourceDir: './test/source',
         import: {
             sizeLimitMB: 100
+        },
+        referencePdf: {
+            sizeLimitMB: 20
         }
     },
     mail: {
@@ -79,5 +82,5 @@ module.exports = {
             ],
         }
     },
-    baseUrl: 'http://localhost:8080'
+    baseUrl: 'http://localhost:5173'
 }

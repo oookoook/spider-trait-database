@@ -44,7 +44,7 @@
       <entity-link-cell v-if="canEdit(item.state)" tooltip="Edit or delete the dataset" :link="`/prepare/${item.id}`" icon="mdi-pencil" />
       <action-button tooltip v-if="canDelete(item.state)" icon="mdi-delete-forever-outline" text="Permanently delete" @click="$emit('remove', item)"/>
       <entity-link-cell v-if="canDelete(item.state)" tooltip="Transfer data back to import editor" :link="`/prepare/transfer/${item.id}`" icon="mdi-table-edit" />
-      <entity-link-cell v-if="item.state == 'approved'" tooltip="Set as filter in the data explorer" :link="`data/dataset/${item.id}`" icon="mdi-filter" />
+      <entity-link-cell v-if="item.state == 'approved'" tooltip="Set as filter in the data explorer" :link="`/data/order/${currentOrder || item.order}/dataset/${item.id}`" icon="mdi-filter" />
     </template>
 
     <template v-slot:no-data>
@@ -69,6 +69,7 @@ export default {
     return {
       headers: [
         { text: 'Name', value: 'name' },
+        { text: 'Order', value: 'order_id' },
         { text: 'Created', value: 'date'},
         { text: 'State', value: 'state'},
         { text: 'Uploader', value: 'uploader' },
@@ -82,6 +83,9 @@ export default {
     }
   },
   computed: {
+    currentOrder() {
+      return this.$store.state.imports.order;
+    }
   },
   watch: {
   },

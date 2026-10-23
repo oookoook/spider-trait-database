@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const baseUrl = `${process.env.VUE_APP_BACKEND}backend/` //Vue.config.devtools ? 'http://localhost:3000/backend/' : '/backend/';
+const baseUrl = `${import.meta.env.VITE_BACKEND}backend/` //Vue.config.devtools ? 'http://localhost:3000/backend/' : '/backend/';
 
 const getUrl = function(payload) {
     return `${baseUrl}${payload.endpoint}${payload.params ? '/' + payload.params : ''}`;
@@ -33,6 +33,7 @@ const getListParams = function(payload) {
     var count = payload.count;
     var sortField = (payload.options.sortBy && payload.options.sortBy[0]) ? payload.options.sortBy[0] : null;
     var sortDirection = (payload.options.sortDesc && payload.options.sortDesc[0]) ? 'desc' : 'asc';
+    var order = (payload.order) ? payload.order : null;
 
     //sortField = adjustSortField(sortField);
 
@@ -55,12 +56,17 @@ const getListParams = function(payload) {
         params.sortField = sortField;
         params.sortDirection = sortDirection;
     }
+
+    if(order) {
+        params.order = order;
+    }
+
     //console.dir(params);
     return params;
 }
 
 
-const authenticate = function(context, payload) {
+const authenticate = async function(context, payload) {
     var authRequired = payload.auth;
     
     if(authRequired) {
@@ -71,7 +77,7 @@ const authenticate = function(context, payload) {
         console.log(Date.now());
         console.log((lastAction + sessionTimeout) > Date.now());
         */ 
-        if(context.dispatch('verifySession', { required: true })) {
+        if(await context.dispatch('verifySession', { required: true })) {
             context.commit('lastAction', {value: Date.now()});
             return Promise.resolve(true);
         } else {
@@ -164,6 +170,25 @@ export default {
                 return false;
             }
         },
+        patch: async function(context, payload) {
+            var url = getUrl(payload);
+            if(!await authenticate(context, payload)) {
+                return false;
+            }
+            try {
+                var result = await axios.patch(url, payload.body, { params: payload.query });
+                if(result.data && result.data.error) {
+                    if(result.data.error == 'validation') {
+                        context.dispatch('notify', { error: true, text: result.data.validation});
+                    }
+                }
+                return result.data || true;
+            } catch (err) {
+                console.error(err);
+                context.dispatch('notify', { error: true, text: `Unable to update record.`});
+                return false;
+            }
+        },
         delete: async function(context, payload) {
             var url = getUrl(payload);
             if(!await authenticate(context, payload)) {
@@ -171,7 +196,7 @@ export default {
             }
             try {
                 var result = await axios.delete(url, { params: payload.query });
-                if(result.data.error) {
+                if(result.data && result.data.error) {
                     if(result.data.error == 'validation') {
                         context.dispatch('notify', { error: true, text: result.data.validation});
                     }

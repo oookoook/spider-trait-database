@@ -2,4 +2,4 @@
 git pull
 cd backend
 npm ci
-sudo pm2 restart spidertraits
+pm2 restart spidertraits

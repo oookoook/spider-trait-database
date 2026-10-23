@@ -276,6 +276,12 @@ const props = {
     isValid: (v) => !!v || 'Name is required',
     isReadonly: () => false
   }],
+  orders: [{
+    name: 'name',
+    label: 'Name',
+    isValid: (v) => !!v || 'Name is required',
+    isReadonly: () => true
+  }],
   taxonomy: [
     {
       name: 'order',

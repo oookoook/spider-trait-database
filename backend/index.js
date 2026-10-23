@@ -18,9 +18,29 @@ const app = express();
 
 app.use(compression())
 
+// redirects the old "spider*" domain to the new "arachnida*/araneae/*" domain (settings.baseUrl holds the new host)
+// only the first hostname label is checked, so it also works for test servers (e.g. spidertraits.nastojte.cz)
+const oldHostLabel = new URL(settings.baseUrl).hostname.split('.')[0].replace(/arachnida/i, 'spider'); // e.g. "spidertraits"
+app.use((req, res, next) => {
+  const hostname = (req.headers.host || '').split(':')[0];
+  if (!hostname.toLowerCase().startsWith(oldHostLabel.toLowerCase() + '.')) {
+    return next();
+  }
+
+  const newHost = hostname.replace(/spider/i, 'arachnida');
+  const [pathname, ...queryParts] = req.originalUrl.split('?');
+  const search = queryParts.length ? '?' + queryParts.join('?') : '';
+
+  const newPath = (pathname === '/data' || pathname.startsWith('/data/'))
+    ? '/data/order/araneae' + pathname.slice('/data'.length)
+    : '/araneae' + pathname;
+
+  return res.redirect(301, `${req.protocol}://${newHost}${newPath}${search}`);
+});
+
 // userd for testing. Other CORS requests should be blocked
 app.use(cors({
-  origin: 'http://localhost:8080',
+  origin: ['http://localhost:8080', 'http://localhost:5173'],
 }));
 
 app.use(bodyParser.json());
@@ -60,7 +80,8 @@ app.use(history({
           // just get the same url that was on input
           return 'index.html';
         }
-      }
+      },
+
     ],
     //verbose: true
   }));
@@ -103,7 +124,7 @@ if(!settings.oidc.disable) {
   
 } else {
   // everything is authorized
-  app.use(cauth.mockupAuth('http://localhost:8080/login', 'http://localhost:8080/logout'));
+  app.use(cauth.mockupAuth(settings.baseUrl +'/login', settings.baseUrl + '/logout'));
 }
 // route used to show the SSO login screen
 // 

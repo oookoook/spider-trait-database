@@ -158,6 +158,7 @@
 <script>
 import { mapState, mapGetters } from 'vuex'
 import {mixin as VueTimers} from 'vue-timers'
+import { setOrder } from '@/store/order-sync'
 
 import ActionButton from './ActionButton'
 import InfoIcon from './InfoIcon'
@@ -374,7 +375,13 @@ export default {
     refreshDS() {
       if(this.id) {
         this.loading = true;
-        this.$store.dispatch(`imports/get`,{ id: this.id }).then(() => {this.loading = false; });
+        this.$store.dispatch(`imports/get`,{ id: this.id }).then(() => {
+          this.loading = false;
+          setOrder(this.$store, this.dataset && this.dataset.order);
+          this.$store.commit('editor/setOrder', { value: this.dataset && this.dataset.order });
+
+          console.log(`Dataset refreshed, order set to ${this.dataset && this.dataset.order}`);
+        });
       }
     },
     uploadFile(f) {
@@ -527,8 +534,13 @@ export default {
           var o = {};
           o[evt.entity.name] = data.entity;
           payload.multipleColumns = true;
-          payload.newValue = evt.entity.match.displayValue(o);
-          return this.$store.dispatch(`editor/editColumn`, payload );
+          if(evt.entity.match) {
+            payload.newValue = evt.entity.match.displayValue(o);
+            return this.$store.dispatch(`editor/editColumn`, payload );
+           } else {
+            // no action for taxonomy
+            return this.$store.dispatch(`editor/validate`,{ id: this.id, all: true });
+           }
           })
           .then((data) => { this.loading = false; this.refreshDS(); this.getData(); });
       } else if(evt.entity.values) {

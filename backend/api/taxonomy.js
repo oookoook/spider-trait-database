@@ -223,7 +223,19 @@ const prepareForSql = function(taxon) {
 }
 
 const create = async function(body, auth) {
-    return await db.createEntity({ body, table: 'taxonomy', auth, prepareForSql, validate});
+    const srctxn = JSON.parse(JSON.stringify(body)); // deep copy
+    const result = await db.createEntity({ body, table: 'taxonomy', auth, prepareForSql, validate});
+    if((srctxn?.originalName !== srctxn?.taxon)) {
+        // create taxon from originalName, set as invalid
+        let invt = {
+            order: srctxn.order,
+            family: srctxn.family,
+            taxon: srctxn.originalName,
+            validTaxon: { id: result.id }
+        }
+        await db.createEntity({ body: invt, table: 'taxonomy', auth, prepareForSql, validate});
+    }
+    return result;
 }
 
 const update = async function(params, body, auth) {
@@ -231,9 +243,10 @@ const update = async function(params, body, auth) {
 }
 
 const remove = async function(params, auth) {
-    return await db.deleteEntity({params, table: 'taxonomy', auth, validate: validateDelete });
+    return await db.deleteEntity({params, table: 'taxonomy', auth, validate: validateDelete,
+        refs: ['import', 'data', {table: 'taxonomy', field: 'valid_id'}, {table: 'taxonomy_name', field: 'taxonomy_id', cascade: true}]
+    });
 }
-
 
 
 const getTaxonFromFullName = function(fullName) {
@@ -249,7 +262,9 @@ const synonyms = {
     //'wsc.lsid': 'taxonomy.wsc_lsid',
     'lsid': 'wsc_lsid',
     'fullName': 'taxonomy.full_name',
-    'taxonomy.fullName': 'taxonomy.full_name'
+    'taxonomy.fullName': 'taxonomy.full_name',
+    'order_id': 'taxonomy.order',
+    'taxonomy.order_id': 'taxonomy.order',
 }
 
 module.exports = function(dbClient) {

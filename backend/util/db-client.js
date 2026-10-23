@@ -53,6 +53,13 @@ const addLimits = function (values, limits, table, hasWhere, aggregate, customWh
     } else {
         whereClause = ` ${searchStart} 1=1`;
     }
+
+    if(limits.order) {
+        whereClause += ` AND ?? = ?`;
+        values.push(getSynonym(table, 'order_id'));
+        values.push(limits.order);
+    }
+
     if(limits.search) {
         //whereClause = ` ${searchStart} ${mysql.escapeId(table+'.'+limits.search.field)} ${op} '${mysql.escape(limits.search.value)}${wildcard}'`;
         //console.log(`has search: `);
@@ -91,7 +98,6 @@ hasWhere
 */
 
 const getQueryParams = function(opt) {
-    //console.dir(opt);
     if(!opt.values) {
         opt.values = [];
     }
@@ -195,6 +201,10 @@ const limits = function (req, res, next) {
         };
     }
 
+    if(req.query.order) {
+        req.recordLimit.order = req.query.order;
+    }
+
     next();
 }
 
@@ -207,14 +217,14 @@ const prepareListResponse = async function (limits, table, customWhereClause, cu
     };
     if (limits.count && !distinctCols) {
         // count is limited when using filter
-        var r = await query({table, sql: `SELECT COUNT(${table}.id) as count FROM ${join ? join : table}`, limits, aggregate: true, customWhereClause, values: customWhereValues});
+        var r = await query({table, sql: `SELECT COUNT(${table}.id) as count FROM ${join ? join : '`' + table + '`'}`, limits, aggregate: true, customWhereClause, values: customWhereValues});
         var count = r[0].count;
         res.count = count;
     } else if (limits.count && distinctCols) {
         //console.log(`Preparing distinct response ${distinctCols} ${join ? join : table}`);
         //var r = await query({table, sql: `SELECT COUNT(*) as count FROM ( SELECT DISTINCT ${distinctSql} FROM ${join ? join : table}) ${table}`, limits, aggregate: true, customWhereClause, values: customWhereValues});
         //console.log(`SELECT COUNT(DISTINCT ${distinctCols.map(c => `COALESCE(${c}, '')`).join(',')}) as COUNT FROM ${join ? join : table}`);
-        var r = await query({table, sql: `SELECT COUNT(DISTINCT ${distinctCols.map(c => `COALESCE(${c}, '')`).join(',')}) as count FROM ${join ? join : table}`, limits, aggregate: true, customWhereClause, values: customWhereValues});
+        var r = await query({table, sql: `SELECT COUNT(DISTINCT ${distinctCols.map(c => `COALESCE(${c}, '')`).join(',')}) as count FROM ${join ? join : '`' + table + '`'}`, limits, aggregate: true, customWhereClause, values: customWhereValues});
         var count = r[0].count;
         res.count = count;
     }
@@ -222,8 +232,8 @@ const prepareListResponse = async function (limits, table, customWhereClause, cu
     return res;
 }
 
-const getAutocomplete = async function(endpoint, valueField, textField, search, count, searchByValue, searchFromStart) {
-    
+const getAutocomplete = async function(endpoint, order, valueField, textField, search, count, searchByValue, searchFromStart) {
+    let orderClause = '1=1';
     var qt = getSynonym(endpoint); 
     var vf = getSynonym(endpoint, valueField);
     var vfparts = vf.split('.');
@@ -246,6 +256,8 @@ const getAutocomplete = async function(endpoint, valueField, textField, search, 
         st = `%${search}%`;
     }
 
+
+
     values.push(vf);
 
     if(textField && Array.isArray(textField)) {        
@@ -253,6 +265,12 @@ const getAutocomplete = async function(endpoint, valueField, textField, search, 
         var syn = textField.map(f => getSynonym(endpoint,f));
         values = values.concat(syn); // ?? AS TEXT
         values.push(qt); // FROM ??
+        if(order) {
+            values.push(getSynonym(endpoint, 'order_id'));
+            values.push(order);
+            orderClause = '?? = ?';
+        }
+        
         if(!searchByValue) {
             values = values.concat(syn); // WHERE ??    
         } else {
@@ -265,6 +283,11 @@ const getAutocomplete = async function(endpoint, valueField, textField, search, 
         var syn = getSynonym(endpoint, textField);
         values.push(syn); // ?? as text
         values.push(qt); // FROM ??
+        if(order) {
+            values.push(getSynonym(endpoint, 'order_id'));
+            values.push(order);
+            orderClause = '?? = ?';
+        }
         if(!searchByValue) {
             values.push(syn); // WHERE ??
         } else {
@@ -277,6 +300,13 @@ const getAutocomplete = async function(endpoint, valueField, textField, search, 
         var syn = getSynonym(endpoint, valueField);
         values.push(syn); // ?? as text
         values.push(qt); // FROM ??
+        
+        if(order) {
+            values.push(getSynonym(endpoint, 'order_id'));
+            values.push(order);
+            orderClause = '?? = ?';
+        }
+
         values.push(syn); // WHERE ??
         values.push(st); // LIKE ?
         values.push(syn); // ORDER BY
@@ -287,13 +317,13 @@ const getAutocomplete = async function(endpoint, valueField, textField, search, 
         values.push(count);
     }
     if(textSql && searchByValue) {
-        sql = `SELECT DISTINCT ?? as value, ${textSql} as text FROM ?? WHERE ?? = ? ORDER BY ${textSql} ${countSql}`;
+        sql = `SELECT DISTINCT ?? as value, ${textSql} as text FROM ?? WHERE ${orderClause} AND ?? = ? ORDER BY ${textSql} ${countSql}`;
     } else if(textSql) {
-        sql = `SELECT DISTINCT ?? as value, ${textSql} as text FROM ?? WHERE ${textSql} LIKE ? ORDER BY ${textSql} ${countSql}`;
+        sql = `SELECT DISTINCT ?? as value, ${textSql} as text FROM ?? WHERE ${orderClause} AND ${textSql} LIKE ? ORDER BY ${textSql} ${countSql}`;
     } else if(searchByValue) {
-        sql = `SELECT DISTINCT ?? as value FROM ?? WHERE ?? = ? ORDER BY ?? ${countSql}`;
+        sql = `SELECT DISTINCT ?? as value FROM ??  WHERE ${orderClause} AND ?? = ? ORDER BY ?? ${countSql}`;
     } else {
-        sql = `SELECT DISTINCT ?? as value FROM ?? WHERE ?? LIKE ? ORDER BY ?? ${countSql}`;
+        sql = `SELECT DISTINCT ?? as value FROM ??  WHERE ${orderClause} AND ?? LIKE ? ORDER BY ?? ${countSql}`;
     }
     //console.log(typeof textField);
     //console.dir(textField);
@@ -312,7 +342,7 @@ const getAutocomplete = async function(endpoint, valueField, textField, search, 
 }
 
 const createEntity = async function (opts) {
-    var {body, table, auth, prepareForSql, validate} = opts;
+    var {body, table, auth, prepareForSql, validate, order, allOrders} = opts;
     var obj = body;
     await prepareForSql(obj, auth);
     if (typeof validate == 'function') {
@@ -327,11 +357,37 @@ const createEntity = async function (opts) {
     delete(obj.id);
     //console.dir(obj);
     var r = await query({table, sql: `INSERT INTO ${table} SET ?`, values: [obj] });
+    
     obj.id = r.insertId; 
+    
+    if(allOrders) {
+        // assign the new entity to every order currently defined, not just the one being browsed
+        await query({table: `${table}_order`, sql: `INSERT INTO ${table}_order (??, order_id) SELECT ?, id FROM \`order\``, values: [`${table}_id`, obj.id]});
+    } else if(order) {
+        var q = await query({table: `${table}_order`, sql: `INSERT INTO ${table}_order SET ?? = ?, order_id = ?`, values: [`${table}_id`, obj.id, order]})
+        obj.order = order;
+    }
+    
     return {
         id: r.insertId,
         entity: obj
     }
+}
+
+const getEntityOrderAssignments = async function (opts) {
+    let { table, id } = opts;
+    var r = await query({table: `${table}_order`, sql: `SELECT order_id FROM ${table}_order WHERE ?? = ?`, values: [`${table}_id`, id]});
+    return r.map(i => i.order_id);
+}
+
+const updateEntityOrderAssignment = async function (opts) {
+    let { table, id, orders } = opts;
+    for(let i = 0; i < orders.length; i++) {
+        let order = orders[i];
+        await query({table: `${table}_order`, sql: `INSERT INTO ${table}_order SET ?? = ?, order_id = ? ON DUPLICATE KEY UPDATE order_id = ?`, values: [`${table}_id`, id, order, order]});
+    }
+    // remove assignments that are not in the orders array
+    await query({table: `${table}_order`, sql: `DELETE FROM ${table}_order WHERE ?? = ? AND order_id NOT IN (?)`, values: [`${table}_id`, id, orders]});
 }
 
 const getAuthWhere = function(auth) {
@@ -349,29 +405,35 @@ const getAuthWhere = function(auth) {
 }
 
 const deleteEntity = async function (opts) {
-    var {params, table, auth, refs, validate} = opts;
+    var {params, table, auth, refs, validate, cascade} = opts;
     var id = parseInt(params.id);
 
     if(!refs) {
         refs = ['import', 'data'];
     }
 
-    var conn = await getConnection();
+    var conn = opts.connection || await getConnection();
+    try {
     var canDelete = true;
     var err = '';
     for(var i = 0; i < refs.length; i++) {
         var reftbl = typeof refs[i] === 'string' ? refs[i] : refs[i].table;
         var reffld = typeof refs[i] === 'string' ? `${table}_id` : refs[i].field;
+        // ref-level cascade wins over the global flag, otherwise fall back to the global cascade opt
+        var refCascade = typeof refs[i] === 'object' && typeof refs[i].cascade !== 'undefined' ? refs[i].cascade : cascade;
         var cntres = await cquery(conn, {table: reftbl, sql: `SELECT COUNT(id) as cnt FROM ?? WHERE ?? = ?`, values: [ reftbl, reffld, id]});
         var cnt = parseInt(cntres[0].cnt);
         if (cnt > 0) {
-            err += `The entity is referenced in the table ${refs[i]} ${cnt} times.`
-            canDelete = false;
+            if(refCascade) {
+                await cquery(conn, {table: reftbl, sql: `DELETE FROM ?? WHERE ?? = ?`, values: [reftbl, reffld, id]});
+            } else {
+                err += `The entity is referenced in the table ${reftbl} ${cnt} times.`
+                canDelete = false;
+            }
         }        
     }
 
     if(!canDelete) {
-        releaseConnection(conn);
         return { 
             error: 'validation',
             validation: err
@@ -390,7 +452,6 @@ const deleteEntity = async function (opts) {
     }
 
     var r = await cquery(conn, {table, sql: `DELETE FROM ${table} WHERE id=? ${getAuthWhere(auth)}`, values: [id] });
-    releaseConnection(conn);
     if(r.affectedRows > 0) {
         return {
             id
@@ -398,7 +459,9 @@ const deleteEntity = async function (opts) {
     } else {
         throw 'No record was deleted';
     }
-    
+    } finally {
+        if (!opts.connection) releaseConnection(conn);
+    }
 }
 
 const updateEntity = async function (opts) {
@@ -425,7 +488,8 @@ const updateEntity = async function (opts) {
     // we don't want to update the id
     delete(obj.id);
     //console.dir(obj);
-    var r = await query({table, sql: `UPDATE \`${table}\` SET ? WHERE id = ? ${getAuthWhere(auth)}`, values: [obj, id] });
+    var runQuery = opts.connection ? opt => cquery(opts.connection, opt) : query;
+    var r = await runQuery({table, sql: `UPDATE \`${table}\` SET ? WHERE id = ? ${getAuthWhere(auth)}`, values: [obj, id] });
     obj.id = id;
     return {
         id,
@@ -501,6 +565,8 @@ module.exports = {
     createEntity,
     updateEntity,
     deleteEntity,
+    getEntityOrderAssignments,
+    updateEntityOrderAssignment,
     getAutocomplete,
     addSynonyms,
     escape: mysql.escape,

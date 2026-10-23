@@ -3,7 +3,10 @@ var db = null;
 
 
 const list = async function(limits) {
-    const join = 'trait LEFT JOIN trait_category ON trait.trait_category_id = trait_category.id';
+    // without an order filter, joining trait_order_view would duplicate rows for traits assigned to multiple orders
+    const join = (limits && limits.order)
+        ? 'trait_order_view trait LEFT JOIN trait_category ON trait.trait_category_id = trait_category.id'
+        : 'trait LEFT JOIN trait_category ON trait.trait_category_id = trait_category.id';
     
     var res = await db.prepareListResponse(limits, 'trait', null, null, join);
     
@@ -70,7 +73,7 @@ const validate = async function(trait) {
     }
 
     var r = await db.query({table: 'trait', sql: 'SELECT trait.id FROM trait WHERE abbrev = ?', values: [trait.abbrev], nestTables: false});
-    return (r.length == 0 || (trait.id && r[0].id == trait.id)) ? true : 'Trait abbrev. is already used.';
+    return (r.length == 0 || (trait.id && r[0].id == trait.id)) ? true : 'Trait abbrev. is already used. It might be already defined for a different order.';
 }
 
 const prepareForSql = function(trait) {
@@ -82,21 +85,33 @@ const prepareForSql = function(trait) {
         trait.reference_id = trait.reference.id;
     }
 
+    delete trait.order;
     delete trait.reference;
     delete trait.category;
     delete trait.dataType;
 }
 
 const create = async function(body, auth) {
-    return await db.createEntity({body, table: 'trait', auth, prepareForSql, validate});
+    // new traits become available for every order, not just the one currently being browsed
+    return await db.createEntity({body, table: 'trait', auth, prepareForSql, validate, allOrders: true});
 }
 
 const update = async function(params, body, auth) {
     return await db.updateEntity({params, body, table: 'trait', auth, prepareForSql, validate});
 }
 
+const getOrderAssignments = async function(id) {
+    return await db.getEntityOrderAssignments({ table: 'trait', id });
+}
+
+const updateOrderAssignment = async function(id, orders) {
+    return await db.updateEntityOrderAssignment({ table: 'trait', id, orders });
+}
+
 const remove = async function(params, auth) {
-    return await db.deleteEntity({params, table: 'trait', auth});
+    return await db.deleteEntity({params, table: 'trait', auth,
+        refs: ['import', 'data', {table: 'trait_order', field: 'trait_id', cascade: true}]
+    });
 }
 
 const synonyms = {
@@ -109,12 +124,16 @@ const synonyms = {
 
 module.exports = function(dbClient) {
     db = dbClient;
+    
     db.addSynonyms('traits','trait', synonyms);
+    db.addSynonyms('traits','trait_order_view', synonyms);
     return {
         list,
         get,
         create,
         update,
-        remove
+        remove,
+        getOrderAssignments,
+        updateOrderAssignment
     }
 }

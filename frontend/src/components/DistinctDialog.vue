@@ -24,7 +24,7 @@
     </v-card-text>
     <v-card-actions>
       <action-button text="Close" @click="$emit('cancel')" icon="mdi-close" />
-      <action-button v-if="isEntity && !showEntities" text="Show entites" @click="showEntities = true" icon="mdi-table-large" />
+      <action-button v-if="isEntity && !showEntities" text="Show entities" @click="showEntities = true" icon="mdi-table-large" />
       <action-button v-if="isEntity && showEntities" text="Show only selected column" @click="showEntities = false" icon="mdi-table-column" />
     </v-card-actions>
   </v-card>

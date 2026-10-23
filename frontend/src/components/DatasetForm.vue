@@ -9,7 +9,21 @@
       <v-card-text>
         <v-form v-model="valid" v-if="dataset" ref="form">
           <v-row>
-            <v-col cols="12" md="4">
+            <v-col cols="12" md="6">
+              <v-select
+                v-model="dataset.order"
+                :items="$store.state.orders.list"
+                item-text="name"
+                item-value="id"
+                label="Order"
+                :loading="ordersLoading"
+                prepend-icon="mdi-format-list-bulleted-type"
+                :rules="orderRules"
+                :readonly="!create"
+                required
+              ></v-select>
+            </v-col>
+            <v-col cols="12" md="6">
           <v-text-field
             v-model="dataset.name"
             :rules="nameRules"
@@ -21,7 +35,7 @@
             required
           ></v-text-field>
             </v-col>
-            <v-col cols="12" md="4">
+            <v-col cols="12" md="6">
           <v-text-field
             v-model="dataset.uploader"
             :counter="255"
@@ -31,7 +45,7 @@
             required
           ></v-text-field>
           </v-col>
-            <v-col cols="12" md="4">
+            <v-col cols="12" md="6">
           <v-text-field
             v-model="dataset.email"
             :rules="emailRules"
@@ -107,6 +121,10 @@ export default {
     return {
       dataset: Object.assign({}, this.value || {}),
       valid: false,
+      ordersLoading: false,
+      orderRules: [
+        v => !!v || 'Order is required'
+      ],
       nameRules: [
         v => !!v || 'Dataset Name is required',
         v => !v || v.length <= 240 || 'Name must be shorter than 240 characters'
@@ -144,7 +162,7 @@ export default {
   },
   watch: {
     value(val) {
-      this.dataset = Object.assign({}, this.value || {});
+      this.dataset = Object.assign({}, val || {});
     }
   },
   methods: {
@@ -162,6 +180,11 @@ export default {
   created () {
   },
   mounted () {
+    if (!this.$store.state.orders.list.length) {
+      this.ordersLoading = true;
+      this.$store.dispatch('orders/list', { options: { page: 1, itemsPerPage: 100 } })
+        .finally(() => { this.ordersLoading = false; });
+    }
   }
 }
 </script>

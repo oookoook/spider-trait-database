@@ -120,6 +120,8 @@ const prepareForSql = async function(location) {
             location.precision = location.coords.precision;
         }
     }
+    location.order_id = location.order;
+    delete location.order;
     delete location.country;
     delete location.coords;
 }

@@ -2,7 +2,7 @@
   <v-card>
     <v-card-title>
       Methods
-      <action-button tooltip color="primary" v-if="isEditor" to="/methods/new" />
+      <action-button tooltip color="primary" v-if="isEditor" :to="`/${currentOrder}/methods/new`" />
       <v-spacer></v-spacer>
       <list-filter 
       :search-fields="searchFields" 
@@ -22,11 +22,11 @@
     >
     
     <template v-slot:item.abbrev="{ item }">
-      <entity-link-cell new-tab :text="item.abbrev" tooltip="View the method detail" :link="`/methods/${item.id}`" />
+      <entity-link-cell new-tab :text="item.abbrev" tooltip="View the method detail" :link="`/${currentOrder}/methods/${item.id}`" />
     </template>
 
     <template v-slot:item.actions="{ item }">
-    <entity-link-cell tooltip="Set as filter in the data explorer" :link="`data/method/${item.id}`" icon="mdi-filter" />
+    <entity-link-cell tooltip="Set as filter in the data explorer" :link="`/data/order/${currentOrder}/method/${item.id}`" icon="mdi-filter" />
     </template>
 
     </v-data-table>
@@ -54,6 +54,9 @@ export default {
     }
   },
   computed: {
+    currentOrder() {
+      return this.$store.state.methods.order;
+    }
   },
   watch: {
   },

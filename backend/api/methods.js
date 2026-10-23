@@ -1,9 +1,11 @@
 var db = null;
 
 const list = async function(limits) {
-    var res = await db.prepareListResponse(limits, 'method');
+    // without an order filter, joining method_order_view would duplicate rows for methods assigned to multiple orders
+    const join = (limits && limits.order) ? 'method_order_view method' : 'method';
+    var res = await db.prepareListResponse(limits, 'method', null, null, join);
     var results = await db.query({ table: 'method', sql: `SELECT method.id, method.abbrev, method.name, method.description `
-     + `FROM method`, nestTables: true, limits });    
+     + `FROM ${join}`, nestTables: true, limits });    
      res.items = results.map(r => {    
         return {
                 id: r.method.id,
@@ -42,25 +44,37 @@ const validate = async function(method) {
     }
 
     var r = await db.query({table: 'method', sql: 'SELECT method.id FROM method WHERE abbrev = ?', values: [method.abbrev], nestTables: false});
-    return (r.length == 0 || (method.id && r[0].id == method.id)) ? true : 'Method abbrev. is already used.';
+    return (r.length == 0 || (method.id && r[0].id == method.id)) ? true : 'Method abbrev. is already used. It might be already defined for a different order.';
 }
 
 const prepareForSql = function(method) {
     // prepare method
     method.reference_id = (method.reference) ? method.reference.id : null;
+    delete(method.order);
     delete(method.reference);
 }
 
 const create = async function(body, auth) {
-    return await db.createEntity({ body, table: 'method', auth, prepareForSql, validate});
+    // new methods become available for every order, not just the one currently being browsed
+    return await db.createEntity({ body, table: 'method', auth, prepareForSql, validate, allOrders: true});
 }
 
 const update = async function(params, body, auth) {
     return await db.updateEntity({params, body, table: 'method', auth, prepareForSql, validate});
 }
 
+const getOrderAssignments = async function(id) {
+    return await db.getEntityOrderAssignments({ table: 'method', id });
+}
+
+const updateOrderAssignment = async function(id, orders) {
+    return await db.updateEntityOrderAssignment({ table: 'method', id, orders });
+}
+
 const remove = async function(params, auth) {
-    return await db.deleteEntity({params, table: 'method', auth});
+    return await db.deleteEntity({params, table: 'method', auth,
+        refs: ['import', 'data', {table: 'method_order', field: 'method_id', cascade: true}]
+    });
 }
 
 const synonyms = {
@@ -69,11 +83,14 @@ const synonyms = {
 module.exports = function(dbClient) {
     db = dbClient;
     db.addSynonyms('methods','method', synonyms);
+    db.addSynonyms('methods','method_order_view', synonyms);
     return {
         list,
         get,
         create,
         update,
-        remove
+        remove,
+        getOrderAssignments,
+        updateOrderAssignment
     }
 }

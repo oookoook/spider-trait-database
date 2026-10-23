@@ -23,7 +23,7 @@
     >
     
     <template v-slot:item.name="{ item }">
-      <entity-link-cell new-tab :text="item.name" tooltip="View the dataset detail" :link="`/datasets/${item.id}`" />
+      <entity-link-cell new-tab :text="item.name" tooltip="View the dataset detail" :link="`/${currentOrder}/datasets/${item.id}`" />
     </template>
     
   <template v-slot:item.uploader="{ item }">
@@ -46,7 +46,7 @@
     </template>
   -->
     <template v-slot:item.actions="{ item }">
-    <entity-link-cell tooltip="Set as filter in the data explorer" :link="`data/dataset/${item.id}`" icon="mdi-filter" />
+    <entity-link-cell tooltip="Set as filter in the data explorer" :link="`/data/order/${currentOrder}/dataset/${item.id}`" icon="mdi-filter" />
     </template>
 
     </v-data-table>
@@ -79,6 +79,9 @@ export default {
     }
   },
   computed: {
+    currentOrder() {
+      return this.$store.state.datasets.order;
+    }
   },
   watch: {
   },

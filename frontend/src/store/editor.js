@@ -1,4 +1,5 @@
 import entityProps from './import-props'
+import { normalizeOrderName, orderSensitiveModules } from './order-sync'
 
 export default {
   namespaced: true,
@@ -8,7 +9,8 @@ export default {
     total: 0,
     distinctTotal: 0,
     autocomplete: {},
-    entityProps
+    entityProps,
+    order: null
   },
   mutations: {
     list(state, payload) {
@@ -26,6 +28,9 @@ export default {
     autocomplete(state, payload) {
       state.autocomplete[payload.entity] = payload.value;
     },
+    setOrder(state, payload) {
+      state.order = payload.value;
+    }
   },
   getters: {
     downloadLink: (state, getters, rootState, rootGetters) => (id) => {
@@ -62,7 +67,9 @@ export default {
       return state.entityProps.filter(p=> p.entity == entity).map(p => p.name);
     },
     entityMatch: (state, getters) => (entity) => {
-      return getters.propsDict[`${entity}.abbrev`];
+      //return getters.propsDict[`${entity}.abbrev`];
+      // taxonomy has no abbrev prop, and we also dont need to update any column
+      return getters.propsDict[entity === 'taxonomy' ? false : `${entity}.abbrev`];
     },
     //distinctEntityItems: (state) => state.distinctList,map(i => ),
     isEntityValid: (state) => (entity, item, editor) => {
@@ -111,7 +118,12 @@ export default {
       }
     },
     autocomplete: async function (context, payload) {
+      let entity = payload.endpoint;
       payload.endpoint = `autocomplete/${payload.endpoint}`;
+      if(orderSensitiveModules.includes(entity)) {
+        payload.query.order = normalizeOrderName(context.state.order);     
+      }
+      console.log('autocomplete from editor', payload, context.state.order, orderSensitiveModules.includes(payload.endpoint));
       var data = await context.dispatch('get', payload, {
         root: true
       });
@@ -323,15 +335,19 @@ export default {
       await context.dispatch('createJob', { job: gj(prog, false, false, err) }, { root: true });
       for(var i = 0; i < payload.entity.values.length; i++) {
         var e = payload.entity.values[i];
-        //console.dir(payload);
+        console.dir(payload);
         var p = {};
         p.endpoint = `${payload.endpoint}`;
         p.auth = true;
         p.body = e;
+        // single-item creation (entity-module.js) adds order automatically, so it must be added here too
+        if (context.state.order && orderSensitiveModules.includes(payload.endpoint)) {
+          p.body.order = normalizeOrderName(context.state.order);
+        }
         var data = await context.dispatch('post', p, { root: true });
         
         // when creating taxons, match is not defined
-        if(data && data.id && data.entity && payload.columns.match) {
+        if(data && data.id && data.entity && payload.columns.match && payload.entity.match) {
           // use the entity.abbrev and do the column changes (disable validation for the requests)
           var pc = Object.assign({}, payload.columns);
           var o = {};
@@ -340,7 +356,7 @@ export default {
           pc.oldValues = payload.entity.oldValues[i];
           await context.dispatch(`editColumn`, pc);
           prog+=1;
-        } else if(data && data.id && data.entity && !payload.columns.match) {
+        } else if(data && data.id && data.entity && (!payload.columns.match || !payload.entity.match)) {
           // nothing special happens here :)
           prog+=1; 
         } else if(data && data.error == 'validation') {

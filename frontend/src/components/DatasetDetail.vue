@@ -23,7 +23,7 @@
           <list-item v-for="(a,i) in parseAuthors(item.authors)" :title="a.name" :key="`author${i}`" icon="mdi-account-edit-outline" :text="getAuthorText(a)" :link="getAuthorLink(a)" link-tooltip="View ORCID profile" external />
         </v-list>
         <v-card-actions  v-if="item">
-          <v-btn text :to="`/data/dataset/${item.id}`"><v-icon left>mdi-filter</v-icon>Set as filter in the data explorer</v-btn>
+          <v-btn text :to="`/data/order/${currentOrder}/dataset/${item.id}`"><v-icon left>mdi-filter</v-icon>Set as filter in the data explorer</v-btn>
           <v-btn v-if="showUpdate" text color="warning" @click="$emit('edit')"><v-icon left>mdi-pencil-outline</v-icon>Edit</v-btn>
           <v-btn v-if="showUpdate" text color="warning" :to="`/prepare/transfer/${item.id}`"><v-icon left>mdi-table-edit</v-icon>Edit the data</v-btn>
           <action-button icon="mdi-protocol" :loading="doiLoading" v-if="showUpdate && doiCreationAllowed" @click="createDoi" color="primary" text="Create DOI" />
@@ -59,6 +59,9 @@ export default {
         return false;
       }
       return !this.item.doi /*&& !!this.value.orcid */ && !!this.item.authors && this.item.state == 'approved';
+    },
+    currentOrder() {
+      return this.$store.state.datasets.order;
     }
   },
   watch: {

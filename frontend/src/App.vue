@@ -6,45 +6,45 @@
       dark
     >
       <v-toolbar-title>
-        <router-link style="color:white;text-decoration:none" to="/"><v-icon left>mdi-spider</v-icon>World Spider Trait database</router-link>
-        <!--<v-icon left>mdi-spider</v-icon>Spider Trait Database-->
+        <router-link style="color:white;text-decoration:none" to="/"><v-icon left>mdi-spider</v-icon>World {{ currentOrder ? orderDisplayName : 'Arachnida' }} Trait Database</router-link>
         </v-toolbar-title>
 
 
       <v-divider vertical class="mx-5"></v-divider>
-      <v-toolbar-items>
+      <v-toolbar-items :key="currentOrder ? `order-navigation-${currentOrder}` : 'global-navigation'">
       <v-btn
-        to="/data"
+        v-if="currentOrder"
+        :to="`/data/order/${currentOrder}`"
         text
       ><v-icon left>mdi-magnify</v-icon> Data Explorer 
       </v-btn>
 
-      <v-menu right bottom offset-y>
+      <v-menu v-if="currentOrder" right bottom offset-y>
       <template v-slot:activator="{ on }">
         <v-btn text v-on="on"><v-icon left>mdi-format-list-bulleted-square</v-icon>Lists<v-icon right>mdi-chevron-down</v-icon></v-btn>
       </template>
       <v-list>
-        <v-list-item to="/datasets">
+        <v-list-item :to="`/${currentOrder}/datasets`">
           <v-list-item-icon><v-icon>mdi-table</v-icon></v-list-item-icon>
           <v-list-item-content><v-list-item-title>Datasets</v-list-item-title></v-list-item-content>
         </v-list-item>
-        <v-list-item to="/references">
+        <v-list-item :to="`/${currentOrder}/references`">
           <v-list-item-icon><v-icon>mdi-bookmark-multiple-outline</v-icon></v-list-item-icon>
           <v-list-item-content><v-list-item-title>References</v-list-item-title></v-list-item-content>
         </v-list-item>
-        <v-list-item to="/locations">
+        <v-list-item :to="`/${currentOrder}/locations`">
           <v-list-item-icon><v-icon>mdi-map-marker</v-icon></v-list-item-icon>
           <v-list-item-content><v-list-item-title>Locations</v-list-item-title></v-list-item-content>
         </v-list-item>
-        <v-list-item to="/traits">
+        <v-list-item :to="`/${currentOrder}/traits`">
           <v-list-item-icon><v-icon>mdi-comment-question-outline</v-icon></v-list-item-icon>
           <v-list-item-content><v-list-item-title>Traits</v-list-item-title></v-list-item-content>
         </v-list-item>
-        <v-list-item to="/taxonomy">
+        <v-list-item :to="`/${currentOrder}/taxonomy`">
           <v-list-item-icon><v-icon>mdi-file-tree</v-icon></v-list-item-icon>
           <v-list-item-content><v-list-item-title>Taxa</v-list-item-title></v-list-item-content>
         </v-list-item>
-        <v-list-item to="/methods">
+        <v-list-item :to="`/${currentOrder}/methods`">
           <v-list-item-icon><v-icon>mdi-chart-bell-curve</v-icon></v-list-item-icon>
           <v-list-item-content><v-list-item-title>Methods</v-list-item-title></v-list-item-content>
         </v-list-item>
@@ -80,6 +80,10 @@
           <v-list-item-icon><v-icon>mdi-lifebuoy</v-icon></v-list-item-icon>
           <v-list-item-content><v-list-item-title>Data editor How To</v-list-item-title></v-list-item-content>
         </v-list-item>
+        <v-list-item to="/assignments" v-if="isEditor">
+          <v-list-item-icon><v-icon>mdi-format-list-checks</v-icon></v-list-item-icon>
+          <v-list-item-content><v-list-item-title>Assignments to orders</v-list-item-title></v-list-item-content>
+        </v-list-item>
       </v-list>
     </v-menu>    
     <v-btn v-else
@@ -93,7 +97,9 @@
         text
       ><v-icon left>mdi-cogs</v-icon> Administration 
     </v-btn>
-    <v-menu right bottom offset-y>
+    <v-btn v-if="currentOrder" to="/about" text><v-icon left>mdi-frequently-asked-questions</v-icon> About</v-btn>
+
+    <v-menu v-if="!currentOrder" right bottom offset-y>
       <template v-slot:activator="{ on }">
         <v-btn text v-on="on"><v-icon left>mdi-help</v-icon> More<v-icon right>mdi-chevron-down</v-icon></v-btn>
       </template>
@@ -164,10 +170,10 @@
       <v-row class="mx-5 my-4 text-body-2">
         <v-col cols="12" sm="4" class="d-inline-flex align-start flex-row">
           <a target="_blank" href="https://muni.cz/en">
-          <v-img contain :src="require('./assets/muni-white.png')" height="47" max-width="164" class="mr-5"/>
+          <v-img contain :src="muniWhite" height="47" max-width="164" class="mr-5"/>
           </a>
           <a target="_blank" href="https://muni.cz/en" v-if="showLargeLogo">
-          <v-img contain :src="require('./assets/muni-lg-text-eng-white.png')" height="47" max-width="183" class="ml-5"/>
+          <v-img contain :src="muniText" height="47" max-width="183" class="ml-5"/>
           </a>
         </v-col>
         <v-col cols="12" sm="4" class="d-flex align-center flex-row">
@@ -177,20 +183,20 @@
           Stano Pekar, Caroline Sayuri, and Jonas Wolff.
           -->
           <div class="subtitle-2">
-          Pekár S. et al. 2021. The World Spider Trait database: a centralised global open repository for curated data on spider traits. Database 2021: baab064.
+          Pekár S. et al. 2027. The World Arachnida Trait database: a global repository for curated data on traits of arachnid orders.. Database 2027: xxxx000.
           <!-- , doi: -->
           </div>
         </v-col>
         <v-col cols="12" sm="4" class="d-flex align-start align-sm-end justify-center flex-column">
           <v-row class="mx-1 mb-1 align-center subtitle-2">
-            <span><a href="https://www.sci.muni.cz/zoolecol/inverteb/?teams=prof-stano-pekar-ph-d" target="_blank" class="white--text">Pekár</a>, <a href="https://nastojte.cz" target="_blank" class="white--text">Kučera</a> 2020</span>
+            <span><a href="https://www.sci.muni.cz/zoolecol/inverteb/?teams=prof-stano-pekar-ph-d" target="_blank" class="white--text">Pekár</a>, <a href="https://nastojte.cz" target="_blank" class="white--text">Kučera</a> 2026</span>
           </v-row>
           <v-row class="mx-1 align-center">
           <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" title="Creative Commons Attribution 4.0 International (CC BY 4.0)">
-          <v-img class="mr-2" width="30" height="30" :src="require('./assets/cc.svg')" alt="CC" />
+          <v-img class="mr-2" width="30" height="30" :src="ccIcon" alt="CC" />
           </a>
           <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" title="Creative Commons Attribution 4.0 International (CC BY 4.0)">
-          <v-img width="30" height="30" :src="require('./assets/by.svg')" alt="BY" />
+          <v-img width="30" height="30" :src="byIcon" alt="BY" />
           </a>
           </v-row>
           
@@ -203,13 +209,23 @@
 <script>
 import { mapGetters } from 'vuex'
 import Auth from './mixins/auth'
+import CurrentOrder from './mixins/current-order'
+import muniWhite from './assets/muni-white.png'
+import muniText from './assets/muni-lg-text-eng-white.png'
+import ccIcon from './assets/cc.svg'
+import byIcon from './assets/by.svg'
+
 export default {
   name: 'App',
-  mixins: [Auth],
+  mixins: [Auth, CurrentOrder],
   components: {
   },
 
   data: () => ({
+    muniWhite,
+    muniText,
+    ccIcon,
+    byIcon
   }),
   computed: {
     showLargeLogo () {
@@ -222,7 +238,7 @@ export default {
         default: return true
       }
     },
-    ...mapGetters(['notification'])
+    ...mapGetters(['notification']),
   }
 }
 </script>

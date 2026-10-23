@@ -1,3 +1,5 @@
+-- DO NOT USE THIS SCRIPT! THIS FROM OLDER VERSION OF THE DATABASE. USE THE TAXA-IMPORTER.JS SCRIPT INSTEAD.
+
 UPDATE taxonomy SET `order` = 'Araneae';
 
 INSERT INTO taxonomy (`order`, `family`, `full_name`, `valid`) VALUES ('Solifugae','Ammotrechidae','Ammotrechidae',1);
