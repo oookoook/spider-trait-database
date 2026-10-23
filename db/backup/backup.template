@@ -1,9 +1,10 @@
-#!/bin/sh
+#!/bin/bash
+
+export NVM_DIR=/home/ubuntu/.nvm
+source "$NVM_DIR/nvm.sh" || exit 1
 
 # HASHED strings are replaced during the setup
 
-export SPIDERTRAITS_BACKUP_USER="#USER#"
-export SPIDERTRAITS_BACKUP_PASS="#PASS#"
 export SPIDERTRAITS_BACKUP_DIR="#BDIR#"
 export SPIDERTRAITS_SCRIPT_DIR="#SDIR#"
 

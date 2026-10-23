@@ -86,6 +86,69 @@ pm2 startup
 pm2 save
 ```
 
+### 6. Aktualizace Certbot renewal hooků na Node.js 24
+
+```bash
+backup_dir=$(sudo mktemp -d /root/certbot-hooks-node16.XXXXXX)
+sudo cp -a /etc/letsencrypt/renewal-hooks "$backup_dir/"
+printf 'Záloha hooků: %s\n' "$backup_dir"
+
+for script in \
+    /etc/letsencrypt/renewal-hooks/pre/stop-pm2.sh \
+    /etc/letsencrypt/renewal-hooks/post/start-pm2.sh \
+    /etc/letsencrypt/renewal-hooks/deploy/restart-pm2.sh
+do
+    sudo sed -i 's/nvm use 16 && //g' "$script" || break
+    sudo bash -n "$script" || break
+    sudo grep -n 'source.*pm2' "$script" || break
+done
+
+sudo su - ubuntu -c 'source ~/.nvm/nvm.sh && node --version && pm2 show spidertraits'
+```
+
+```bash
+# Servisní okno: test krátce zastaví produkční aplikaci.
+sudo /snap/bin/certbot renew --cert-name spidertraits.sci.muni.cz --dry-run --run-deploy-hooks
+sudo su - ubuntu -c 'source ~/.nvm/nvm.sh && pm2 show spidertraits'
+sudo systemctl is-active snap.certbot.renew.timer
+sudo systemctl list-timers --all snap.certbot.renew.timer
+```
+
+### 7. Načtení NVM v cron wrapperech (zatím pod rootem)
+
+V existujících cron wrapperech použít Bash a před voláním Node skriptů načíst NVM uživatele `ubuntu`.
+Ponechat stávající plánování i spuštění pod rootem. Například:
+
+```bash
+sudoedit /etc/cron.weekly/spidertraits-wsc-synchro
+```
+
+Obsah wrapperu:
+
+```bash
+#!/bin/bash
+export NVM_DIR=/home/ubuntu/.nvm
+source "$NVM_DIR/nvm.sh" &&
+cd /opt/spider-traits/spider-trait-database/backend/util/taxonomy-synchro &&
+exec /bin/sh ./run
+```
+
+Stejné načtení NVM přidat do dalších wrapperů volajících `node`. Použije se výchozí verze z NVM;
+skripty v repozitáři nemusí obsahovat cestu ke konkrétnímu binárníku.
+Job nadále vytváří soubory jako root a spouští kód z instalace spravované uživatelem `ubuntu`.
+
+Ověření bez spuštění synchronizace:
+
+```bash
+sudo /bin/bash -n /etc/cron.weekly/spidertraits-wsc-synchro
+sudo /usr/bin/env -i HOME=/root PATH=/usr/bin:/bin /bin/bash -c '
+    export NVM_DIR=/home/ubuntu/.nvm
+    source "$NVM_DIR/nvm.sh" &&
+    command -v node &&
+    node --version
+'
+```
+
 ---
 
 ## Ověření po migraci
@@ -114,13 +177,13 @@ Očekávaná hodnota je `67108864`.
 Pro PDF přílohy referencí po záloze databáze aplikovat migraci:
 
 ```bash
-mysql -u root spider_traits_db < /opt/spider-traits/spider-trait-database/db/sql/reference-pdf.sql
+sudo mysql -u root spider_traits_db < /opt/spider-traits/spider-trait-database/db/sql/reference-pdf.sql
 ```
 
 Před restartem aplikace po upgradu kódu spustit migraci pro podporu řádů (issue #44 — World Arachnida Traits Database):
 
 ```bash
-mysql -u root spider_traits_db < /opt/spider-traits/spider-trait-database/db/sql/order-tables.sql
+sudo mysql -u root spider_traits_db < /opt/spider-traits/spider-trait-database/db/sql/order-tables.sql
 ```
 
 Dále je třeba spustit sql soubory pro import jednotlivých katalogů druhů pro všechny řády:
@@ -163,4 +226,4 @@ pm2 restart spidertraits
 
 - Postup je identický, pouze jiná hostname.
 - Před migrací na produkci doporučeno udělat snapshot/zálohu.
-- Na produkci je dále třeba prověřit "dirty" soubory v repozitáří, jsou to shellové skripty, kde je napevno cesta k node 16. Tyto soubory nejspíš bude stačit resetovat na verze z repozitáře, aby se spouštely s default verzí node.
+- Na produkci prověřit lokálně upravené shellové skripty s cestou k Node.js 16. Při návratu k volání `node` zajistit načtení NVM v cron wrapperech podle kroku 7.

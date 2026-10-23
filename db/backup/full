@@ -4,7 +4,7 @@ DATESTR=$(date '+%Y%m%d-%H%M%S')
 LAST=$SPIDERTRAITS_BACKUP_DIR/last
 TRGT=$SPIDERTRAITS_BACKUP_DIR/$DATESTR-full
 
-mariabackup --backup --target-dir=$TRGT --user=$SPIDERTRAITS_BACKUP_USER --password="$SPIDERTRAITS_BACKUP_PASS"
+mariabackup --backup --target-dir=$TRGT
 
 if [ $? -ne 0 ]
 then
